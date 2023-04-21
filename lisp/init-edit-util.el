@@ -18,27 +18,26 @@
            sis-default-cursor-color "#d43930"
            sis-other-cursor-color "orange"
            sis-prefix-override-keys (list "C-c" "C-x" "C-h"))
-  (:when-loaded
-    (:hooks meow-leaving-insert-mode-hook sis-set-english)
-    (if *IS-MAC*
-        (sis-ism-lazyman-config
-         "com.apple.keylayout.ABC"
-         "im.rime.inputmethod.Squirrel.Hans" 'macism)
-      (sis-ism-lazyman-config "1" "2" 'fcitx))
-    ;; enable the /cursor color/ mode
-    (sis-global-cursor-color-mode t)
-    ;; enable the /respect/ mode
-    (sis-global-respect-mode t)
-    ;; enable the /context/ mode for all buffers
-    (sis-global-context-mode t)
-    (add-to-list 'sis-context-hooks 'meow-entering-insert-mode-hook)
-    ;; org title 处切换 Rime，telega 聊天时切换 Rime。
-    (add-to-list 'sis-context-detectors
-                 (lambda (&rest _)
-                   (when (or (eq major-mode 'org-mode)
-                             (eq major-mode 'gfm-mode)
-                             (eq major-mode 'telega-chat-mode))
-                     'other)))))
+  (:hooks meow-leaving-insert-mode-hook sis-set-english)
+  (if *IS-MAC*
+      (sis-ism-lazyman-config
+       "com.apple.keylayout.ABC"
+       "im.rime.inputmethod.Squirrel.Hans" 'macism)
+    (sis-ism-lazyman-config "1" "2" 'fcitx))
+  ;; enable the /cursor color/ mode
+  (sis-global-cursor-color-mode t)
+  ;; enable the /respect/ mode
+  (sis-global-respect-mode t)
+  ;; enable the /context/ mode for all buffers
+  (sis-global-context-mode t)
+  (add-to-list 'sis-context-hooks 'meow-entering-insert-mode-hook)
+  ;; org title 处切换 Rime，telega 聊天时切换 Rime。
+  (add-to-list 'sis-context-detectors
+               (lambda (&rest _)
+                 (when (or (eq major-mode 'org-mode)
+                           (eq major-mode 'gfm-mode)
+                           (eq major-mode 'telega-chat-mode))
+                   'other))))
 
 (setup avy
   (:require ace-pinyin)
