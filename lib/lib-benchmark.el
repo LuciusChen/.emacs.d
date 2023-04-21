@@ -1,4 +1,4 @@
-;; lib-benchmark.el --- Initialize org	-*- lexical-binding: t; -*-
+;; lib-benchmark.el --- benchmark  -*- lexical-binding: t; -*-
 (defun lucius/time-subtract-millis (b a)
   (* 1000.0 (float-time (time-subtract b a))))
 

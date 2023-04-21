@@ -8,6 +8,14 @@
               (propertize 
                (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n") 'face 'italic))
 
+;; tab 键来补全
+(setq tab-always-indent 'complete)
+;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。
+(setq completion-category-defaults nil
+      completion-category-overrides nil)
+;; 将阈值设置为 4 表示只有当需要补全的字符数大于4时才会执行循环补全
+(setq completion-cycle-threshold 4)
+
 ;; For Emacs >= 27
 (setq read-process-output-max (* 1024 1024))
 
@@ -77,6 +85,7 @@
 (add-hook 'after-init-hook 'savehist-mode)
 (add-hook 'after-init-hook 'transient-mark-mode)
 (add-hook 'after-init-hook 'lucius/show-init-time)
+(add-hook 'after-init-hook 'electric-pair-mode)
 (advice-add 'require :around 'lucius/require-times-wrapper)
 ;; Restore histories and registers after saving
 (advice-add 'desktop-read :around 'lucius/desktop-time-restore)

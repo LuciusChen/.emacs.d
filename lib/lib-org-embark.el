@@ -1,4 +1,4 @@
-;;; lib-org-embark.el --- Org-mode config -*- lexical-binding: t -*-
+;;; lib-org-roam.el --- Org-mode config -*- lexical-binding: t -*-
 ;;; Commentary:
 (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
   "Return the value of \"#+title:\" (if any) from file that NODE resides in.
@@ -103,5 +103,9 @@
          (backlink (lucius/org-roam-backlinks--read-node-backlinks node)))
     (find-file (org-roam-node-file backlink))))
 
-(provide 'lib-org-embark)
-;;; lib-org-embark.el ends here
+(defvar-keymap embark-org-roam-map
+            "i" #'org-roam-node-insert
+            "s" #'embark-collect
+            "b" #'lucius/org-roam-backlinks-node-read)
+(provide 'lib-org-roam)
+;;; lib-org-roam.el ends here

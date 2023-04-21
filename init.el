@@ -63,14 +63,6 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Install use-package
-(when (version< emacs-version "29.0.60")
-  (straight-use-package 'use-package))
-
-(use-package straight
-    :custom
-  (straight-use-package-by-default t))
-
 ;; install packages
 (defvar *use-package-list*
   '(nov
@@ -82,15 +74,15 @@
     affe
     ebib
     citar
+    setup
     eglot
     corfu
-    unfill
     embark
     xenops
     bibtex
     auctex
+    dimmer
     vertico
-    ipretty
     diredfl
     cdlatex
     consult
@@ -103,6 +95,7 @@
     diminish
     org-roam
     git-link
+    fullframe
     ox-pandoc
     macrostep
     json-mode
@@ -116,7 +109,7 @@
     projectile
     marginalia
     git-commit
-    org-starter
+    org-roam-ui
     company-box
     magit-todos
     prettier-js
@@ -135,8 +128,8 @@
     ns-auto-titlebar
     command-log-mode
     org-transclusion
-    highlight-quoted
     browse-kill-ring
+    flymake-flycheck
     rainbow-delimiters
     default-text-scale
     dwim-shell-command
@@ -147,7 +140,7 @@
     all-the-icons-completion
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
-    (org-mpvi :host github :repo "lorniu/org-mpvi")
+    (mpvi :host github :repo "lorniu/mpvi")
     (ef-themes :host github :repo "LuciusChen/ef-themes")
     (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
@@ -161,7 +154,7 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
 (require 'init-core)
-(require 'init-themes)
+(require 'init-setup)
 (require 'init-gui-frames)
 (require 'init-font)
 
@@ -171,7 +164,6 @@
 (require 'init-git)
 (require 'init-minibuffer)
 (require 'init-corfu)
-(require 'init-psearch)
 (require 'init-prog)
 
 (require 'init-telega)

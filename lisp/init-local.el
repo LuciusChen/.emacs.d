@@ -1,7 +1,6 @@
 ;;; init-local.el  --- Custom configuration
 ;;; Commentary
 
-(use-package dwim-shell-command :defer t)
 (defun dwim-shell-commands-macos-reveal-in-finder ()
   "Reveal selected files in macOS Finder."
   (interactive)

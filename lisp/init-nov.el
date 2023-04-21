@@ -1,10 +1,9 @@
 ;;; init-nov.el  --- Custom configuration
 ;;; Commentary
-(use-package nov
-    :defer t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-    (add-hook 'nov-mode-hook #'lucius/nov-annotate-font-lock))
+(setup nov
+  (:when-loaded
+    (:hooks nov-mode-hook lucius/nov-annotate-font-lock)
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))))
 
 (defface lucius/nov-annotate-face
     '((t (:foreground "#86C166")))

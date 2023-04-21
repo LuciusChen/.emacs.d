@@ -1,8 +1,8 @@
 ;;; init-beancount.el -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(use-package beancount-mode
-  :mode "\\.beancount\\'"
-  :hook (beancount-mode . corfu-mode))
+(setup beancount-mode
+  (:file-match "\\.beancount\\'")
+  (:with-mode beancount-mode (:hook corfu-mode)))
 (provide 'init-beancount)
 ;;; init-beancount.el ends here

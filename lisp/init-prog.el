@@ -2,85 +2,66 @@
 ;;; Commentary:
 ;;; Code:
 ;; lisp
-(require 'lib-prog)
-(global-set-key [remap eval-expression] 'pp-eval-expression)
+(setup emacs-lisp-mode (:file-match "\\.emacs.d\\'"))
+(setup lisp-mode
+  (:also-load lib-lisp)
+  (:require macrostep)
+  (global-set-key [remap eval-expression] 'pp-eval-expression)
+  (:bind-into emacs-lisp-mode-map
+    "C-x C-e" lucius/eval-last-sexp-or-region
+    "C-c C-e" pp-eval-expression
+    "C-c C-l" lucius/load-this-file
+    "C-c x"   macrostep-expand
+    "C-c X"   macrostep-collapse)
+  (:advice pp-display-expression :after lucius/make-read-only)
+  (:hooks emacs-lisp-mode-hook lucius/maybe-set-bundled-elisp-readonly))
 
-(use-package macrostep)
+;; (setup macrostep
+;;        (:with-mode lisp-mode
+;;          (:bind-into emacs-lisp-mode-map
+;;                      "C-c x"   macrostep-expand
+;;                      "C-c X"   macrostep-collapse)))
 
-(with-eval-after-load 'lisp-mode
-  (define-key emacs-lisp-mode-map (kbd "C-x C-e") 'lucius/eval-last-sexp-or-region)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'pp-eval-expression)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'lucius/load-this-file)
-  (define-key emacs-lisp-mode-map (kbd "C-c x") 'macrostep-expand))
-
-(use-package ipretty
-    :config
-  (add-hook 'after-init-hook 'ipretty-mode))
-
-(advice-add 'pp-display-expression :after 'lucius/make-read-only)
-(add-hook 'emacs-lisp-mode-hook 'lucius/maybe-set-bundled-elisp-readonly)
-
-(use-package highlight-quoted
-    :config
-  (add-hook 'emacs-lisp-mode-hook 'highlight-quoted-mode))
-
-(use-package sly-el-indent
-    :config
-  (add-hook 'emacs-lisp-mode-hook #'sly-el-indent-setup))
+(setup sly-el-indent
+  (:hooks emacs-lisp-mode-hook sly-el-indent-setup))
 
 ;; js
-(use-package json-mode)
-(use-package js2-mode)
-(use-package typescript-mode)
-(use-package prettier-js)
-
 ;;; Basic js-mode setup
+(setup js-mode (:file-match "\\.\\(js\\|es6\\)\\(\\.erb\\)?\\'"))
 
-(add-to-list 'auto-mode-alist '("\\.\\(js\\|es6\\)\\(\\.erb\\)?\\'" . js-mode))
-
-(defun sanityinc/set-major-mode-name (name)
-  "Override the major mode NAME in this buffer."
-  (setq-local mode-name name))
-
-(defun sanityinc/major-mode-lighter (mode name)
-  (add-hook (derived-mode-hook-name mode)
-            (apply-partially 'sanityinc/set-major-mode-name name)))
-
-(with-eval-after-load 'js
-  (sanityinc/major-mode-lighter 'js-mode "JS")
-  (sanityinc/major-mode-lighter 'js-jsx-mode "JSX"))
-
-(setq-default js-indent-level 2)
+(setup js
+  (:also-load lib-js)
+  (:when-loaded
+    (setq-default js-indent-level 2)
+    (lucius/major-mode-lighter 'js-mode "JS")
+    (lucius/major-mode-lighter 'js-jsx-mode "JSX")))
 
 ;; js2-mode
+(setup js2-mode
+  (:when-loaded
+    (:hooks js-mode-hook lucius/enable-js2-checks-if-flycheck-inactive
+            js2-mode-hook lucius/enable-js2-checks-if-flycheck-inactive)
+    ;; Change some defaults: customize them to override
+    (setq-default js2-bounce-indent-p nil)
+    ;; Disable js2 mode's syntax error highlighting by default...
+    (setq-default js2-mode-show-parse-errors nil
+                  js2-mode-show-strict-warnings nil)
+    ;; ... but enable it if flycheck can't handle javascript
+    (autoload 'flycheck-get-checker-for-buffer "flycheck")
+    (js2-imenu-extras-setup)
+    (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))
+    (lucius/major-mode-lighter 'js2-mode "JS2")
+    (lucius/major-mode-lighter 'js2-jsx-mode "JSX2")))
 
-;; Change some defaults: customize them to override
-(setq-default js2-bounce-indent-p nil)
-(with-eval-after-load 'js2-mode
-  ;; Disable js2 mode's syntax error highlighting by default...
-  (setq-default js2-mode-show-parse-errors nil
-                js2-mode-show-strict-warnings nil)
-  ;; ... but enable it if flycheck can't handle javascript
-  (autoload 'flycheck-get-checker-for-buffer "flycheck")
-  (defun sanityinc/enable-js2-checks-if-flycheck-inactive ()
-    (unless (flycheck-get-checker-for-buffer)
-      (setq-local js2-mode-show-parse-errors t)
-      (setq-local js2-mode-show-strict-warnings t)
-      (when (derived-mode-p 'js-mode)
-        (js2-minor-mode 1))))
-  (add-hook 'js-mode-hook 'sanityinc/enable-js2-checks-if-flycheck-inactive)
-  (add-hook 'js2-mode-hook 'sanityinc/enable-js2-checks-if-flycheck-inactive)
+(setup treesit-auto
+  (:autoload global-treesit-auto-mode)
+  (:option treesit-auto-install 'prompt)
+  (:when-loaded (global-treesit-auto-mode)))
 
-  (js2-imenu-extras-setup))
-
-(add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))
-
-(with-eval-after-load 'js2-mode
-  (sanityinc/major-mode-lighter 'js2-mode "JS2")
-  (sanityinc/major-mode-lighter 'js2-jsx-mode "JSX2"))
-
-(use-package treesit-auto
-  :config
-  (global-treesit-auto-mode))
+(setup diff-hl
+  (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
+          after-init-hook global-diff-hl-mode)
+  (:bind-into diff-hl-mode-map
+    "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))
 (provide 'init-prog)
 ;;; init-prog.el ends here

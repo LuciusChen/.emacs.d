@@ -74,14 +74,6 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
 (defvar my-same-scale-fonts
   '("Apple Color Emoji"
     "Noto Sans Egyptian Hieroglyphs"
-    ;; "STIXGeneral"
-    ;; "Apple Symbols" --
-    ;; "Noto Sans Kannada"
-    ;; "Academy Engraved LET"
-    ;; "Kohinoor Devanagari" --
-    ;; "Geneva"
-    ;; "Noto Sans Oriya"
-    ;; "Euphemia UCAS"
     "HanaMinA"))
 
 (let ((scale-factor 0.8))

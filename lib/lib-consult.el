@@ -34,6 +34,15 @@
       (save-excursion
         (insert (propertize pre-insert-string 'face 'shadow))))
     (add-hook 'pre-command-hook 'mcfly-back-to-present nil t)))
+
+(defmacro lucius/no-consult-preview (&rest cmds)
+      `(with-eval-after-load 'consult
+         (consult-customize ,@cmds :preview-key "M-P")))
+
+(defun lucius/affe-grep-at-point (&optional dir initial)
+      (interactive (list prefix-arg (when-let ((s (symbol-at-point)))
+                                      (symbol-name s))))
+      (affe-grep dir initial))
 ;;;; provide
 (provide 'lib-consult)
 ;;; lib-consult.el ends here.

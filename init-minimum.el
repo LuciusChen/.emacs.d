@@ -45,14 +45,12 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Install use-package
-(when (version< emacs-version "29.0.60")
-  (straight-use-package 'use-package))
+;; install packages
+(defvar *use-package-list*
+  '(setup))
 
-(use-package straight
-    :custom
-  (straight-use-package-by-default t))
-
+(dolist (e *use-package-list*)
+  (straight-use-package e))
 (setq vc-follow-symlinks t)
 ;; ==== put your code below this line!
 ;; emacs -Q -l ~/xxx/init.el(use-package vertico
