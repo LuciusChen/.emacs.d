@@ -2,8 +2,7 @@
 ;;; Commentary:
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
-  (:also-load lib-org-archive-hierachical
-              lib-org-agenda-dynamic)
+  (:also-load lib-org-archive-hierachical)
   (:global
    "C-c l"     org-store-link
    "C-M-<up>"  org-up-element
@@ -65,15 +64,10 @@
                                (python . t)
                                (latex . t)))
   (:with-mode org-mode (lambda () (pixel-scroll-precision-mode 1)))
-  (:advice org-refile :after (lambda (&rest _) (org-save-all-org-buffers))
-           org-todo-list :before #'vulpea-agenda-files-update
-           org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
+  (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
   (:when-loaded
     ;; only hook in org-mode
-    (:hooks  org-mode-hook (lambda ()
-                             (dolist (hook '(before-save-hook find-file-hook))
-                               (add-hook hook #'vulpea-dynamic-update-tag nil t)))
-             org-after-todo-state-change-hook log-todo-next-creation-date
+    (:hooks  org-after-todo-state-change-hook log-todo-next-creation-date
              org-mode-hook (lambda () (electric-pair-local-mode -1)))
     ;; patch the function org-insert-structure-template
     ;; adding an optional newline after an org template structure is inserted,
@@ -116,8 +110,7 @@
   (:after org (org-clock-persistence-insinuate)))
 
 (setup org-agenda
-  (:also-load lib-org-agenda
-              lib-org-agenda-dynamic)
+  (:also-load lib-org-agenda)
   (:global "C-c a" org-agenda)
   (:option
    org-agenda-sort-notime-is-late nil
@@ -213,7 +206,6 @@
                        (org-tags-match-list-sublevels t)
                        (org-agenda-sorting-strategy
                         '(category-keep))))))))
-  (:advice org-agenda :before #'vulpea-agenda-files-update)
   (:when-loaded
     (setq-default org-agenda-clockreport-parameter-plist
                   '(:link t :maxlevel 3))
@@ -230,6 +222,7 @@
       (setcdr agenda-sorting-strategy (remove 'habit-down (cdr agenda-sorting-strategy))))))
 
 (setup org-roam
+  (:also-load lib-org-agenda-dynamic)
   (:require emacsql-sqlite-builtin)
   (:also-load lib-org-roam)
   (:global   "C-c n l"     org-roam-buffer-toggle
@@ -302,9 +295,14 @@
                                                       'face 'org-tag)))
   ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
   (:advice
+   org-agenda :before #'vulpea-agenda-files-update
+   org-todo-list :before #'vulpea-agenda-files-update
    org-roam-node-read--to-candidate
    :override lucius/org-roam-node-read--to-candidate)
   (:when-loaded
+    (:hooks org-mode-hook (lambda ()
+                             (dolist (hook '(before-save-hook find-file-hook))
+                               (add-hook hook #'vulpea-dynamic-update-tag nil t))))
     (org-roam-db-autosync-enable)
     (add-to-list 'display-buffer-alist
                  '("\\*org-roam\\*"
