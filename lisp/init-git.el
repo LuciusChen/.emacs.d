@@ -3,7 +3,7 @@
 (setup git-timemachine
   (:global "C-x v t" git-timemachine-toggle))
 (setup magit
-  (:also-loaded lib-vc)
+  (:also-load lib-vc)
   (:load-after vc)
   (:bind-into magit-status-mode-map "C-M-<up>" magit-section-up)
   (:bind-into vc-prefix-map
