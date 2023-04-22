@@ -11,6 +11,17 @@
   (:advice company-box--make-candidate :override company-box--make-candidate!))
 
 (setup telega
+  ;; @LawxenceX
+  ;; telega 中 telega-prefix-map 定义的是 defvar，
+  ;; 需要转成 defun，即 defalias。
+  ;; defun 宏展开其实也是 defalias 包裹了一个 lambda。
+  ;; (defalias 'telega-prefix-map telega-prefix-map)
+  ;; (:global "C-c t" 'telega-prefix-map)
+  ;;
+  ;; @Eli
+  ;; :bind-into 里面用 :ensure 规定了 func`，直接传的话就会给你加 #'。
+  ;; 改成 (identity xxx-prefix-map) 即可
+  (:bind-into global-map "C-c t" (identity telega-prefix-map))
   (:option telega-translate-to-language-by-default "zh"
            ;;  telega-debug t
            telega-autoplay-mode 1)
@@ -102,14 +113,14 @@
   ;; 去除用户名填充为整行的效果
   (psearch-patch telega-ins--message-header
     (psearch-replace '`(telega-ins--with-attrs
-                           ,a ,b ,c ,d ,e ,f ,g ,h ,i ,j ,k ,l ,m, n)
+                           ,a ,b ,c . ,rest)
                      '`(telega-ins--with-attrs
                            ,a ,b
                            (telega-ins--with-attrs
                                (list :max (* 11(/ telega-chat-fill-column 14)) :elide t)
                              (telega-ins
                               (telega-msg-sender-title sender nil 'with-username)))
-                           ,d ,e ,f ,g ,h ,i ,j ,k ,l ,m ,n))
+                           . ,rest))
     (psearch-replace '`(if telega-msg-heading-whole-line ,a ,b)
                      '`(if telega-msg-heading-whole-line ,a)))
   ;; i'm sure 实在是太阻塞了
@@ -189,18 +200,18 @@
                                     img))) ,b)))
 
   (psearch-patch telega-ins--user
-    (psearch-replace '`(let ,a ,b ,c ,d ,e ,f ,g ,h ,i ,j ,k ,l ,m, n ,o)
+    (psearch-replace '`(let ,a . ,rest)
                      '`(let ((avatar (telega-msg-sender-avatar-image user))
                              (username (if (telega-user-p user)
                                            (telega-user-title user 'name)
                                          (cl-assert (telega-chat-p user))
                                          (telega-chat-title user)))
-                             (off-column (telega-current-column)))
+                             (off-column (telega-current-column))) . ,rest))
                          ;; Manual return t
-                         ,b ,c ,d ,e ,f ,g ,h ,i ,j ,k ,l ,m, n ,o)) t)
+                         t)
 
   (psearch-patch telega-ins--message0
-    (psearch-replace '`(let* ,a ,b ,c ,d ,e ,f ,g ,h ,i ,j)
+    (psearch-replace '`(let* ,a ,b . ,rest)
                      '`(let* ((chat (telega-msg-chat msg))
                               ;; Is formatting done for "Replies" chat?
                               ;; Workaround for case when `:forward_info' is unset (for
@@ -243,6 +254,6 @@
                              (telega-ins--image avatar 1
                                                 :image-ascent (unless msg-for-replies-p 100)
                                                 :no-display-if (not telega-chat-show-avatars))))
-                         ,c ,d ,e ,f ,g ,h ,i ,j))))
+                         . ,rest))))
 (provide 'init-telega)
 ;;; init-telega.el ends here
