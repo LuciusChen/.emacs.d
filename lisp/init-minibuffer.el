@@ -46,8 +46,9 @@
   (:hooks after-init-hook marginalia-mode))
 
 (setup all-the-icons-completion
-  (:when-loaded
-    (:hooks marginalia-mode all-the-icons-completion-marginalia-setup)
-    (all-the-icons-completion-mode)))
+  (:also-load all-the-icons marginalia)
+  (all-the-icons-completion-mode)
+  (:with-mode marginalia-mode
+    (:hook all-the-icons-completion-marginalia-setup)))
 (provide 'init-minibuffer)
 ;;; init-minibuffer.el ends here
