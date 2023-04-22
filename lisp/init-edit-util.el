@@ -48,19 +48,20 @@
   (ace-pinyin-global-mode +1))
 
 ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
-(with-eval-after-load 'autorevert
-  (diminish 'auto-revert-mode))
+(setup autorevert
+  (:when-loaded (diminish 'auto-revert-mode)))
 
-;; 显示行号
-(when (fboundp 'display-line-numbers-mode)
+(setup line-number
+  (when (fboundp 'display-line-numbers-mode)
   (setq-default display-line-numbers-width 3)
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode))
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)))
 
 ;; 编程模式下显示竖线作为参考，控制行宽。
-(when (boundp 'display-fill-column-indicator)
+(setup column-indicator
+  (when (boundp 'display-fill-column-indicator)
   (setq-default indicate-buffer-boundaries 'left)
   (setq-default display-fill-column-indicator-character ?\u254e)
-  (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+  (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)))
 
 ;; 剪贴板查找
 (setup browse-kill-ring
@@ -74,10 +75,11 @@
 (setup consult-eglot
   (:load-after eglot))
 
-(add-hook 'after-init-hook 'recentf-mode)
-(setq-default
- recentf-max-saved-items 1000
- recentf-exclude `("/tmp/" "/ssh:" ,(concat package-user-dir "/.*-autoloads\\.el\\'")))
+(setup recentf-mode
+  (add-hook 'after-init-hook 'recentf-mode)
+  (setq-default
+   recentf-max-saved-items 1000
+   recentf-exclude `("/tmp/" "/ssh:" ,(concat package-user-dir "/.*-autoloads\\.el\\'"))))
 
 ;; Shift lines up and down with M-up and M-down. When paredit is enabled,
 ;; it will use those keybindings. For this reason, you might prefer to
@@ -117,25 +119,10 @@
     (global-whitespace-cleanup-mode)
     (diminish 'whitespace-cleanup-mode)))
 
-(defun split-window-horizontally-instead ()
-  "Kill any other windows and re-split such that the current window is on the top half of the frame."
-  (interactive)
-  (let ((other-buffer (and (next-window) (window-buffer (next-window)))))
-    (delete-other-windows)
-    (split-window-horizontally)
-    (when other-buffer
-      (set-window-buffer (next-window) other-buffer))))
+(setup window
+  (:require lib-window)
+  (global-set-key (kbd "C-x |") 'split-window-horizontally-instead)
+  (global-set-key (kbd "C-x _") 'split-window-vertically-instead))
 
-(defun split-window-vertically-instead ()
-  "Kill any other windows and re-split such that the current window is on the left half of the frame."
-  (interactive)
-  (let ((other-buffer (and (next-window) (window-buffer (next-window)))))
-    (delete-other-windows)
-    (split-window-vertically)
-    (when other-buffer
-      (set-window-buffer (next-window) other-buffer))))
-
-(global-set-key (kbd "C-x |") 'split-window-horizontally-instead)
-(global-set-key (kbd "C-x _") 'split-window-vertically-instead)
 (provide 'init-edit-util)
 ;;; init-edit-util.el ends here
