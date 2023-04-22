@@ -9,7 +9,6 @@
 
 (setup consult
   (:also-load lib-consult)
-  ;; (:autoload mcfly-time-travel)
   (:global "M-g l" consult-line
            [remap switch-to-buffer] consult-buffer
            [remap switch-to-buffer-other-window] 'consult-buffer-other-window
@@ -35,10 +34,10 @@
 (setup affe
   (when (executable-find "rg")
     (:also-load lib-consult)
+    (:require consult)
     (:global "M-?"  lucius/affe-grep-at-point)
-    (:when-loaded
-      (lucius/no-consult-preview sanityluciusinc/affe-grep-at-point)
-      (lucius/no-consult-preview affe-grep))))
+    (lucius/no-consult-preview lucius/affe-grep-at-point)
+    (lucius/no-consult-preview affe-grep)))
 
 (setup embark-consult
   (:hooks embark-collect-mode-hook consult-preview-at-point-mode))
