@@ -17,10 +17,10 @@
 (setup corfu
   ;; org-mode 中关闭补全
   (:option corfu-excluded-modes '(org-mode))
+  (global-corfu-mode)
   (:when-loaded
-    (:hooks after-init-hook global-corfu-mode
-            eshell-mode-hook (lambda () (setq-local corfu-auto nil)))
-    (setq-default corfu-auto t)
-    (setq-default corfu-quit-no-match 'separator)))
+    (:with-mode eshell-mode (:hook (lambda () (setq-local corfu-auto nil)))
+                (setq-default corfu-auto t)
+                (setq-default corfu-quit-no-match 'separator))))
 (provide 'init-corfu)
 ;;; init-corfu.el ends here
