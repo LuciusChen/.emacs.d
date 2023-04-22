@@ -207,8 +207,8 @@
                                          (cl-assert (telega-chat-p user))
                                          (telega-chat-title user)))
                              (off-column (telega-current-column))) . ,rest))
-                         ;; Manual return t
-                         t)
+    ;; Manual return t
+    t)
 
   (psearch-patch telega-ins--message0
     (psearch-replace '`(let* ,a ,b . ,rest)

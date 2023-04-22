@@ -144,6 +144,11 @@ If nil it defaults to `split-string-default-separators', normally
     (when (re-search-forward (concat "\\(^#\\+" name ":.*\n?\\)")
                              (point-max) t)
       (replace-match ""))))
+
+(defun toggle-dynamic-agenda ()
+  (dolist (hook '(before-save-hook find-file-hook))
+    (add-hook hook #'vulpea-dynamic-update-tag nil t)))
+
 ;;;; provide
 (provide 'lib-org-agenda-dynamic)
 ;;; lib-org-agenda-dynamic.el ends here.

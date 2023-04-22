@@ -6,6 +6,24 @@
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 
+;; Copy Done To-Dos to Today
+(defun org-roam-copy-todo-to-today ()
+  (interactive)
+  (when (and (or (equal org-state "DONE") (equal org-state "CANCELLED")) (not (org-find-property "STYLE")))
+    (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+          (org-after-refile-insert-hook #'save-buffer)
+          today-file
+          pos)
+      (save-window-excursion
+        (org-roam-dailies-capture-today t "t")
+        (setq today-file (buffer-file-name))
+        (setq pos (point)))
+
+      ;; Only refile if the target file is different than the current file
+      (unless (equal (file-truename today-file)
+                     (file-truename (buffer-file-name)))
+        (org-refile nil nil (list "Tasks" today-file nil pos))))))
+
 ;; Save the corresponding buffers
 (defun gtd-save-org-buffers ()
   "Save `org-agenda-files' buffers without user confirmation.
@@ -82,23 +100,6 @@ TEMPLATE is the processed template used to format the entry."
                          (1- (if (minibufferp)
                                  (window-width) (frame-width))))))
     (cons (propertize candidate-main 'node node) node)))
-
-;; Copy Done To-Dos to Today
-(defun org-roam-copy-todo-to-today ()
-  (interactive)
-  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
-        (org-after-refile-insert-hook #'save-buffer)
-        today-file
-        pos)
-    (save-window-excursion
-      (org-roam-dailies-capture-today t "t")
-      (setq today-file (buffer-file-name))
-      (setq pos (point)))
-
-    ;; Only refile if the target file is different than the current file
-    (unless (equal (file-truename today-file)
-                   (file-truename (buffer-file-name)))
-      (org-refile nil nil (list "Tasks" today-file nil pos)))))
 
 ;; I encountered the following message when attempting
 ;; to export data:
@@ -228,9 +229,9 @@ TEMPLATE is the processed template used to format the entry."
     (find-file (org-roam-node-file backlink))))
 
 (defvar-keymap embark-org-roam-map
-            "i" #'org-roam-node-insert
-            "s" #'embark-collect
-            "b" #'lucius/org-roam-backlinks-node-read)
+  "i" #'org-roam-node-insert
+  "s" #'embark-collect
+  "b" #'lucius/org-roam-backlinks-node-read)
 
 ;; 导出特定文件夹下所有内容到 hugo
 (defun ox-hugo/export-all (&optional org-files-root-dir dont-recurse)

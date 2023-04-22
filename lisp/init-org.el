@@ -67,8 +67,7 @@
   (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
   (:when-loaded
     ;; only hook in org-mode
-    (:hooks  org-after-todo-state-change-hook log-todo-next-creation-date
-             org-mode-hook (lambda () (electric-pair-local-mode -1)))
+    (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1)))
     ;; patch the function org-insert-structure-template
     ;; adding an optional newline after an org template structure is inserted,
     ;; depending on whether or not a region is active.
@@ -223,8 +222,14 @@
 
 (setup org-roam
   (:also-load lib-org-agenda-dynamic)
-  (:require emacsql-sqlite-builtin)
   (:also-load lib-org-roam)
+  (:autoload toggle-dynamic-agenda)
+  (:autoload log-todo-next-creation-date)
+  (:autoload org-roam-copy-todo-to-today)
+  (:hooks org-mode-hook toggle-dynamic-agenda
+          org-after-todo-state-change-hook log-todo-next-creation-date
+          org-after-todo-state-change-hook org-roam-copy-todo-to-today)
+  (:require emacsql-sqlite-builtin)
   (:global   "C-c n l"     org-roam-buffer-toggle
              "C-c n f"     org-roam-node-find
              "C-c n i"     org-roam-node-insert
@@ -293,31 +298,13 @@
    org-roam-node-display-template (concat "${type:10} ${doom-hierarchy:120} "
                                           (propertize "${tags:*}"
                                                       'face 'org-tag)))
-  ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
   (:advice
    org-agenda :before #'vulpea-agenda-files-update
    org-todo-list :before #'vulpea-agenda-files-update
+   ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
    org-roam-node-read--to-candidate
    :override lucius/org-roam-node-read--to-candidate)
-  (:when-loaded
-    (:hooks org-mode-hook (lambda ()
-                             (dolist (hook '(before-save-hook find-file-hook))
-                               (add-hook hook #'vulpea-dynamic-update-tag nil t))))
-    (org-roam-db-autosync-enable)
-    (add-to-list 'display-buffer-alist
-                 '("\\*org-roam\\*"
-                   (display-buffer-in-direction)
-                   (direction . right)
-                   (window-width . 0.33)
-                   (window-height . fit-window-to-buffer)))
-    (add-to-list 'org-after-todo-state-change-hook
-                 (lambda ()
-                   ;; DONE 和 CANCELLED 的 To-Dos 自动复制到今日
-                   ;; 同时过滤掉 habit 的 To-Dos
-                   (when (and (or (equal org-state "DONE")
-                                  (equal org-state "CANCELLED"))
-                              (not (org-find-property "STYLE")))
-                     (org-roam-copy-todo-to-today)))))
+  (:when-loaded (org-roam-db-autosync-enable))
   (:after embark
     (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map))))
 
