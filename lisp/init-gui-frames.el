@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (setup appearance
-  (:require lib-theme)
+  (:require lib-appearance)
   ;; Stop C-z from minimizing windows under OS X
   (global-set-key (kbd "C-z") 'lucius/maybe-suspend-frame)
 
@@ -50,8 +50,10 @@
   (add-hook 'term-mode-hook (lambda () (setq line-spacing 0)))
 
   ;; Change global font size easily
-  (add-hook 'after-init-hook 'default-text-scale-mode)
+  (add-hook 'after-init-hook 'default-text-scale-mode))
 
+(setup theme
+  (:require lib-appearance)
   ;; theme setting
   ;; Don't prompt to confirm theme safety. This avoids problems with
   ;; first-time startup on Emacs > 26.3.
