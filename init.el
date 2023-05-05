@@ -43,9 +43,7 @@
   (dolist (multiple '("" "double-" "triple-"))
     (dolist (direction '("right" "left"))
       (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
-  (global-set-key (kbd "M-`") 'ns-next-frame)
-  (global-set-key (kbd "M-h") 'ns-do-hide-emacs)
-  (global-set-key (kbd "M-˙") 'ns-do-hide-others))
+  (global-set-key (kbd "M-`") 'ns-next-frame))
 
 ;; Install straight.el
 ;; branch develop
@@ -102,6 +100,7 @@
     orderless
     kind-icon
     git-modes
+    ibuffer-vc
     git-blamed
     org-modern
     ace-pinyin
@@ -157,6 +156,7 @@
 (require 'init-setup)
 (require 'init-gui-frames)
 (require 'init-font)
+(require 'init-ibuffer)
 
 (require 'init-edit-util)
 (require 'init-dired)

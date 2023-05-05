@@ -3,8 +3,9 @@
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
   (:also-load lib-org-archive-hierachical)
+  (:also-load lib-org)
   (:global
-   "C-c l"     org-store-link
+   "C-C L"     org-store-link
    "C-M-<up>"  org-up-element
    "C-c b"     org-cite-insert)
   (:option
@@ -74,7 +75,8 @@
     (psearch-patch org-insert-structure-template
       (psearch-replace '`(format "#+%s_%s%s\n" . ,rest)
                        '`(format (if region? "#+%s_%s%s\n"
-                                   "#+%s_%s%s\n\n") ,@rest)))))
+                                   "#+%s_%s%s\n\n") ,@rest)))
+    (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
 
 (setup org-capture
   (:global "C-c c" org-capture)
@@ -223,6 +225,7 @@
 (setup org-roam
   (:also-load lib-org-agenda-dynamic)
   (:also-load lib-org-roam)
+  (:also-load lib-org-embark)
   (:autoload toggle-dynamic-agenda)
   (:autoload log-todo-next-creation-date)
   (:autoload org-roam-copy-todo-to-today)

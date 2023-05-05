@@ -1,43 +1,5 @@
-;;; lib-org-roam.el --- Org-mode config -*- lexical-binding: t -*-
+;;; lib-org-embark.el --- Org-mode config -*- lexical-binding: t -*-
 ;;; Commentary:
-(cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
-  "Return the value of \"#+title:\" (if any) from file that NODE resides in.
-  If there's no file-level title in the file, return empty string."
-  (or (if (= (org-roam-node-level node) 0)
-          (org-roam-node-title node)
-        (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
-      ""))
-
-(cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
-  "Return hierarchy for NODE, constructed of its file title, OLP and
-  direct title.
-  If some elements are missing, they will be stripped out."
-  (let ((title     (org-roam-node-title node))
-        (olp       (org-roam-node-olp   node))
-        (level     (org-roam-node-level node))
-        (filetitle (org-roam-node-doom-filetitle node))
-        (separator (propertize " > " 'face 'shadow)))
-    (cl-case level
-      ;; node is a top-level file
-      (0 filetitle)
-      ;; node is a level 1 heading
-      (1 (concat (propertize filetitle 'face '(shadow italic))
-                 separator title))
-      ;; node is a heading with an arbitrary outline path
-      (t (concat (propertize filetitle 'face '(shadow italic))
-                 separator (propertize (string-join olp " > ")
-                                       'face '(shadow italic))
-                 separator title)))))
-
-(cl-defmethod org-roam-node-type ((node org-roam-node))
-  "Return the TYPE of NODE."
-  (condition-case nil
-      (file-name-nondirectory
-       (directory-file-name
-        (file-name-directory
-         (file-relative-name (org-roam-node-file node) org-roam-directory))))
-    (error "")))
-
 (cl-defmethod org-roam-node-backlinkscount ((node org-roam-node))
   "Access slot \"backlinks\" of org-roam-node struct CL-X"
   (let* ((count (caar (org-roam-db-query
@@ -107,5 +69,5 @@
             "i" #'org-roam-node-insert
             "s" #'embark-collect
             "b" #'lucius/org-roam-backlinks-node-read)
-(provide 'lib-org-roam)
-;;; lib-org-roam.el ends here
+(provide 'lib-org-embark)
+;;; lib-org-embark.el ends here
