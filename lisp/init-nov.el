@@ -2,8 +2,7 @@
 ;;; Commentary
 (setup nov
   (:when-loaded
-    (:hooks nov-mode-hook lucius/nov-annotate-font-lock)
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))))
+    (:hooks nov-mode-hook lucius/nov-annotate-font-lock)))
 
 (defface lucius/nov-annotate-face
     '((t (:foreground "#86C166")))
