@@ -22,6 +22,17 @@
 ;;                      "C-c x"   macrostep-expand
 ;;                      "C-c X"   macrostep-collapse)))
 
+;; https://cestlaz.github.io/post/using-emacs-74-eglot/
+(setup eglot
+  (:also-load lib-java)
+  (:with-mode python-mode (:hook eglot-ensure))
+  (:with-mode java-mode (:hook eglot-ensure))
+  (:option eglot-events-buffer-size 0)
+  (:when-loaded
+    ;; Java $brew install jdtls
+    ;; Python $pip3 install pyright
+    (push '((java-mode java-ts-mode) . jdtls-command-contact) eglot-server-programs)))
+
 (setup sly-el-indent
   (:hooks emacs-lisp-mode-hook sly-el-indent-setup))
 

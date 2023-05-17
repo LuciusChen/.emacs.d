@@ -484,6 +484,10 @@
   (:global [f7] deft))
 
 (setup mpvi (:require mpv))
-(setup org-transclusion (:also-load lib-transclusion))
+(setup org-transclusion (:also-load lib-org-transclusion))
+(eval-after-load 'ox
+  (function
+   (lambda nil
+    (require 'ox-hugo))))
 (provide 'init-org)
 ;;; init-org.el ends here

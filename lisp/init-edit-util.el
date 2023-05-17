@@ -72,9 +72,6 @@
     "M-p" browse-kill-ring-previous)
   (:option browse-kill-ring-separator "\f"))
 
-(setup consult-eglot
-  (:load-after eglot))
-
 (setup recentf-mode
   (add-hook 'after-init-hook 'recentf-mode)
   (setq-default
