@@ -33,8 +33,7 @@
 
   ;; 调整背景透明度（假透明）
   (global-set-key (kbd "M-C-8") (lambda () (interactive) (lucius/adjust-opacity nil -2)))
-  (global-set-key (kbd "M-C-9") (lambda () (interactive) (lucius/adjust-opacity nil 2)))
-  (global-set-key (kbd "M-C-7") (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
+  (global-set-key (kbd "M-C-7") (lambda () (interactive) (lucius/adjust-opacity nil 2)))
 
   (when *IS-MAC*
     (require 'ns-auto-titlebar)

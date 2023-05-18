@@ -115,7 +115,6 @@
     consult-dir
     treesit-auto
     org-cliplink
-    gruvbox-theme
     markdown-mode
     all-the-icons
     disable-mouse
@@ -137,6 +136,7 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
+    color-theme-sanityinc-tomorrow
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
     (mpvi :host github :repo "lorniu/mpvi")
