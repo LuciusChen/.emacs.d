@@ -31,7 +31,7 @@
   "Activate a dark color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(gruvbox))
+  (setq custom-enabled-themes '(color-theme-sanityinc-tomorrow-night))
   (reapply-themes)
   (set-dividers-and-fringe-color))
 
