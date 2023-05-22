@@ -93,6 +93,7 @@
     diminish
     org-roam
     git-link
+    ef-themes
     fullframe
     ox-pandoc
     macrostep
@@ -132,15 +133,14 @@
     default-text-scale
     dwim-shell-command
     language-detection
+    gruvbox-theme
     list-unicode-display
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
-    color-theme-sanityinc-tomorrow
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
     (mpvi :host github :repo "lorniu/mpvi")
-    (ef-themes :host github :repo "LuciusChen/ef-themes")
     (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     (psearch :host github :repo "twlz0ne/psearch.el" :files ("psearch.el"))))

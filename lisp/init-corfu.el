@@ -2,7 +2,11 @@
 ;;; Commentary:
 ;;; Code:
 (setup orderless
-  (:option completion-styles '(orderless basic))
+  (:option completion-styles '(orderless flex)
+           ;; https://github.com/minad/corfu/issues/136
+           ;; eglot 会更改 completion-category-defaults 这个变量。
+           ;; 需要通过修改 completion-category-overrides 改为 orderless
+           completion-category-overrides '((eglot (styles . (orderless flex)))))
   (:when-loaded
     ;; pinyinlib.el 用于匹配简体/繁体汉字拼音首字母
     (add-to-list 'orderless-matching-styles
@@ -17,8 +21,15 @@
                  #'kind-icon-margin-formatter)))
 
 (setup corfu
+  (:with-mode corfu
+    (:bind "<escape>" corfu-quit
+           "TAB"  corfu-next
+           [tab]  corfu-next
+           "S-TAB"  corfu-previous
+           [backtab]  corfu-previous))
   ;; org-mode 中关闭补全
   (:option corfu-excluded-modes '(org-mode)
+           ;; Using VS Code icons as an alternative
            kind-icon-mapping '((array          "a"   :icon "symbol-array"       :face font-lock-type-face              :collection "vscode")
                                (boolean        "b"   :icon "symbol-boolean"     :face font-lock-builtin-face           :collection "vscode")
                                (color          "#"   :icon "symbol-color"       :face success                          :collection "vscode")
@@ -36,7 +47,7 @@
                                (function       "f"   :icon "symbol-method"      :face font-lock-function-name-face     :collection "vscode")
                                (interface      "if"  :icon "symbol-interface"   :face font-lock-type-face              :collection "vscode")
                                (keyword        "kw"  :icon "symbol-keyword"     :face font-lock-keyword-face           :collection "vscode")
-                               (macro          "mc"  :icon "lambda"             :face font-lock-keyword-face)
+                               (macro          "mc"  w:icon "lambda"             :face font-lock-keyword-face)
                                (magic          "ma"  :icon "lightbulb-autofix"  :face font-lock-builtin-face           :collection "vscode")
                                (method         "m"   :icon "symbol-method"      :face font-lock-function-name-face     :collection "vscode")
                                (module         "{"   :icon "file-code-outline"  :face font-lock-preprocessor-face)

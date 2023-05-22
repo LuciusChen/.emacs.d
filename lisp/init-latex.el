@@ -29,6 +29,7 @@
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
     (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
+
 (setup xenops
   (:also-load lib-latex)
   (:option
