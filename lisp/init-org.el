@@ -143,7 +143,7 @@
                        (org-agenda-tags-todo-honor-ignore-options t)
                        (org-agenda-todo-ignore-scheduled 'future)
                        (org-agenda-skip-function
-                        '(lambda ()
+                        (lambda ()
                           (or (org-agenda-skip-subtree-if 'todo '("HOLD" "WAITING"))
                            (org-agenda-skip-entry-if 'nottodo '("NEXT")))))
                        (org-tags-match-list-sublevels t)
@@ -176,7 +176,7 @@
            (tags-todo "-inbox"
                       ((org-agenda-overriding-header "On Hold")
                        (org-agenda-skip-function
-                        '(lambda ()
+                        (lambda ()
                           (or (org-agenda-skip-subtree-if 'todo '("WAITING"))
                            (org-agenda-skip-entry-if 'nottodo '("HOLD")))))
                        (org-tags-match-list-sublevels nil)
@@ -201,7 +201,7 @@
                        (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
                        (org-agenda-todo-ignore-scheduled 'future)
                        (org-agenda-skip-function
-                        '(lambda ()
+                        (lambda ()
                           (or (org-agenda-skip-subtree-if 'todo '("PROJECT" "HOLD" "WAITING" "DELEGATED"))
                            (org-agenda-skip-subtree-if 'nottododo '("TODO")))))
                        (org-tags-match-list-sublevels t)
@@ -317,44 +317,21 @@
   (:when-loaded
     (transient-define-prefix tsc-hello ()
       "Prefix for some files"
-      [["Org-agenda-menu"
-        ("i"   "Inbox"     (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/inbox.org")))
-        ("w"   "Work"      (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/work.org")))
-        ("b"   "Books"     (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/books.org")))
-        ("te"  "Tech-Debt" (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/tech-debt.org")))
-        ("a"   "Agenda"    (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/agenda.org")))
-        ("p"   "Personal"  (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/personal.org")))
-        ("n"   "Note"      (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/note.org")))
-        ("s"   "Someday"   (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/agenda/someday.org")))]
-       ["Daily-log-menu"
-        ("j"   "Journal"   (lambda ()
-                             (interactive)
-                             (find-file "~/Dropbox/org/daily/journal.org")))
-        ("td"  "Today" open-daily-log-file)
-        ("y"   "yesterday" (lambda ()
-                             (interactive)
-                             (open-daily-log-file
-                              (format-time-string "%Y-%m-%d"
-                                                  (time-subtract
-                                                   (current-time)
-                                                   (days-to-time 1))))))
-        ("dl"  "delete daily log" lucius/delete-archived-daily-log-files)]])))
+      [:pad-keys t
+                 ["Org-agenda-menu"
+                  ("i"   "Inbox"            open-inbox)
+                  ("w"   "Work"             open-work)
+                  ("b"   "Books"            open-books)
+                  ("te"  "Tech-Debt"        open-tech-debt)
+                  ("a"   "Agenda"           open-agenda)
+                  ("p"   "Personal"         open-personal)
+                  ("n"   "Note"             open-note)
+                  ("s"   "Someday"          open-someday)]
+                 ["Daily-log-menu"
+                  ("j"   "Journal"          open-journal)
+                  ("td"  "Today"            open-daily-log-file)
+                  ("y"   "yesterday"        open-yesterday)
+                  ("dl"  "delete daily log" lucius/delete-archived-daily-log-files)]])))
 
 (setup bibtex
   (:option bibtex-file-path "~/Dropbox/org/bib/"
@@ -450,7 +427,7 @@
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
     ;; https://emacs.stackexchange.com/questions/45291/change-color-of-org-mode-checkboxes
     (defface org-checkbox-todo-text
-        '((t (:foreground nil :inherit org-todo)))
+        '((t (:foreground unspecified :inherit org-todo)))
       "Face for the text part of an unchecked org-mode checkbox.")
 
     (font-lock-add-keywords
@@ -459,7 +436,7 @@
      'append)
 
     (defface org-checkbox-done-text
-        '((t (:foreground nil :inherit org-done :strike-through t)))
+        '((t (:foreground unspecified :inherit org-done :strike-through t)))
       "Face for the text part of a checked org-mode checkbox.")
 
     (font-lock-add-keywords
@@ -485,9 +462,7 @@
 
 (setup mpvi (:require mpv))
 (setup org-transclusion (:also-load lib-org-transclusion))
-(eval-after-load 'ox
-  (function
-   (lambda nil
-    (require 'ox-hugo))))
+(setup ox-hugo
+  (:after ox (require 'ox-hugo)))
 (provide 'init-org)
 ;;; init-org.el ends here

@@ -27,6 +27,50 @@
           (when buffer (kill-buffer buffer)))))
     (when deleted-files
       (message "Deleted archived daily log file: %s" (string-join (nreverse deleted-files) ", ")))))
+
+(defun open-inbox ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/inbox.org"))
+
+(defun open-work ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/work.org"))
+
+(defun open-books ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/books.org"))
+
+(defun open-tech-debt ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/tech-debt.org"))
+
+(defun open-agenda ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/agenda.org"))
+
+(defun open-personal ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/personal.org"))
+
+(defun open-note ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/note.org"))
+
+(defun open-someday ()
+  (interactive)
+  (find-file "~/Dropbox/org/agenda/someday.org"))
+
+(defun open-journal ()
+  (interactive)
+  (find-file "~/Dropbox/org/daily/journal.org"))
+
+(defun open-yesterday ()
+  (interactive)
+  (open-daily-log-file
+   (format-time-string "%Y-%m-%d"
+                       (time-subtract
+                        (current-time)
+                        (days-to-time 1)))))
 ;;;; provide
 (provide 'lib-transient)
 ;;; lib-transient.el ends here.
