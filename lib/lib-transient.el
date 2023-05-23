@@ -28,49 +28,33 @@
     (when deleted-files
       (message "Deleted archived daily log file: %s" (string-join (nreverse deleted-files) ", ")))))
 
-(defun open-inbox ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/inbox.org"))
+(defun agenda-files-switcher (&optional args)
+      (interactive (list (transient-args 'agenda-transient)))
+      (find-file  (concat "~/Dropbox/org/agenda/" (car args))))
 
-(defun open-work ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/work.org"))
-
-(defun open-books ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/books.org"))
-
-(defun open-tech-debt ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/tech-debt.org"))
-
-(defun open-agenda ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/agenda.org"))
-
-(defun open-personal ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/personal.org"))
-
-(defun open-note ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/note.org"))
-
-(defun open-someday ()
-  (interactive)
-  (find-file "~/Dropbox/org/agenda/someday.org"))
-
-(defun open-journal ()
-  (interactive)
-  (find-file "~/Dropbox/org/daily/journal.org"))
-
-(defun open-yesterday ()
-  (interactive)
-  (open-daily-log-file
-   (format-time-string "%Y-%m-%d"
-                       (time-subtract
-                        (current-time)
-                        (days-to-time 1)))))
+(defun journal-options (&optional args)
+      (interactive (list (transient-args 'journal-transient)))
+      (let ((file-path-prefix "~/Dropbox/org/daily/"))
+        (cond ((member "journal.org" args)
+               (find-file (concat file-path-prefix (car args))))
+              ((member "today" args)
+               (let ((file-path (concat file-path-prefix
+                                        (format-time-string "%Y-%m-%d.org"
+                                                            (current-time)))))
+                 (if (file-exists-p file-path)
+                     (find-file file-path)
+                   (message "Journal file not found for today"))))
+              ((member "yesterday" args)
+               (let ((file-path (concat file-path-prefix
+                                        (format-time-string "%Y-%m-%d"
+                                                            (time-subtract
+                                                             (current-time)
+                                                             (days-to-time 1))))))
+                 (if (file-exists-p file-path)
+                     (find-file file-path)
+                   (message "Journal file not found for yesterday"))))
+              (member "delete" args)
+              (lucius/delete-archived-daily-log-files))))
 ;;;; provide
 (provide 'lib-transient)
 ;;; lib-transient.el ends here.

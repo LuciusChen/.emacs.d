@@ -313,25 +313,36 @@
 
 (setup transient
   (:also-load lib-transient)
-  (:global "C-c e" tsc-hello)
+  (:global "C-c e a" agenda-transient
+           "C-c e j" journal-transient)
   (:when-loaded
-    (transient-define-prefix tsc-hello ()
-      "Prefix for some files"
-      [:pad-keys t
-                 ["Org-agenda-menu"
-                  ("i"   "Inbox"            open-inbox)
-                  ("w"   "Work"             open-work)
-                  ("b"   "Books"            open-books)
-                  ("te"  "Tech-Debt"        open-tech-debt)
-                  ("a"   "Agenda"           open-agenda)
-                  ("p"   "Personal"         open-personal)
-                  ("n"   "Note"             open-note)
-                  ("s"   "Someday"          open-someday)]
-                 ["Daily-log-menu"
-                  ("j"   "Journal"          open-journal)
-                  ("td"  "Today"            open-daily-log-file)
-                  ("y"   "yesterday"        open-yesterday)
-                  ("dl"  "delete daily log" lucius/delete-archived-daily-log-files)]])))
+    (transient-define-prefix  agenda-transient ()
+      "Agenda menu"
+      :info-manual "Agenda menu"
+      ["Arguments"
+       ("-i" "Inbox"     "inbox.org")
+       ("-w" "Work"      "work.org")
+       ("-b" "Books"     "books.org")
+       ("-t" "Tech-Debt" "tech-debt.org")
+       ("-a" "Agenda"    "agenda.org")
+       ("-p" "Personal"  "personal.org")
+       ("-n" "Note"      "note.org")
+       ("-s" "Someday"   "someday.org")]
+      ["Commands"
+       ("p" "agenda files switcher"     agenda-files-switcher)]
+      [("q" "Quit"           transient-quit-one)])
+    
+    (transient-define-prefix journal-transient ()
+       "Journal menu"
+      :info-manual "Journal menu"
+      ["Arguments"
+       ("-j" "Journal"            "journal.org")
+       ("-t" "Today"              "today")
+       ("-y" "Yesterday"          "yesterday")
+       ("-d" "Clear archive log"  "delete")]
+      ["Commands"
+       ("p" "Journal files switch"   journal-options)]
+      [("q" "Quit"           transient-quit-one)])))
 
 (setup bibtex
   (:option bibtex-file-path "~/Dropbox/org/bib/"
