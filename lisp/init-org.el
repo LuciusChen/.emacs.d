@@ -331,7 +331,7 @@
       ["Commands"
        ("p" "agenda files switcher"     agenda-files-switcher)]
       [("q" "Quit"           transient-quit-one)])
-    
+
     (transient-define-prefix journal-transient ()
        "Journal menu"
       :info-manual "Journal menu"
