@@ -18,12 +18,17 @@
     (set-face-foreground face (face-attribute 'default :background)))
   (set-face-background 'fringe (face-attribute 'default :background)))
 
+
 ;; Toggle between light and dark
+(defvar light-theme nil "The light theme.")
+(defvar dark-theme nil "The dark theme.")
+
 (defun light ()
   "Activate a light color theme."
   (interactive)
-  (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(ef-spring))
+  (when custom-enabled-themes
+    (disable-theme (car custom-enabled-themes)))
+  (setq custom-enabled-themes (list light-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color))
 
@@ -31,7 +36,7 @@
   "Activate a dark color theme."
   (interactive)
   (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes '(gruvbox))
+  (setq custom-enabled-themes (list dark-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color))
 
