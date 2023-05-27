@@ -155,7 +155,6 @@
 (require 'init-core)
 (require 'init-setup)
 (require 'init-gui-frames)
-(require 'init-font)
 (require 'init-ibuffer)
 
 (require 'init-edit-util)
