@@ -1,6 +1,7 @@
 ;;; init-prog.el --- Measure startup and require times -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+
 ;; lisp
 (setup emacs-lisp-mode (:file-match "\\.emacs.d\\'"))
 (setup lisp-mode

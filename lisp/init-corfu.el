@@ -28,7 +28,8 @@
            "S-TAB"  corfu-previous
            [backtab]  corfu-previous))
   ;; org-mode 中关闭补全
-  (:option corfu-excluded-modes '(org-mode)
+  (:option corfu-cycle t
+           corfu-excluded-modes '(org-mode)
            ;; Using VS Code icons as an alternative
            kind-icon-mapping '((array          "a"   :icon "symbol-array"       :face font-lock-type-face              :collection "vscode")
                                (boolean        "b"   :icon "symbol-boolean"     :face font-lock-builtin-face           :collection "vscode")

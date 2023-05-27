@@ -10,6 +10,8 @@
 (setup consult
   (:also-load lib-consult)
   (:global "M-g l" consult-line
+           "M-g i" consult-imenu
+           "M-g r" consult-recent-file
            [remap switch-to-buffer] consult-buffer
            [remap switch-to-buffer-other-window] 'consult-buffer-other-window
            [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame
