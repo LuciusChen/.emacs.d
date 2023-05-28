@@ -73,10 +73,9 @@
   ;;                                           (qiang-set-font en-font-list 14 zh-font-list))))
 
   ;; 特殊字符缩放
-  (setq scale-fonts-list
-        '("Apple Color Emoji"
-          "Noto Sans Egyptian Hieroglyphs"
-          "HanaMinA"))
+  (setq scale-fonts-list '("Apple Color Emoji"
+                           "Noto Sans Egyptian Hieroglyphs"
+                           "HanaMinA"))
   (lucius/scale-fonts)
 
    ;; 特殊字符需要安装 Symbola 字体
@@ -92,9 +91,7 @@
     (set-fontset-font
      t
      (if (version< emacs-version "28.1")
-         '(#x1f300 . #x1fad0)
-       'emoji
-       )
+         '(#x1f300 . #x1fad0) 'emoji)
      (cond
        ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji")
        ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
