@@ -1,6 +1,9 @@
 ;;; init-setup.el --- Setup.el config -*- lexical-binding: t -*-
 ;;; Commentary:
 (require 'setup)
+(require 'cl-lib)
+(require 'map)
+
 (setup-define :advice
   (lambda (symbol where function)
     `(advice-add ',symbol ,where ,function))
@@ -41,6 +44,21 @@ See `advice-add' for more details."
         (dolist (feature (nreverse features))
           (setq body `(with-eval-after-load ',feature ,body)))
         body))
-  :documentation "Load the current feature after FEATURES.")
+    :documentation "Load the current feature after FEATURES.")
+
+(with-eval-after-load 'imenu
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (setf (map-elt imenu-generic-expression "Setup")
+                    (list (rx line-start (0+ blank)
+                              "(setup" (1+ blank)
+                              (or (group-n 1 (1+ (or (syntax word)
+                                                     (syntax symbol))))
+                                  ;; Add here items that can define a feature:
+                                  (seq "(:" (or "straight" "require" "package")
+                                       (1+ blank)
+                                       (group-n 1 (1+ (or (syntax word)
+                                                          (syntax symbol)))))))
+                          1)))))
 (provide 'init-setup)
 ;;; init-setup.el ends here
