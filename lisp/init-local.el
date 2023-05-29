@@ -1,17 +1,6 @@
 ;;; init-local.el  --- Custom configuration
 ;;; Commentary
 
-(defun dwim-shell-commands-macos-reveal-in-finder ()
-  "Reveal selected files in macOS Finder."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   "Reveal in Finder"
-   "import AppKit
-    NSWorkspace.shared.activateFileViewerSelecting([\"<<*>>\"].map{URL(fileURLWithPath:$0)})"
-   :join-separator ", "
-   :silent-success t
-   :shell-pipe "swift -"))
-
 ;; (defun lucius/mode-line-format (left right)
 ;;   "Return a string of `window-width' length.
 ;; Containing LEFT, and RIGHT aligned respectively."
