@@ -68,6 +68,7 @@
     avy
     mpv
     deft
+    benchmark-init
     ;; rime
     affe
     ebib
@@ -116,6 +117,7 @@
     consult-dir
     treesit-auto
     org-cliplink
+    gruvbox-theme
     markdown-mode
     all-the-icons
     disable-mouse
@@ -131,9 +133,7 @@
     flymake-flycheck
     rainbow-delimiters
     default-text-scale
-    dwim-shell-command
     language-detection
-    gruvbox-theme
     list-unicode-display
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
@@ -148,6 +148,10 @@
 (dolist (e *use-package-list*)
   (straight-use-package e))
 (setq vc-follow-symlinks t)
+
+;; (require 'benchmark-init)
+;; ;; To disable collection of benchmark data after init is done.
+;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 ;; load module settings
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
