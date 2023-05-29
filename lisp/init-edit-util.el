@@ -32,11 +32,13 @@
   (sis-global-context-mode t)
   (add-to-list 'sis-context-hooks 'meow-entering-insert-mode-hook)
   ;; org title 处切换 Rime，telega 聊天时切换 Rime。
+  ;; 使用模式编辑 meow，需要额外加一个条件。
   (add-to-list 'sis-context-detectors
                (lambda (&rest _)
-                 (when (or (eq major-mode 'org-mode)
-                           (eq major-mode 'gfm-mode)
-                           (eq major-mode 'telega-chat-mode))
+                 (when (and meow-insert-mode
+                            (or (eq major-mode 'org-mode)
+                                (eq major-mode 'gfm-mode)
+                                (eq major-mode 'telega-chat-mode)))
                    'other))))
 
 (setup avy
@@ -53,15 +55,15 @@
 
 (setup line-number
   (when (fboundp 'display-line-numbers-mode)
-  (setq-default display-line-numbers-width 3)
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)))
+    (setq-default display-line-numbers-width 3)
+    (add-hook 'prog-mode-hook 'display-line-numbers-mode)))
 
 ;; 编程模式下显示竖线作为参考，控制行宽。
 (setup column-indicator
   (when (boundp 'display-fill-column-indicator)
-  (setq-default indicate-buffer-boundaries 'left)
-  (setq-default display-fill-column-indicator-character ?\u254e)
-  (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)))
+    (setq-default indicate-buffer-boundaries 'left)
+    (setq-default display-fill-column-indicator-character ?\u254e)
+    (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)))
 
 ;; 剪贴板查找
 (setup browse-kill-ring
@@ -82,12 +84,12 @@
 ;; it will use those keybindings. For this reason, you might prefer to
 ;; use M-S-up and M-S-down, which will work even in lisp modes.
 (setup move-dup
-(:global [M-up] move-dup-move-lines-up
-         [M-down] move-dup-move-lines-down
-         [M-S-up] move-dup-move-lines-up
-         [M-S-down] move-dup-move-lines-down
-         "C-c d" move-dup-duplicate-down
-         "C-c u" move-dup-duplicate-up))
+  (:global [M-up] move-dup-move-lines-up
+           [M-down] move-dup-move-lines-down
+           [M-S-up] move-dup-move-lines-up
+           [M-S-down] move-dup-move-lines-down
+           "C-c d" move-dup-duplicate-down
+           "C-c u" move-dup-duplicate-up))
 
 ;; mode-line 闪烁
 (setup mode-line-bell
