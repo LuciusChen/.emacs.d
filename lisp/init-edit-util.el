@@ -10,7 +10,15 @@
           (lambda ()
             (if meow-insert-mode
                 (run-hooks 'meow-entering-insert-mode-hook)
-              (run-hooks 'meow-leaving-insert-mode-hook)))))
+              (run-hooks 'meow-leaving-insert-mode-hook))))
+  (setq wrap-keymap
+        (let ((map (make-keymap)))
+          (suppress-keymap map)
+          (dolist (k '("(" "[" "{" "<"))
+            (define-key map k #'insert-pair))
+          map))
+
+  (meow-normal-define-key (cons "\\" wrap-keymap)))
 
 (setup sis
   (:option sis-english-source "com.apple.keylayout.ABC"
