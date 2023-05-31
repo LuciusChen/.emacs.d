@@ -135,44 +135,9 @@
                   (telega-msg-sender-title sender)))))))
     ;; ;; 修改 [| In reply to: ] 为 [| ➦: ]
     ;; ;; 因为这个 fwd-info 是个闭包，如果想在 elisp 里用闭包必须开词法作用域
-    ;; (psearch-patch telega-ins--msg-reply-inline
-    ;;   (psearch-replace
-    ;;    '`((or (null replied-msg) (eq replied-msg 'loading)) ,a)
-    ;;    '`((or (null replied-msg) (eq replied-msg 'loading))
-    ;;       (lucius/telega-ins--aux-inline-reply
-    ;;        (telega-ins-i18n "lng_profile_loading"))))
-    ;;   (psearch-replace
-    ;;    '`((telega--tl-error-p replied-msg) ,a)
-    ;;    '`((telega--tl-error-p replied-msg)
-    ;;       (lucius/telega-ins--aux-inline-reply
-    ;;        (telega-ins--with-face 'telega-shadow
-    ;;          (telega-ins (telega-i18n "lng_deleted_message"))))))
-    ;;   (psearch-replace
-    ;;    '`((telega-msg-match-p replied-msg 'ignored) ,a)
-    ;;    '`((telega-msg-match-p replied-msg 'ignored)
-    ;;       (lucius/telega-ins--aux-inline-reply
-    ;;        (telega-ins--message-ignored replied-msg))))
-    ;;   (psearch-replace
-    ;;    '`(telega-ins--with-props ,a ,b)
-    ;;    '`(telega-ins--with-props ,a
-    ;;        (lucius/telega-ins--aux-inline-reply
-    ;;         (telega-ins--aux-msg-one-line replied-msg
-    ;;           :with-username t
-    ;;           :username-face
-    ;;           (let* ((sender (telega-msg-sender replied-msg))
-    ;;                  (sender-faces (telega-msg-sender-title-faces sender)))
-    ;;             (if (and (telega-sender-match-p sender 'me)
-    ;;                      (plist-get msg :contains_unread_mention))
-    ;;                 (append sender-faces '(telega-entity-type-mention))
-    ;;               sender-faces)))))))
-    ;; ;; 修改 [| Forward from: ] 为 [| ➥: ]
-    ;; (psearch-patch telega-ins--fwd-info-inline
-    ;;   (psearch-replace '`(telega-ins "| " ,a)
-    ;;                    '`(telega-ins "| " "➥: ")))
-    ;; ;; Forward {username • @ID} 改变 @ID 的 face 和 username 相同
-    ;; (psearch-patch telega-msg-sender-title
-    ;;   (psearch-replace '`(propertize username 'face ,a)
-    ;;                    '`(propertize username 'face title-faces)))
+    (advice-add 'telega-ins--msg-reply-inline :override #'lucius/telega-ins--msg-reply-inline)
+    ;; 修改 [| Forward from: ] 为 [| ➥: ]
+    (advice-add 'telega-ins--fwd-info-inline :override #'lucius/telega-ins--fwd-info-inline)
     ;; 头像问题
     (psearch-patch telega-ins--image
       (psearch-replace '`(let ,a ,b)
