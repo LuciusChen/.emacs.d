@@ -69,13 +69,6 @@
   (:when-loaded
     ;; only hook in org-mode
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1)))
-    ;; patch the function org-insert-structure-template
-    ;; adding an optional newline after an org template structure is inserted,
-    ;; depending on whether or not a region is active.
-    (psearch-patch org-insert-structure-template
-      (psearch-replace '`(format "#+%s_%s%s\n" . ,rest)
-                       '`(format (if region? "#+%s_%s%s\n"
-                                   "#+%s_%s%s\n\n") ,@rest)))
     (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
 
 (setup org-capture

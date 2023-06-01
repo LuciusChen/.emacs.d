@@ -11,6 +11,12 @@
 ;; the user-init-file unless you've set package-enable-at-startup to nil
 ;; in the early init file.
 
+(add-to-list 'load-path
+     "/Users/luciuschen/.emacs.d/straight/repos/benchmark-init-el")
+     (require 'benchmark-init)
+     ;; To disable collection of benchmark data after init is done.
+     (add-hook 'after-init-hook 'benchmark-init/deactivate)
+
 ;; Disable package.el in favor of straight.el
 (setq package-enable-at-startup nil)
 ;; Inhibit resizing Puremacs frame

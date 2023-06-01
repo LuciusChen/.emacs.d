@@ -149,10 +149,6 @@
   (straight-use-package e))
 (setq vc-follow-symlinks t)
 
-;; (require 'benchmark-init)
-;; ;; To disable collection of benchmark data after init is done.
-;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
-
 ;; load module settings
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
@@ -176,7 +172,7 @@
 
 (require 'init-org)
 (require 'init-latex)
-(require 'init-local)
+;; (require 'init-local)
 (provide 'init)
 
 ;; Local Variables:
