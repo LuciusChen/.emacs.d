@@ -40,7 +40,7 @@
   (sis-global-context-mode t)
   (add-to-list 'sis-context-hooks 'meow-entering-insert-mode-hook)
   ;; org title 处切换 Rime，telega 聊天时切换 Rime。
-  ;; 使用模式编辑 meow，需要额外加一个条件。
+  ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。
   (add-to-list 'sis-context-detectors
                (lambda (&rest _)
                  (when (and meow-insert-mode
