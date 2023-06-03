@@ -89,6 +89,7 @@
     scratch
     diff-hl
     flymake
+    git-link
     js2-mode
     move-dup
     diminish
@@ -172,7 +173,7 @@
 
 (require 'init-org)
 (require 'init-latex)
-;; (require 'init-local)
+(require 'init-local)
 (provide 'init)
 
 ;; Local Variables:

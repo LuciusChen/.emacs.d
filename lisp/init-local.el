@@ -1,5 +1,5 @@
 ;;; init-local.el  --- Custom configuration
-;;; Commentary
+;;; Commentary:
 
 ;; (defun lucius/mode-line-format (left right)
 ;;   "Return a string of `window-width' length.
@@ -21,8 +21,10 @@
 ;;                      (propertize
 ;;                       (concat
 ;;                        (meow-indicator)) 'face 'meow-mode-line-face))
-;;                     " " (:eval (when (buffer-modified-p) "[+]"))
-;;                     " " mode-line-buffer-identification
+;;                     " "
+;;                     (:eval (when (buffer-modified-p) "[+]"))
+;;                     " "
+;;                     mode-line-buffer-identification
 ;;                     " %l:%c")))
 ;;            ;; right portion
 ;;            (format-mode-line (quote ("%m " (vc-mode vc-mode))))))))
