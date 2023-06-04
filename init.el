@@ -76,6 +76,7 @@
     setup
     eglot
     corfu
+    vundo
     embark
     xenops
     bibtex

@@ -131,5 +131,8 @@
   (global-set-key (kbd "C-x |") 'split-window-horizontally-instead)
   (global-set-key (kbd "C-x _") 'split-window-vertically-instead))
 
+(setup vundo
+  (:option vundo--window-max-height 5
+           vundo-roll-back-on-quit t))
 (provide 'init-edit-util)
 ;;; init-edit-util.el ends here

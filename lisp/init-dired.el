@@ -8,7 +8,11 @@
   (:bind-into dired-mode-map
     [mouse-2] 'dired-find-file
     (kbd "C-c C-q") 'wdired-change-to-wdired-mode)
-  (:option dired-recursive-deletes 'top)
+  (:option dired-recursive-deletes 'top
+           dired-listing-switches "-alGhv --group-directories-first"
+           dired-dwim-target t
+           dired-recursive-copies 'always
+           dired-kill-when-opening-new-dired-buffer t)
   (:when-loaded
     (setq-default dired-dwim-target t)
     ;; Prefer g-prefixed coreutils version of standard utilities when available
@@ -16,6 +20,7 @@
       (when gls (setq insert-directory-program gls)))
     (diredfl-global-mode)
     (require 'dired-x))
-  (:with-mode dired-mode (:hook diff-hl-dired-mode)))
+  (:with-mode dired-mode (:hook diff-hl-dired-mode
+                                dired-hide-details-mode)))
 (provide 'init-dired)
 ;;; init-dired.el ends here
