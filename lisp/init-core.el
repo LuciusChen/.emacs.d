@@ -26,40 +26,13 @@
 
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
-;; save a list of open files in ~/.emacs.d/.emacs.desktop
-(setq desktop-path (list user-emacs-directory)
-      desktop-auto-save-timeout 600)
-(desktop-save-mode 1)
-;; save a bunch of variables to the desktop file
-;; for lists specify the len of the maximal saved data also
-(setq desktop-globals-to-save
-      '((comint-input-ring        . 50)
-        (compile-history          . 30)
-        desktop-missing-file-warning
-        (dired-regexp-history     . 20)
-        (extended-command-history . 30)
-        (face-name-history        . 20)
-        (file-name-history        . 100)
-        (grep-find-history        . 30)
-        (grep-history             . 30)
-        (ivy-history              . 100)
-        (magit-revision-history   . 50)
-        (minibuffer-history       . 50)
-        (org-clock-history        . 50)
-        (org-refile-history       . 50)
-        (org-tags-history         . 50)
-        (query-replace-history    . 60)
-        (read-expression-history  . 60)
-        (regexp-history           . 60)
-        (regexp-search-ring       . 20)
-        register-alist
-        (search-ring              . 20)
-        (shell-command-history    . 50)
-        tags-file-name
-        tags-table-list))
-;; 主题相关的一些参数不保存
-(dolist (param '(foreground-color background-color font cursor-color mouse-color))
-    (push `(,param . :never) frameset-filter-alist))
+
+(setup recentf-mode
+  (add-hook 'after-init-hook 'recentf-mode)
+  (setq-default
+   recentf-max-saved-items 1000
+   recentf-exclude `("/tmp/" "/ssh:" ,(concat package-user-dir "/.*-autoloads\\.el\\'"))))
+
 (setq-default
  ;; 书签保存
  bookmark-default-file (locate-user-emacs-file ".bookmarks.el")

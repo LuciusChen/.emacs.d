@@ -82,12 +82,6 @@
     "M-p" browse-kill-ring-previous)
   (:option browse-kill-ring-separator "\f"))
 
-(setup recentf-mode
-  (add-hook 'after-init-hook 'recentf-mode)
-  (setq-default
-   recentf-max-saved-items 1000
-   recentf-exclude `("/tmp/" "/ssh:" ,(concat package-user-dir "/.*-autoloads\\.el\\'"))))
-
 ;; Shift lines up and down with M-up and M-down. When paredit is enabled,
 ;; it will use those keybindings. For this reason, you might prefer to
 ;; use M-S-up and M-S-down, which will work even in lisp modes.
