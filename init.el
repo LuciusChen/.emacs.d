@@ -74,6 +74,7 @@
     ebib
     citar
     setup
+    popper
     eglot
     corfu
     vundo

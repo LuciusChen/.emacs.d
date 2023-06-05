@@ -37,7 +37,22 @@
     ;; Use human readable Size column instead of original one
     (define-ibuffer-column size-h
         (:name "Size" :inline t)
-      (file-size-human-readable (buffer-size)))
-    ))
+      (file-size-human-readable (buffer-size)))))
+
+(setup popper
+  (:global "C-`"   popper-toggle-latest
+           "M-`"   popper-cycle
+           "C-M-`" popper-toggle-type)
+  (:option popper-reference-buffers
+           '(("\\*Messages\\*"
+              "Output\\*$"
+              "\\*Async Shell Command\\*"
+              help-mode
+              compilation-mode)
+             ("\\*Org Select\\*$")
+             ("\\*Agenda Commands\\*$"))
+           )
+  (popper-mode +1)
+  (popper-echo-mode +1))
 (provide 'init-ibuffer)
 ;;; init-ibuffer.el ends here
