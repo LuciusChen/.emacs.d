@@ -6,7 +6,17 @@
 
 (setq-default initial-scratch-message
               (propertize 
-               (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n") 'face 'italic))
+               (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you") 'face 'italic))
+;; 启动时间、加载包数量以及 gc 次数
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (with-current-buffer "*scratch*"
+              (goto-char (point-max))
+              (insert (concat "\n;; (\\\\)"
+                              "\n;; ( -.-)"
+                              "\n;; o_(\")(\")"
+                              (lucius/emacs-startup-info)
+                              (lucius/package-info))))))
 
 ;; tab 键来补全
 (setq tab-always-indent 'complete)

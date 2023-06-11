@@ -11,6 +11,13 @@
 ;; the user-init-file unless you've set package-enable-at-startup to nil
 ;; in the early init file.
 
+;; Adjust garbage collection thresholds during startup, and thereafter
+(setq gc-cons-threshold most-positive-fixnum)
+
+(add-hook 'emacs-startup-hook
+  (lambda ()
+    (setq gc-cons-threshold (* 20 1024 1024))))
+
 (add-to-list 'load-path
      "/Users/luciuschen/.emacs.d/straight/repos/benchmark-init-el")
      (require 'benchmark-init)

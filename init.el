@@ -27,13 +27,6 @@
 ;; (defconst MODULES     (featurep 'dynamic-modules))
 ;; (defconst NATIVECOMP  (featurep 'native-compile))
 
-;; Adjust garbage collection thresholds during startup, and thereafter
-(let ((normal-gc-cons-threshold (* 20 1024 1024))
-      (init-gc-cons-threshold (* 128 1024 1024)))
-  (setq gc-cons-threshold init-gc-cons-threshold)
-  (add-hook 'emacs-startup-hook
-            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
-
 (when *IS-MAC*
   ;; modify meta from ⌥ to ⌘
   (setq mac-command-modifier 'meta)
@@ -48,6 +41,7 @@
 ;; Install straight.el
 ;; branch develop
 (setq straight-repository-branch "develop")
+(setq straight-check-for-modifications '(check-on-save find-when-checking))
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -68,7 +62,6 @@
     avy
     mpv
     deft
-    benchmark-init
     ;; rime
     affe
     ebib
@@ -91,6 +84,7 @@
     scratch
     diff-hl
     flymake
+    web-mode
     git-link
     js2-mode
     move-dup
@@ -126,6 +120,7 @@
     disable-mouse
     consult-eglot
     mode-line-bell
+    benchmark-init
     embark-consult
     typescript-mode
     git-timemachine
@@ -175,7 +170,7 @@
 
 (require 'init-org)
 (require 'init-latex)
-(require 'init-local)
+;; (require 'init-local)
 (provide 'init)
 
 ;; Local Variables:

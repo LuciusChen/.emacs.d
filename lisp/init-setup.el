@@ -4,6 +4,12 @@
 (require 'cl-lib)
 (require 'map)
 
+ (setup-define :delay
+    (lambda (&optional time)
+      `(run-with-idle-timer ,(or time 1) nil
+                            (lambda () (require ',(setup-get 'feature)))))
+    :documentation "Delay loading the feature until a certain amount of idle time has passed.")
+
 (setup-define :advice
   (lambda (symbol where function)
     `(advice-add ',symbol ,where ,function))

@@ -23,16 +23,78 @@
 ;;                      "C-c x"   macrostep-expand
 ;;                      "C-c X"   macrostep-collapse)))
 
+(setup web-mode
+  (:option web-mode-markup-indent-offset 2
+           web-mode-code-indent-offset 2)
+  ;; (:when-loaded
+    ;; vue
+    (define-derived-mode vue-mode web-mode "Vue")
+    (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
+    (add-hook 'vue-mode-hook (lambda ()
+                               (setq-local tab-width 2)
+                               (eglot-ensure)))
+    ;; html
+    (define-derived-mode my-html-mode web-mode "Web")
+    (add-to-list 'auto-mode-alist '("\\.html\\'" . my-html-mode)))
+;; )
+
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 (setup eglot
   (:also-load lib-java)
   (:with-mode python-mode (:hook eglot-ensure))
   (:with-mode java-mode (:hook eglot-ensure))
+  (:with-mode typescript-mode (:hook eglot-ensure))
   (:option eglot-events-buffer-size 0)
   (:when-loaded
     ;; Java $brew install jdtls
     ;; Python $pip3 install pyright
-    (push '((java-mode java-ts-mode) . jdtls-command-contact) eglot-server-programs)))
+    (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
+                    ;; curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+                    ;; nvm install node
+                    ;; sudo npm install -g typescript
+                    ;; npm install -g @volar/vue-language-server
+                    (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
+                    ;; npm install -g typescript-language-server
+                    (typescript-mode . ("typescript-language-server" "--stdio"))
+                    (java-mode . (eglot-eclipse-jdt "java-language-server" "--stdio"))))
+      (push item eglot-server-programs))
+
+    (defclass eglot-volar (eglot-lsp-server) ()
+      :documentation "volar")
+    (cl-defmethod eglot-initialization-options ((server eglot-volar))
+      "Passes through required cquery initialization options"
+      `(
+        :typescript (
+                     :serverPath ,(expand-file-name "~/.nvm/versions/node/v20.2.0/lib/node_modules/typescript/lib/tsserverlibrary.js")
+                     :tsdk ,(expand-file-name "~/.nvm/versions/node/v20.2.0/lib/node_modules/typescript/lib/"))
+        :languageFeatures (
+                           :references t
+                           :implementation t
+                           :definition t
+                           :typeDefinition t
+                           :rename t
+                           :renameFileRefactoring t
+                           :signatureHelp t
+                           :codeAction t
+                           :workspaceSymbol t
+                           :completion (
+                                        :defaultTagNameCase ""
+                                        :defaultAttrNameCase ""
+                                        :getDocumentNameCasesRequest :json-false
+                                        :getDocumentSelectionRequest :json-false)
+                           :schemaRequestService (:getDocumentContentRequest :json-false))
+        :documentFeatures (
+                           :selectionRange t,
+                           :foldingRange :json-false,
+                           :linkedEditingRange t,
+                           :documentSymbol t,
+                           :documentColor t,
+                           :documentFormatting (
+                                                :defaultPrintWidth 100
+                                                :getDocumentPrintWidthRequest :json-false)
+                           :defaultPrintWidth 100
+                           :getDocumentPrintWidthRequest :json-false)))
+       ))
 
 (setup sly-el-indent
   (:hooks emacs-lisp-mode-hook sly-el-indent-setup))
