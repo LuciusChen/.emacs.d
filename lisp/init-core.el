@@ -1,7 +1,6 @@
 ;;; init-core.el --- Measure startup and require times -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(require 'lib-core)
 (require 'lib-benchmark)
 
 (setq-default initial-scratch-message
@@ -12,11 +11,21 @@
           (lambda ()
             (with-current-buffer "*scratch*"
               (goto-char (point-max))
-              (insert (concat "\n;; (\\\\)"
-                              "\n;; ( -.-)"
-                              "\n;; o_(\")(\")"
-                              (lucius/emacs-startup-info)
-                              (lucius/package-info))))))
+              (insert
+               (concat "\n;; (\\\\)"
+                       "\n;; ( -.-)"
+                       "\n;; o_(\")(\")"
+                       "\n;; Emacs startup time: "
+                       (format "%.2f seconds with %d garbage collections"
+                               (float-time
+                                (time-subtract after-init-time
+                                               before-init-time))
+                               gcs-done)
+                       "\n;; Loaded "
+                       (format "%d packages"
+                               (length (hash-table-keys
+                                        straight--profile-cache)))
+                       "\n\n")))))
 
 ;; tab 键来补全
 (setq tab-always-indent 'complete)
@@ -31,7 +40,12 @@
 
 (global-set-key (kbd "C-.") 'set-mark-command)
 (global-set-key (kbd "C-x C-.") 'pop-global-mark)
-(global-set-key (kbd "C-M-<backspace>") 'kill-back-to-indentation)
+;; 从光标位置删除到行首第一个非空格字符。
+(global-set-key (kbd "C-M-<backspace>") (lambda ()
+                                          (interactive)
+                                          (let ((prev-pos (point)))
+                                            (back-to-indentation)
+                                            (kill-region (point) prev-pos))))
 (global-set-key (kbd "C-h K") 'find-function-on-key)
 
 (setq global-auto-revert-non-file-buffers t
