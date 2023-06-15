@@ -94,6 +94,7 @@
     ef-themes
     fullframe
     ox-pandoc
+    chatgpt-shell
     macrostep
     json-mode
     orderless
@@ -101,6 +102,7 @@
     git-modes
     ibuffer-vc
     git-blamed
+    nerd-icons
     org-modern
     ace-pinyin
     org-remark
@@ -116,7 +118,6 @@
     org-cliplink
     gruvbox-theme
     markdown-mode
-    all-the-icons
     disable-mouse
     consult-eglot
     mode-line-bell
@@ -124,15 +125,18 @@
     embark-consult
     typescript-mode
     git-timemachine
+    nerd-icons-dired
     ns-auto-titlebar
     command-log-mode
     org-transclusion
     browse-kill-ring
     flymake-flycheck
+    nerd-icons-ibuffer
     rainbow-delimiters
     default-text-scale
     language-detection
     list-unicode-display
+    nerd-icons-completion
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
@@ -165,12 +169,12 @@
 
 (require 'init-telega)
 (require 'init-nov)
-;; (require 'init-beancount)
-;; (require 'init-rime)
+;; ;; (require 'init-beancount)
+;; ;; (require 'init-rime)
 
 (require 'init-org)
 (require 'init-latex)
-;; (require 'init-local)
+(require 'init-local)
 (provide 'init)
 
 ;; Local Variables:

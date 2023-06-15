@@ -2,6 +2,7 @@
 ;;; Commentary:
 (setup git-timemachine
   (:global "C-x v t" git-timemachine-toggle))
+
 (setup magit
   (:when-loaded
     (:also-load lib-vc)

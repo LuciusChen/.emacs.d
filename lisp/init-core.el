@@ -1,8 +1,6 @@
 ;;; init-core.el --- Measure startup and require times -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(require 'lib-benchmark)
-
 (setq-default initial-scratch-message
               (propertize 
                (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you") 'face 'italic))
@@ -81,11 +79,6 @@
 (add-hook 'after-init-hook 'global-auto-revert-mode)
 (add-hook 'after-init-hook 'savehist-mode)
 (add-hook 'after-init-hook 'transient-mark-mode)
-(add-hook 'after-init-hook 'lucius/show-init-time)
 (add-hook 'after-init-hook 'electric-pair-mode)
-(advice-add 'require :around 'lucius/require-times-wrapper)
-;; Restore histories and registers after saving
-(advice-add 'desktop-read :around 'lucius/desktop-time-restore)
-(advice-add 'desktop-create-buffer :around 'lucius/desktop-time-buffer-create)
 (provide 'init-core)
 ;;; init-core.el ends here

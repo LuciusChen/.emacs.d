@@ -106,6 +106,7 @@
       (telega-ins--with-attrs  (list :max (- telega-chat-fill-column
                                              (telega-current-column))
                                      :elide t
+                                     :elide-trail 8
                                      :face 'telega-msg-inline-forward)
         ;; | Forwarded From:
         (telega-ins "| " "➥: ")
@@ -118,18 +119,27 @@
           (cl-ecase (telega--tl-type origin)
             (messageForwardOriginChat
              (setq sender (telega-chat-get (plist-get origin :sender_chat_id)))
-             (telega-ins--msg-sender sender t t t))
+             (telega-ins--msg-sender sender
+               :with-avatar-p t
+               :with-username-p t
+               :with-brackets-p t))
 
             (messageForwardOriginUser
              (setq sender (telega-user-get (plist-get origin :sender_user_id)))
-             (telega-ins--msg-sender sender t t t))
+             (telega-ins--msg-sender sender
+               :with-avatar-p t
+               :with-username-p t
+               :with-brackets-p t))
 
             ((messageForwardOriginHiddenUser messageForwardOriginMessageImport)
              (telega-ins (telega-tl-str origin :sender_name)))
 
             (messageForwardOriginChannel
              (setq sender (telega-chat-get (plist-get origin :chat_id)))
-             (telega-ins--msg-sender sender t t t)))
+             (telega-ins--msg-sender sender
+               :with-avatar-p t
+               :with-username-p t
+               :with-brackets-p t)))
 
           (when-let ((signature (telega-tl-str origin :author_signature)))
             (telega-ins " --" signature))
@@ -142,7 +152,10 @@
             (if telega-chat-show-avatars
                 (telega-ins--image
                  (telega-msg-sender-avatar-image-one-line from-chat))
-              (telega-ins--msg-sender from-chat t t t))))
+              (telega-ins--msg-sender from-chat
+               :with-avatar-p t
+               :with-username-p t
+               :with-brackets-p t))))
 
         (let ((date (plist-get fwd-info :date)))
           (unless (zerop date)

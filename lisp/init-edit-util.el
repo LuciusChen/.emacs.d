@@ -46,7 +46,8 @@
                  (when (and meow-insert-mode
                             (or (eq major-mode 'org-mode)
                                 (eq major-mode 'gfm-mode)
-                                (eq major-mode 'telega-chat-mode)))
+                                (eq major-mode 'telega-chat-mode)
+                                (eq major-mode 'chatgpt-shell-mode)))
                    'other))))
 
 (setup avy

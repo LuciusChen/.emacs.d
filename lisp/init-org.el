@@ -2,12 +2,11 @@
 ;;; Commentary:
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
-  (:also-load lib-org-archive-hierachical)
-  (:also-load lib-org)
   (:global
    "C-C L"     org-store-link
    "C-M-<up>"  org-up-element
    "C-c b"     org-cite-insert)
+  (:when-loaded
   (:option
    org-directory "~/Dropbox/org/"
    org-image-actual-width nil
@@ -64,9 +63,10 @@
    'org-babel-load-languages '((plantuml . t)
                                (python . t)
                                (latex . t)))
-  (:with-mode org-mode (lambda () (pixel-scroll-precision-mode 1)))
-  (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
-  (:when-loaded
+    (:also-load lib-org-archive-hierachical)
+    (:also-load lib-org)
+    (:with-mode org-mode (lambda () (pixel-scroll-precision-mode 1)))
+    (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     ;; only hook in org-mode
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1)))
     (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
@@ -80,7 +80,6 @@
                   "* %? :NOTE:\n%U\n%a\n" :clock-resume t))))
 
 (setup org-clock
-  (:also-load lib-org-clock)
   (:global "C-c o j" org-clock-goto
            "C-c o l" org-clock-in-last
            "C-c o i" org-clock-in
@@ -98,13 +97,14 @@
    org-time-clocksum-format
    '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t)
    )
-  (:hooks org-clock-in-hook lucius/show-org-clock-in-header-line
-          org-clock-out-hook lucius/hide-org-clock-from-header-line
-          org-clock-cancel-hook lucius/hide-org-clock-from-header-line)
+  (:when-loaded
+    (:also-load lib-org-clock)
+    (:hooks org-clock-in-hook lucius/show-org-clock-in-header-line
+            org-clock-out-hook lucius/hide-org-clock-from-header-line
+            org-clock-cancel-hook lucius/hide-org-clock-from-header-line))
   (:after org (org-clock-persistence-insinuate)))
 
 (setup org-agenda
-  (:also-load lib-org-agenda)
   (:global "C-c a" org-agenda)
   (:option
    org-agenda-sort-notime-is-late nil
@@ -201,12 +201,13 @@
                        (org-agenda-sorting-strategy
                         '(category-keep))))))))
   (:when-loaded
+    (:also-load lib-org-agenda)
     (setq-default org-agenda-clockreport-parameter-plist
                   '(:link t :maxlevel 3))
-    (add-to-list 'org-agenda-after-show-hook 'org-show-entry))
-  ;; Re-align tags when window shape changes
-  (:with-mode org-agenda-mode
-    (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t))))
+    (add-to-list 'org-agenda-after-show-hook 'org-show-entry)
+    ;; Re-align tags when window shape changes
+    (:with-mode org-agenda-mode
+      (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t)))))
 
 (setup org-habit
   (:option org-habit-show-done-always-green t)
@@ -216,16 +217,6 @@
       (setcdr agenda-sorting-strategy (remove 'habit-down (cdr agenda-sorting-strategy))))))
 
 (setup org-roam
-  (:also-load lib-org-agenda-dynamic)
-  (:also-load lib-org-roam)
-  (:also-load lib-org-embark)
-  (:autoload toggle-dynamic-agenda)
-  (:autoload log-todo-next-creation-date)
-  (:autoload org-roam-copy-todo-to-today)
-  (:hooks org-mode-hook toggle-dynamic-agenda
-          org-after-todo-state-change-hook log-todo-next-creation-date
-          org-after-todo-state-change-hook org-roam-copy-todo-to-today)
-  (:require emacsql-sqlite-builtin)
   (:global   "C-c n l"     org-roam-buffer-toggle
              "C-c n f"     org-roam-node-find
              "C-c n i"     org-roam-node-insert
@@ -294,21 +285,32 @@
    org-roam-node-display-template (concat "${type:10} ${doom-hierarchy:120} "
                                           (propertize "${tags:*}"
                                                       'face 'org-tag)))
-  (:advice
-   org-agenda :before #'vulpea-agenda-files-update
-   org-todo-list :before #'vulpea-agenda-files-update
-   ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
-   org-roam-node-read--to-candidate
-   :override lucius/org-roam-node-read--to-candidate)
-  (:when-loaded (org-roam-db-autosync-enable))
+  (:when-loaded
+    (:require emacsql-sqlite-builtin)
+    (:autoload toggle-dynamic-agenda)
+    (:autoload log-todo-next-creation-date)
+    (:autoload org-roam-copy-todo-to-today)
+    (:hooks org-mode-hook toggle-dynamic-agenda
+            org-after-todo-state-change-hook log-todo-next-creation-date
+            org-after-todo-state-change-hook org-roam-copy-todo-to-today)
+    (:advice
+     org-agenda :before #'vulpea-agenda-files-update
+     org-todo-list :before #'vulpea-agenda-files-update
+     ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
+     org-roam-node-read--to-candidate
+     :override lucius/org-roam-node-read--to-candidate)
+    (org-roam-db-autosync-enable)
+    (:also-load lib-org-agenda-dynamic)
+    (:also-load lib-org-roam)
+    (:also-load lib-org-embark))
   (:after embark
     (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map))))
 
 (setup transient
-  (:also-load lib-transient)
   (:global "C-c e a" agenda-transient
            "C-c e j" journal-transient)
   (:when-loaded
+    (:also-load lib-transient)
     (transient-define-prefix  agenda-transient ()
       "Agenda menu"
       :info-manual "Agenda menu"
@@ -326,7 +328,7 @@
       [("q" "Quit"           transient-quit-one)])
 
     (transient-define-prefix journal-transient ()
-       "Journal menu"
+      "Journal menu"
       :info-manual "Journal menu"
       ["Arguments"
        ("-j" "Journal"            "journal.org")
@@ -405,7 +407,7 @@
       "Face for the default highlighter pen.")))
 
 (setup org-modern
-  (:require org)
+  (:load-after org)
   (:with-mode org-mode
     (:hook org-modern-mode)
     (:hook (lambda ()
@@ -449,7 +451,6 @@
      'append)))
 
 (setup deft
-  (:also-load lib-deft)
   (:option
    deft-extensions '("md" "tex" "org" "mw" "conf")
    deft-directory "~/Dropbox/org/notes"
@@ -462,10 +463,11 @@
            "\\|^:PROPERTIES:\n\\(.+\n\\)+:END:\n"
            "\\)"))
   (:advice deft-parse-title :override #'lucius/deft-parse-title)
-  (:global [f7] deft))
+  (:global [f7] deft)
+  (:when-loaded (:also-load lib-deft)))
 
-(setup mpvi (:require mpv))
 (setup org-transclusion (:also-load lib-org-transclusion))
+
 (setup ox-hugo
   (:after ox (require 'ox-hugo)))
 (provide 'init-org)

@@ -134,8 +134,9 @@
 
 (setup diff-hl
   (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
-          after-init-hook global-diff-hl-mode)
-  (:bind-into diff-hl-mode-map
-    "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))
+          prog-mode-hook global-diff-hl-mode)
+  (:when-loaded
+    (:bind-into diff-hl-mode-map
+      "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk)))
 (provide 'init-prog)
 ;;; init-prog.el ends here

@@ -28,5 +28,7 @@
 ;;                     " %l:%c")))
 ;;            ;; right portion
 ;;            (format-mode-line (quote ("%m " (vc-mode vc-mode))))))))
+(setup chatgpt-shell
+  (:option chatgpt-shell-openai-key "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"))
 (provide 'init-local)
 ;;; init-local.el ends here

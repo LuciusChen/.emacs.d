@@ -6,8 +6,6 @@
 
 ;;; Code:
 (setup ibuffer
-  (:require fullframe)
-  (fullframe ibuffer ibuffer-quit)
   (:global "C-x C-b" ibuffer)
   (:option ibuffer-formats
            '((mark modified read-only vc-status-mini " "
@@ -29,10 +27,14 @@
               " "
               vc-relative-file))
            ibuffer-filter-group-name-face 'font-lock-doc-face)
-  (:hooks ibuffer-hook (lambda () (ibuffer-vc-set-filter-groups-by-vc-root)
-                         (unless (eq ibuffer-sorting-mode 'filename/process)
-                           (ibuffer-do-sort-by-filename/process))))
   (:when-loaded
+    (:require fullframe)
+    (fullframe ibuffer ibuffer-quit)
+    (:require nerd-icons-ibuffer)
+    (:hooks ibuffer-hook (lambda () (ibuffer-vc-set-filter-groups-by-vc-root)
+                           (unless (eq ibuffer-sorting-mode 'filename/process)
+                             (ibuffer-do-sort-by-filename/process)))
+            ibuffer-mode-hook nerd-icons-ibuffer-mode)
     (setq-default ibuffer-show-empty-filter-groups nil)
     ;; Use human readable Size column instead of original one
     (define-ibuffer-column size-h
@@ -41,7 +43,7 @@
 
 (setup popper
   (:global "C-`"   popper-toggle-latest
-           "M-`"   popper-cycle
+           "M-~"   popper-cycle
            "C-M-`" popper-toggle-type)
   (:option popper-reference-buffers
            '(("\\*Messages\\*"
@@ -50,8 +52,8 @@
               help-mode
               compilation-mode)
              ("\\*Org Select\\*$")
-             ("\\*Agenda Commands\\*$"))
-           )
+             ("\\*Agenda Commands\\*$")
+             "\\*chatgpt\\*$"))
   (popper-mode +1)
   (popper-echo-mode +1))
 (provide 'init-ibuffer)

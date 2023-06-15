@@ -3,7 +3,7 @@
 ;; If language-detection is available,
 ;; then laguage could be detected automatically
 ;; for code blocks without language explicitly specified.
-(setup language-detection)
+
 ;; company 补全列表时参差不齐
 (setup company-box
   (:with-mode company-mode
@@ -34,7 +34,8 @@
     (:also-load telega-url-shorten
                 telega-bridge-bot
                 telega-mnz
-                lib-telega)
+                lib-telega
+                language-detection)
     ;; telega-url-shorten
     (add-to-list
      'telega-url-shorten-regexps
@@ -106,23 +107,8 @@
         (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
       (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))
     (psearch-patch telega-ins--message-header
-      (psearch-replace '`(telega-ins--with-attrs
-                             ,a ,b ,c . ,rest)
-                       '`(telega-ins--with-attrs
-                             ,a ,b
-                             (telega-ins--with-attrs
-                                 (list :max (* 11(/ telega-chat-fill-column 14)) :elide t)
-                               (telega-ins
-                                (telega-msg-sender-title sender nil 'with-username)))
-                             . ,rest))
       (psearch-replace '`(if telega-msg-heading-whole-line ,a ,b)
                        '`(if telega-msg-heading-whole-line ,a)))
-    ;; i'm sure 实在是太阻塞了
-    (psearch-patch telega-read-im-sure-p
-      (psearch-replace '`(concat ,a ,b)
-                       '`(concat ,a " (type \"y\" to confirm): "))
-      (psearch-replace '`(string-equal ,a ,b)
-                       '`(string-equal ,a "y")))
     ;; 用户名过长时，在 Reply 中省略部分。
     (psearch-patch telega-ins--aux-msg-one-line
       (psearch-replace
@@ -213,6 +199,7 @@
                                (telega-ins--image avatar 1
                                                   :image-ascent (unless msg-for-replies-p 100)
                                                   :no-display-if (not telega-chat-show-avatars))))
-                           . ,rest)))))
+                           . ,rest)))
+                           ))
 (provide 'init-telega)
 ;;; init-telega.el ends here

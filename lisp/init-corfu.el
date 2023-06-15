@@ -15,21 +15,15 @@
                     (pinyinlib-build-regexp-string str))))))
 
 (setup kind-icon
-  (:load-after corfu)
-  (:when-loaded
-    (add-to-list 'corfu-margin-formatters
-                 #'kind-icon-margin-formatter)))
+  (:defer 
+   (add-to-list 'corfu-margin-formatters
+                #'kind-icon-margin-formatter)))
 
 (setup corfu
-  (:with-mode corfu
-    (:bind "<escape>" corfu-quit
-           "TAB"  corfu-next
-           [tab]  corfu-next
-           "S-TAB"  corfu-previous
-           [backtab]  corfu-previous))
-  ;; org-mode 中关闭补全
+  (:require nerd-icons)
   (:option corfu-cycle t
-           corfu-excluded-modes '(org-mode)
+           ;; org-mode 中关闭补全
+           corfu-exclude-modes '(org-mode)
            ;; Using VS Code icons as an alternative
            kind-icon-mapping '((array          "a"   :icon "symbol-array"       :face font-lock-type-face              :collection "vscode")
                                (boolean        "b"   :icon "symbol-boolean"     :face font-lock-builtin-face           :collection "vscode")
@@ -67,8 +61,14 @@
                                (value          "v"   :icon "symbol-enum"        :face font-lock-builtin-face           :collection "vscode")
                                (variable       "va"  :icon "symbol-variable"    :face font-lock-variable-name-face     :collection "vscode")
                                (t              "."   :icon "question"           :face font-lock-warning-face           :collection "vscode")))
-  (global-corfu-mode)
+  (:defer (global-corfu-mode))
   (:when-loaded
+    (:with-mode corfu
+      (:bind "<escape>" corfu-quit
+             "TAB"  corfu-next
+             [tab]  corfu-next
+             "S-TAB"  corfu-previous
+             [backtab]  corfu-previous))
     (:with-mode eshell-mode
       (:hook (lambda () (setq-local corfu-auto nil)))
       (setq-default corfu-auto t)
