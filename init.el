@@ -94,7 +94,9 @@
     ef-themes
     fullframe
     ox-pandoc
+    doom-modeline
     chatgpt-shell
+    gptel
     macrostep
     json-mode
     orderless

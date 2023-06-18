@@ -47,10 +47,12 @@
 
 ;; install packages
 (defvar *use-package-list*
-  '(setup))
+  '(
+    setup
+    ))
 
 (dolist (e *use-package-list*)
   (straight-use-package e))
 (setq vc-follow-symlinks t)
 ;; ==== put your code below this line!
-;; emacs -Q -l ~/xxx/init.el(use-package vertico
+;; emacs -Q -l ~/xxx/init.el

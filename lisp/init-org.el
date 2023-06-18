@@ -324,7 +324,7 @@
        ("-n" "Note"      "note.org")
        ("-s" "Someday"   "someday.org")]
       ["Commands"
-       ("p" "agenda files switcher"     agenda-files-switcher)]
+       ("RET" "agenda files switcher"     agenda-files-switcher)]
       [("q" "Quit"           transient-quit-one)])
 
     (transient-define-prefix journal-transient ()
@@ -336,7 +336,7 @@
        ("-y" "Yesterday"          "yesterday")
        ("-d" "Clear archive log"  "delete")]
       ["Commands"
-       ("p" "Journal files switch"   journal-options)]
+       ("RET" "Journal files switch"   journal-options)]
       [("q" "Quit"           transient-quit-one)])))
 
 (setup bibtex

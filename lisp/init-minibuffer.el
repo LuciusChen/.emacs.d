@@ -1,6 +1,32 @@
 ;;; init-minibuffer.el --- Config for minibuffer completion       -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
+(setup doom-modeline
+  (doom-modeline-mode)
+  (:option doom-modeline-height 20
+           doom-modeline-buffer-file-name-style 'auto
+           doom-modeline-buffer-modification-icon t)
+  (:when-loaded
+    (doom-modeline-def-segment lucius/buffer-info
+        "custom doom-modeline for telega-chat-mode"
+      (let ((buffer-name (doom-modeline--buffer-name)))
+        (when (eq major-mode 'telega-chat-mode)
+          (setq buffer-name (propertize buffer-name 'face '(:foreground "color"))))
+        (concat
+         (doom-modeline-spc)
+         (doom-modeline--buffer-mode-icon)
+         (doom-modeline--buffer-state-icon)
+         buffer-name)))
+
+    (doom-modeline-def-modeline 'telega-chat-line
+        '(bar workspace-name window-number modals lucius/buffer-info selection-info)
+      '(misc-info minor-modes buffer-encoding major-mode time))
+
+    (add-hook 'doom-modeline-mode-hook
+              (lambda ()
+                (doom-modeline-set-modeline 'telega-chat-line 'default)))
+
+    (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . telega-chat-line))))
 
 (setup projectile
   (:option consult-project-root-function 'projectile-project-root))

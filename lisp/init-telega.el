@@ -23,33 +23,31 @@
   ;; 改成 (identity xxx-prefix-map) 即可
   (:bind-into global-map "C-c t" (identity telega-prefix-map))
   (:when-loaded
-    (:option telega-translate-to-language-by-default "zh"
-             ;;  telega-debug t
-             telega-autoplay-mode 1)
-    (:with-mode telega-chat-mode (:hook lucius/telega-chat-mode))
-    ;; 聊天列表高亮
-    ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
-    (:with-mode telega-root-mode (:hook lg-telega-root-mode))
-    (:hooks telega-chat-update lg-telega-chat-update)
     (:also-load telega-url-shorten
                 telega-bridge-bot
                 telega-mnz
                 lib-telega
                 language-detection)
+    (:option telega-translate-to-language-by-default "zh"
+             ;;  telega-debug t
+             telega-autoplay-mode 1
+             telega-url-shorten-regexps
+             ;; telega-url-shorten
+             (list `(too-long-link
+                     :regexp "^\\(https?://\\)\\(.\\{55\\}\\).*?$"
+                     :symbol ""
+                     :replace "\\1\\2...")))
+    (:with-mode telega-chat-mode (:hook lucius/telega-chat-mode))
+    ;; 聊天列表高亮
+    ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
+    (:with-mode telega-root-mode (:hook lg-telega-root-mode))
+    (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
-    (add-to-list
-     'telega-url-shorten-regexps
-     `(too-long-link
-       :regexp "^\\(https?://\\)\\(.\\{55\\}\\).*?$"
-       :symbol ""
-       :replace "\\1\\2...")
-     'append)
     (global-telega-url-shorten-mode 1)
     ;; telega-mnz
     (global-telega-mnz-mode 1)
     ;;telega-bridge-bot
-    (:option telega-bridge-bot-matrix-access-token
-             "syt_bHVjaXVzX2NoZW4_bgxwWBDOJrkowtgIFQqo_1GSVu8"
+    (:option telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
              telega-bridge-bot-bridge-info-plist
              '(-1001773572820                ; @emacs_china
                (420415423                    ; @matrix_t2bot
@@ -57,7 +55,7 @@
                -1001478915941                ; @vimzh_real
                (5296957089                   ; @nichi_matrix_bot
                 (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
-               -1001480067069                                 ;@keyboard_cn
+               -1001480067069                ;@keyboard_cn
                (420415423                    ; @matrix_t2bot
                 (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))))
     (set-face-attribute 'telega-msg-heading nil
@@ -115,10 +113,10 @@
        '`(let ((sender (telega-msg-sender msg))) ,a)
        '`(let ((sender (telega-msg-sender msg)))
            (telega-ins--with-attrs
-               (list :max (/ telega-chat-fill-column 3) :elide t)
-             (telega-ins
-              (or (telega-msg-sender-username sender 'with-Q)
-                  (telega-msg-sender-title sender)))))))
+            (list :max (/ telega-chat-fill-column 3) :elide t)
+            (telega-ins
+             (or (telega-msg-sender-username sender 'with-Q)
+                 (telega-msg-sender-title sender)))))))
     ;; ;; 修改 [| In reply to: ] 为 [| ➦: ]
     ;; ;; 因为这个 fwd-info 是个闭包，如果想在 elisp 里用闭包必须开词法作用域
     (advice-add 'telega-ins--msg-reply-inline :override #'lucius/telega-ins--msg-reply-inline)
@@ -186,20 +184,20 @@
 
                              ;; Show user profile when clicked on avatar, header
                              (telega-ins--with-props
-                                 (list 'action (lambda (button)
-                                                 ;; NOTE: check for custom message :action first
-                                                 ;; - [RESEND] button uses :action
-                                                 ;; - via @bot link uses :action
-                                                 (or (telega-button--action button)
-                                                     (telega-describe-msg-sender sender))))
-                               (telega-ins--image avatar 0
-                                                  :image-ascent (telega-ins--ascent-percent sender-name)
-                                                  :no-display-if (not telega-chat-show-avatars))
-                               (telega-ins--message-header msg chat sender addon-header-inserter)
-                               (telega-ins--image avatar 1
-                                                  :image-ascent (unless msg-for-replies-p 100)
-                                                  :no-display-if (not telega-chat-show-avatars))))
-                           . ,rest)))
-                           ))
+                              (list 'action (lambda (button)
+                                              ;; NOTE: check for custom message :action first
+                                              ;; - [RESEND] button uses :action
+                                              ;; - via @bot link uses :action
+                                              (or (telega-button--action button)
+                                                  (telega-describe-msg-sender sender))))
+                              (telega-ins--image avatar 0
+                                                 :image-ascent (telega-ins--ascent-percent sender-name)
+                                                 :no-display-if (not telega-chat-show-avatars))
+                              (telega-ins--message-header msg chat sender addon-header-inserter)
+                              (telega-ins--image avatar 1
+                                                 :image-ascent (unless msg-for-replies-p 100)
+                                                 :no-display-if (not telega-chat-show-avatars))))
+                           . ,rest))))
+                           )
 (provide 'init-telega)
 ;;; init-telega.el ends here
