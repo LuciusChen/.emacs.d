@@ -3,30 +3,32 @@
 ;;; Code:
 (setup doom-modeline
   (doom-modeline-mode)
-  (:option doom-modeline-height 20
+  (:option doom-modeline-height 18
            doom-modeline-buffer-file-name-style 'auto
            doom-modeline-buffer-modification-icon t)
   (:when-loaded
     (doom-modeline-def-segment lucius/buffer-info
-        "custom doom-modeline for telega-chat-mode"
+        "Customize doom-modeline to remove modification indication"
       (let ((buffer-name (doom-modeline--buffer-name)))
-        (when (eq major-mode 'telega-chat-mode)
-          (setq buffer-name (propertize buffer-name 'face '(:foreground "color"))))
+        (when (or (eq major-mode 'telega-chat-mode)
+                  (eq major-mode 'org-agenda-mode))
+          (setq buffer-name (propertize buffer-name 'face '(:foreground "color" :weight bold))))
         (concat
          (doom-modeline-spc)
          (doom-modeline--buffer-mode-icon)
          (doom-modeline--buffer-state-icon)
          buffer-name)))
 
-    (doom-modeline-def-modeline 'telega-chat-line
+    (doom-modeline-def-modeline 'disbale-modification-indication
         '(bar workspace-name window-number modals lucius/buffer-info selection-info)
       '(misc-info minor-modes buffer-encoding major-mode time))
 
     (add-hook 'doom-modeline-mode-hook
               (lambda ()
-                (doom-modeline-set-modeline 'telega-chat-line 'default)))
+                (doom-modeline-set-modeline 'disbale-modification-indication 'default)))
 
-    (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . telega-chat-line))))
+    (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disbale-modification-indication))
+    (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disbale-modification-indication))))
 
 (setup projectile
   (:option consult-project-root-function 'projectile-project-root))
