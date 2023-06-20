@@ -95,7 +95,6 @@
     fullframe
     ox-pandoc
     doom-modeline
-    chatgpt-shell
     gptel
     macrostep
     json-mode
@@ -171,8 +170,8 @@
 
 (require 'init-telega)
 (require 'init-nov)
-;; ;; (require 'init-beancount)
-;; ;; (require 'init-rime)
+;; (require 'init-beancount)
+;; (require 'init-rime)
 
 (require 'init-org)
 (require 'init-latex)

@@ -41,6 +41,19 @@ Screen 版本粗体和 normal 有明显的区别，有利于组织文本。
 
 需要安装 [Symbola]( https://www.wfonts.com/font/symbola) 字体，安装 [Symbola]( https://www.wfonts.com/font/symbola) 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [Emacs: Set Font in Init File](http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html)。
 
+## Language server
+
+
+
+## authinfo
+
+```
+machine api.openai.com login apikey password ****
+machine matrix.org login @lucius_chen:matrix.org  password ****
+```
+
+Matrix 的 key 实在 All Settings -> Help & About 当中的 Access Token 处获取。
+
 ## 执行 elisp
 
 在 Scratch 中开启 `lisp-interaction-mode`，在需要执行的函数最后 `C-j` 执行。

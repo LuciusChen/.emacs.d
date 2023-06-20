@@ -5,14 +5,20 @@
   (doom-modeline-mode)
   (:option doom-modeline-height 18
            doom-modeline-buffer-file-name-style 'auto
-           doom-modeline-buffer-modification-icon t)
+           doom-modeline-buffer-modification-icon t
+           doom-modeline-bar-width 4
+           doom-modeline-hud t
+           doom-modeline-hud-min-height 1)
   (:when-loaded
     (doom-modeline-def-segment lucius/buffer-info
         "Customize doom-modeline to remove modification indication"
       (let ((buffer-name (doom-modeline--buffer-name)))
         (when (or (eq major-mode 'telega-chat-mode)
                   (eq major-mode 'org-agenda-mode))
-          (setq buffer-name (propertize buffer-name 'face '(:foreground "color" :weight bold))))
+          (setq buffer-name
+                (propertize buffer-name 'face
+                            '(:foreground ,(frame-parameter nil 'foreground-color)
+                              :weight bold))))
         (concat
          (doom-modeline-spc)
          (doom-modeline--buffer-mode-icon)
@@ -23,9 +29,9 @@
         '(bar workspace-name window-number modals lucius/buffer-info selection-info)
       '(misc-info minor-modes buffer-encoding major-mode time))
 
-    (add-hook 'doom-modeline-mode-hook
-              (lambda ()
-                (doom-modeline-set-modeline 'disbale-modification-indication 'default)))
+    (:hooks doom-modeline-mode-hook
+            (lambda ()
+              (doom-modeline-set-modeline 'disbale-modification-indication 'default)))
 
     (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disbale-modification-indication))
     (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disbale-modification-indication))))

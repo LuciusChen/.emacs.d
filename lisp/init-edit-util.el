@@ -5,6 +5,11 @@
   (:autoload meow-setup)
   (meow-global-mode 1)
   (meow-setup)
+  (:option meow-replace-state-name-list '((normal . "⟨N⟩")
+                                          (motion . "⟨M⟩")
+                                          (keypad . "⟨K⟩")
+                                          (insert . "⟨I⟩")
+                                          (beacon . "⟨B⟩")))
   (:hooks focus-out-hook meow-insert-exit
           meow-insert-mode-hook
           (lambda ()
@@ -46,8 +51,7 @@
                  (when (and meow-insert-mode
                             (or (eq major-mode 'org-mode)
                                 (eq major-mode 'gfm-mode)
-                                (eq major-mode 'telega-chat-mode)
-                                (eq major-mode 'chatgpt-shell-mode)))
+                                (eq major-mode 'telega-chat-mode)))
                    'other))))
 
 (setup avy
@@ -114,12 +118,11 @@
 
 (setup whitespace-cleanup-mode
   (:global [remap just-one-space] cycle-spacing)
-  (:when-loaded
-    (setq-default show-trailing-whitespace nil)
-    (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-      (add-hook hook (lambda () (setq-local show-trailing-whitespace t))))
-    (global-whitespace-cleanup-mode)
-    (diminish 'whitespace-cleanup-mode)))
+  (setq-default show-trailing-whitespace nil)
+  (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+    (add-hook hook (lambda () (setq-local show-trailing-whitespace t))))
+  (global-whitespace-cleanup-mode)
+  (diminish 'whitespace-cleanup-mode))
 
 (setup window
   (:require lib-window)

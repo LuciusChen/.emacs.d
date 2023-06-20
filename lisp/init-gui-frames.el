@@ -120,5 +120,16 @@
       (not (display-graphic-p)))
     (add-to-list 'dimmer-exclusion-predicates 'sanityinc/display-non-graphic-p)
     (:advice frame-set-background-mode :after (lambda (&rest args) (dimmer-process-all)))))
+
+(setup nerd-icons
+  ;; fix orig. nerd dashboard oct icon missing
+  (:when-loaded (let ((icons nerd-icons-mode-icon-alist))
+                  (setq nerd-icons-mode-icon-alist
+                        (cons '(benchmark-init/tree-mode nerd-icons-codicon
+                                "nf-cod-dashboard"
+                                :face
+                                nerd-icons-blue)
+                              (delq (assq 'benchmark-init/tree-mode icons)
+                                    icons))))))
 (provide 'init-gui-frames)
 ;;; init-gui-frames.el ends here
