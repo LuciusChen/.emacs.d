@@ -15,7 +15,7 @@
                     (pinyinlib-build-regexp-string str))))))
 
 (setup kind-icon
-  (:defer 
+  (:defer
    (add-to-list 'corfu-margin-formatters
                 #'kind-icon-margin-formatter)))
 

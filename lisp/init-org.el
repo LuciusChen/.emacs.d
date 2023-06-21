@@ -213,7 +213,7 @@
       (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t)))))
 
 (setup org-habit
-  (:when-loaded
+  (:after org
     (:option org-habit-show-done-always-green t)
     (:with-feature org-agenda
       (:also-load org-habit)
@@ -421,7 +421,7 @@
              (push '("[X]" . "☑" ) prettify-symbols-alist)
              (push '("[-]" . "❍" ) prettify-symbols-alist)
              (prettify-symbols-mode))))
-  (:option org-modern-star ["➮" "✦" "✧" "✰" "✫" "✩"]
+  (:option org-modern-star ["§" "¶" "❡" "⁋" "※"]
            org-hide-emphasis-markers t
            org-tags-column 0
            org-modern-block-fringe 2

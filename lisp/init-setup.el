@@ -4,19 +4,13 @@
 (require 'cl-lib)
 (require 'map)
 
- (setup-define :delay
-    (lambda (&optional time)
-      `(run-with-idle-timer ,(or time 1) nil
-                            (lambda () (require ',(setup-get 'feature)))))
-    :documentation "Delay loading the feature until a certain amount of idle time has passed.")
-
 (setup-define :defer
   (lambda (features)
     `(run-with-idle-timer 1 nil
                           (lambda ()
                             ,features)))
-    :documentation "Delay loading the feature until a certain amount of idle time has passed."
-    :repeatable t)
+  :documentation "Delay loading the feature until a certain amount of idle time has passed."
+  :repeatable t)
 
 (setup-define :advice
   (lambda (symbol where function)
@@ -53,12 +47,12 @@ See `advice-add' for more details."
   :repeatable t)
 
 (setup-define :load-after
-    (lambda (&rest features)
-      (let ((body `(require ',(setup-get 'feature))))
-        (dolist (feature (nreverse features))
-          (setq body `(with-eval-after-load ',feature ,body)))
-        body))
-    :documentation "Load the current feature after FEATURES.")
+  (lambda (&rest features)
+    (let ((body `(require ',(setup-get 'feature))))
+      (dolist (feature (nreverse features))
+        (setq body `(with-eval-after-load ',feature ,body)))
+      body))
+  :documentation "Load the current feature after FEATURES.")
 
 (with-eval-after-load 'imenu
   (add-hook 'emacs-lisp-mode-hook

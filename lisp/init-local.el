@@ -1,9 +1,7 @@
-;;; init-local.el  --- Custom configuration
+;;; init-local.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary:
-
 (setup gptel
-  (:when-loaded 
-    (require 'auth-source)
+  (:when-loaded
     (:also-load org)
     (:option gptel-api-key (auth-source-pick-first-password :host "api.openai.com" :user "apikey")
              gptel-model "gpt-3.5-turbo"

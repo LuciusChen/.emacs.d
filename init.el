@@ -71,6 +71,8 @@
     eglot
     corfu
     vundo
+    gptel
+    vterm
     embark
     xenops
     bibtex
@@ -94,8 +96,6 @@
     ef-themes
     fullframe
     ox-pandoc
-    doom-modeline
-    gptel
     macrostep
     json-mode
     orderless
@@ -117,6 +117,7 @@
     consult-dir
     treesit-auto
     org-cliplink
+    doom-modeline
     gruvbox-theme
     markdown-mode
     disable-mouse
