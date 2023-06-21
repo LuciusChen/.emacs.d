@@ -213,7 +213,7 @@
       (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t)))))
 
 (setup org-habit
-  (:after org
+  (:after org-agenda
     (:option org-habit-show-done-always-green t)
     (:with-feature org-agenda
       (:also-load org-habit)

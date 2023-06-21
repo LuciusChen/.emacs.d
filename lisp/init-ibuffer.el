@@ -53,7 +53,7 @@
               compilation-mode)
              ("\\*Org Select\\*$")
              ("\\*Agenda Commands\\*$")
-             "\\*chatgpt\\*$"))
+             ("\\*chatgpt\\*$")))
   (popper-mode +1)
   (popper-echo-mode +1))
 (provide 'init-ibuffer)

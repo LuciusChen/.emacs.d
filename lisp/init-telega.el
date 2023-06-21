@@ -202,7 +202,6 @@
                               (telega-ins--image avatar 1
                                                  :image-ascent (unless msg-for-replies-p 100)
                                                  :no-display-if (not telega-chat-show-avatars))))
-                           . ,rest))))
-                           )
+                           . ,rest)))))
 (provide 'init-telega)
 ;;; init-telega.el ends here

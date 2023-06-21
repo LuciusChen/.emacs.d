@@ -30,10 +30,6 @@
   (global-set-key (kbd "M-C-8") (lambda () (interactive) (lucius/adjust-opacity nil -2)))
   (global-set-key (kbd "M-C-7") (lambda () (interactive) (lucius/adjust-opacity nil 2)))
 
-  (when *IS-MAC*
-    (require 'ns-auto-titlebar)
-    (ns-auto-titlebar-mode))
-
   (setq frame-title-format
         '((:eval (if (buffer-file-name)
                      (abbreviate-file-name (buffer-file-name))
