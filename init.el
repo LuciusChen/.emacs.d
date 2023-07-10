@@ -63,6 +63,8 @@
     mpv
     deft
     ;; rime
+    vterm
+    vterm-toggle
     affe
     ebib
     citar
@@ -72,7 +74,6 @@
     corfu
     vundo
     gptel
-    vterm
     embark
     xenops
     bibtex
@@ -128,7 +129,6 @@
     typescript-mode
     git-timemachine
     nerd-icons-dired
-    ns-auto-titlebar
     command-log-mode
     org-transclusion
     browse-kill-ring

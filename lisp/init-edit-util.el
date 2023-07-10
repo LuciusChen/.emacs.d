@@ -5,24 +5,21 @@
   (:autoload meow-setup)
   (meow-global-mode 1)
   (meow-setup)
-  (:option meow-replace-state-name-list '((normal . "⟨N⟩")
-                                          (motion . "⟨M⟩")
-                                          (keypad . "⟨K⟩")
-                                          (insert . "⟨I⟩")
-                                          (beacon . "⟨B⟩")))
-  (:hooks focus-out-hook meow-insert-exit
-          meow-insert-mode-hook
+  (:option  meow-replace-state-name-list '((normal . "⟨N⟩")
+                                           (motion . "⟨M⟩")
+                                           (keypad . "⟨K⟩")
+                                           (insert . "⟨I⟩")
+                                           (beacon . "⟨B⟩"))
+            wrap-keymap (let ((map (make-keymap)))
+                          (suppress-keymap map)
+                          (dolist (k '("(" "[" "{" "<"))
+                            (define-key map k #'insert-pair))
+                          map))
+  (:hooks meow-insert-mode-hook
           (lambda ()
             (if meow-insert-mode
                 (run-hooks 'meow-entering-insert-mode-hook)
               (run-hooks 'meow-leaving-insert-mode-hook))))
-  (setq wrap-keymap
-        (let ((map (make-keymap)))
-          (suppress-keymap map)
-          (dolist (k '("(" "[" "{" "<"))
-            (define-key map k #'insert-pair))
-          map))
-
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
 (setup sis
@@ -52,7 +49,14 @@
                             (or (eq major-mode 'org-mode)
                                 (eq major-mode 'gfm-mode)
                                 (eq major-mode 'telega-chat-mode)))
-                   'other))))
+                   'other)))
+
+  (defun lucius/meow-focus-change-function ()
+    (if (frame-focus-state)
+        (sis-set-english)
+      (meow-insert-exit)))
+
+  (add-function :after after-focus-change-function 'lucius/meow-focus-change-function))
 
 (setup avy
   (:require ace-pinyin)
