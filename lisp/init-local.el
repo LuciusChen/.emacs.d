@@ -48,6 +48,6 @@
           (rename-buffer "*vterm compilation*")
           (compilation-shell-minor-mode 1)
           (vterm-send-M-w)
-          (vterm-send-string compile-command t)
+          (vterm-send-string compile-command t))))))
 (provide 'init-local)
 ;;; init-local.el ends here

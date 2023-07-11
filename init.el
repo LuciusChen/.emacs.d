@@ -7,7 +7,7 @@
 ;;; Code:
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
-(setq debug-on-error t)
+;; (setq debug-on-error t)
 ;; ignore native compile warning
 (setq warning-minimum-level :emergency)
 
