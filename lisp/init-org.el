@@ -37,7 +37,6 @@
      org-archive-mark-done nil
      org-archive-location "%s_archive::* Archive"
      org-archive-default-command 'org-archive-subtree-hierarchical
-  ;;; To-do settings
      ;; TODO
      ;; HOLD(h@)       ; 进入时添加笔记
      ;; HOLD(h/!)      ; 离开时添加变更信息
@@ -68,7 +67,8 @@
     (:with-mode org-mode (lambda () (pixel-scroll-precision-mode 1)))
     (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     ;; only hook in org-mode
-    (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1)))
+    (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
+            org-mode-hook org-indent-mode)
     (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
 
 (setup org-capture
@@ -103,7 +103,16 @@
       (:also-load lib-org-clock)
       (:hooks org-clock-in-hook lucius/show-org-clock-in-header-line
               org-clock-out-hook lucius/hide-org-clock-from-header-line
-              org-clock-cancel-hook lucius/hide-org-clock-from-header-line))
+              org-clock-cancel-hook lucius/hide-org-clock-from-header-line
+              org-clock-in-hook
+              (lambda ()
+                (when (and (org-entry-is-todo-p) (not (org-entry-is-done-p)))
+                  (org-todo "NEXT")))
+              org-after-todo-state-change-hook
+              (lambda ()
+                (when (string= org-state "DONE")
+                  (org-clock-out)))
+              ))
     (:after org (org-clock-persistence-insinuate))))
 
 (setup org-agenda
@@ -457,7 +466,7 @@
 
 (setup deft
   (:option
-   deft-extensions '("md" "tex" "org" "mw" "conf")
+   deft-extensions '("md" "tex" "org" "conf")
    deft-directory "~/Dropbox/org/notes"
    deft-recursive t
    deft-strip-summary-regexp
