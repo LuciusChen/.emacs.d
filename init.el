@@ -63,12 +63,11 @@
     mpv
     deft
     ;; rime
-    vterm
-    vterm-toggle
     affe
     ebib
     citar
     setup
+    elfeed
     popper
     eglot
     corfu
@@ -145,6 +144,7 @@
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
     (mpvi :host github :repo "lorniu/mpvi")
+    (emacs-immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
     (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     (psearch :host github :repo "twlz0ne/psearch.el" :files ("psearch.el"))))
@@ -179,6 +179,20 @@
 (require 'init-local)
 (provide 'init)
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(ef-spring))
+ '(elfeed-feeds
+   '("https://karthinks.com/index.xml" "https://blog.jcole.us/feed/" "https://kisaragi-hiu.com/feed.xml")))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 ;; Local Variables:
 ;; coding: utf-8
 ;; no-byte-compile: t

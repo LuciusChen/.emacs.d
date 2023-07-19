@@ -401,24 +401,24 @@
            org-cite-activate-processor 'citar
            citar-bibliography org-cite-global-bibliography))
 
-(setup org-remark
-  (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
-  (:global "C-c i m" org-remark-mark)
-  (:bind-into org-remark-mode-map
-    "C-c i o" org-remark-open
-    "C-c i ]" org-remark-view-next
-    "C-c i [" org-remark-view-prev
-    "C-c i r" org-remark-remove
-    "C-c i d" org-remark-delete)
-  (:when-loaded
-    (defface org-remark-highlighter
-        '((((class color) (min-colors 88) (background light))
-           :underline (:color "#FF6DB3" :style line :position 5) :background "#ADF6D9")
-          (((class color) (min-colors 88) (background dark))
-           :underline (:color "#FCFAC7" :style line :position 5) :background "#3F3F3F")
-          (t
-           :inherit highlight))
-      "Face for the default highlighter pen.")))
+;; (setup org-remark
+;;   (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
+;;   (:global "C-c i m" org-remark-mark)
+;;   (:bind-into org-remark-mode-map
+;;     "C-c i o" org-remark-open
+;;     "C-c i ]" org-remark-view-next
+;;     "C-c i [" org-remark-view-prev
+;;     "C-c i r" org-remark-remove
+;;     "C-c i d" org-remark-delete)
+;;   (:when-loaded
+;;     (defface org-remark-highlighter
+;;         '((((class color) (min-colors 88) (background light))
+;;            :underline (:color "#FF6DB3" :style line :position 5) :background "#ADF6D9")
+;;           (((class color) (min-colors 88) (background dark))
+;;            :underline (:color "#FCFAC7" :style line :position 5) :background "#3F3F3F")
+;;           (t
+;;            :inherit highlight))
+;;       "Face for the default highlighter pen.")))
 
 (setup org-modern
   (:load-after org)
