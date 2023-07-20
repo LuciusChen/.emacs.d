@@ -49,10 +49,11 @@
 (defvar *use-package-list*
   '(
     setup
+    ;; ==== Put the packages related to the code below this line! ====
     ))
 
 (dolist (e *use-package-list*)
   (straight-use-package e))
 (setq vc-follow-symlinks t)
-;; ==== put your code below this line!
-;; emacs -Q -l ~/xxx/init.el
+;; ==== put your code below this line! ====
+;; emacs -Q -l ~/.emacs.d/init-minimum.el

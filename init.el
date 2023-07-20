@@ -67,12 +67,12 @@
     ebib
     citar
     setup
-    elfeed
-    popper
     eglot
     corfu
     vundo
     gptel
+    elfeed
+    popper
     embark
     xenops
     bibtex
@@ -93,6 +93,7 @@
     diminish
     org-roam
     git-link
+    pdf-tools
     ef-themes
     fullframe
     ox-pandoc
@@ -106,10 +107,11 @@
     nerd-icons
     org-modern
     ace-pinyin
-    org-remark
+    ;; org-remark
     projectile
     marginalia
     git-commit
+    elfeed-tube
     org-roam-ui
     company-box
     magit-todos
@@ -125,11 +127,12 @@
     mode-line-bell
     benchmark-init
     embark-consult
+    elfeed-tube-mpv
     typescript-mode
     git-timemachine
     nerd-icons-dired
     command-log-mode
-    org-transclusion
+    ;; org-transclusion
     browse-kill-ring
     flymake-flycheck
     nerd-icons-ibuffer

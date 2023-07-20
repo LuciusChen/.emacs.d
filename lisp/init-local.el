@@ -18,6 +18,23 @@
            '("https://andreyorst.gitlab.io/feed.xml"
              "https://blog.dornea.nu/feed.xml"
              "https://fasterthanli.me/index.xml"
-             "https://blog.jcole.us/feed/")))
+             "https://blog.jcole.us/feed/"
+             "https://karthinks.com/index.xml"
+             ("https://rsshub.app/youtube/user/@lijxse" Figma))))
+
+(setup elfeed-tube
+  (:after elfeed
+    (:bind-into elfeed-show-mode-map
+      "F" elfeed-tube-fetch
+      [remap save-buffer] elfeed-tube-save)
+    (:bind-into     elfeed-search-mode-map
+      "F" elfeed-tube-fetch
+      [remap save-buffer] elfeed-tube-save))
+  (elfeed-tube-setup))
+
+(setup elfeed-tube-mpv
+ (:bind-into elfeed-show-mode-map
+              "C-c C-f"  elfeed-tube-mpv-follow-mode
+              "C-c C-w"  elfeed-tube-mpv-where))
 (provide 'init-local)
 ;;; init-local.el ends here
