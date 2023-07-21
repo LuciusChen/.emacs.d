@@ -61,4 +61,4 @@ Matrix 的 key 实在 All Settings -> Help & About 当中的 Access Token 处获
 - [GitHub - karthink/gptel: A no-frills ChatGPT client for Emacs](https://github.com/karthink/gptel)
 - [GitHub - Elilif/emacs-immersive-translate](https://github.com/Elilif/emacs-immersive-translate)
 
-通过上述两个包就可以在 org 以及 nov 等 mode 中进行翻译。
+通过上述两个包就可以在 org 以及 nov 等 mode 中进行翻译。其中 [OpenAI](https://platform.openai.com/) 需要绑定支付方式后才可以使用，可以使用我的 [WildCard](https://bewildcard.com/i/YAOHUA) 邀请链接注册充值。

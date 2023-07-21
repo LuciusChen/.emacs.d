@@ -53,15 +53,7 @@
      org-refile-target-verify-function (lambda ()
                                          (not (member
                                                (nth 2 (org-heading-components))
-                                               org-done-keywords)))
-     org-plantuml-jar-path
-     (expand-file-name "~/Dropbox/org/plantuml/plantuml.jar")
-     ;; 这里应该就是 .zshrc 里面配置的 python3
-     org-babel-python-command "python3")
-    (org-babel-do-load-languages
-     'org-babel-load-languages '((plantuml . t)
-                                 (python . t)
-                                 (latex . t)))
+                                               org-done-keywords))))
     (:also-load lib-org-archive-hierachical)
     (:also-load lib-org)
     (:with-mode org-mode (lambda () (pixel-scroll-precision-mode 1)))
@@ -70,6 +62,21 @@
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
             org-mode-hook org-indent-mode)
     (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
+
+(setup ob-core
+  (:after org)
+  (:when-loaded
+    (:also-load ob-plantuml
+                ob-python
+                ob-latex)
+    (:option      org-plantuml-jar-path
+                  (expand-file-name "~/Dropbox/org/plantuml/plantuml.jar")
+                  ;; 这里应该就是 .zshrc 里面配置的 python3
+                  org-babel-python-command "python3")
+    (org-babel-do-load-languages
+     'org-babel-load-languages '((plantuml . t)
+                                 (python . t)
+                                 (latex . t)))))
 
 (setup org-capture
   (:global "C-c c" org-capture)
