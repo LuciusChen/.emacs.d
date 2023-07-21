@@ -41,10 +41,6 @@ Screen 版本粗体和 normal 有明显的区别，有利于组织文本。
 
 需要安装 [Symbola]( https://www.wfonts.com/font/symbola) 字体，安装 [Symbola]( https://www.wfonts.com/font/symbola) 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [Emacs: Set Font in Init File](http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html)。
 
-## Language server
-
-
-
 ## authinfo
 
 ```
@@ -58,4 +54,11 @@ Matrix 的 key 实在 All Settings -> Help & About 当中的 Access Token 处获
 
 在 Scratch 中开启 `lisp-interaction-mode`，在需要执行的函数最后 `C-j` 执行。
 
-## 快捷键
+## Workflow
+
+用过一段时间的 Readwise Reader，选择其的原因在于可以配合沉浸式翻译，达到快速阅读英文书籍及文章的目的。但是目前在 Emacs 当中也可以通过 gpt 的应用达到相同的目的。
+
+- [GitHub - karthink/gptel: A no-frills ChatGPT client for Emacs](https://github.com/karthink/gptel)
+- [GitHub - Elilif/emacs-immersive-translate](https://github.com/Elilif/emacs-immersive-translate)
+
+通过上述两个包就可以在 org 以及 nov 等 mode 中进行翻译。

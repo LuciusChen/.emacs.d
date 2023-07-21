@@ -147,7 +147,7 @@
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
     (mpvi :host github :repo "lorniu/mpvi")
-    (emacs-immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
+    (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
     (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     (psearch :host github :repo "twlz0ne/psearch.el" :files ("psearch.el"))))

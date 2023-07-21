@@ -12,6 +12,11 @@
              gptel-default-mode 'org-mode
              gptel-temperature 0.7)))
 
+(setup immersive-translate
+  (:with-mode elfeed-show-mode
+    (:hook immersive-translate-setup))
+  (:hooks nov-pre-html-render-hook immersive-translate-setup))
+
 (setup elfeed
   (:global "C-x w" elfeed)
   (:option elfeed-feeds
@@ -20,7 +25,12 @@
              "https://fasterthanli.me/index.xml"
              "https://blog.jcole.us/feed/"
              "https://karthinks.com/index.xml"
-             ("https://rsshub.app/youtube/user/@lijxse" Figma))))
+             "https://www.chinagfw.org/feeds/posts/default"
+             "https://leancrew.com/all-this/feed/"
+             ("https://rsshub.app/youtube/user/@lijxse" Figma)
+             ("https://rsshub.app/youtube/user/@TimelabPro" TimelabPro)
+             ("https://rsshub.app/youtube/user/@xiao_lin_shuo" xiao_lin_shuo)
+             ("https://rsshub.app/youtube/user/@MacroRoom" MacroRoom))))
 
 (setup elfeed-tube
   (:after elfeed

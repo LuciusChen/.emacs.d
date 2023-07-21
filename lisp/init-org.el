@@ -365,6 +365,7 @@
 
 (setup ebib
   (:require bibtex)
+  (:also-load lib-org)
   (:option ebib-default-directory bibtex-file-path
            ebib-bib-search-dirs `(,bibtex-file-path)
            ebib-file-search-dirs `(,(concat bibtex-file-path "files/"))
