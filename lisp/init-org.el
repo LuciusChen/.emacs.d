@@ -137,7 +137,7 @@
      org-agenda-start-on-weekday nil
      org-agenda-span 'day
      org-agenda-include-diary nil
-     org-agenda-current-time-string "◀┈┈┈┈┈┈┈┈┈┈┈ ⌛"
+     org-agenda-current-time-string (concat "◀┈┈┈┈┈┈┈┈┈┈┈┈┈ " (nerd-icons-faicon "nf-fa-clock_o"))
      org-agenda-sorting-strategy
      '((agenda habit-down time-up user-defined-up effort-up category-keep)
        (todo category-up effort-up)

@@ -13,6 +13,8 @@
              gptel-temperature 0.7)))
 
 (setup immersive-translate
+  (:option immersive-translate-backend 'chatgpt
+           immersive-translate-chatgpt-host "api.openai.com")
   (:with-mode elfeed-show-mode
     (:hook immersive-translate-setup))
   (:hooks nov-pre-html-render-hook immersive-translate-setup))
@@ -30,7 +32,8 @@
              ("https://rsshub.app/youtube/user/@lijxse" Figma)
              ("https://rsshub.app/youtube/user/@TimelabPro" TimelabPro)
              ("https://rsshub.app/youtube/user/@xiao_lin_shuo" xiao_lin_shuo)
-             ("https://rsshub.app/youtube/user/@MacroRoom" MacroRoom))))
+             ("https://rsshub.app/youtube/user/@MacroRoom" MacroRoom)
+             ("https://rsshub.app/youtube/user/@BrandonLiUnscripted" BrandonLi))))
 
 (setup elfeed-tube
   (:after elfeed
