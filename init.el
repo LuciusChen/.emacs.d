@@ -144,9 +144,9 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
+    (mpvi :host github :repo "lorniu/mpvi")
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
-    (mpvi :host github :repo "lorniu/mpvi")
     (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
     (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
