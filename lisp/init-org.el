@@ -263,16 +263,15 @@
        ("p" "private" plain
         (file "~/Dropbox/org/templates/private.org")
         :if-new (file "private/%<%Y%m%d%H%M%S>-${slug}.org")
-        :unnarrowed t)
-       ("a" "article" plain
-        (file "~/Dropbox/org/templates/article.org")
-        :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-        :unnarrowed t)
-       ("n" "article-network" plain
-        (file "~/Dropbox/org/templates/article-network.org")
-        :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-        :unnarrowed t)
-       )
+        :unnarrowed t))
+       ;; ("a" "article" plain
+       ;;  (file "~/Dropbox/org/templates/article.org")
+       ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
+       ;;  :unnarrowed t)
+       ;; ("n" "article-network" plain
+       ;;  (file "~/Dropbox/org/templates/article-network.org")
+       ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
+       ;;  :unnarrowed t)
      org-roam-dailies-capture-templates
      ;; %<%H:%M> 为24小时制，%<%I:%M %p> 为12小时制
      '(
