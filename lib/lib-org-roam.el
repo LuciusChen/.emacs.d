@@ -24,17 +24,6 @@
                      (file-truename (buffer-file-name)))
         (org-refile nil nil (list "Tasks" today-file nil pos))))))
 
-;; Save the corresponding buffers
-(defun gtd-save-org-buffers ()
-  "Save `org-agenda-files' buffers without user confirmation.
-See also `org-save-all-org-buffers'"
-  (interactive)
-  (message "Saving org-agenda-files buffers...")
-  (save-some-buffers t (lambda ()
-                         (when (member (buffer-file-name) org-agenda-files)
-                           t)))
-  (message "Saving org-agenda-files buffers... done"))
-
 ;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
 ;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
 (defun dired-copy-images-links ()

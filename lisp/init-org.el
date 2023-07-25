@@ -7,6 +7,7 @@
    "C-M-<up>"  org-up-element
    "C-c b"     org-cite-insert)
   (:when-loaded
+    (:also-load lib-org)
     (:option
      org-directory "~/Dropbox/org/"
      org-image-actual-width nil
