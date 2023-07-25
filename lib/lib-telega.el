@@ -60,9 +60,9 @@
   ;; NOTE: Do not show reply inline if replying to thread's root message.
   ;; If replied message is not instantly available, it will be fetched
   ;; later by the `telega-msg--replied-message-fetch'
-  (unless (or (zerop (plist-get msg :reply_to_message_id))
+  (unless (or (not (telega-msg-match-p msg 'is-reply))
               (eq (plist-get telega-chatbuf--thread-msg :id)
-                  (plist-get msg :reply_to_message_id)))
+                  (telega--tl-get msg :reply_to :message_id)))
     (let ((replied-msg (telega-msg--replied-message msg)))
       (cond ((or (null replied-msg) (eq replied-msg 'loading))
              ;; NOTE: replied message will be fetched by the
