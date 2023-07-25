@@ -144,7 +144,7 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
-    (mpvi :host github :repo "lorniu/mpvi")
+    ;; (mpvi :host github :repo "lorniu/mpvi")
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
     (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
@@ -173,7 +173,7 @@
 (require 'init-prog)
 
 (require 'init-telega)
-(require 'init-nov)
+(require 'init-reader)
 ;; (require 'init-beancount)
 ;; (require 'init-rime)
 
