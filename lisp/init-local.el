@@ -66,7 +66,7 @@
     (:bind-into     elfeed-search-mode-map
       "F" elfeed-tube-fetch
       [remap save-buffer] elfeed-tube-save))
-  (elfeed-tube-setup))
+  (:when-loaded (elfeed-tube-setup)))
 
 (setup elfeed-tube-mpv
   (:bind-into elfeed-show-mode-map
