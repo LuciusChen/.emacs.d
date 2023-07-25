@@ -48,7 +48,7 @@ machine api.openai.com login apikey password ****
 machine matrix.org login @lucius_chen:matrix.org  password ****
 ```
 
-Matrix 的 key 实在 All Settings -> Help & About 当中的 Access Token 处获取。
+Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获取。
 
 ## 执行 elisp
 
