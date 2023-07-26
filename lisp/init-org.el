@@ -61,7 +61,8 @@
     (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     ;; only hook in org-mode
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
-            org-mode-hook org-indent-mode)
+            org-mode-hook org-indent-mode
+            org-after-todo-state-change-hook org-copy-todo-to-today)
     (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
 
 (setup ob-core
@@ -312,8 +313,7 @@
     (:autoload log-todo-next-creation-date)
     (:autoload org-roam-copy-todo-to-today)
     (:hooks org-mode-hook toggle-dynamic-agenda
-            org-after-todo-state-change-hook log-todo-next-creation-date
-            org-after-todo-state-change-hook org-roam-copy-todo-to-today)
+            org-after-todo-state-change-hook log-todo-next-creation-date)
     (:advice
      org-agenda :before #'vulpea-agenda-files-update
      org-todo-list :before #'vulpea-agenda-files-update
