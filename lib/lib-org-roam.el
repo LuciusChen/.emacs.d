@@ -6,24 +6,6 @@
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 
-;; Copy Done To-Dos to Today
-(defun org-roam-copy-todo-to-today ()
-  (interactive)
-  (when (and (or (equal org-state "DONE") (equal org-state "CANCELLED")) (not (org-find-property "STYLE")))
-    (let ((org-refile-keep t) ;; Set this to nil to delete the original!
-          (org-after-refile-insert-hook #'save-buffer)
-          today-file
-          pos)
-      (save-window-excursion
-        (org-roam-dailies-capture-today t "t")
-        (setq today-file (buffer-file-name))
-        (setq pos (point)))
-
-      ;; Only refile if the target file is different than the current file
-      (unless (equal (file-truename today-file)
-                     (file-truename (buffer-file-name)))
-        (org-refile nil nil (list "Tasks" today-file nil pos))))))
-
 ;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
 ;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
 (defun dired-copy-images-links ()

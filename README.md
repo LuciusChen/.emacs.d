@@ -56,7 +56,7 @@ Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获
 
 通过 [Elilif/emacs-immersive-translate](https://github.com/Elilif/emacs-immersive-translate) 进行翻译。其中 [OpenAI](https://platform.openai.com/) 需要绑定支付方式后才可以使用，可以使用我的 [WildCard](https://bewildcard.com/i/YAOHUA) 邀请链接注册充值，享受88折优惠。
 
-另外阅读书籍 ePub 用 [nov.el](https://depp.brause.cc/nov.el/)，阅读 PDF 用 [vedang/pdf-tools](https://github.com/vedang/pdf-tools)；RSS 订阅用 [skeeto/elfeed](https://github.com/skeeto/elfeed) 和 [karthink/elfeed-tube](https://github.com/karthink/elfeed-tube)，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
+阅读书籍 ePub 用 [nov.el](https://depp.brause.cc/nov.el/)，阅读 PDF 用 [vedang/pdf-tools](https://github.com/vedang/pdf-tools)；RSS 订阅用 [skeeto/elfeed](https://github.com/skeeto/elfeed) 和 [karthink/elfeed-tube](https://github.com/karthink/elfeed-tube)，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
 
 ChatGPT 的应用可以通过 [karthink/gptel](https://github.com/karthink/gptel) 在 Emacs 当中使用。
 
