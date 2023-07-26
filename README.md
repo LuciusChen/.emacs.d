@@ -50,15 +50,16 @@ machine matrix.org login @lucius_chen:matrix.org  password ****
 
 Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获取。
 
-## 执行 elisp
-
-在 Scratch 中开启 `lisp-interaction-mode`，在需要执行的函数最后 `C-j` 执行。
-
-## Workflow
+## Reader
 
 用过一段时间的 [Readwise Reader](https://read.readwise.io)，选择其的原因在于可以配合沉浸式翻译，达到快速阅读英文书籍及文章的目的。但是目前在 Emacs 当中也可以通过 gpt 的应用达到相同的目的。
 
-- [GitHub - karthink/gptel: A no-frills ChatGPT client for Emacs](https://github.com/karthink/gptel)
-- [GitHub - Elilif/emacs-immersive-translate](https://github.com/Elilif/emacs-immersive-translate)
+通过 [Elilif/emacs-immersive-translate](https://github.com/Elilif/emacs-immersive-translate) 进行翻译。其中 [OpenAI](https://platform.openai.com/) 需要绑定支付方式后才可以使用，可以使用我的 [WildCard](https://bewildcard.com/i/YAOHUA) 邀请链接注册充值，享受88折优惠。
 
-通过上述两个包就可以在 org 以及 nov 等 mode 中进行翻译。其中 [OpenAI](https://platform.openai.com/) 需要绑定支付方式后才可以使用，可以使用我的 [WildCard](https://bewildcard.com/i/YAOHUA) 邀请链接注册充值，享受88折优惠。
+另外阅读书籍 ePub 用 [nov.el](https://depp.brause.cc/nov.el/)，阅读 PDF 用 [vedang/pdf-tools](https://github.com/vedang/pdf-tools)；RSS 订阅用 [skeeto/elfeed](https://github.com/skeeto/elfeed) 和 [karthink/elfeed-tube](https://github.com/karthink/elfeed-tube)，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
+
+ChatGPT 的应用可以通过 [karthink/gptel](https://github.com/karthink/gptel) 在 Emacs 当中使用。
+
+## Tricks
+
+在 Scratch 中开启 `lisp-interaction-mode`，在需要执行的函数最后 `C-j` 执行。
