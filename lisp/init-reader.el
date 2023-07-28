@@ -10,7 +10,9 @@
 
     (defun lucius/nov-annotate-font-lock ()
       "Set up font-lock for # in lucius/nov-annotate-face."
-      (font-lock-add-keywords nil '(("『\\(\\(?:.\\|\n\\)*?\\)』" . 'lucius/nov-annotate-face)))
+      (font-lock-add-keywords
+       nil
+       '(("『\\(\\(?:.\\|\n\\)*?\\)』" . 'lucius/nov-annotate-face)))
       (font-lock-flush))))
 
 (setup gptel
@@ -36,20 +38,39 @@
   (:global "C-x w" elfeed)
   (:when-loaded
     (:also-load lib-reader)
+    (defface stats-elfeed-entry
+        `((t :foreground ,(color-lighten-name "palevioletred" -40)))
+      "Marks a relevant Elfeed entry.")
+
+    (defface ml-elfeed-entry
+        `((t :foreground ,(color-lighten-name "linen" -60)))
+      "Marks an important Elfeed entry.")
+
+    (defface siam-elfeed-entry
+        `((t :foreground ,(color-lighten-name "mediumturquoise" -30)))
+      "Marks an important Elfeed entry.")
+
+    (defface review-elfeed-entry
+        `((t :foreground ,(color-lighten-name "powderblue" -40)))
+      "Marks an important Elfeed entry.")
+
+    (push '(Program stats-elfeed-entry) elfeed-search-face-alist)
+    (push '(Youtube ml-elfeed-entry) elfeed-search-face-alist)
+    (push '(Emacs siam-elfeed-entry) elfeed-search-face-alist)
+
     (:option elfeed-feeds
-             '("https://andreyorst.gitlab.io/feed.xml"
-               "https://blog.dornea.nu/feed.xml"
-               "https://fasterthanli.me/index.xml"
-               "https://blog.jcole.us/feed/"
-               "https://karthinks.com/index.xml"
-               "https://www.chinagfw.org/feeds/posts/default"
+             '(("https://andreyorst.gitlab.io/feed.xml" Emacs)
+               ("https://blog.dornea.nu/feed.xml" Emacs)
+               ("https://fasterthanli.me/index.xml" Program)
+               ("https://blog.jcole.us/feed/" Database)
+               ("https://karthinks.com/index.xml" Emacs)
                "https://leancrew.com/all-this/feed/"
-               ("https://samwho.dev/rss.xml" Sam Blog)
-               ("https://rsshub.app/youtube/user/@lijxse" Figma)
-               ("https://rsshub.app/youtube/user/@TimelabPro" TimelabPro)
-               ("https://rsshub.app/youtube/user/@xiao_lin_shuo" xiao_lin_shuo)
-               ("https://rsshub.app/youtube/user/@MacroRoom" MacroRoom)
-               ("https://rsshub.app/youtube/user/@BrandonLiUnscripted" BrandonLi)))
+               ("https://samwho.dev/rss.xml" Program)
+               ("https://rsshub.app/youtube/user/@lijxse" Youtube)
+               ("https://rsshub.app/youtube/user/@TimelabPro" Youtube)
+               ("https://rsshub.app/youtube/user/@xiao_lin_shuo" Youtube)
+               ("https://rsshub.app/youtube/user/@MacroRoom" Youtube)
+               ("https://rsshub.app/youtube/user/@BrandonLiUnscripted" Youtube)))
     (:bind-into elfeed-show-mode-map
       "N" lucius/menu-dwim--org-capture-elfeed-show)
     (:bind-into elfeed-search-mode-map
