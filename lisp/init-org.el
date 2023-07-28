@@ -5,11 +5,14 @@
   (:global
    "C-C L"     org-store-link
    "C-M-<up>"  org-up-element
+   ;; 一般这个函数都是在 org 启动后调用，如果 org 没有启动则会报错。
+   ;; Wrong type argument: commandp, dired-copy-images-links
+   "C-c n m"   dired-copy-images-links
    "C-c b"     org-cite-insert)
   (:when-loaded
     (:also-load lib-org)
     (:option
-     org-directory "~/Dropbox/org/"
+     org-directory "~/Library/CloudStorage/Dropbox/org/"
      org-image-actual-width nil
      ;; remove org-src content indent
      org-edit-src-content-indentation 0
@@ -62,7 +65,8 @@
     ;; only hook in org-mode
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
             org-mode-hook org-indent-mode
-            org-after-todo-state-change-hook org-copy-todo-to-today)
+            org-after-todo-state-change-hook log-todo-next-creation-date
+            org-after-todo-state-change-hook org-roam-copy-todo-to-today)
     (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
 
 (setup ob-core
@@ -72,7 +76,7 @@
                 ob-python
                 ob-latex)
     (:option      org-plantuml-jar-path
-                  (expand-file-name "~/Dropbox/org/plantuml/plantuml.jar")
+                  (expand-file-name "~/Library/CloudStorage/Dropbox/org/plantuml/plantuml.jar")
                   ;; 这里应该就是 .zshrc 里面配置的 python3
                   org-babel-python-command "python3")
     (org-babel-do-load-languages
@@ -133,7 +137,7 @@
      org-agenda-time-leading-zero t
      ;; 过滤掉 dynamic
      org-agenda-hide-tags-regexp (regexp-opt '("dynamic"))
-     org-agenda-files (file-expand-wildcards "~/Dropbox/org/agenda/*.org")
+     org-agenda-files (file-expand-wildcards "~/Library/CloudStorage/Dropbox/org/agenda/*.org")
      org-agenda-compact-blocks t
      org-agenda-sticky t
      org-agenda-start-on-weekday nil
@@ -244,36 +248,35 @@
              "C-c n i"     org-roam-node-insert
              "C-c n j"     org-roam-dailies-capture-today
              "C-c n I"     org-roam-node-insert-immediate
-             "C-c n m"     dired-copy-images-links
              "C-x <up>"    org-move-subtree-up
              "C-x <down>"  org-move-subtree-down
              "C-c r r"     lucius/org-roam-rg-search)
   (:when-loaded
     (:option
-     org-roam-directory (file-truename "~/Dropbox/org/")
+     org-roam-directory (file-truename "~/Library/CloudStorage/Dropbox/org/")
      org-roam-database-connector 'sqlite-builtin
-     org-roam-db-location "~/Dropbox/org/org.db"
+     org-roam-db-location "~/Library/CloudStorage/Dropbox/org/org.db"
      org-roam-db-gc-threshold most-positive-fixnum
      org-roam-completion-everywhere t
      org-roam-capture-templates
      '(
        ;; #+OPTIONS: toc:nil 为了导出 .md 的格式更加符合使用
        ("d" "default" plain
-        (file "~/Dropbox/org/templates/default.org")
+        (file "~/Library/CloudStorage/Dropbox/org/templates/default.org")
         :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
         :unnarrowed t)
        ("p" "private" plain
-        (file "~/Dropbox/org/templates/private.org")
+        (file "~/Library/CloudStorage/Dropbox/org/templates/private.org")
         :if-new (file "private/%<%Y%m%d%H%M%S>-${slug}.org")
         :unnarrowed t))
-       ;; ("a" "article" plain
-       ;;  (file "~/Dropbox/org/templates/article.org")
-       ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-       ;;  :unnarrowed t)
-       ;; ("n" "article-network" plain
-       ;;  (file "~/Dropbox/org/templates/article-network.org")
-       ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-       ;;  :unnarrowed t)
+     ;; ("a" "article" plain
+     ;;  (file "~/Library/CloudStorage/Dropbox/org/templates/article.org")
+     ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
+     ;;  :unnarrowed t)
+     ;; ("n" "article-network" plain
+     ;;  (file "~/Library/CloudStorage/Dropbox/org/templates/article-network.org")
+     ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
+     ;;  :unnarrowed t)
      org-roam-dailies-capture-templates
      ;; %<%H:%M> 为24小时制，%<%I:%M %p> 为12小时制
      '(
@@ -304,26 +307,17 @@
      org-src-fontify-natively t
      org-export-backends (quote (ascii html icalendar latex md))
      ;; Hierachy for title nodes
-     org-roam-node-display-template (concat "${type:10} ${doom-hierarchy:120} "
-                                            (propertize "${tags:*}"
-                                                        'face 'org-tag)))
-
+     org-roam-node-display-template
+     (concat "${type:10} ${doom-hierarchy:120} "
+             (propertize "${tags:*}" 'face 'org-tag)))
     (:require emacsql-sqlite-builtin)
-    (:autoload toggle-dynamic-agenda)
-    (:autoload log-todo-next-creation-date)
-    (:autoload org-roam-copy-todo-to-today)
-    (:hooks org-mode-hook toggle-dynamic-agenda
-            org-after-todo-state-change-hook log-todo-next-creation-date)
+    (:also-load lib-org-roam)
+    (:also-load lib-org-embark)
     (:advice
-     org-agenda :before #'vulpea-agenda-files-update
-     org-todo-list :before #'vulpea-agenda-files-update
      ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
      org-roam-node-read--to-candidate
      :override lucius/org-roam-node-read--to-candidate)
     (org-roam-db-autosync-enable)
-    (:also-load lib-org-agenda-dynamic)
-    (:also-load lib-org-roam)
-    (:also-load lib-org-embark)
     (:after embark
       (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
 
@@ -336,14 +330,14 @@
       "Agenda menu"
       :info-manual "Agenda menu"
       ["Arguments"
-       ("-i" "Inbox"     "inbox.org")
-       ("-w" "Work"      "work.org")
-       ("-b" "Books"     "books.org")
-       ("-t" "Tech-Debt" "tech-debt.org")
-       ("-a" "Agenda"    "agenda.org")
-       ("-p" "Personal"  "personal.org")
-       ("-n" "Note"      "note.org")
-       ("-s" "Someday"   "someday.org")]
+       ("-i" "Inbox"       "inbox.org")
+       ("-w" "Work"        "work.org")
+       ("-b" "Books"       "books.org")
+       ("-t" "Tech-Debt"   "tech-debt.org")
+       ("-a" "Agenda"      "agenda.org")
+       ("-p" "Personal"    "personal.org")
+       ("-n" "Note"        "note.org")
+       ("-s" "Someday"     "someday.org")]
       ["Commands"
        ("RET" "agenda files switcher"     agenda-files-switcher)]
       [("q" "Quit"           transient-quit-one)])
@@ -361,9 +355,9 @@
       [("q" "Quit"           transient-quit-one)])))
 
 (setup bibtex
-  (:option bibtex-file-path "~/Dropbox/org/bib/"
+  (:option bibtex-file-path "~/Library/CloudStorage/Dropbox/org/bib/"
            bibtex-files '("bibtex.bib")
-           bibtex-notes-path "~/Dropbox/org/main/"
+           bibtex-notes-path "~/Library/CloudStorage/Dropbox/org/main/"
            bibtex-align-at-equal-sign t
            bibtex-autokey-titleword-separator "-"
            bibtex-autokey-year-title-separator "-"
@@ -377,7 +371,7 @@
            ebib-bib-search-dirs `(,bibtex-file-path)
            ebib-file-search-dirs `(,(concat bibtex-file-path "files/"))
            ebib-notes-directory bibtex-notes-path
-           ebib-reading-list-file "~/Dropbox/org/agenda/books.org"
+           ebib-reading-list-file "~/Library/CloudStorage/Dropbox/org/agenda/books.org"
            ebib-bibtex-dialect bibtex-dialect
            ebib-file-associations '(("pdf" . "open"))
            ebib-index-default-sort '("timestamp" . descend)
@@ -401,9 +395,9 @@
            ebib-use-timestamp t))
 
 (setup citar
-  (:option org-cite-global-bibliography '("~/Dropbox/org/bib/bibtex.bib")
-           citar-notes-paths (list "~/Dropbox/org/main")
-           citar-library-paths (list "~/Dropbox/org/bib/files")
+  (:option org-cite-global-bibliography '("~/Library/CloudStorage/Dropbox/org/bib/bibtex.bib")
+           citar-notes-paths (list "~/Library/CloudStorage/Dropbox/org/main")
+           citar-library-paths (list "~/Library/CloudStorage/Dropbox/org/bib/files")
            org-cite-insert-processor 'citar
            org-cite-follow-processor 'citar
            org-cite-activate-processor 'citar
@@ -475,7 +469,7 @@
 (setup deft
   (:option
    deft-extensions '("md" "tex" "org" "conf")
-   deft-directory "~/Dropbox/org/notes"
+   deft-directory "~/Library/CloudStorage/Dropbox/org/notes"
    deft-recursive t
    deft-strip-summary-regexp
    (concat "\\("

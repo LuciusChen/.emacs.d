@@ -3,7 +3,7 @@
 (defun lucius/delete-archived-daily-log-files ()
   "Delete Daily log files that have no titles in them."
   (interactive)
-  (let ((dir "~/Dropbox/org/daily/")
+  (let ((dir "~/Library/CloudStorage/Dropbox/org/daily/")
         (deleted-files '()))
     (dolist (file (directory-files dir nil "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org$"))
       (let* ((fullpath (concat (file-name-as-directory dir) file))
@@ -21,11 +21,11 @@
 
 (defun agenda-files-switcher (&optional args)
       (interactive (list (transient-args 'agenda-transient)))
-      (find-file  (concat "~/Dropbox/org/agenda/" (car args))))
+      (find-file  (concat "~/Library/CloudStorage/Dropbox/org/agenda/" (car args))))
 
 (defun journal-options (&optional args)
   (interactive (list (transient-args 'journal-transient)))
-  (let ((file-path-prefix "~/Dropbox/org/daily/"))
+  (let ((file-path-prefix "~/Library/CloudStorage/Dropbox/org/daily/"))
     (cond ((member "journal.org" args)
            (find-file (concat file-path-prefix (car args))))
           ((member "today" args)

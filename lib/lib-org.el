@@ -1,7 +1,12 @@
 ;; lib-org.el --- Initialize org	-*- lexical-binding: t; -*-
 ;; Save the corresponding buffers
+(defun log-todo-next-creation-date (&rest ignore)
+  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
+  (when (and (string= (org-get-todo-state) "NEXT")
+             (not (org-entry-get nil "ACTIVATED")))
+    (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 ;; Copy Done To-Dos to Today
-(defun org-copy-todo-to-today ()
+(defun org-roam-copy-todo-to-today ()
   (interactive)
   (when (and (or (equal org-state "DONE") (equal org-state "CANCELLED")) (not (org-find-property "STYLE")))
     (let ((org-refile-keep t) ;; Set this to nil to delete the original!
@@ -17,6 +22,41 @@
       (unless (equal (file-truename today-file)
                      (file-truename (buffer-file-name)))
         (org-refile nil nil (list "Tasks" today-file nil pos))))))
+;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
+;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
+(defun dired-copy-images-links ()
+  "Works only in dired-mode, put in kill-ring,
+  ready to be yanked in some other org-mode file,
+  the links of marked image files using file-name-base as #+CAPTION.
+  If no file marked then do it on all images files of directory.
+  No file is moved nor copied anywhere.
+  This is intended to be used with org-redisplay-inline-images."
+  (interactive)
+  (if (derived-mode-p 'dired-mode)
+      (let* ((marked-files (dired-get-marked-files))
+             (number-marked-files (string-to-number
+                                   (dired-number-of-marked-files))))
+        (when (= number-marked-files 0)
+          (dired-toggle-marks)
+          (setq marked-files (dired-get-marked-files)))
+        (message "Files marked for copy")
+        (dired-number-of-marked-files)
+        (kill-new "\n")
+        (dolist (marked-file marked-files)
+          (when (org-file-image-p marked-file)
+            (kill-append
+             (concat "#+CAPTION: "
+                     (file-name-base marked-file)
+                     "\n#+ATTR_ORG: :width 800"
+                     "\n[[file:"
+                     ;; 需要绝对路径则直接用 marked-file
+                     (file-relative-name
+                      marked-file
+                      "~/Library/CloudStorage/Dropbox/org") "]]\n\n")
+             nil)))
+        (when (= number-marked-files 0)
+          (dired-toggle-marks)))
+    (message "Error: Does not work outside dired-mode")))
 
 (defun gtd-save-org-buffers ()
   "Save `org-agenda-files' buffers without user confirmation.
