@@ -1,0 +1,54 @@
+* .emacs.d
+** 字体
+*** [[https://github.com/be5invis/Iosevka][Iosevka]]
+Iosevka 设计之初就是和大部分 CJK 字体等高，1:2 的比例，可以很好的解决中英文字体不对齐的问题。
+
+可以根据 [[https://typeof.net/Iosevka/customizer][Iosevka Customizer]] 进行自定义，将 [[https://typeof.net/Iosevka/customizer][Iosevka Customizer]] 中的自定义配置粘贴在 =private-build-plans.toml= 中即可。
+
+#+begin_src shell
+$ brew install ttfautohint
+$ cd Iosevka
+$ npm install
+$ touch private-build-plans.toml
+#+end_src
+
+#+begin_src toml
+[buildPlans.iosevka-lucius]
+family = "Iosevka Lucius"
+spacing = "normal"
+serifs = "sans"
+no-cv-ss = true
+export-glyph-names = false
+
+  [buildPlans.iosevka-lucius.variants]
+  inherits = "ss08"
+
+    [buildPlans.iosevka-lucius.variants.design]
+    capital-n = "standard"
+    r = "compact"
+    dollar = "interrupted"
+    question = "corner-flat-hooked"
+#+end_src
+*** [[https://github.com/lxgw/LxgwWenKai-Screen][LxgwWenKai Screen]]
+Screen 版本粗体和 normal 有明显的区别，有利于组织文本。
+*** 特殊字体
+需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji
+需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。
+** authinfo
+#+begin_example
+machine api.openai.com login apikey password ****
+machine matrix.org login @lucius_chen:matrix.org  password ****
+#+end_example
+
+Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获取。
+
+** Reader
+用过一段时间的 [[https://read.readwise.io][Readwise Reader]]，选择其的原因在于可以配合沉浸式翻译，达到快速阅读英文书籍及文章的目的。但是目前在 Emacs 当中也可以通过 gpt 的应用达到相同的目的。
+
+通过 [[https://github.com/Elilif/emacs-immersive-translate][Elilif/emacs-immersive-translate]] 进行翻译。其中 [[https://platform.openai.com/][OpenAI]] 需要绑定支付方式后才可以使用，可以使用我的 [[https://bewildcard.com/i/YAOHUA][WildCard]] 邀请链接注册充值，享受88折优惠。
+
+阅读书籍 ePub 用 [[https://depp.brause.cc/nov.el/][nov.el]]，阅读 PDF 用 [[https://github.com/vedang/pdf-tools][vedang/pdf-tools]]；RSS 订阅用 [[https://github.com/skeeto/elfeed][skeeto/elfeed]] 和 [[https://github.com/karthink/elfeed-tube][karthink/elfeed-tube]]，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
+
+ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
+** Tricks
+在 Scratch 中开启 =lisp-interaction-mode=​，在需要执行的函数最后 =C-j= 执行。
