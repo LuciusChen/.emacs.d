@@ -51,4 +51,4 @@ Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获
 
 ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
 ** Tricks
-在 Scratch 中开启 =lisp-interaction-mode=​，在需要执行的函数最后 =C-j= 执行。
+在 Scratch 中开启 =lisp-interaction-mode= 后，在需要执行的函数最后 =C-j= 执行。
