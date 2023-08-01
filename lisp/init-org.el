@@ -117,15 +117,8 @@
       (:hooks org-clock-in-hook lucius/show-org-clock-in-header-line
               org-clock-out-hook lucius/hide-org-clock-from-header-line
               org-clock-cancel-hook lucius/hide-org-clock-from-header-line
-              org-clock-in-hook
-              (lambda ()
-                (when (and (org-entry-is-todo-p) (not (org-entry-is-done-p)))
-                  (org-todo "NEXT")))
-              org-after-todo-state-change-hook
-              (lambda ()
-                (when (string= org-state "DONE")
-                  (org-clock-out)))
-              ))
+              org-clock-in-hook lucius/clock-in-with-auto-next
+              org-after-todo-state-change-hook lucius/done-with-auto-clock-out))
     (:after org (org-clock-persistence-insinuate))))
 
 (setup org-agenda

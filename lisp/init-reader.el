@@ -66,6 +66,8 @@
                ("https://karthinks.com/index.xml" Emacs)
                "https://leancrew.com/all-this/feed/"
                ("https://samwho.dev/rss.xml" Program)
+               ("https://matt-rickard.com/rss/" Program)
+               ("https://guangzhengli.com/index.xml" Program)
                ("https://rsshub.app/youtube/user/@lijxse" Youtube)
                ("https://rsshub.app/youtube/user/@TimelabPro" Youtube)
                ("https://rsshub.app/youtube/user/@xiao_lin_shuo" Youtube)
