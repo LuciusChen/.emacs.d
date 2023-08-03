@@ -245,6 +245,7 @@
              "C-x <down>"  org-move-subtree-down
              "C-c r r"     lucius/org-roam-rg-search)
   (:when-loaded
+    (:require emacsql-sqlite-builtin)
     (:option
      org-roam-directory (file-truename "~/Library/CloudStorage/Dropbox/org/")
      org-roam-database-connector 'sqlite-builtin
@@ -262,14 +263,6 @@
         (file "~/Library/CloudStorage/Dropbox/org/templates/private.org")
         :if-new (file "private/%<%Y%m%d%H%M%S>-${slug}.org")
         :unnarrowed t))
-     ;; ("a" "article" plain
-     ;;  (file "~/Library/CloudStorage/Dropbox/org/templates/article.org")
-     ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-     ;;  :unnarrowed t)
-     ;; ("n" "article-network" plain
-     ;;  (file "~/Library/CloudStorage/Dropbox/org/templates/article-network.org")
-     ;;  :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-     ;;  :unnarrowed t)
      org-roam-dailies-capture-templates
      ;; %<%H:%M> 为24小时制，%<%I:%M %p> 为12小时制
      '(
@@ -298,12 +291,10 @@
                  "#+title: %<%Y-%m-%d>\n#+ARCHIVE: journal.org::\n"
                  ("%<%Y-%m-%d>"))))
      org-src-fontify-natively t
-     org-export-backends (quote (ascii html icalendar latex md))
      ;; Hierachy for title nodes
      org-roam-node-display-template
      (concat "${type:10} ${doom-hierarchy:120} "
              (propertize "${tags:*}" 'face 'org-tag)))
-    (:require emacsql-sqlite-builtin)
     (:also-load lib-org-roam)
     (:also-load lib-org-embark)
     (:advice
