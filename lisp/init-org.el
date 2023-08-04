@@ -466,8 +466,6 @@
   (:global [f7] deft)
   (:when-loaded (:also-load lib-deft)))
 
-;; (setup org-transclusion (:also-load lib-org-transclusion))
-
 (setup ox-hugo
   (:after ox (require 'ox-hugo)))
 (provide 'init-org)
