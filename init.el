@@ -120,7 +120,6 @@
     treesit-auto
     org-cliplink
     doom-modeline
-    gruvbox-theme
     markdown-mode
     disable-mouse
     consult-eglot
@@ -132,7 +131,6 @@
     git-timemachine
     nerd-icons-dired
     command-log-mode
-    ;; org-transclusion
     browse-kill-ring
     flymake-flycheck
     nerd-icons-ibuffer
