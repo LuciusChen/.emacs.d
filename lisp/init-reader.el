@@ -38,25 +38,21 @@
   (:global "C-x w" elfeed)
   (:when-loaded
     (:also-load lib-reader)
-    (defface stats-elfeed-entry
-        `((t :foreground ,(color-lighten-name "palevioletred" -40)))
-      "Marks a relevant Elfeed entry.")
-
-    (defface ml-elfeed-entry
-        `((t :foreground ,(color-lighten-name "linen" -60)))
-      "Marks an important Elfeed entry.")
-
-    (defface siam-elfeed-entry
-        `((t :foreground ,(color-lighten-name "mediumturquoise" -30)))
-      "Marks an important Elfeed entry.")
-
-    (defface review-elfeed-entry
-        `((t :foreground ,(color-lighten-name "powderblue" -40)))
-      "Marks an important Elfeed entry.")
-
-    (push '(Program stats-elfeed-entry) elfeed-search-face-alist)
-    (push '(Youtube ml-elfeed-entry) elfeed-search-face-alist)
-    (push '(Emacs siam-elfeed-entry) elfeed-search-face-alist)
+    ;; tags face
+    (defface program-elfeed-entry `((t :foreground "#D05A6E"))
+      "Marks program tag Elfeed entry.")
+    (defface youtube-elfeed-entry `((t :foreground "#EBB471"))
+      "Marks youtube tag Elfeed entry.")
+      ;; 
+    (defface emacs-elfeed-entry `((t :foreground "#3A8FB7"))
+      "Marks emacs tag Elfeed entry.")
+      ;; 千草
+    (defface database-elfeed-entry `((t :foreground "#986DB2"))
+      "Marks database tag Elfeed entry.")
+    (push '(Program program-elfeed-entry) elfeed-search-face-alist)
+    (push '(Youtube youtube-elfeed-entry) elfeed-search-face-alist)
+    (push '(Emacs emacs-elfeed-entry) elfeed-search-face-alist)
+    (push '(Database database-elfeed-entry) elfeed-search-face-alist)
 
     (:option elfeed-feeds
              '(("https://andreyorst.gitlab.io/feed.xml" Emacs)
@@ -65,6 +61,7 @@
                ("https://blog.jcole.us/feed/" Database)
                ("https://karthinks.com/index.xml" Emacs)
                "https://leancrew.com/all-this/feed/"
+               ("https://www.allthingsdistributed.com/atom.xml" Program)
                ("https://samwho.dev/rss.xml" Program)
                ("https://matt-rickard.com/rss/" Program)
                ("https://guangzhengli.com/index.xml" Program)
