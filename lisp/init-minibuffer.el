@@ -17,7 +17,7 @@
                   (eq major-mode 'org-agenda-mode))
           (setq buffer-name
                 (propertize buffer-name 'face
-                            '(:foreground ,(frame-parameter nil 'foreground-color)
+                            `(:foreground ,(frame-parameter nil 'foreground-color)
                               :weight bold))))
         (concat
          (doom-modeline-spc)
@@ -88,6 +88,6 @@
                                    nil))
   (:hook-into after-init))
 
-(setup nerd-icons-completion (:defer (nerd-icons-completion-mode)))
+;; (setup nerd-icons-completion (:defer (nerd-icons-completion-mode)))
  (provide 'init-minibuffer)
 ;;; init-minibuffer.el ends here
