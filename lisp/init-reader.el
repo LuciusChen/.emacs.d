@@ -43,10 +43,8 @@
       "Marks program tag Elfeed entry.")
     (defface youtube-elfeed-entry `((t :foreground "#EBB471"))
       "Marks youtube tag Elfeed entry.")
-      ;; 
     (defface emacs-elfeed-entry `((t :foreground "#3A8FB7"))
       "Marks emacs tag Elfeed entry.")
-      ;; 千草
     (defface database-elfeed-entry `((t :foreground "#986DB2"))
       "Marks database tag Elfeed entry.")
     (push '(Program program-elfeed-entry) elfeed-search-face-alist)

@@ -50,9 +50,8 @@
                      "\n#+ATTR_ORG: :width 800"
                      "\n[[file:"
                      ;; 需要绝对路径则直接用 marked-file
-                     (file-relative-name
-                      marked-file
-                      "~/Library/CloudStorage/Dropbox/org") "]]\n\n")
+                     (replace-regexp-in-string "^\\(~/\\|/Users/[^/]+/\\)Library/CloudStorage/Dropbox/org/[^/]*/" "" marked-file)
+                     "]]\n\n")
              nil)))
         (when (= number-marked-files 0)
           (dired-toggle-marks)))
