@@ -51,7 +51,7 @@
     (push '(Youtube youtube-elfeed-entry) elfeed-search-face-alist)
     (push '(Emacs emacs-elfeed-entry) elfeed-search-face-alist)
     (push '(Database database-elfeed-entry) elfeed-search-face-alist)
-
+    ;; full-text RSS https://morss.it/
     (:option elfeed-feeds
              '(("https://andreyorst.gitlab.io/feed.xml" Emacs)
                ("https://blog.dornea.nu/feed.xml" Emacs)
@@ -61,7 +61,7 @@
                "https://leancrew.com/all-this/feed/"
                ("https://www.allthingsdistributed.com/atom.xml" Program)
                ("https://samwho.dev/rss.xml" Program)
-               ("https://matt-rickard.com/rss/" Program)
+               ("https://morss.it/https://matt-rickard.com/" Program)
                ("https://guangzhengli.com/index.xml" Program)
                ("https://rsshub.app/youtube/user/@lijxse" Youtube)
                ("https://rsshub.app/youtube/user/@TimelabPro" Youtube)

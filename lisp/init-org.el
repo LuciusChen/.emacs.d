@@ -425,9 +425,8 @@
            org-insert-heading-respect-content t
            org-modern-table-horizontal 0.2
            org-modern-checkbox nil
-           org-modern-list '((43 . "➤")
-                             (45 . "▻")
-                             (42 . "►"))
+           org-modern-list '((43 . "▻")
+                             (45 . "►"))
            org-ellipsis "[+]")
   (:when-loaded
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。

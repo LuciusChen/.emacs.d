@@ -23,6 +23,7 @@
   ;; 改成 (identity xxx-prefix-map) 即可
   (:bind-into global-map "C-c t" (identity telega-prefix-map))
   (:when-loaded
+    (:bind-into telega-prefix-map "p" telega-chatbuf-filter-search)
     (:also-load telega-url-shorten
                 telega-bridge-bot
                 telega-mnz
@@ -118,10 +119,10 @@
        '`(let ((sender (telega-msg-sender msg))) ,a)
        '`(let ((sender (telega-msg-sender msg)))
            (telega-ins--with-attrs
-            (list :max (/ telega-chat-fill-column 3) :elide t)
-            (telega-ins
-             (or (telega-msg-sender-username sender 'with-Q)
-                 (telega-msg-sender-title sender)))))))
+               (list :max (/ telega-chat-fill-column 3) :elide t)
+             (telega-ins
+              (or (telega-msg-sender-username sender 'with-Q)
+                  (telega-msg-sender-title sender)))))))
     ;; ;; 修改 [| In reply to: ] 为 [| ➦: ]
     ;; ;; 因为这个 fwd-info 是个闭包，如果想在 elisp 里用闭包必须开词法作用域
     (advice-add 'telega-ins--msg-reply-inline :override #'lucius/telega-ins--msg-reply-inline)
@@ -189,19 +190,19 @@
 
                              ;; Show user profile when clicked on avatar, header
                              (telega-ins--with-props
-                              (list 'action (lambda (button)
-                                              ;; NOTE: check for custom message :action first
-                                              ;; - [RESEND] button uses :action
-                                              ;; - via @bot link uses :action
-                                              (or (telega-button--action button)
-                                                  (telega-describe-msg-sender sender))))
-                              (telega-ins--image avatar 0
-                                                 :image-ascent (telega-ins--ascent-percent sender-name)
-                                                 :no-display-if (not telega-chat-show-avatars))
-                              (telega-ins--message-header msg chat sender addon-header-inserter)
-                              (telega-ins--image avatar 1
-                                                 :image-ascent (unless msg-for-replies-p 100)
-                                                 :no-display-if (not telega-chat-show-avatars))))
+                                 (list 'action (lambda (button)
+                                                 ;; NOTE: check for custom message :action first
+                                                 ;; - [RESEND] button uses :action
+                                                 ;; - via @bot link uses :action
+                                                 (or (telega-button--action button)
+                                                     (telega-describe-msg-sender sender))))
+                               (telega-ins--image avatar 0
+                                                  :image-ascent (telega-ins--ascent-percent sender-name)
+                                                  :no-display-if (not telega-chat-show-avatars))
+                               (telega-ins--message-header msg chat sender addon-header-inserter)
+                               (telega-ins--image avatar 1
+                                                  :image-ascent (unless msg-for-replies-p 100)
+                                                  :no-display-if (not telega-chat-show-avatars))))
                            . ,rest)))))
 (provide 'init-telega)
 ;;; init-telega.el ends here
