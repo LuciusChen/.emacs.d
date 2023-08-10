@@ -56,7 +56,7 @@
                     (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
                     ;; npm install -g typescript-language-server
                     (typescript-mode . ("typescript-language-server" "--stdio"))
-                    (java-mode . (eglot-eclipse-jdt "java-language-server" "--stdio"))))
+                    ((java-mode java-ts-mode) . jdtls-command-contact)))
       (push item eglot-server-programs))
 
     (defclass eglot-volar (eglot-lsp-server) ()
