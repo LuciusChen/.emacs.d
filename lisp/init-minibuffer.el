@@ -73,7 +73,7 @@
 (setup affe
   (when (executable-find "rg")
     (:autoload lucius/affe-grep-at-point)
-    (:global "M-?"  lucius/affe-grep-at-point)
+    (:global "C-c f"  lucius/affe-grep-at-point)
     (:when-loaded
       (:also-load lib-consult)
       (lucius/no-consult-preview lucius/affe-grep-at-point)

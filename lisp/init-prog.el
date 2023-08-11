@@ -17,16 +17,9 @@
   (:advice pp-display-expression :after lucius/make-read-only)
   (:hooks emacs-lisp-mode-hook lucius/maybe-set-bundled-elisp-readonly))
 
-;; (setup macrostep
-;;        (:with-mode lisp-mode
-;;          (:bind-into emacs-lisp-mode-map
-;;                      "C-c x"   macrostep-expand
-;;                      "C-c X"   macrostep-collapse)))
-
 (setup web-mode
   (:option web-mode-markup-indent-offset 2
            web-mode-code-indent-offset 2)
-  ;; (:when-loaded
     ;; vue
     (define-derived-mode vue-mode web-mode "Vue")
     (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
@@ -35,12 +28,15 @@
                                (eglot-ensure)))
     ;; html
     (define-derived-mode my-html-mode web-mode "Web")
-    (add-to-list 'auto-mode-alist '("\\.html\\'" . my-html-mode)))
-;; )
+    (add-to-list 'auto-mode-alist '("\\.html\\'" . my-html-mode))
+
+    ;; jsp
+    (define-derived-mode my-jsp-mode web-mode "Web")
+    (add-to-list 'auto-mode-alist '("\\.jsp\\'" . my-jsp-mode)))
 
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 (setup eglot
-  (:also-load lib-java)
+  (:also-load lib-eglot)
   (:with-mode python-mode (:hook eglot-ensure))
   (:with-mode java-mode (:hook eglot-ensure))
   (:with-mode typescript-mode (:hook eglot-ensure))
@@ -57,44 +53,7 @@
                     ;; npm install -g typescript-language-server
                     (typescript-mode . ("typescript-language-server" "--stdio"))
                     ((java-mode java-ts-mode) . jdtls-command-contact)))
-      (push item eglot-server-programs))
-
-    (defclass eglot-volar (eglot-lsp-server) ()
-      :documentation "volar")
-    (cl-defmethod eglot-initialization-options ((server eglot-volar))
-      "Passes through required cquery initialization options"
-      `(
-        :typescript (
-                     :serverPath ,(expand-file-name "~/.nvm/versions/node/v20.2.0/lib/node_modules/typescript/lib/tsserverlibrary.js")
-                     :tsdk ,(expand-file-name "~/.nvm/versions/node/v20.2.0/lib/node_modules/typescript/lib/"))
-        :languageFeatures (
-                           :references t
-                           :implementation t
-                           :definition t
-                           :typeDefinition t
-                           :rename t
-                           :renameFileRefactoring t
-                           :signatureHelp t
-                           :codeAction t
-                           :workspaceSymbol t
-                           :completion (
-                                        :defaultTagNameCase ""
-                                        :defaultAttrNameCase ""
-                                        :getDocumentNameCasesRequest :json-false
-                                        :getDocumentSelectionRequest :json-false)
-                           :schemaRequestService (:getDocumentContentRequest :json-false))
-        :documentFeatures (
-                           :selectionRange t,
-                           :foldingRange :json-false,
-                           :linkedEditingRange t,
-                           :documentSymbol t,
-                           :documentColor t,
-                           :documentFormatting (
-                                                :defaultPrintWidth 100
-                                                :getDocumentPrintWidthRequest :json-false)
-                           :defaultPrintWidth 100
-                           :getDocumentPrintWidthRequest :json-false)))
-       ))
+      (push item eglot-server-programs))))
 
 (setup sly-el-indent
   (:hooks emacs-lisp-mode-hook sly-el-indent-setup))

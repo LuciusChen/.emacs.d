@@ -50,6 +50,17 @@ Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获
 阅读书籍 ePub 用 [[https://depp.brause.cc/nov.el/][nov.el]]，阅读 PDF 用 [[https://github.com/vedang/pdf-tools][vedang/pdf-tools]]；RSS 订阅用 [[https://github.com/skeeto/elfeed][skeeto/elfeed]] 和 [[https://github.com/karthink/elfeed-tube][karthink/elfeed-tube]]，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
 
 ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
+** Program
+*** Java
+#+begin_src shell
+brew install jdtls
+pip3 install pyright
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+nvm install node
+sudo npm install -g typescript
+npm install -g @volar/vue-language-server
+npm install -g typescript-language-server
+#+end_src
 ** Tricks
 在 Scratch 中开启 =lisp-interaction-mode= 后，在需要执行的函数最后 =C-j= 执行。
 *** Working with Frame
