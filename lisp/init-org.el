@@ -267,29 +267,30 @@
      ;; %<%H:%M> 为24小时制，%<%I:%M %p> 为12小时制
      '(
        ("d" "Default" entry "** %<%H:%M> %?"
-        :if-new (file+head+olp "%<%Y-%m-%d>.org"
-                 "#+title: %<%Y-%m-%d>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%Y-%m-%d>")))
+        :if-new (file+head+olp
+                 "%<%Y-%m-%d>.org"
+                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
+                 ("%<%a, %d %b %Y>")))
        ("r" "Read" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
-                 "#+title: %<%Y-%m-%d>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%Y-%m-%d>" "What I read? :read:")))
+                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
+                 ("%<%a, %d %b %Y>" "What I read? :read:")))
        ("t" "Tasks" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
-                 "#+title: %<%Y-%m-%d>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%Y-%m-%d>" "Tasks :task:")))
+                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
+                 ("%<%a, %d %b %Y>" "Tasks :task:")))
        ("f" "Fleeting Notes" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
-                 "#+title: %<%Y-%m-%d>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%Y-%m-%d>" "Notes :note:")))
+                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
+                 ("%<%a, %d %b %Y>" "Notes :note:")))
        ("o" "Online" entry "** %<%H:%M> %? :online:"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
-                 "#+title: %<%Y-%m-%d>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%Y-%m-%d>"))))
+                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
+                 ("%<%a, %d %b %Y>"))))
      org-src-fontify-natively t
      ;; Hierachy for title nodes
      org-roam-node-display-template

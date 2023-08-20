@@ -51,10 +51,12 @@ Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获
 
 ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
 ** Program
-*** Java
 #+begin_src shell
+# java
 brew install jdtls
+# python
 pip3 install pyright
+# vue
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 nvm install node
 sudo npm install -g typescript

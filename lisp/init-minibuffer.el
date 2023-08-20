@@ -89,5 +89,5 @@
   (:hook-into after-init))
 
 (setup nerd-icons-completion (:defer (nerd-icons-completion-mode)))
- (provide 'init-minibuffer)
+(provide 'init-minibuffer)
 ;;; init-minibuffer.el ends here
