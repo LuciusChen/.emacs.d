@@ -61,6 +61,7 @@
                "https://leancrew.com/all-this/feed/"
                ("https://www.allthingsdistributed.com/atom.xml" Program)
                ("https://samwho.dev/rss.xml" Program)
+               ("https://morss.it/susam.net/" Emacs)
                ("https://morss.it/https://matt-rickard.com/" Program)
                ("https://guangzhengli.com/index.xml" Program)
                ("https://rsshub.app/youtube/user/@lijxse" Youtube)
