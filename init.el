@@ -107,7 +107,6 @@
     nerd-icons
     org-modern
     ace-pinyin
-    ;; org-remark
     projectile
     marginalia
     git-commit
@@ -117,6 +116,8 @@
     magit-todos
     prettier-js
     consult-dir
+    vterm
+    vterm-toggle
     treesit-auto
     org-cliplink
     doom-modeline
