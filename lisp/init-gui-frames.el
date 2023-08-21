@@ -73,7 +73,7 @@
     (setq scale-fonts-list '("Apple Color Emoji"
                              "Noto Sans Egyptian Hieroglyphs"
                              "HanaMinA"))
-    (lucius/scale-fonts)
+    (lucius/scale-fonts 0.8)
 
     ;; 特殊字符需要安装 Symbola 字体
     ;; https://www.wfonts.com/font/symbola
