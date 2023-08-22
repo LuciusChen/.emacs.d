@@ -4,6 +4,7 @@
 (defvar zh-font-list)
 (defvar en-font-list)
 (defvar scale-fonts-list)
+(defvar scale-fonts-list-large)
 
 (defun qiang-font-existsp (font)
   (if (null (x-list-fonts font)) nil t))
@@ -34,17 +35,50 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
         (zh-font (font-spec :family (cl-find-if #'qiang-font-existsp chinese-fonts))))
 
     ;; Set the default English font
-    (message "Set English Font to %s" en-font)
     (set-face-attribute 'default nil :font en-font)
 
     ;; Set Chinese font
     ;; Do not use 'unicode charset, it will cause the English font setting invalid
-    (message "Set Chinese Font to %s" zh-font)
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
       (set-fontset-font (frame-parameter nil 'font)
-                        charset zh-font))))
+                        charset zh-font)))
+  ;; scale special fonts
+  (lucius/scale-fonts scale-fonts-list 0.8)
+  (lucius/scale-fonts scale-fonts-list-large 0.675)
+  ;; 特殊字符需要安装 Symbola 字体
+  ;; https://www.wfonts.com/font/symbola
+  ;; 安装 Symbola 后 Emoji 需要添加下面的设置，才可以正常采用 Mac 内置。
+  ;; https://archive.casouri.cc/note/2019/emacs-%E5%AD%97%E4%BD%93%E4%B8%8E%E5%AD%97%E4%BD%93%E9%9B%86/
+  ;; http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html
+  (progn
+    ;; set font for emoji
+    ;; (if before emacs 28, should come after setting symbols.
+    ;; emacs 28 now has 'emoji .
+    ;; before, emoji is part of 'symbol)
+    (set-fontset-font
+     t
+     (if (version< emacs-version "28.1")
+         '(#x1f300 . #x1fad0) 'emoji)
+     (cond
+       ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji")
+       ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
+       ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
+       ((member "Segoe UI Emoji" (font-family-list)) "Segoe UI Emoji")
+       ((member "Symbola" (font-family-list)) "Symbola"))))
 
-(defun lucius/scale-fonts (factor)
+  ;; Fix incorrect character width for Telega
+  ;; https://emacs.stackexchange.com/questions/14420/how-can-i-fix-incorrect-character-width
+  ;; argument is an alist of width and list of RANGEs,
+  ;; which is the same as the RANGE that set-char-table-range accepts
+  (lucius/set-char-widths
+   `((
+      2 . (,@(mapcar 'string-to-char '("𓆡" "𓆝" "𓆟" "𓆜" "𓆞"
+                                       "𓆝" "𓆟" "𓆝" "𓆟" "𓆜"
+                                       "𓆞" "𓆝" "𓆟" "𓆝" "𓆟"
+                                       "𓆜" "𓆞" "𓆝" "𓆟" "𓆝"
+                                       "𓆟" "𓆜" "𓆞" "𓆝" "𓆟")))))))
+
+(defun lucius/scale-fonts (scale-fonts-list factor)
   "Scale the fonts in =scale-fonts-list' by the given factor.
 
 FACTOR is the scaling factor by which the fonts should be scaled.

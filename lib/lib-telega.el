@@ -57,42 +57,70 @@
 
 (defun lucius/telega-ins--msg-reply-inline (msg)
   "For message MSG insert reply header in case MSG is replying to some message."
-  ;; NOTE: Do not show reply inline if replying to thread's root message.
-  ;; If replied message is not instantly available, it will be fetched
-  ;; later by the `telega-msg--replied-message-fetch'
-  (unless (or (not (telega-msg-match-p msg 'is-reply))
-              (eq (plist-get telega-chatbuf--thread-msg :id)
-                  (telega--tl-get msg :reply_to :message_id)))
-    (let ((replied-msg (telega-msg--replied-message msg)))
-      (cond ((or (null replied-msg) (eq replied-msg 'loading))
-             ;; NOTE: replied message will be fetched by the
-             ;; `telega-msg--replied-message-fetch'
-             (lucius/telega-ins--aux-inline-reply
-              (telega-ins-i18n "lng_profile_loading")))
-            ((telega--tl-error-p replied-msg)
-             (lucius/telega-ins--aux-inline-reply
-              (telega-ins--with-face 'telega-shadow
-                (telega-ins (telega-i18n "lng_deleted_message")))))
-            ((telega-msg-match-p replied-msg 'ignored)
-             (lucius/telega-ins--aux-inline-reply
-              (telega-ins--message-ignored replied-msg)))
-            (t
-             (telega-ins--with-props
-                 ;; When pressed, then jump to the REPLIED-MSG message
-                 (list 'action
-                       (lambda (_button)
-                         (telega-msg-goto-highlight replied-msg)))
-               (lucius/telega-ins--aux-inline-reply
-                (telega-ins--aux-msg-one-line replied-msg
-                  :with-username t
-                  :username-face
-                  (let* ((sender (telega-msg-sender replied-msg))
-                         (sender-faces (telega-msg-sender-title-faces sender)))
-                    (if (and (telega-sender-match-p sender 'me)
-                             (plist-get msg :contains_unread_mention))
-                        (append sender-faces '(telega-entity-type-mention))
-                      sender-faces))))
-               ))))))
+  (when-let ((reply-to (plist-get msg :reply_to)))
+    (cl-ecase (telega--tl-type reply-to)
+      (messageReplyToMessage
+       ;; NOTE: Do not show reply inline if replying to thread's root
+       ;; message.  If replied message is not instantly available, it
+       ;; will be fetched later by the
+       ;; `telega-msg--replied-message-fetch'
+       (unless (eq (plist-get telega-chatbuf--thread-msg :id)
+                   (telega--tl-get msg :reply_to :message_id))
+         (let ((replied-msg (telega-msg--replied-message msg)))
+           (cond ((or (null replied-msg) (eq replied-msg 'loading))
+                  ;; NOTE: replied message will be fetched by the
+                  ;; `telega-msg--replied-message-fetch'
+                  (lucius/telega-ins--aux-inline-reply
+                   (telega-ins-i18n "lng_profile_loading")))
+                 ((telega--tl-error-p replied-msg)
+                  (lucius/telega-ins--aux-inline-reply
+                   (telega-ins--with-face 'telega-shadow
+                     (telega-ins (telega-i18n "lng_deleted_message")))))
+                 ((telega-msg-match-p replied-msg 'ignored)
+                  (lucius/telega-ins--aux-inline-reply
+                   (telega-ins--message-ignored replied-msg)))
+                 (t
+                  (telega-ins--with-props
+                      ;; When pressed, then jump to the REPLIED-MSG message
+                      (list 'action
+                            (lambda (_button)
+                              (telega-msg-goto-highlight replied-msg)))
+                    (lucius/telega-ins--aux-inline-reply
+                     (telega-ins--aux-msg-one-line replied-msg
+                       :with-username t
+                       :username-face
+                       (let* ((sender (telega-msg-sender replied-msg))
+                              (faces (telega-msg-sender-title-faces sender)))
+                         (if (and (telega-sender-match-p sender 'me)
+                                  (plist-get msg :contains_unread_mention))
+                             (append faces '(telega-entity-type-mention))
+                           faces))))
+                    ))))))
+
+      (messageReplyToStory
+       ;; NOTE: If replied story is not instantly available, it will
+       ;; be fetched later by the `telega-msg--replied-story-fetch'
+       (let ((replied-story (telega-msg--replied-story msg)))
+         (cond ((or (null replied-story) (eq replied-story 'loading))
+                ;; NOTE: replied story will be fetched by the
+                ;; `telega-msg--replied-story-fetch'
+                (lucius/telega-ins--aux-inline-reply
+                 (telega-ins-i18n "lng_profile_loading")))
+               ((or (telega--tl-error-p replied-story)
+                    (telega-story-deleted-p replied-story))
+                (lucius/telega-ins--aux-inline-reply
+                 (telega-ins--with-face 'telega-shadow
+                   (telega-ins (telega-i18n "lng_deleted_story")))))
+               (t
+                (telega-ins--with-props
+                    ;; When pressed, open the replied story
+                    (list 'action
+                          (lambda (_button)
+                            (telega-story-open replied-story msg)))
+                  (lucius/telega-ins--aux-inline-reply
+                   (telega-ins--my-story-one-line replied-story msg))
+                  )))))
+      )))
 
 (defun lucius/telega-ins--fwd-info-inline (fwd-info)
   "Insert forward info FWD-INFO as one liner."
@@ -166,21 +194,5 @@
       (unless telega-msg-heading-whole-line
         (telega-ins "\n")))
     t))
-
-(defun telega-ins--ascent-percent (string)
-  "Calculate the max-descent/height in STRING and convert it to ascent."
-  (let* ((max-descent -1)
-         (buffer (or telega--current-buffer (current-buffer)))
-         (window (get-buffer-window buffer))
-         (frame (window-frame window)))
-    (dotimes (i (length string))
-      (when-let* ((font (font-at i window string))
-                  (descent (aref (font-info font frame) 9))
-                  (max? (> descent max-descent)))
-        (setq max-descent descent)))
-    (if (= max-descent -1)
-        0
-      (round (* 100 (- 1 (/ (float max-descent)
-                            (telega-chars-xheight 1))))))))
 (provide 'lib-telega)
 ;;; init-telega.el ends here
