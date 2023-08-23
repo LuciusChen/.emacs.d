@@ -80,5 +80,6 @@
 (add-hook 'after-init-hook 'savehist-mode)
 (add-hook 'after-init-hook 'transient-mark-mode)
 (add-hook 'after-init-hook 'electric-pair-mode)
+(add-hook 'telega-chat-mode-hook (lambda () (electric-pair-local-mode -1)))
 (provide 'init-core)
 ;;; init-core.el ends here

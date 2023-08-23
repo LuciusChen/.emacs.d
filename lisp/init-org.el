@@ -110,8 +110,7 @@
      org-clock-out-remove-zero-time-clocks t
      ;; Show clock sums as hours and minutes, not "n days" etc.
      org-time-clocksum-format
-     '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t)
-     )
+     '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
     (:when-loaded
       (:also-load lib-org-clock)
       (:hooks org-clock-in-hook lucius/show-org-clock-in-header-line

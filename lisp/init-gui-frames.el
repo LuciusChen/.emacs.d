@@ -65,10 +65,10 @@
     (setq en-font-list '("Iosevka Lucius" "Latin Modern Mono" "Fira Code" "IBM Plex Mono"))
     ;; 特殊字符缩放
     (setq scale-fonts-list '("Apple Color Emoji"
-                             "Noto Sans Egyptian Hieroglyphs"
                              "Noto Sans Symbols 2"
                              "HanaMinA"))
-    (setq scale-fonts-list-large '("STIX Two Math"))
+    (setq scale-fonts-list-large '("STIX Two Math"
+                                   "Noto Sans Egyptian Hieroglyphs"))
     (qiang-set-font en-font-list 14 zh-font-list)
     ;; 偶发切换窗口时，字体设置失效。modify 2023-08-22
     (add-hook 'window-setup-hook
