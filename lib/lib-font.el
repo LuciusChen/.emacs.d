@@ -9,6 +9,10 @@
 (defun qiang-font-existsp (font)
   (if (null (x-list-fonts font)) nil t))
 
+(defun font-installed-p (font-name)
+  "Check if font with FONT-NAME is available."
+  (find-font (font-spec :name font-name)))
+
 (defun qiang-make-font-string (font-name font-size)
   (if (and (stringp font-size)
            (equal ":" (string (elt font-size 0))))
@@ -32,11 +36,33 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
   (let ((en-font (qiang-make-font-string
                   (cl-find-if #'qiang-font-existsp english-fonts)
                   english-font-size))
-        (zh-font (font-spec :family (cl-find-if #'qiang-font-existsp chinese-fonts))))
+        (zh-font (font-spec :family
+                            (cl-find-if #'qiang-font-existsp
+                                        chinese-fonts))))
 
     ;; Set the default English font
     (set-face-attribute 'default nil :font en-font)
-
+    ;; 特殊字符需要安装 Symbola 字体
+    ;; https://www.wfonts.com/font/symbola
+    ;; "emacs 28 now has 'emoji . before, emoji is part of 'symbol"
+    ;; 根据上面这句话应该写成 'emoji 就可以了，但是由于 Emoji 本身
+    ;; 分布比较散，所以还是先设置 'unicode 后再设置 CJK 比较靠谱。
+    ;; 特例：'emoji 就会导致 ⛈️ fallback 到 ⛈
+    ;; https://emacs-china.org/t/emacs/15676/34?u=luciuschen
+    (cl-loop for font in '("Apple Color Emoji"
+                           "Noto Color Emoji"
+                           "Noto Emoji"
+                           "Segoe UI Emoji"
+                           "Symbola")
+          when (font-installed-p font)
+          return (set-fontset-font
+                  t
+                  'unicode
+                  (font-spec :family font
+                             :size
+                             (cond ((eq system-type 'gnu/linux) 16.5)
+                                   ((eq system-type 'windows-nt) 15.0)))
+                  nil 'prepend))
     ;; Set Chinese font
     ;; Do not use 'unicode charset, it will cause the English font setting invalid
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
@@ -45,26 +71,6 @@ If set/leave chinese-font-scale to nil, it will follow english-font-size"
   ;; scale special fonts
   (lucius/scale-fonts scale-fonts-list 0.8)
   (lucius/scale-fonts scale-fonts-list-large 0.675)
-  ;; 特殊字符需要安装 Symbola 字体
-  ;; https://www.wfonts.com/font/symbola
-  ;; 安装 Symbola 后 Emoji 需要添加下面的设置，才可以正常采用 Mac 内置。
-  ;; https://archive.casouri.cc/note/2019/emacs-%E5%AD%97%E4%BD%93%E4%B8%8E%E5%AD%97%E4%BD%93%E9%9B%86/
-  ;; http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html
-  (progn
-    ;; set font for emoji
-    ;; (if before emacs 28, should come after setting symbols.
-    ;; emacs 28 now has 'emoji .
-    ;; before, emoji is part of 'symbol)
-    (set-fontset-font
-     t
-     (if (version< emacs-version "28.1")
-         '(#x1f300 . #x1fad0) 'emoji)
-     (cond
-       ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji")
-       ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
-       ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
-       ((member "Segoe UI Emoji" (font-family-list)) "Segoe UI Emoji")
-       ((member "Symbola" (font-family-list)) "Symbola"))))
 
   ;; Fix incorrect character width for Telega
   ;; https://emacs.stackexchange.com/questions/14420/how-can-i-fix-incorrect-character-width
