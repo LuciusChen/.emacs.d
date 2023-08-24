@@ -58,23 +58,10 @@
 (when window-system
   (setup font
     (:require lib-font)
-    ;; LXGW WenKai Mono 配合 Iosevka 按照 1:1 缩放，偶数字号就可以做到等高等宽。
-    (setq zh-font-list '("LXGW WenKai Screen" "FZSongKeBenXiuKai-R-GBK" "HanaMinB"))
-    ;; https://typeof.net/Iosevka/customizer
-    ;; https://github.com/be5invis/Iosevka/blob/v21.0.0/doc/PACKAGE-LIST.md
-    (setq en-font-list '("Iosevka Lucius" "Latin Modern Mono" "Fira Code" "IBM Plex Mono"))
-    ;; 特殊字符缩放
-    (setq scale-fonts-list '("Apple Color Emoji"
-                             "Noto Sans Symbols 2"
-                             "HanaMinA"))
-    (setq scale-fonts-list-large '("STIX Two Math"
-                                   "Noto Sans Egyptian Hieroglyphs"))
-    (qiang-set-font en-font-list 14 zh-font-list)
+    (lucius/setup-fonts)
     ;; 偶发切换窗口时，字体设置失效。modify 2023-08-22
-    (add-hook 'window-setup-hook
-              (lambda ()(qiang-set-font en-font-list 14 zh-font-list)))
-    (add-hook 'server-after-make-frame-hook
-              (lambda ()(qiang-set-font en-font-list 14 zh-font-list)))))
+    (add-hook 'window-setup-hook #'lucius/setup-fonts)
+    (add-hook 'server-after-make-frame-hook #'lucius/setup-fonts)))
 
 (setup dimmer
   (dimmer-mode t)
