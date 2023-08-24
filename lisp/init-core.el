@@ -10,9 +10,14 @@
             (with-current-buffer "*scratch*"
               (goto-char (point-max))
               (insert
-               (concat "\n;; (\\\\)"
-                       "\n;; ( -.-)"
-                       "\n;; o_(\")(\")"
+               (concat "\n;;     \\\"\\/\\/\\/\"/"
+                       "\n;;      )======("
+                       "\n;;    .'  LOOT  '."
+                       "\n;;   /   __||___  \\"
+                       "\n;;  /   (__||__    \\"
+                       "\n;; |    ___||__)    | (\\\\)"
+                       "\n;; \"       ||       \" ( -.-)"
+                       "\n;;   \"____________\"  o_(\")(\")"
                        "\n;; Emacs startup time: "
                        (format "%.2f seconds with %d garbage collections"
                                (float-time

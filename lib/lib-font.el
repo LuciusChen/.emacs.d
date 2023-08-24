@@ -94,6 +94,7 @@ and setting it as the parent of =char-width-table=."
                         charset zh-font)))
   ;; scale special fonts
   (lucius/scale-fonts '("STIX Two Math"
+                        "HanaMinA"
                         "Noto Sans Egyptian Hieroglyphs")
                       0.7)
 
