@@ -15,14 +15,14 @@
 (setq gc-cons-threshold most-positive-fixnum)
 
 (add-hook 'emacs-startup-hook
-  (lambda ()
-    (setq gc-cons-threshold (* 20 1024 1024))))
+          (lambda ()
+            (setq gc-cons-threshold (* 20 1024 1024))))
 
 (add-to-list 'load-path
-     "/Users/luciuschen/.emacs.d/straight/repos/benchmark-init-el")
-     (require 'benchmark-init)
-     ;; To disable collection of benchmark data after init is done.
-     (add-hook 'after-init-hook 'benchmark-init/deactivate)
+             "~/.emacs.d/straight/repos/benchmark-init-el")
+(require 'benchmark-init)
+;; To disable collection of benchmark data after init is done.
+(add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 ;; Disable package.el in favor of straight.el
 (setq package-enable-at-startup nil)
