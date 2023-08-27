@@ -30,6 +30,7 @@
                 lib-telega
                 language-detection)
     (:option telega-translate-to-language-by-default "zh"
+             telega-msg-save-dir "~/Downloads"
              ;;  telega-debug t
              telega-autoplay-mode 1
              telega-url-shorten-regexps
@@ -65,19 +66,22 @@
                (420415423                    ; @matrix_t2bot
                 (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))))
     (set-face-attribute 'telega-msg-heading nil
-                        :underline '(:style line)
                         :inherit nil
-                        :background 'unspecified)
+                        :background "#EBF4EC")
     (set-face-attribute 'telega-msg-inline-reply nil
+                        :inherit nil
                         :foreground "#86C166") ;; 苗 NAE
     (set-face-attribute 'telega-msg-inline-forward nil
+                        :inherit nil
                         :foreground "#FFB11B")
     (set-face-attribute 'telega-entity-type-mention nil
                         :underline '(:style line)
                         :weight 'bold)
     (set-face-attribute 'telega-msg-self-title nil
-                        :foreground "#E2943B") ;; 朽葉 KUCHIBA
-    (set-face-attribute 'telega-msg-user-title nil :weight 'bold)
+                        :foreground "#E2943B" ;; 朽葉 KUCHIBA
+                        :italic t
+                        :weight 'normal)
+    (set-face-attribute 'telega-msg-user-title nil :italic t)
     (set-face-attribute 'telega-button nil
                         :foreground "#986DB2"
                         :box '(:line-width (-2 . -2)
