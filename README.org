@@ -67,9 +67,9 @@ npm install -g typescript-language-server
 针对 UI 做了一些修改
 - 修改了 msg-heading 的背景，只保留用户名所在行的背景，并且适应长度。
 - 修改了按钮的样式
-- 回复样式修改 ~| In reply to:~ 变为 ~| ➦:~
+- 回复样式修改字体颜色为绿色且 ~| In reply to:~ 变为 ~| ➦:~
 - 回复行中用户名过长，则省略以显示更多的「被回复」内容。
-- 转发样式修改 ~| Forward from:~ 变为 ~| ➥:~
+- 转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 ~| ➥:~
 
 #+CAPTION: telega_forward
 #+ATTR_ORG: :width 600
