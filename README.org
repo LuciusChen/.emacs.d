@@ -73,15 +73,15 @@ npm install -g typescript-language-server
 
 #+CAPTION: telega_forward
 #+ATTR_ORG: :width 600
-[[file:/Users/luciuschen/.emacs.d/assets/telega_forward.png]]
+[[file:assets/telega_forward.png]]
 
 #+CAPTION: telega_reply
 #+ATTR_ORG: :width 600
-[[file:/Users/luciuschen/.emacs.d/assets/telega_reply.png]]
+[[file:assets/telega_reply.png]]
 
 #+CAPTION: telega_reply_username
 #+ATTR_ORG: :width 600
-[[file:/Users/luciuschen/.emacs.d/assets/telega_reply_username.png]]
+[[file:assets/telega_reply_username.png]]
 ** Tricks
 在 Scratch 中开启 =lisp-interaction-mode= 后，在需要执行的函数最后 =C-j= 执行。
 *** Working with Frame
