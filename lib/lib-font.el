@@ -94,9 +94,12 @@ and setting it as the parent of =char-width-table=."
                         charset zh-font)))
   ;; scale special fonts
   (lucius/scale-fonts '("STIX Two Math"
-                        "HanaMinA"
                         "Noto Sans Egyptian Hieroglyphs")
                       0.7)
+
+  (lucius/scale-fonts '("HanaMinA"
+                        "Euphemia UCAS")
+                      0.9)
 
   ;; Fix incorrect character width for Telega
   ;; https://emacs.stackexchange.com/questions/14400/how-can-i-fix-incorrect-character-width
