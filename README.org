@@ -29,6 +29,10 @@ export-glyph-names = false
     dollar = "interrupted"
     question = "corner-flat-hooked"
 #+end_src
+
+和 Iosevka 等高的中文字体目前有：霞鹜文楷、仓耳今楷。
+*** [[http://tsanger.cn/product?keyword=%E4%BB%8A%E6%A5%B7][仓耳今楷]]
+目前选用的是 02W04，这个系列的字体前面的序号越大越圆润，从接近宋体到接近楷体；W 开头的序号代表字重，04 的字重是和 Iosevka 的 normal 相近。
 *** [[https://github.com/lxgw/LxgwWenKai-Screen][LxgwWenKai Screen]]
 Screen 版本粗体和 normal 有明显的区别，有利于组织文本。
 *** 特殊字体
