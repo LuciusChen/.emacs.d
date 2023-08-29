@@ -60,11 +60,12 @@ and setting it as the parent of =char-width-table=."
         (zh-font (font-spec
                   :family
                   (cl-find-if #'font-list-existsp
-                              '("LXGW WenKai Screen"
+                              '("TsangerJinKai02"
+                                "LXGW WenKai Screen"
                                 "FZSongKeBenXiuKai-R-GBK"
                                 "HanaMinB")))))
     ;; Set the default English font
-    (set-face-attribute 'default nil :font en-font)
+    (set-face-attribute 'default nil :font en-font :weight 'normal)
     ;; 特殊字符需要安装 Symbola 字体
     ;; https://www.wfonts.com/font/symbola
     ;; "emacs 28 now has 'emoji . before, emoji is part of 'symbol"
@@ -98,6 +99,7 @@ and setting it as the parent of =char-width-table=."
                       0.7)
 
   (lucius/scale-fonts '("HanaMinA"
+                        "Arial Unicode MS"
                         "Euphemia UCAS")
                       0.9)
 
