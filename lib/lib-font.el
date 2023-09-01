@@ -99,8 +99,10 @@ and setting it as the parent of =char-width-table=."
                       0.7)
 
   (lucius/scale-fonts '("HanaMinA"
+                        "PingFang SC"
+                        "Euphemia UCAS"
                         "Arial Unicode MS"
-                        "Euphemia UCAS")
+                        "Apple Symbols-regular")
                       0.9)
 
   ;; Fix incorrect character width for Telega
