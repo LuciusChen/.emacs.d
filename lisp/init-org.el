@@ -476,7 +476,8 @@
     (:option org-anki-model-fields '(("Basic" "Front" "Back")
                                      ("prettify-minimal-basic" "Front" "Back"))
              org-anki-skip-function #'org-anki-skip
-             org-anki-default-match "+LEVEL=1")
+             org-anki-default-match "+LEVEL=1"
+             org-anki-inherit-tags nil)
     (advice-add 'org-anki--html-to-org :override #'lucius/org-anki--html-to-org)
     (advice-add 'org-anki--org-to-html :override #'lucius/org-anki--org-to-html)))
 
