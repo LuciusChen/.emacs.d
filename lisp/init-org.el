@@ -479,6 +479,7 @@
              org-anki-default-match "+LEVEL=1"
              org-anki-inherit-tags nil)
     (advice-add 'org-anki--html-to-org :override #'lucius/org-anki--html-to-org)
+    ;; TODO * 开头的正文不能同步到 anki
     (advice-add 'org-anki--org-to-html :override #'lucius/org-anki--org-to-html)))
 
 (setup ox-hugo
