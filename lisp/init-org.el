@@ -471,12 +471,12 @@
 (setup org-anki
   (:after org)
   (:when-loaded
+    (require 'org-ml)
     (:also-load lib-org-anki)
     (:option org-anki-model-fields '(("Basic" "Front" "Back")
                                      ("prettify-minimal-basic" "Front" "Back"))
              org-anki-skip-function #'org-anki-skip
              org-anki-default-match "+LEVEL=1")
-    (require 'org-ml)
     (advice-add 'org-anki--html-to-org :override #'lucius/org-anki--html-to-org)
     (advice-add 'org-anki--org-to-html :override #'lucius/org-anki--org-to-html)))
 
