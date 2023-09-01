@@ -66,7 +66,10 @@
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
             org-mode-hook org-indent-mode
             org-after-todo-state-change-hook log-todo-next-creation-date
-            org-after-todo-state-change-hook org-roam-copy-todo-to-today)
+            org-after-todo-state-change-hook org-roam-copy-todo-to-today
+            org-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook 'org-align-all-tags nil t)))
     (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
 
 (setup ob-core
@@ -464,6 +467,18 @@
   (:advice deft-parse-title :override #'lucius/deft-parse-title)
   (:global [f7] deft)
   (:when-loaded (:also-load lib-deft)))
+
+(setup org-anki
+  (:after org)
+  (:when-loaded
+    (:also-load lib-org-anki)
+    (:option org-anki-model-fields '(("Basic" "Front" "Back")
+                                     ("prettify-minimal-basic" "Front" "Back"))
+             org-anki-skip-function #'org-anki-skip
+             org-anki-default-match "+LEVEL=1")
+    (require 'org-ml)
+    (advice-add 'org-anki--html-to-org :override #'lucius/org-anki--html-to-org)
+    (advice-add 'org-anki--org-to-html :override #'lucius/org-anki--org-to-html)))
 
 (setup ox-hugo
   (:after ox (require 'ox-hugo)))
