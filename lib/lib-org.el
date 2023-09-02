@@ -99,6 +99,12 @@ See also `org-save-all-org-buffers'"
   "Create inactive timestamp for the Org mode note."
   (let ((org-time-stamp-custom-formats org-time-stamp-custom-formats))
     (format "%s" (with-temp-buffer (org-time-stamp-inactive nil)))))
+
+(defun lucius/anki-org-to-mark (backend)
+  (when (eq backend 'html)
+    (goto-char (point-min))
+    (while (re-search-forward "@\\(.*?\\)@" nil t)
+      (replace-match "@@html:<mark>\\1</mark>@@"))))
 ;;;; provide
 (provide 'lib-org)
 ;;; lib-org.el ends here.
