@@ -102,7 +102,7 @@ Used by `org-anki-skip-function'"
   "Convert STRING (org element heading or content) to html."
   (save-excursion
     (org-anki--string-to-anki-mathjax
-     (org-export-string-as string
+     (org-export-string-as (org-anki--edit-links 'org-anki--remove-media-prefix string)
                            'html t
                            '(:with-toc nil)))))
 
