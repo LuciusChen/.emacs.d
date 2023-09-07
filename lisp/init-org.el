@@ -60,7 +60,7 @@
                                                org-done-keywords))))
     (:also-load lib-org-archive-hierachical)
     (:also-load lib-org)
-    (:with-mode org-mode (lambda () (pixel-scroll-precision-mode 1)))
+    (:with-mode org-mode (:hook pixel-scroll-precision-mode))
     (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     ;; only hook in org-mode
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
