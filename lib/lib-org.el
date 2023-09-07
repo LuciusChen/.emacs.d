@@ -94,17 +94,12 @@ See also `org-save-all-org-buffers'"
   "Marker for reading list items that are still open."
   :group 'ebib-reading-list
   :type '(string :tag "Project marker"))
+
 ;; 获取 [%Y-%m-%d %a %H:%M] 格式的时间戳
 (defun ebib-create-org-stamp-inactive (_key _db)
   "Create inactive timestamp for the Org mode note."
   (let ((org-time-stamp-custom-formats org-time-stamp-custom-formats))
     (format "%s" (with-temp-buffer (org-time-stamp-inactive nil)))))
-
-(defun lucius/anki-org-to-mark (backend)
-  (when (eq backend 'html)
-    (goto-char (point-min))
-    (while (re-search-forward "@\\(.*?\\)@" nil t)
-      (replace-match "@@html:<mark>\\1</mark>@@"))))
 ;;;; provide
 (provide 'lib-org)
 ;;; lib-org.el ends here.

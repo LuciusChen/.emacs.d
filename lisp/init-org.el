@@ -67,7 +67,6 @@
             org-mode-hook org-indent-mode
             org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today
-            org-export-before-parsing-hook lucius/anki-org-to-mark
             org-mode-hook
             (lambda ()
               (add-hook 'before-save-hook 'org-align-all-tags nil t)))
@@ -261,10 +260,6 @@
        ("d" "default" plain
         (file "~/Library/CloudStorage/Dropbox/org/templates/default.org")
         :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-        :unnarrowed t)
-       ("p" "private" plain
-        (file "~/Library/CloudStorage/Dropbox/org/templates/private.org")
-        :if-new (file "private/%<%Y%m%d%H%M%S>-${slug}.org")
         :unnarrowed t))
      org-roam-dailies-capture-templates
      ;; %<%H:%M> 为24小时制，%<%I:%M %p> 为12小时制
@@ -469,20 +464,9 @@
   (:global [f7] deft)
   (:when-loaded (:also-load lib-deft)))
 
-(setup org-anki
-  (:after org)
+(setup anki-editor
   (:when-loaded
-    (require 'org-ml)
-    (:also-load lib-org-anki)
-    (:option org-anki-model-fields '(("prettify-minimal-basic" "Front" "Back")
-                                     ("prettify-minimal-cloze" "Text" "Back Extra"))
-             org-anki-skip-function #'org-anki-skip
-             org-anki-default-match "+LEVEL=1"
-             org-anki-inherit-tags nil)
-    (advice-add 'org-anki--get-fields :override #'lucius/org-anki--get-fields)
-    (advice-add 'org-anki--html-to-org :override #'lucius/org-anki--html-to-org)
-    ;; TODO * 开头的正文不能同步到 anki
-    (advice-add 'org-anki--org-to-html :override #'lucius/org-anki--org-to-html)))
+    (:also-load anki-editor-ui)))
 
 (setup ox-hugo
   (:after ox (require 'ox-hugo)))
