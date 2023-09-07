@@ -64,13 +64,11 @@
     deft
     ;; rime
     affe
-    org-anki
     ebib
     citar
     setup
     eglot
     corfu
-    org-ml
     vundo
     gptel
     elfeed
@@ -145,6 +143,8 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
+    (yasnippet :host github :repo "joaotavora/yasnippet")
+    (anki-editor :host github :repo "LuciusChen/anki-editor")
     (eglot-hierarchy :host github :repo "dolmens/eglot-hierarchy")
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")

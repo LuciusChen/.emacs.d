@@ -38,5 +38,11 @@
           (compilation-shell-minor-mode 1)
           (vterm-send-M-w)
           (vterm-send-string compile-command t))))))
+
+(setup yasnippet
+  (:option yas-keymap-disable-hook
+           (lambda () (and (frame-live-p corfu--frame)
+                           (frame-visible-p corfu--frame))))
+  (:when-loaded (:hooks after-init-hook yas-global-mode)))
 (provide 'init-local)
 ;;; init-local.el ends here
