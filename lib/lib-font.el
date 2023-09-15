@@ -61,9 +61,7 @@ and setting it as the parent of =char-width-table=."
                   :family
                   (cl-find-if #'font-list-existsp
                               '("TsangerJinKai02"
-                                "LXGW WenKai Screen"
-                                "FZSongKeBenXiuKai-R-GBK"
-                                "HanaMinB")))))
+                                "LXGW WenKai Screen")))))
     ;; Set the default English font
     (set-face-attribute 'default nil :font en-font :weight 'normal)
     ;; 特殊字符需要安装 Symbola 字体

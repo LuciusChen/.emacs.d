@@ -14,7 +14,22 @@
                           (suppress-keymap map)
                           (dolist (k '("(" "[" "{" "<"))
                             (define-key map k #'insert-pair))
-                          map))
+                          map)
+            meow-char-thing-table '((?\( . round)
+                                    (?\) . round)
+                                    (?\" .  string)
+                                    (?\[ . square)
+                                    (?\] . square)
+                                    (?<  . angle)
+                                    (?>  . angle)
+                                    (?{  . curly)
+                                    (?}  . curly)
+                                    (?s  . symbol)
+                                    (?f  . defun)
+                                    (?w  . window)
+                                    (?l  . line)
+                                    (?b  . buffer)
+                                    (?p  . paragraph)))
   (:hooks meow-insert-mode-hook
           (lambda ()
             (if meow-insert-mode
@@ -60,7 +75,7 @@
 
 (setup avy
   (:require ace-pinyin)
-  (:global "C-;" avy-goto-char
+  (:global "C-;" avy-goto-char-timer
            "C-:" avy-goto-char-in-line)
   ;; uncomment if you want to use `ace-jump-mode'
   ;; (:option ace-pinyin-use-avy nil)

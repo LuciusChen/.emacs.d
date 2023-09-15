@@ -31,6 +31,7 @@
                 language-detection)
     (:option telega-translate-to-language-by-default "zh"
              telega-msg-save-dir "~/Downloads"
+             telega-chat-input-markups '("markdown2" "org")
              ;;  telega-debug t
              telega-autoplay-mode 1
              telega-url-shorten-regexps
