@@ -143,6 +143,7 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
+    (modus-themes :host github :repo "protesilaos/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (anki-editor :host github :repo "LuciusChen/anki-editor")
     (eglot-hierarchy :host github :repo "dolmens/eglot-hierarchy")
