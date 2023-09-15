@@ -38,7 +38,7 @@
 (setup eglot
   (:also-load lib-eglot)
   (:with-mode python-mode (:hook eglot-ensure))
-  (:with-mode java-mode (:hook eglot-ensure))
+  (:with-mode (java-mode java-ts-mode) (:hook eglot-ensure))
   (:with-mode typescript-mode (:hook eglot-ensure))
   (:option eglot-events-buffer-size 0)
   (:when-loaded
