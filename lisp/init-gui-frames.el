@@ -45,7 +45,7 @@
 (setup theme
   (:require lib-appearance)
   (setq light-theme 'ef-spring)
-  (setq dark-theme 'modus-vivendi)
+  (setq dark-theme 'modus-vivendi-tritanopia)
   ;; theme setting
   ;; Don't prompt to confirm theme safety. This avoids problems with
   ;; first-time startup on Emacs > 26.3.
