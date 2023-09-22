@@ -42,7 +42,7 @@
       (file-size-human-readable (buffer-size)))))
 
 (setup popper
-  (:global "C-`"   popper-toggle-latest
+  (:global "C-~"   popper-toggle-latest
            "M-~"   popper-cycle
            "C-M-`" popper-toggle-type)
   (:option popper-reference-buffers

@@ -61,9 +61,9 @@
   (add-to-list 'sis-context-detectors
                (lambda (&rest _)
                  (when (and meow-insert-mode
-                            (or (eq major-mode 'org-mode)
-                                (eq major-mode 'gfm-mode)
-                                (eq major-mode 'telega-chat-mode)))
+                            (or (derived-mode-p 'org-mode
+                                                'gfm-mode
+                                                'telega-chat-mode)))
                    'other)))
 
   (defun lucius/meow-focus-change-function ()

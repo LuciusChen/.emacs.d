@@ -102,6 +102,7 @@
     orderless
     kind-icon
     git-modes
+    format-all
     ibuffer-vc
     git-blamed
     nerd-icons

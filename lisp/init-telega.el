@@ -68,7 +68,8 @@
                 (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))))
     (set-face-attribute 'telega-msg-heading nil
                         :inherit nil
-                        :background "#EBF4EC")
+                        :background "#EBF4EC"
+                        :weight 'bold)
     (set-face-attribute 'telega-msg-inline-reply nil
                         :inherit nil
                         :foreground "#86C166") ;; 苗 NAE
@@ -81,7 +82,7 @@
     (set-face-attribute 'telega-msg-self-title nil
                         :foreground "#E2943B" ;; 朽葉 KUCHIBA
                         :italic t
-                        :weight 'normal)
+                        :weight 'bold)
     (set-face-attribute 'telega-msg-user-title nil :italic t)
     (set-face-attribute 'telega-button nil
                         :foreground "#986DB2"
