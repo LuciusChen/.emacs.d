@@ -384,7 +384,43 @@
            org-cite-insert-processor 'citar
            org-cite-follow-processor 'citar
            org-cite-activate-processor 'citar
-           citar-bibliography org-cite-global-bibliography))
+           citar-bibliography org-cite-global-bibliography)
+
+  (defvar citar-indicator-files
+    (citar-indicator-create
+     :symbol (nerd-icons-faicon
+              "nf-fa-file_o"
+              :face 'nerd-icons-green
+              :v-adjust -0.1)
+     :function #'citar-has-files
+     :padding "  " ; need this because the default padding is too low for these icons
+     :tag "has:files"))
+  (defvar citar-indicator-links
+    (citar-indicator-create
+     :symbol (nerd-icons-faicon
+              "nf-fa-link"
+              :face 'nerd-icons-orange
+              :v-adjust 0.01)
+     :function #'citar-has-links
+     :padding "  "
+     :tag "has:links"))
+  (defvar citar-indicator-notes
+    (citar-indicator-create
+     :symbol (nerd-icons-codicon
+              "nf-cod-note"
+              :face 'nerd-icons-blue
+              :v-adjust -0.3)
+     :function #'citar-has-notes
+     :padding "    "
+     :tag "has:notes"))
+  (defvar citar-indicator-cited
+    (citar-indicator-create
+     :symbol (nerd-icons-faicon
+              "nf-fa-circle_o"
+              :face 'nerd-icon-green)
+     :function #'citar-is-cited
+     :padding "  "
+     :tag "is:cited")))
 
 ;; (setup org-remark
 ;;   (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
@@ -415,7 +451,7 @@
              (push '("[X]" . "☑" ) prettify-symbols-alist)
              (push '("[-]" . "❍" ) prettify-symbols-alist)
              (prettify-symbols-mode))))
-  (:option org-modern-star ["§" "¶" "❡" "⁋" "※"]
+  (:option org-modern-star ["❑" "❍" "❑" "❍" "❑" "❍"]
            org-hide-emphasis-markers t
            org-tags-column 0
            org-modern-block-fringe 2

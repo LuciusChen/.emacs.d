@@ -20,26 +20,25 @@
 (setup web-mode
   (:option web-mode-markup-indent-offset 2
            web-mode-code-indent-offset 2)
-    ;; vue
-    (define-derived-mode vue-mode web-mode "Vue")
-    (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
-    (add-hook 'vue-mode-hook (lambda ()
-                               (setq-local tab-width 2)
-                               (eglot-ensure)))
-    ;; html
-    (define-derived-mode my-html-mode web-mode "Web")
-    (add-to-list 'auto-mode-alist '("\\.html\\'" . my-html-mode))
+  ;; vue
+  (define-derived-mode vue-mode web-mode "Vue")
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
+  (add-hook 'vue-mode-hook (lambda ()
+                             (setq-local tab-width 2)
+                             (eglot-ensure)))
+  ;; html
+  (define-derived-mode my-html-mode web-mode "Web")
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . my-html-mode))
 
-    ;; jsp
-    (define-derived-mode my-jsp-mode web-mode "Web")
-    (add-to-list 'auto-mode-alist '("\\.jsp\\'" . my-jsp-mode)))
+  ;; jsp
+  (define-derived-mode my-jsp-mode web-mode "Web")
+  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . my-jsp-mode)))
 
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 (setup eglot
   (:also-load lib-eglot)
-  (:with-mode python-mode (:hook eglot-ensure))
-  (:with-mode (java-mode java-ts-mode) (:hook eglot-ensure))
-  (:with-mode typescript-mode (:hook eglot-ensure))
+  (:with-mode (python-mode java-mode java-ts-mode typescript-mode)
+    (:hook eglot-ensure))
   (:option eglot-events-buffer-size 0)
   (:when-loaded
     ;; Java $brew install jdtls
@@ -53,7 +52,9 @@
                     ;; npm install -g typescript-language-server
                     (typescript-mode . ("typescript-language-server" "--stdio"))
                     ((java-mode java-ts-mode) . jdtls-command-contact)))
-      (push item eglot-server-programs))))
+      (push item eglot-server-programs)))
+  (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode)))
 
 (setup sly-el-indent
   (:hooks emacs-lisp-mode-hook sly-el-indent-setup))

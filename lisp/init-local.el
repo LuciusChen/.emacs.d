@@ -44,5 +44,24 @@
            (lambda () (and (frame-live-p corfu--frame)
                            (frame-visible-p corfu--frame))))
   (:when-loaded (:hooks after-init-hook yas-global-mode)))
+
+(use-package format-all
+  :preface
+  (defun ian/format-code ()
+    "Auto-format whole buffer."
+    (interactive)
+    (if (derived-mode-p 'prolog-mode)
+        (prolog-indent-buffer)
+      (format-all-buffer)))
+  :config
+  (global-set-key (kbd "M-F") #'ian/format-code)
+  (add-hook 'prog-mode-hook #'format-all-ensure-formatter))
+
+;; brew install clang-format
+(setup format-all
+  (:when-loaded
+    (:with-mode prog-mode
+      (:hook format-all-mode)
+      (:hook format-all-ensure-formatter))))
 (provide 'init-local)
 ;;; init-local.el ends here
