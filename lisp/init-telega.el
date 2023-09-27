@@ -63,9 +63,12 @@
                -1001478915941                ; @vimzh_real
                (5296957089                   ; @nichi_matrix_bot
                 (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
-               -1001480067069                ;@keyboard_cn
+               -1001480067069                ; @keyboard_cn
                (420415423                    ; @matrix_t2bot
-                (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))))
+                (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
+               -1001154313178                ; @coder_ot
+               (6332621450                   ; @yamatrix_bridge_bot
+                (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))))
     (set-face-attribute 'telega-msg-heading nil
                         :inherit nil
                         :background "#EBF4EC"
