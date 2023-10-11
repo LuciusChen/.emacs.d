@@ -54,8 +54,20 @@
              ("\\*Org Select\\*$")
              ("\\*Agenda Commands\\*$")
              ("\\*chatgpt\\*$")
-             ("\\*xref\\*$")))
+             ("\\*xref\\*$")
+             ("\\*Telegram Chat Info\\*$")
+             ("\\*Telegram Message Info\\*$")))
   (popper-mode +1)
-  (popper-echo-mode +1))
+  (popper-echo-mode +1)
+  ;; HACK: close popper window with `C-g'
+  (defun +popper-close-window-hack (&rest _)
+    "Close popper window via `C-g'."
+    (when (and (called-interactively-p 'interactive)
+               (not (region-active-p))
+               popper-open-popup-alist)
+      (let ((window (caar popper-open-popup-alist)))
+        (when (window-live-p window)
+          (delete-window window)))))
+  (advice-add #'keyboard-quit :before #'+popper-close-window-hack))
 (provide 'init-ibuffer)
 ;;; init-ibuffer.el ends here
