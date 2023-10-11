@@ -314,13 +314,11 @@
       :info-manual "Agenda menu"
       ["Arguments"
        ("-i" "Inbox"       "inbox.org")
-       ("-w" "Work"        "work.org")
-       ("-b" "Books"       "books.org")
-       ("-t" "Tech-Debt"   "tech-debt.org")
-       ("-a" "Agenda"      "agenda.org")
-       ("-p" "Personal"    "personal.org")
-       ("-n" "Note"        "note.org")
-       ("-s" "Someday"     "someday.org")]
+       ("-a" "AREA"        "AREA.org")
+       ("-r" "RESOURCE"    "RESOURCE.org")
+       ("-p" "PROJECT"    "PROJECT.org")
+       ("-g" "Agenda"      "agenda.org")
+       ("-n" "Note"        "note.org")]
       ["Commands"
        ("RET" "agenda files switcher"     agenda-files-switcher)]
       [("q" "Quit"           transient-quit-one)])
@@ -354,7 +352,7 @@
            ebib-bib-search-dirs `(,bibtex-file-path)
            ebib-file-search-dirs `(,(concat bibtex-file-path "files/"))
            ebib-notes-directory bibtex-notes-path
-           ebib-reading-list-file "~/Library/CloudStorage/Dropbox/org/agenda/books.org"
+           ebib-reading-list-file "~/Library/CloudStorage/Dropbox/org/agenda/inbox.org"
            ebib-bibtex-dialect bibtex-dialect
            ebib-file-associations '(("pdf" . "open"))
            ebib-index-default-sort '("timestamp" . descend)

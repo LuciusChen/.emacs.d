@@ -92,28 +92,30 @@ and setting it as the parent of =char-width-table=."
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
       (set-fontset-font (frame-parameter nil 'font)
                         charset zh-font)))
+  ;; telega avatar patch 有效就不需要这个了
   ;; scale special fonts
-  (lucius/scale-fonts '("STIX Two Math"
-                        "Noto Sans Egyptian Hieroglyphs")
-                      0.7)
+  ;; (lucius/scale-fonts '("STIX Two Math"
+  ;;                       "Noto Sans Egyptian Hieroglyphs")
+  ;;                     0.7)
 
-  (lucius/scale-fonts '("HanaMinA"
-                        "PingFang SC"
-                        "Euphemia UCAS"
-                        "Arial Unicode MS"
-                        "Apple Symbols-regular")
-                      0.9)
+  ;; (lucius/scale-fonts '("HanaMinA"
+  ;;                       "PingFang SC"
+  ;;                       "Euphemia UCAS"
+  ;;                       "Arial Unicode MS"
+  ;;                       "Apple Symbols-regular")
+  ;;                     0.9)
 
   ;; Fix incorrect character width for Telega
   ;; https://emacs.stackexchange.com/questions/14400/how-can-i-fix-incorrect-character-width
   ;; argument is an alist of width and list of RANGEs,
   ;; which is the same as the RANGE that set-char-table-range accepts
-  (lucius/set-char-widths
-   `((
-      2 . (,@(mapcar 'string-to-char '("𓆡" "𓆝" "𓆟" "𓆜" "𓆞"
-                                       "𓆝" "𓆟" "𓆝" "𓆟" "𓆜"
-                                       "𓆞" "𓆝" "𓆟" "𓆝" "𓆟"
-                                       "𓆜" "𓆞" "𓆝" "𓆟" "𓆝"
-                                       "𓆟" "𓆜" "𓆞" "𓆝" "𓆟")))))))
+  ;; (lucius/set-char-widths
+  ;;  `((
+  ;;     2 . (,@(mapcar 'string-to-char '("𓆡" "𓆝" "𓆟" "𓆜" "𓆞"
+  ;;                                      "𓆝" "𓆟" "𓆝" "𓆟" "𓆜"
+  ;;                                      "𓆞" "𓆝" "𓆟" "𓆝" "𓆟"
+  ;;                                      "𓆜" "𓆞" "𓆝" "𓆟" "𓆝"
+  ;;                                      "𓆟" "𓆜" "𓆞" "𓆝" "𓆟"))))))
+  )
 (provide 'lib-font)
 ;;; lib-font.el ends here
