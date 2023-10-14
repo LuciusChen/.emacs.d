@@ -65,5 +65,12 @@
       (setf entries (sort entries elfeed-search-sort-function))
       (setf elfeed-search-entries
             entries))))
+(defun lucius/xwidget-webkit-browse-entry-link-at-point ()
+  (interactive)
+  (let ((entry-link
+         (if (eq major-mode 'elfeed-search-mode)
+             (elfeed-entry-link (elfeed-search-selected t))
+           (elfeed-entry-link elfeed-show-entry))))
+    (xwidget-webkit-browse-url entry-link)))
 (provide 'lib-reader)
 ;;; lib-reader.el ends here

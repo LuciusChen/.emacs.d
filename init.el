@@ -94,7 +94,7 @@
     org-roam
     git-link
     pdf-tools
-    ef-themes
+    ;; ef-themes
     fullframe
     ox-pandoc
     macrostep
@@ -144,7 +144,8 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
-    (modus-themes :host github :repo "protesilaos/modus-themes")
+    (ef-themes :host github :repo "LuciusChen/ef-themes")
+    (modus-themes :host github :repo "LuciusChen/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (anki-editor :host github :repo "LuciusChen/anki-editor")
     (eglot-hierarchy :host github :repo "dolmens/eglot-hierarchy")
