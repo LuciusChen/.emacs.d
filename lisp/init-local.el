@@ -54,7 +54,7 @@
 
 ;;; TABBAR
 (defface lucius/nerd-icons-purple
-  '((((background dark)) :foreground "#AA759F" :background "#0d0e1c")
+  '((((background dark)) :foreground "#B2A3F9" :background "#172021")
     (((background light)) :foreground "#8940AE" :background "#f6fff9"))
   "Face for purple icons."
   :group 'nerd-icons-faces)
@@ -103,11 +103,6 @@
                   (propertize (concat " " (alist-get 'name tab) " ") 'face face))))
              tab-bar-format '(tab-bar-format-menu-bar
                               tab-bar-format-tabs
-                              tab-bar-format-add-tab)))
-  (:when-loaded
-    (set-face-attribute 'tab-bar-tab-inactive nil
-                        :inherit nil
-                        :background "#e0e6e3"
-                        :box nil)))
+                              tab-bar-format-add-tab))))
 (provide 'init-local)
 ;;; init-local.el ends here

@@ -55,6 +55,8 @@
              ("\\*Agenda Commands\\*$")
              ("\\*chatgpt\\*$")
              ("\\*xref\\*$")
+             ("\\*Help\\*$")
+             ("\\*Telega User\\*$")
              ("\\*Telegram Chat Info\\*$")
              ("\\*Telegram Message Info\\*$")))
   (popper-mode +1)
