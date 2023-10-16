@@ -24,6 +24,8 @@
   (:bind-into global-map "C-c t" (identity telega-prefix-map))
   (:when-loaded
     (:bind-into telega-prefix-map "p" telega-chatbuf-filter-search)
+    (:bind-into telega-msg-button-map "C" lucius/telega-save-file-to-clipboard)
+    (:bind-into telega-msg-button-map "s" lucius/telega-msg-save-to-cloud-copyleft)
     (:also-load telega-url-shorten
                 telega-bridge-bot
                 telega-mnz
