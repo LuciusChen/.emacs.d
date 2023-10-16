@@ -151,5 +151,9 @@
 (setup vundo
   (:option vundo--window-max-height 5
            vundo-roll-back-on-quit t))
+
+(setup webpaste
+  (require 'webpaste)
+  (:option webpaste-provider-priority '("paste.mozilla.org")))
 (provide 'init-edit-util)
 ;;; init-edit-util.el ends here

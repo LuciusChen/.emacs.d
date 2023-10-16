@@ -479,4 +479,4 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
     (telega-ins--outgoing-status msg))
   t)
 (provide 'lib-telega)
-;;; init-telega.el ends here
+;;; lib-telega.el ends here

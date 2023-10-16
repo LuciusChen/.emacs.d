@@ -87,14 +87,13 @@
     diff-hl
     flymake
     web-mode
-    git-link
     js2-mode
     move-dup
     diminish
     org-roam
     git-link
+    webpaste
     pdf-tools
-    ;; ef-themes
     fullframe
     ox-pandoc
     macrostep
@@ -166,7 +165,7 @@
 (require 'init-core)
 (require 'init-setup)
 (require 'init-gui-frames)
-(require 'init-ibuffer)
+(require 'init-layout)
 
 (require 'init-edit-util)
 (require 'init-dired)
