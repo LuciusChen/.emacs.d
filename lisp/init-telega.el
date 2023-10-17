@@ -70,7 +70,10 @@
                 (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
                -1001154313178                ; @coder_ot
                (6332621450                   ; @yamatrix_bridge_bot
-                (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))))
+                (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
+               -1001873425044                ; @Emacs_CN Lite
+               (420415423
+                (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))))
     (set-face-attribute 'telega-msg-heading nil
                         :inherit nil
                         :background "#EBF4EC"

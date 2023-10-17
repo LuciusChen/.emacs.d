@@ -47,26 +47,12 @@
                  (unread-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
                  (mentioned-count (apply '+ (mapcar (telega--tl-prop :unread_mention_count)
                                                     (telega-filter-chats telega--ordered-chats '(mention)))))
+                 ;; 最好使用 (and is-known unread-reactions) temex 来切断一般列表中不可见的聊天
+                 ;; 此类聊天，例如对频道中的帖子发表评论，或者您进入、写下一些内容然后离开，然后有人做出反应的聊天
                  (reaction-count (apply '+ (mapcar (telega--tl-prop :unread_reaction_count)
-                                                   (telega-filter-chats telega--ordered-chats '(unread-reactions)))))
+                                                   (telega-filter-chats telega--ordered-chats '(and is-known unread-reactions)))))
                  (notification-count (+ mentioned-count unread-count reaction-count)))
             (when (> notification-count 0)
-              ;; (let ((icon (nerd-icons-faicon "nf-fae-telegram" :face 'lucius/nerd-icons-purple))
-              ;;       (unread-text (when (> unread-count 0) (format "%d " unread-count)))
-              ;;       (mentioned-text (when (> mentioned-count 0) (format "@%d " mentioned-count)))
-              ;;       (reaction-text (when (> reaction-count 0) (format "❤%d " reaction-count))))
-                ;; (propertize
-                ;;  (concat icon " " unread-text mentioned-text reaction-text)
-                ;;  'face `(:inherit ,(if online-p 'success 'warning)))
-                ;; (format "%s %s" icon
-                ;;         (propertize
-                ;;          (concat unread-text mentioned-text reaction-text)
-                ;;          'face 'telega-mention-count))
-                ;; (format "%s %s%s%s" icon
-                ;;         (propertize unread-text 'face 'telega-unmuted-count)
-                ;;         (propertize mentioned-text 'face 'telega-mention-count)
-                ;;         (propertize reaction-text 'face 'telega-mention-count)
-                ;;         )
               (concat (nerd-icons-faicon "nf-fae-telegram" :face 'lucius/nerd-icons-purple)
                       " "
                       (when (> unread-count 0)
