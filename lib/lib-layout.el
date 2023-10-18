@@ -1,18 +1,18 @@
 ;;; lib-layout.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(defface lucius/nerd-icons-purple
-    '((((background dark)) :foreground "#B2A3F9" :background "#172021")
-      (((background light)) :foreground "#8940AE" :background "#f6fff9"))
-  "Face for purple icons."
-  :group 'nerd-icons-faces)
+;; (defface lucius/nerd-icons-purple
+;;     '((((background dark)) :foreground "#B2A3F9" :background "#172021")
+;;       (((background light)) :foreground "#8940AE" :background "#f6fff9"))
+;;   "Face for purple icons."
+;;   :group 'nerd-icons-faces)
 
 (defun tab-bar-format-menu-bar ()
   "Produce the Menu button for the tab bar that shows the menu bar."
   `((menu-bar menu-item
               (format " %s "
                       (nerd-icons-sucicon "nf-custom-emacs"
-                                          :face 'lucius/nerd-icons-purple))
+                                          :face '(:inherit nerd-icons-purple)))
               tab-bar-menu-bar :help "Menu Bar")))
 
 (defun lucius/tab-bar-tab-name-function ()
@@ -53,7 +53,7 @@
                                                    (telega-filter-chats telega--ordered-chats '(and is-known unread-reactions)))))
                  (notification-count (+ mentioned-count unread-count reaction-count)))
             (when (> notification-count 0)
-              (concat (nerd-icons-faicon "nf-fae-telegram" :face 'lucius/nerd-icons-purple)
+              (concat (nerd-icons-faicon "nf-fae-telegram" :face '(:inherit nerd-icons-purple))
                       " "
                       (when (> unread-count 0)
                         (propertize (concat "●" (number-to-string unread-count) " ")

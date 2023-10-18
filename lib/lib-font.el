@@ -14,40 +14,40 @@
       (format "%s%s" font-name font-size)
     (format "%s %s" font-name font-size)))
 
-(defun lucius/scale-fonts (scale-fonts-list scale-factor)
-  "Scale the fonts in =scale-fonts-list' by the given factor.
+;; (defun lucius/scale-fonts (scale-fonts-list scale-factor)
+;;   "Scale the fonts in =scale-fonts-list' by the given factor.
 
-FACTOR is the scaling factor by which the fonts should be scaled.
-This function iterates over each font in =scale-fonts-list' and
-adds an entry to =face-font-rescale-alist' with the font and the
-specified scale factor.  This scales the size of the fonts by the
-given factor."
-  (dolist (font scale-fonts-list)
-    (add-to-list 'face-font-rescale-alist (cons font scale-factor))))
+;; FACTOR is the scaling factor by which the fonts should be scaled.
+;; This function iterates over each font in =scale-fonts-list' and
+;; adds an entry to =face-font-rescale-alist' with the font and the
+;; specified scale factor.  This scales the size of the fonts by the
+;; given factor."
+;;   (dolist (font scale-fonts-list)
+;;     (add-to-list 'face-font-rescale-alist (cons font scale-factor))))
 
-(defun lucius/set-char-widths (alist)
-  "Set the character widths for specific characters.
+;; (defun lucius/set-char-widths (alist)
+;;   "Set the character widths for specific characters.
 
-ALIST is a list of pairs, where each pair consists of a WIDTH
-and a list of CHARACTERS.  WIDTH is the desired width for the
-characters in the list.  CHARACTERS is a list of characters for
-which the width should be set.
+;; ALIST is a list of pairs, where each pair consists of a WIDTH
+;; and a list of CHARACTERS.  WIDTH is the desired width for the
+;; characters in the list.  CHARACTERS is a list of characters for
+;; which the width should be set.
 
-This function sets the character widths in the global
-=char-width-table= by creating a new character table, setting
-the width for each character in CHARACTERS, optimizing the table,
-and setting it as the parent of =char-width-table=."
-  (while (char-table-parent char-width-table)
-    (setq char-width-table (char-table-parent char-width-table)))
-  (dolist (pair alist)
-    (let ((width (car pair))
-          (chars (cdr pair))
-          (table (make-char-table nil)))
-      (dolist (char chars)
-        (set-char-table-range table char width))
-      (optimize-char-table table)
-      (set-char-table-parent table char-width-table)
-      (setq char-width-table table))))
+;; This function sets the character widths in the global
+;; =char-width-table= by creating a new character table, setting
+;; the width for each character in CHARACTERS, optimizing the table,
+;; and setting it as the parent of =char-width-table=."
+;;   (while (char-table-parent char-width-table)
+;;     (setq char-width-table (char-table-parent char-width-table)))
+;;   (dolist (pair alist)
+;;     (let ((width (car pair))
+;;           (chars (cdr pair))
+;;           (table (make-char-table nil)))
+;;       (dolist (char chars)
+;;         (set-char-table-range table char width))
+;;       (optimize-char-table table)
+;;       (set-char-table-parent table char-width-table)
+;;       (setq char-width-table table))))
 
 (defun lucius/setup-fonts ()
   ;; https://typeof.net/Iosevka/customizer
