@@ -53,17 +53,17 @@
                                                    (telega-filter-chats telega--ordered-chats '(and is-known unread-reactions)))))
                  (notification-count (+ mentioned-count unread-count reaction-count)))
             (when (> notification-count 0)
-              (concat (nerd-icons-faicon "nf-fae-telegram" :face '(:inherit nerd-icons-purple))
-                      " "
+              (concat "[" (nerd-icons-faicon "nf-fae-telegram" :face '(:inherit nerd-icons-purple))
                       (when (> unread-count 0)
-                        (propertize (concat "●" (number-to-string unread-count) " ")
+                        (propertize (concat " ●" (number-to-string unread-count))
                                     'face 'telega-unmuted-count))
                       (when (> mentioned-count 0)
-                        (propertize (concat "@" (number-to-string mentioned-count) " ")
+                        (propertize (concat " @" (number-to-string mentioned-count))
                                     'face 'telega-mention-count))
                       (when (> reaction-count 0)
-                        (propertize (concat "❤" (number-to-string reaction-count) " ")
-                                    'face 'telega-mention-count))))))))
+                        (propertize (concat " ❤" (number-to-string reaction-count))
+                                    'face 'telega-mention-count))
+                      "] "))))))
 
 (defun lucius/tab-bar-telega-icon ()
   (or lucius/tab-bar-telega-indicator-cache

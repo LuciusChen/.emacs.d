@@ -38,7 +38,10 @@
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
 (setup sis
-  (:option sis-english-source "com.apple.keylayout.ABC"
+  ;; brew tap daipeihust/tap
+  ;; brew install im-select
+  (:option sis-external-ism "im-select"
+           sis-english-source "com.apple.keylayout.ABC"
            sis-inline-tighten-head-rule nil
            sis-default-cursor-color "#f78fe7"
            sis-other-cursor-color "orange"
