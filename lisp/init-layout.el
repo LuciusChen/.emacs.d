@@ -90,9 +90,10 @@
              tab-bar-tab-name-function 'lucius/tab-bar-tab-name-function
              tab-bar-tab-name-format-function 'lucius/tab-bar-tab-name-format-function
              tab-bar-format '(tab-bar-format-menu-bar
-                              lucius/tab-bar-telega-icon
                               tab-bar-format-tabs
-                              tab-bar-format-add-tab))
+                              tab-bar-format-add-tab
+                              tab-bar-format-align-right
+                              lucius/tab-bar-telega-icon))
     (:hooks telega-connection-state-hook lucius/tab-bar-telega-icon-update
             telega-kill-hook lucius/tab-bar-telega-icon-update)
     (advice-add 'telega--on-updateUnreadChatCount :after #'lucius/tab-bar-telega-icon-update)
