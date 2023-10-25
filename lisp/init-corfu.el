@@ -73,5 +73,10 @@
       (:hook (lambda () (setq-local corfu-auto nil)))
       (setq-default corfu-auto t)
       (setq-default corfu-quit-no-match 'separator))))
+
+(setup cape
+  (:when-loaded
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-file)))
 (provide 'init-corfu)
 ;;; init-corfu.el ends here
