@@ -61,6 +61,7 @@
     sis
     avy
     mpv
+    cape
     deft
     ;; rime
     affe
@@ -112,7 +113,6 @@
     git-commit
     elfeed-tube
     org-roam-ui
-    company-box
     magit-todos
     prettier-js
     consult-dir
@@ -153,7 +153,7 @@
     (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
     (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
-    (psearch :host github :repo "twlz0ne/psearch.el" :files ("psearch.el"))))
+    ))
 
 (dolist (e *use-package-list*)
   (straight-use-package e))

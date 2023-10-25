@@ -4,9 +4,9 @@
 (defun font-list-existsp (font)
   (if (null (x-list-fonts font)) nil t))
 
-(defun font-installed-p (font-name)
-  "Check if font with FONT-NAME is available."
-  (find-font (font-spec :name font-name)))
+;; (defun font-installed-p (font-name)
+;;   "Check if font with FONT-NAME is available."
+;;   (find-font (font-spec :name font-name)))
 
 (defun make-font-string (font-name font-size)
   (if (and (stringp font-size)
@@ -77,7 +77,7 @@
                            "Noto Emoji"
                            "Segoe UI Emoji"
                            "Symbola")
-          when (font-installed-p font)
+          when (find-font (font-spec :name font))
           return (set-fontset-font
                   t
                   'unicode

@@ -1,15 +1,5 @@
 ;;; init-telega.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary
-;; If language-detection is available,
-;; then laguage could be detected automatically
-;; for code blocks without language explicitly specified.
-
-;; company 补全列表时参差不齐
-(setup company-box
-  (:with-mode company-mode
-    (:hook company-box-mode))
-  (:advice company-box--make-candidate :override company-box--make-candidate!))
-
 (setup telega
   ;; @LawxenceX
   ;; telega 中 telega-prefix-map 定义的是 defvar，
@@ -30,6 +20,9 @@
                 telega-bridge-bot
                 telega-mnz
                 lib-telega
+                ;; If language-detection is available,
+                ;; then laguage could be detected automatically
+                ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option telega-translate-to-language-by-default "zh"
              telega-msg-save-dir "~/Downloads"
@@ -42,7 +35,7 @@
                      :regexp "^\\(https?://\\)\\(.\\{55\\}\\).*?$"
                      :symbol ""
                      :replace "\\1\\2...")))
-    (:with-mode telega-chat-mode (:hook lucius/telega-chat-mode))
+    (:with-mode telega-chat-mode (:hook lucius/telega-completion-setup))
     ;; 聊天列表高亮
     ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
     (:with-mode telega-root-mode (:hook lg-telega-root-mode))
@@ -124,19 +117,9 @@
     (if *IS-MAC*
         (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
       (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))
-    (psearch-patch telega-ins--message-header
-      (psearch-replace '`(if telega-msg-heading-whole-line ,a ,b)
-                       '`(if telega-msg-heading-whole-line ,a)))
-    ;; 用户名过长时，在 Reply 中省略部分。
-    (psearch-patch telega-ins--aux-msg-one-line
-      (psearch-replace
-       '`(let ((sender (telega-msg-sender msg))) ,a)
-       '`(let ((sender (telega-msg-sender msg)))
-           (telega-ins--with-attrs
-               (list :max (/ telega-chat-fill-column 3) :elide t)
-             (telega-ins
-              (or (telega-msg-sender-username sender 'with-Q)
-                  (telega-msg-sender-title sender)))))))
+    ;; 让 heading 不充满整行
+    (advice-add 'telega-ins--message-header :override #'lucius/telega-ins--message-header)
+    (advice-add 'telega-ins--aux-msg-one-line :override #'lucius/telega-ins--aux-msg-one-line)
     ;; ;; 修改 [| In reply to: ] 为 [| ➦: ]
     ;; ;; 因为这个 fwd-info 是个闭包，如果想在 elisp 里用闭包必须开词法作用域
     (advice-add 'telega-ins--msg-reply-inline :override #'lucius/telega-ins--msg-reply-inline)
