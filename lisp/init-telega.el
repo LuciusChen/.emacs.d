@@ -67,24 +67,24 @@
                -1001873425044                ; @Emacs_CN Lite
                (420415423
                 (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))))
-    (set-face-attribute 'telega-msg-heading nil
-                        :inherit nil
-                        :background "#EBF4EC"
-                        :weight 'bold)
-    (set-face-attribute 'telega-msg-inline-reply nil
-                        :inherit nil
-                        :foreground "#86C166") ;; 苗 NAE
-    (set-face-attribute 'telega-msg-inline-forward nil
-                        :inherit nil
-                        :foreground "#FFB11B")
-    (set-face-attribute 'telega-entity-type-mention nil
-                        :underline '(:style line)
-                        :weight 'bold)
-    (set-face-attribute 'telega-msg-self-title nil
-                        :foreground "#E2943B" ;; 朽葉 KUCHIBA
-                        :italic t
-                        :weight 'bold)
-    (set-face-attribute 'telega-msg-user-title nil :italic t)
+    ;; (set-face-attribute 'telega-msg-heading nil
+    ;;                     :inherit nil
+    ;;                     :background "#EBF4EC"
+    ;;                     :weight 'bold)
+    ;; (set-face-attribute 'telega-msg-inline-reply nil
+    ;;                     :inherit nil
+    ;;                     :foreground "#86C166") ;; 苗 NAE
+    ;; (set-face-attribute 'telega-msg-inline-forward nil
+    ;;                     :inherit nil
+    ;;                     :foreground "#FFB11B")
+    ;; (set-face-attribute 'telega-entity-type-mention nil
+    ;;                     :underline '(:style line)
+    ;;                     :weight 'bold)
+    ;; (set-face-attribute 'telega-msg-self-title nil
+    ;;                     :foreground "#E2943B" ;; 朽葉 KUCHIBA
+    ;;                     :italic t
+    ;;                     :weight 'bold)
+    ;; (set-face-attribute 'telega-msg-user-title nil :italic t)
     (set-face-attribute 'telega-button nil
                         :foreground "#986DB2"
                         :box '(:line-width (-2 . -2)
@@ -94,14 +94,14 @@
                         :foreground "#ffffff"
                         :background "#986DB2")
     ;; 未读提示
-    (set-face-attribute 'telega-unmuted-count nil
-                        :foreground "#FFB11B"
-                        :weight 'bold)
-    (set-face-attribute 'telega-mention-count nil
-                        :foreground "#FE6DB3")
-    (set-face-attribute 'telega-muted-count nil
-                        :foreground "#86C166"
-                        :weight 'bold)
+    ;; (set-face-attribute 'telega-unmuted-count nil
+    ;;                     :foreground "#FFB11B"
+    ;;                     :weight 'bold)
+    ;; (set-face-attribute 'telega-mention-count nil
+    ;;                     :foreground "#FE6DB3")
+    ;; (set-face-attribute 'telega-muted-count nil
+    ;;                     :foreground "#86C166"
+    ;;                     :weight 'bold)
 
     ;; Linux settings
     (when *IS-LINUX*
