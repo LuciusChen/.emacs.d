@@ -32,7 +32,7 @@
   (let ((face (funcall tab-bar-tab-face-function tab)))
     (concat
      (propertize " " 'face face)
-     (propertize (number-to-string i) 'face `(:inherit ,face :weight ultra-bold :underline t))
+     (propertize (number-to-string i) 'face `(:inherit ,face :weight ultra-bold))
      (propertize (concat " " (alist-get 'name tab) " ") 'face face))))
 ;; telega notification
 (defvar lucius/tab-bar-telega-indicator-cache nil)

@@ -30,6 +30,28 @@
                                         straight--profile-cache)))
                        "\n\n")))))
 
+;; make left-fringe half
+(fringe-mode '(5 . 8))
+;; Better fringe symbol
+(define-fringe-bitmap 'right-curly-arrow
+    [#b00110000
+     #b00110000
+     #b00000000
+     #b00110000
+     #b00110000
+     #b00000000
+     #b00110000
+     #b00110000])
+(define-fringe-bitmap 'left-curly-arrow
+    [#b00110000
+     #b00110000
+     #b00000000
+     #b00110000
+     #b00110000
+     #b00000000
+     #b00110000
+     #b00110000])
+
 ;; tab 键来补全
 (setq tab-always-indent 'complete)
 ;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。

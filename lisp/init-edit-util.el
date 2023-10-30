@@ -5,11 +5,11 @@
   (:autoload meow-setup)
   (meow-global-mode 1)
   (meow-setup)
-  (:option  meow-replace-state-name-list '((normal . "[N]")
-                                           (motion . "[M]")
-                                           (keypad . "[K]")
-                                           (insert . "[I]")
-                                           (beacon . "[B]"))
+  (:option  meow-replace-state-name-list '((normal . "N")
+                                           (motion . "M")
+                                           (keypad . "K")
+                                           (insert . "I")
+                                           (beacon . "B"))
             wrap-keymap (let ((map (make-keymap)))
                           (suppress-keymap map)
                           (dolist (k '("(" "[" "{" "<"))
@@ -43,7 +43,7 @@
   (:option sis-external-ism "im-select"
            sis-english-source "com.apple.keylayout.ABC"
            sis-inline-tighten-head-rule nil
-           sis-default-cursor-color "#f78fe7"
+           sis-default-cursor-color "#cf7fa7"
            sis-other-cursor-color "orange"
            sis-prefix-override-keys (list "C-c" "C-x" "C-h"))
   (:hooks meow-leaving-insert-mode-hook sis-set-english)
@@ -58,6 +58,8 @@
   (sis-global-respect-mode t)
   ;; enable the /context/ mode for all buffers
   (sis-global-context-mode t)
+  ;; enable the /inline english/ mode for all buffers
+  ;; (sis-global-inline-mode t)
   (add-to-list 'sis-context-hooks 'meow-entering-insert-mode-hook)
   ;; org title 处切换 Rime，telega 聊天时切换 Rime。
   ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。

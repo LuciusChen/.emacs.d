@@ -44,14 +44,14 @@
 
 (setup theme
   (:require lib-appearance)
-  (setq light-theme 'ef-spring)
+  (setq light-theme 'modus-operandi-tinted)
   (setq dark-theme 'modus-vivendi-tinted)
   ;; theme setting
   ;; Don't prompt to confirm theme safety. This avoids problems with
   ;; first-time startup on Emacs > 26.3.
   (setq custom-safe-themes t)
   ;; If you don't customize it, this is the theme you get.
-  (setq-default custom-enabled-themes '(ef-spring))
+  (setq-default custom-enabled-themes '(modus-operandi-tinted))
   (add-hook 'after-init-hook 'reapply-themes)
   (add-hook 'after-init-hook 'set-dividers-and-fringe-color))
 

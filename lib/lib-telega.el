@@ -37,9 +37,8 @@
                         (append (list telega-emoji-company-backend
                                       #'telega-company-username
                                       #'telega-company-hashtag
-                                      #'telega-company-markdown-precode)
-                                (when (telega-chat-bot-p telega-chatbuf--chat)
-                                  #'(telega-company-botcmd))))
+                                      #'telega-company-botcmd
+                                      #'telega-company-markdown-precode)))
                 completion-at-point-functions))
   (require 'company)
   (corfu-mode 1))

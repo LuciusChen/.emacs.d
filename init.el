@@ -86,6 +86,7 @@
     ox-hugo
     scratch
     diff-hl
+    company
     flymake
     web-mode
     js2-mode
@@ -143,14 +144,13 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
-    (ef-themes :host github :repo "LuciusChen/ef-themes")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (anki-editor :host github :repo "LuciusChen/anki-editor")
     (eglot-hierarchy :host github :repo "dolmens/eglot-hierarchy")
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "zevlg/telega.el")
-    (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
+    ;; (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
     (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     ))
@@ -172,7 +172,7 @@
 (require 'init-flymake)
 (require 'init-git)
 (require 'init-minibuffer)
-(require 'init-corfu)
+(require 'init-completion)
 (require 'init-prog)
 
 (require 'init-telega)
