@@ -1,4 +1,4 @@
-;;; init-corfu.el --- Interactive completion in buffers -*- lexical-binding: t -*-
+;;; init-completion.el --- Interactive completion in buffers -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 (setup orderless
@@ -78,5 +78,28 @@
   (:when-loaded
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)))
-(provide 'init-corfu)
-;;; init-corfu.el ends here
+
+;; https://cestlaz.github.io/post/using-emacs-74-eglot/
+(setup eglot
+  (:also-load lib-eglot)
+  (:with-mode (python-mode java-mode java-ts-mode typescript-mode)
+    (:hook eglot-ensure))
+  (:option eglot-events-buffer-size 0)
+  (:when-loaded
+    ;; Java $brew install jdtls
+    ;; Python $pip3 install pyright
+    (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
+                    ;; curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+                    ;; nvm install node
+                    ;; sudo npm install -g typescript
+                    ;; npm install -g @volar/vue-language-server
+                    (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
+                    ;; npm install -g typescript-language-server
+                    (typescript-mode . ("typescript-language-server" "--stdio"))
+                    ((java-mode java-ts-mode) . jdtls-command-contact)))
+      (push item eglot-server-programs)))
+  (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
+(provide 'init-completion)
+;;; init-completion.el ends here
