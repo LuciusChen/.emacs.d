@@ -34,28 +34,6 @@
   (define-derived-mode my-jsp-mode web-mode "Web")
   (add-to-list 'auto-mode-alist '("\\.jsp\\'" . my-jsp-mode)))
 
-;; https://cestlaz.github.io/post/using-emacs-74-eglot/
-(setup eglot
-  (:also-load lib-eglot)
-  (:with-mode (python-mode java-mode java-ts-mode typescript-mode)
-    (:hook eglot-ensure))
-  (:option eglot-events-buffer-size 0)
-  (:when-loaded
-    ;; Java $brew install jdtls
-    ;; Python $pip3 install pyright
-    (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
-                    ;; curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-                    ;; nvm install node
-                    ;; sudo npm install -g typescript
-                    ;; npm install -g @volar/vue-language-server
-                    (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
-                    ;; npm install -g typescript-language-server
-                    (typescript-mode . ("typescript-language-server" "--stdio"))
-                    ((java-mode java-ts-mode) . jdtls-command-contact)))
-      (push item eglot-server-programs)))
-  (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode)))
-
 (setup sly-el-indent
   (:hooks emacs-lisp-mode-hook sly-el-indent-setup))
 

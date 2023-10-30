@@ -28,12 +28,12 @@
              gptel-default-mode 'org-mode
              gptel-temperature 0.7)))
 
-(setup immersive-translate
-  (:option immersive-translate-backend 'chatgpt
-           immersive-translate-chatgpt-host "api.openai.com")
-  (:with-mode elfeed-show-mode
-    (:hook immersive-translate-setup))
-  (:hooks nov-pre-html-render-hook immersive-translate-setup))
+;; (setup immersive-translate
+;;   (:option immersive-translate-backend 'chatgpt
+;;            immersive-translate-chatgpt-host "api.openai.com")
+;;   (:with-mode elfeed-show-mode
+;;     (:hook immersive-translate-setup))
+;;   (:hooks nov-pre-html-render-hook immersive-translate-setup))
 
 (setup elfeed
   (:global "C-x w" elfeed)

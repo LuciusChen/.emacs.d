@@ -58,7 +58,8 @@
              ("\\*Help\\*$")
              ("\\*Telega User\\*$")
              ("\\*Telegram Chat Info\\*$")
-             ("\\*Telegram Message Info\\*$")))
+             ("\\*Telegram Message Info\\*$")
+             ("\\*Telegram Sticker Set\\*$")))
   (popper-mode +1)
   (popper-echo-mode +1)
   ;; HACK: close popper window with `C-g'

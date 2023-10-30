@@ -13,8 +13,7 @@
     (doom-modeline-def-segment lucius/buffer-info
         "Customize doom-modeline to remove modification indication"
       (let ((buffer-name (doom-modeline--buffer-name)))
-        (when (or (eq major-mode 'telega-chat-mode)
-                  (eq major-mode 'org-agenda-mode))
+        (when (derived-mode-p 'telega-chat-mode 'org-agenda-mode)
           (setq buffer-name
                 (propertize buffer-name 'face
                             `(:foreground ,(frame-parameter nil 'foreground-color)
