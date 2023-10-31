@@ -15,9 +15,10 @@
                     (pinyinlib-build-regexp-string str))))))
 
 (setup kind-icon
-  (:defer
-   (add-to-list 'corfu-margin-formatters
-                #'kind-icon-margin-formatter)))
+  (:after corfu
+    ;; (:option kind-icon-default-face 'corfu-default)
+    (add-to-list 'corfu-margin-formatters
+                 #'kind-icon-margin-formatter)))
 
 (setup corfu
   (:require nerd-icons)

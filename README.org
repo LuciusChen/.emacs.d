@@ -41,6 +41,8 @@ Screen 版本粗体和 normal 有明显的区别，有利于组织文本。
 目前选用的是 02W04，这个系列的字体前面的序号越大越圆润，从接近宋体到接近楷体；W 开头的序号代表字重，04 的字重是和 Iosevka 的 normal 相近。相对于霞鹜文楷，仓耳今楷的笔画更加紧凑，显得更加正式。
 *** 特殊字体
 需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。
+** Themes
+[[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]
 ** .authinfo
 #+begin_example
 machine api.openai.com login apikey password ****
@@ -73,10 +75,10 @@ npm install -g typescript-language-server
 ** Telega
 针对 UI 做了一些修改
 - 修改了 msg-heading 的背景，只保留用户名所在行的背景，并且适应长度。
-- 修改了按钮的样式
-- 回复样式修改字体颜色为绿色且 ~| In reply to:~ 变为 ~| ➦:~
+- +修改了按钮的样式+ （移到 forkd 的主题中去了）
+- +回复样式修改字体颜色为绿色且 =| In reply to:= 变为 | ➦:+ （已在 commit 93fedce 实现）
 - 回复行中用户名过长，则省略以显示更多的「被回复」内容。
-- 转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 ~| ➥:~
+- +转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 | ➥:+ （已在 commit 93fedce 实现）
 
 #+CAPTION: telega_forward
 #+ATTR_ORG: :width 600
@@ -100,6 +102,8 @@ npm install -g typescript-language-server
 [[file:assets/telega-bridge-bot.png]]
 *** telega-mnz
 高亮消息中的代码块
+*** Adjust the ascent to avoid gaps between slices.
+
 *** Frequent Shortcuts
 | =C-u C-c C-k= | 取消回复和附带的文件，不保留所输入文字（用得最多）        |
 | =C-c C-k=     | 取消回复和附带的文件，但保留所输入文字（不用 只用上面↑） |
