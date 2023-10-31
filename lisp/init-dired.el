@@ -1,7 +1,6 @@
 ;;; init-dired.el --- Dired customisations -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-
 (setup dired
   (:bind-into ctl-x-map "\C-j" 'dired-jump)
   (:bind-into ctl-x-4-map "\C-j" 'dired-jump-other-window)
