@@ -119,11 +119,6 @@
       (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))
     ;; 让 heading 不充满整行
     (advice-add 'telega-ins--message-header :override #'lucius/telega-ins--message-header)
-    (advice-add 'telega-ins--aux-msg-one-line :override #'lucius/telega-ins--aux-msg-one-line)
-    ;; ;; 修改 [| In reply to: ] 为 [| ➦: ]
-    ;; ;; 因为这个 fwd-info 是个闭包，如果想在 elisp 里用闭包必须开词法作用域
-    (advice-add 'telega-ins--msg-reply-inline :override #'lucius/telega-ins--msg-reply-inline)
-    ;; 修改 [| Forward from: ] 为 [| ➥: ]
-    (advice-add 'telega-ins--fwd-info-inline :override #'lucius/telega-ins--fwd-info-inline)))
+    (advice-add 'telega-ins--aux-msg-one-line :override #'lucius/telega-ins--aux-msg-one-line)))
 (provide 'init-telega)
 ;;; init-telega.el ends here
