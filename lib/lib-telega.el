@@ -34,11 +34,7 @@
   (make-variable-buffer-local 'completion-at-point-functions)
   (setq completion-at-point-functions
         (append (mapcar #'cape-company-to-capf
-                        (append (list telega-emoji-company-backend
-                                      #'telega-company-username
-                                      #'telega-company-hashtag
-                                      #'telega-company-botcmd
-                                      #'telega-company-markdown-precode)))
+                        telega-company-backends)
                 completion-at-point-functions))
   (require 'company)
   (corfu-mode 1))
@@ -217,9 +213,10 @@ argument - MSG to insert additional information after header."
                                                      username-face remove-caption)
   "Insert contents for aux message MSG as one line.
 If WITH-USERNAME is non-nil then insert MSG sender as well.
-USERNAME-FACE specifies face to use for sender's title.
-if WITH-USERNAME is `unread-mention', then outline sender with
+If WITH-USERNAME is `unread-mention', then outline sender with
 `telega-mention-count' face.
+If WITH-USERNAME is a string, then use it as title of the MSG sender.
+USERNAME-FACE specifies face to use for sender's title.
 REMOVE-CAPTION is passed directly to `telega-ins--content-one-line'."
   (declare (indent 1))
   (when (and with-username
@@ -227,160 +224,20 @@ REMOVE-CAPTION is passed directly to `telega-ins--content-one-line'."
                (let ((sender (telega-msg-sender msg)))
                  (telega-ins--with-attrs
                      (list :max (/ telega-chat-fill-column 3) :elide t)
-                   (telega-ins
-                    (or (telega-msg-sender-username sender 'with-Q)
-                        (telega-msg-sender-title sender)))))))
-    (when-let ((topic (telega-msg-topic msg)))
+                   (telega-ins (or (when (stringp with-username)
+                                     with-username)
+                                   (telega-msg-sender-username sender 'with-@)
+                                   (telega-msg-sender-title sender)))))))
+    (when-let ((topic (telega-msg-topic msg))
+               (show-topic-p
+                (or telega-msg-always-show-topic-info
+                    (not (eq topic (telega-chatbuf--thread-topic))))))
       (telega-ins--with-face 'telega-shadow
-        (telega-ins " → "))
-      (telega-ins--topic-icon topic))
-    (telega-ins "> "))
+        (telega-ins " → " (telega-symbol 'topic))
+        (telega-ins--topic-icon topic)))
+    (telega-ins (telega-symbol 'sender-and-text-delim) " "))
   (telega-ins--content-one-line msg remove-caption))
-;; reply and forward
-(defmacro lucius/telega-ins--aux-inline-reply (&rest body)
-  `(telega-ins--aux-inline
-       "➦" 'telega-msg-inline-reply
-     ,@body))
 
-(defun lucius/telega-ins--msg-reply-inline (msg)
-  "For message MSG insert reply header in case MSG is replying to some message."
-  (when-let ((reply-to (plist-get msg :reply_to)))
-    (cl-ecase (telega--tl-type reply-to)
-      (messageReplyToMessage
-       ;; NOTE: Do not show reply inline if replying to thread's root
-       ;; message.  If replied message is not instantly available, it
-       ;; will be fetched later by the
-       ;; `telega-msg--replied-message-fetch'
-       (unless (eq (plist-get telega-chatbuf--thread-msg :id)
-                   (telega--tl-get msg :reply_to :message_id))
-         (let ((replied-msg (telega-msg--replied-message msg)))
-           (cond ((or (null replied-msg) (eq replied-msg 'loading))
-                  ;; NOTE: replied message will be fetched by the
-                  ;; `telega-msg--replied-message-fetch'
-                  (lucius/telega-ins--aux-inline-reply
-                   (telega-ins-i18n "lng_profile_loading")))
-                 ((telega--tl-error-p replied-msg)
-                  (lucius/telega-ins--aux-inline-reply
-                   (telega-ins--with-face 'telega-shadow
-                     (telega-ins (telega-i18n "lng_deleted_message")))))
-                 ((telega-msg-match-p replied-msg 'ignored)
-                  (lucius/telega-ins--aux-inline-reply
-                   (telega-ins--message-ignored replied-msg)))
-                 (t
-                  (telega-ins--with-props
-                      ;; When pressed, then jump to the REPLIED-MSG message
-                      (list 'action
-                            (lambda (_button)
-                              (telega-msg-goto-highlight replied-msg)))
-                    (lucius/telega-ins--aux-inline-reply
-                     (telega-ins--aux-msg-one-line replied-msg
-                       :with-username t
-                       :username-face
-                       (let* ((sender (telega-msg-sender replied-msg))
-                              (faces (telega-msg-sender-title-faces sender)))
-                         (if (and (telega-sender-match-p sender 'me)
-                                  (plist-get msg :contains_unread_mention))
-                             (append faces '(telega-entity-type-mention))
-                           faces))))
-                    ))))))
-
-      (messageReplyToStory
-       ;; NOTE: If replied story is not instantly available, it will
-       ;; be fetched later by the `telega-msg--replied-story-fetch'
-       (let ((replied-story (telega-msg--replied-story msg)))
-         (cond ((or (null replied-story) (eq replied-story 'loading))
-                ;; NOTE: replied story will be fetched by the
-                ;; `telega-msg--replied-story-fetch'
-                (lucius/telega-ins--aux-inline-reply
-                 (telega-ins-i18n "lng_profile_loading")))
-               ((or (telega--tl-error-p replied-story)
-                    (telega-story-deleted-p replied-story))
-                (lucius/telega-ins--aux-inline-reply
-                 (telega-ins--with-face 'telega-shadow
-                   (telega-ins (telega-i18n "lng_deleted_story")))))
-               (t
-                (telega-ins--with-props
-                    ;; When pressed, open the replied story
-                    (list 'action
-                          (lambda (_button)
-                            (telega-story-open replied-story msg)))
-                  (lucius/telega-ins--aux-inline-reply
-                   (telega-ins--my-story-one-line replied-story msg))
-                  )))))
-      )))
-
-(defun lucius/telega-ins--fwd-info-inline (fwd-info)
-  "Insert forward info FWD-INFO as one liner."
-  (when fwd-info
-    (telega-ins--with-props
-        ;; When pressed, then jump to original message or show info
-        ;; about original sender
-        (list 'action
-              (lambda (_button) (telega--fwd-info-action fwd-info))
-              'help-echo "RET to goto original message")
-      (telega-ins--with-attrs  (list :max (- telega-chat-fill-column
-                                             (telega-current-column))
-                                     :elide t
-                                     :elide-trail 8
-                                     :face 'telega-msg-inline-forward)
-        ;; | Forwarded From:
-        (telega-ins "| " "➥: ")
-        (let* ((origin (plist-get fwd-info :origin))
-               (sender nil)
-               (from-chat-id (plist-get fwd-info :from_chat_id))
-               (from-chat (when (and from-chat-id (not (zerop from-chat-id)))
-                            (telega-chat-get from-chat-id))))
-          ;; Insert forward origin first
-          (cl-ecase (telega--tl-type origin)
-            (messageForwardOriginChat
-             (setq sender (telega-chat-get (plist-get origin :sender_chat_id)))
-             (telega-ins--msg-sender sender
-               :with-avatar-p t
-               :with-username-p t
-               :with-brackets-p t))
-
-            (messageForwardOriginUser
-             (setq sender (telega-user-get (plist-get origin :sender_user_id)))
-             (telega-ins--msg-sender sender
-               :with-avatar-p t
-               :with-username-p t
-               :with-brackets-p t))
-
-            ((messageForwardOriginHiddenUser messageForwardOriginMessageImport)
-             (telega-ins (telega-tl-str origin :sender_name)))
-
-            (messageForwardOriginChannel
-             (setq sender (telega-chat-get (plist-get origin :chat_id)))
-             (telega-ins--msg-sender sender
-               :with-avatar-p t
-               :with-username-p t
-               :with-brackets-p t)))
-
-          (when-let ((signature (telega-tl-str origin :author_signature)))
-            (telega-ins " --" signature))
-
-          (when (and from-chat
-                     (not (or (eq sender from-chat)
-                              (and (telega-user-p sender)
-                                   (eq sender (telega-chat-user from-chat))))))
-            (telega-ins "→")
-            (if telega-chat-show-avatars
-                (telega-ins--image
-                 (telega-msg-sender-avatar-image-one-line from-chat))
-              (telega-ins--msg-sender from-chat
-                :with-avatar-p t
-                :with-username-p t
-                :with-brackets-p t))))
-
-        (let ((date (plist-get fwd-info :date)))
-          (unless (zerop date)
-            (telega-ins " " (telega-i18n "lng_schedule_at") " ")
-            (telega-ins--date date)))
-        (when telega-msg-heading-whole-line
-          (telega-ins "\n")))
-      (unless telega-msg-heading-whole-line
-        (telega-ins "\n")))
-    t))
 ;; avatar
 (defcustom telega-avatar-slice-2-raise 0.5
   "Raise of the second slice of the avatar.
@@ -395,7 +252,7 @@ but increase the distance between username and text body."
   "Find the max of the fonts descent in STRING and convert it to ascent percent.
 If STRING is empty or can't find the telega current buffer frame,
 then return \\='center."
-  (if-let* ((buffer (or telega--current-buffer (current-buffer)))
+  (if-let* ((buffer (current-buffer))
             (window (get-buffer-window buffer))
             (frame (window-frame window))
             (default-font (face-font 'default frame))
@@ -467,6 +324,7 @@ It is useful to adjust the position of the sliced avatar."
                                  (cl-assert img)
                                  (car (image-size img t (telega-x-frame))))))
                           ?X)))))))
+
 (defun telega-ins--user (user &optional member show-phone-p)
   "Insert USER, aligning multiple lines at current column.
 MEMBER specifies corresponding \"ChatMember\" object.
@@ -545,11 +403,11 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
 
     ;; Message header needed
     (let* ((chat (telega-msg-chat msg))
+           (fwd-info (plist-get msg :forward_info))
            ;; Is formatting done for "Replies" chat?
            ;; Workaround for case when `:forward_info' is unset (for
            ;; outgoing messages [what?] for example)
-           (msg-for-replies-p (and (telega-replies-p chat)
-                                   (plist-get msg :forward_info)))
+           (msg-for-replies-p (and (telega-replies-p chat) fwd-info))
            (sender (if msg-for-replies-p
                        (telega-replies-msg-sender msg)
                      (telega-msg-sender msg)))
@@ -588,7 +446,7 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
                              :no-display-if (not telega-chat-show-avatars))))
 
       (setq ccol (telega-current-column))
-      (telega-ins--fwd-info-inline (plist-get msg :forward_info))
+      (telega-ins--fwd-info-inline fwd-info)
       ;; NOTE: Three lines avatars in "Replies" chat
       (when msg-for-replies-p
         (telega-ins--image avatar 2
