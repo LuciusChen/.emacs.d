@@ -85,7 +85,12 @@
    '("Y" . meow-sync-grab)
    '("z" . meow-pop-selection)
    '("'" . repeat)
-   '("<escape>" . ignore)))
+   '("<escape>" . ignore))
+  (dolist
+      (state
+        '((telega-root-mode . motion)
+          (telega-chat-mode . normal)))
+    (add-to-list 'meow-mode-state-list state)))
 
 ;; meow insert mode switch
 (defvar meow-leaving-insert-mode-hook nil
