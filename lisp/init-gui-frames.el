@@ -53,7 +53,7 @@
   ;; If you don't customize it, this is the theme you get.
   (setq-default custom-enabled-themes '(modus-operandi-tinted))
   (add-hook 'after-init-hook 'reapply-themes)
-  (add-hook 'after-init-hook 'set-dividers-and-fringe-color))
+  (add-hook 'window-setup-hook 'set-dividers-and-fringe-color))
 
 (when window-system
   (setup font
