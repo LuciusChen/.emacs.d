@@ -30,6 +30,7 @@
 (setq frame-inhibit-implied-resize t)
 ;; no title bar and round corners
 (add-to-list 'default-frame-alist '(undecorated-round . t))
+(setq tab-bar-mode t)
 
 ;; So we can detect this having been loaded
 (provide 'early-init)

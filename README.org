@@ -128,13 +128,13 @@ npm install -g typescript-language-server
 =C-x C-e= 可以执行 elisp 或者在 Scratch 中开启 =lisp-interaction-mode= 后，在需要执行的函数最后 =C-j= 执行。
 *** Working with Frame
 | Command | What it does                            |
-| C-x 5 0 | Close current frame                     |
-| C-x 5 1 | Close all frames except the current one |
-| C-x 5 2 | Create a new frame                      |
+| ~C-x 5 0~ | Close current frame                     |
+| ~C-x 5 1~ | Close all frames except the current one |
+| ~C-x 5 2~ | Create a new frame                      |
 *** Working with windows
 | Command | What it does                             |
-| C-x 0   | Close current window                     |
-| C-x 1   | Close all windows except the current one |
-| C-x 2   | Split current window in two vertically   |
-| C-x 3   | Split current window in two horizontally |
-| C-x o   | Switch to other window                   |
+| ~C-x 0~ | Close current window                     |
+| ~C-x 1~ | Close all windows except the current one |
+| ~C-x 2~ | Split current window in two vertically   |
+| ~C-x 3~ | Split current window in two horizontally |
+| ~C-x o~ | Switch to other window                   |

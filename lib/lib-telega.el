@@ -31,13 +31,25 @@
 
 ;; 补全
 (defun lucius/telega-completion-setup ()
+  (require 'company)
   (make-variable-buffer-local 'completion-at-point-functions)
   (setq completion-at-point-functions
-        (append (mapcar #'cape-company-to-capf
-                        telega-company-backends)
+        (append (mapcar #'cape-company-to-capf telega-company-backends)
                 completion-at-point-functions))
-  (require 'company)
   (corfu-mode 1))
+;; override
+(defun telega-company-botcmd (command &optional arg &rest _ignored)
+  (interactive (list 'interactive))
+  (cl-case command
+    (interactive (company-begin-backend 'telega-company-botcmd))
+    (require-match 'never)
+    (sorted t)
+    ;; Complete only if chatbuf has corresponding bot
+    (prefix (telega-company-grab-botcmd))
+    (candidates
+     (all-completions arg (telega-company--bot-commands)))
+    (annotation
+     (get-text-property 0 'telega-annotation arg))))
 
 (defun lucius/telega-save-file-to-clipboard (msg)
   "Save file at point to clipboard.
