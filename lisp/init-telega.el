@@ -12,6 +12,8 @@
   ;; :bind-into 里面用 :ensure 规定了 func`，直接传的话就会给你加 #'。
   ;; 改成 (identity xxx-prefix-map) 即可
   (:bind-into global-map "C-c t" (identity telega-prefix-map))
+  ;; remove chat folder icons
+  (setq telega-chat-folder-format nil)
   (:when-loaded
     (:bind-into telega-prefix-map "p" telega-chatbuf-filter-search)
     (:bind-into telega-msg-button-map "C" lucius/telega-save-file-to-clipboard)
@@ -24,17 +26,50 @@
                 ;; then laguage could be detected automatically
                 ;; for code blocks without language explicitly specified.
                 language-detection)
-    (:option telega-translate-to-language-by-default "zh"
-             telega-msg-save-dir "~/Downloads"
-             telega-chat-input-markups '("markdown2" "org")
-             ;; telega-debug t
-             telega-autoplay-mode 1
-             telega-url-shorten-regexps
-             ;; telega-url-shorten
-             (list `(too-long-link
-                     :regexp "^\\(https?://\\)\\(.\\{55\\}\\).*?$"
-                     :symbol ""
-                     :replace "\\1\\2...")))
+    (:option
+     telega-translate-to-language-by-default "zh"
+     telega-msg-save-dir "~/Downloads"
+     telega-chat-input-markups '("markdown2" "org")
+     ;; telega-debug t
+     telega-autoplay-mode 1
+     telega-url-shorten-regexps
+     ;; telega-url-shorten
+     (list `(too-long-link
+             :regexp "^\\(https?://\\)\\(.\\{55\\}\\).*?$"
+             :symbol ""
+             :replace "\\1\\2..."))
+     ;; telega-root
+     telega-root-default-view-function 'telega-view-folders
+     telega-root-keep-cursor 'track
+     telega-root-show-avatars nil
+     telega-root-buffer-name "*Telega Root*"
+     telega-root-fill-column 70 ; fill-column
+     telega-filters-custom nil
+     telega-filter-custom-show-folders nil
+     telega-symbol-folder "  "
+     ;;telega-bridge-bot
+     telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
+     telega-bridge-bot-bridge-info-plist
+     ;; @emacs_china
+     ;; telega 中在 Telega Root 对应的群组上 i 键查看
+     '(-1001773572820
+       ;; @matrix_t2bot
+       ;; 同样的方式查看 bot 信息获得
+       (420415423
+        ;; Room Settings -> Advanced -> Internal room ID
+        (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
+       -1001478915941                ; @vimzh_real
+       (5296957089                   ; @nichi_matrix_bot
+        (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
+       -1001480067069                ; @keyboard_cn
+       (420415423                    ; @matrix_t2bot
+        (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
+       -1001154313178                ; @coder_ot
+       (6332621450                   ; @yamatrix_bridge_bot
+        (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
+       -1001873425044                ; @Emacs_CN Lite
+       (420415423
+        (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))))
     (:with-mode telega-chat-mode (:hook lucius/telega-completion-setup))
     ;; 聊天列表高亮
     ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
@@ -44,47 +79,6 @@
     (global-telega-url-shorten-mode 1)
     ;; telega-mnz
     (global-telega-mnz-mode 1)
-    ;;telega-bridge-bot
-    (:option telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
-             telega-bridge-bot-bridge-info-plist
-             ;; @emacs_china
-             ;; telega 中在 Telega Root 对应的群组上 i 键查看
-             '(-1001773572820
-               ;; @matrix_t2bot
-               ;; 同样的方式查看 bot 信息获得
-               (420415423
-                ;; Room Settings -> Advanced -> Internal room ID
-                (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
-               -1001478915941                ; @vimzh_real
-               (5296957089                   ; @nichi_matrix_bot
-                (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
-               -1001480067069                ; @keyboard_cn
-               (420415423                    ; @matrix_t2bot
-                (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
-               -1001154313178                ; @coder_ot
-               (6332621450                   ; @yamatrix_bridge_bot
-                (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
-               -1001873425044                ; @Emacs_CN Lite
-               (420415423
-                (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))))
-    ;; (set-face-attribute 'telega-msg-heading nil
-    ;;                     :inherit nil
-    ;;                     :background "#EBF4EC"
-    ;;                     :weight 'bold)
-    ;; (set-face-attribute 'telega-msg-inline-reply nil
-    ;;                     :inherit nil
-    ;;                     :foreground "#86C166") ;; 苗 NAE
-    ;; (set-face-attribute 'telega-msg-inline-forward nil
-    ;;                     :inherit nil
-    ;;                     :foreground "#FFB11B")
-    ;; (set-face-attribute 'telega-entity-type-mention nil
-    ;;                     :underline '(:style line)
-    ;;                     :weight 'bold)
-    ;; (set-face-attribute 'telega-msg-self-title nil
-    ;;                     :foreground "#E2943B" ;; 朽葉 KUCHIBA
-    ;;                     :italic t
-    ;;                     :weight 'bold)
-    ;; (set-face-attribute 'telega-msg-user-title nil :italic t)
     (set-face-attribute 'telega-button nil
                         :foreground "#986DB2"
                         :box '(:line-width (-2 . -2)
@@ -93,15 +87,6 @@
     (set-face-attribute 'telega-button-active nil
                         :foreground "#ffffff"
                         :background "#986DB2")
-    ;; 未读提示
-    ;; (set-face-attribute 'telega-unmuted-count nil
-    ;;                     :foreground "#FFB11B"
-    ;;                     :weight 'bold)
-    ;; (set-face-attribute 'telega-mention-count nil
-    ;;                     :foreground "#FE6DB3")
-    ;; (set-face-attribute 'telega-muted-count nil
-    ;;                     :foreground "#86C166"
-    ;;                     :weight 'bold)
 
     ;; Linux settings
     (when *IS-LINUX*
