@@ -30,10 +30,11 @@
   (global-set-key (kbd "M-C-8") (lambda () (interactive) (lucius/adjust-opacity nil -2)))
   (global-set-key (kbd "M-C-7") (lambda () (interactive) (lucius/adjust-opacity nil 2)))
 
-  (setq frame-title-format
-        '((:eval (if (buffer-file-name)
-                     (abbreviate-file-name (buffer-file-name))
-                   "%b"))))
+  ;; title 隐藏就不需要了
+  ;; (setq frame-title-format
+  ;;       '((:eval (if (buffer-file-name)
+  ;;                    (abbreviate-file-name (buffer-file-name))
+  ;;                  "%b"))))
 
   ;; Non-zero values for `line-spacing' can mess up ansi-term and co,
   ;; so we zero it explicitly in those cases.

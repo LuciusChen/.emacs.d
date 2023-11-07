@@ -60,7 +60,6 @@
                                                org-done-keywords))))
     (:also-load lib-org-archive-hierachical)
     (:also-load lib-org)
-    (:with-mode org-mode (:hook pixel-scroll-precision-mode))
     (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     ;; only hook in org-mode
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
@@ -69,8 +68,7 @@
             org-after-todo-state-change-hook org-roam-copy-todo-to-today
             org-mode-hook
             (lambda ()
-              (add-hook 'before-save-hook 'org-align-all-tags nil t)))
-    (advice-add 'consult-theme :after (lambda (&rest args) (set-org-block-end-line-color)))))
+              (add-hook 'before-save-hook 'org-align-all-tags nil t)))))
 
 (setup ob-core
   (:after org)

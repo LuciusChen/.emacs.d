@@ -16,8 +16,7 @@
         (when (derived-mode-p 'telega-chat-mode 'org-agenda-mode)
           (setq buffer-name
                 (propertize buffer-name 'face
-                            `(:foreground ,(frame-parameter nil 'foreground-color)
-                              :weight bold))))
+                            `(:inherit doom-modeline))))
         (concat
          (doom-modeline-spc)
          (doom-modeline--buffer-mode-icon)
@@ -63,11 +62,20 @@
 
 (setup consult-flycheck)
 
+(setup isearch
+  (:option isearch-lazy-count t
+           isearch-allow-motion t
+           isearch-motion-changes-direction t))
+
 (setup embark
-  (:after vertico
-    (:bind-into vertico-map
-      "C-c C-o" embark-export
-      "C-c C-c" embark-act)))
+  (:global "C-c ." embark-act
+           "M-n"   embark-next-symbol
+           "M-p"   embark-previous-symbol)
+  (:option embark-indicators '(embark-minimal-indicator
+                               embark-highlight-indicator
+                               embark-isearch-highlight-indicator)
+           embark-cycle-key "."
+           embark-help-key "?"))
 
 (setup affe
   (when (executable-find "rg")
