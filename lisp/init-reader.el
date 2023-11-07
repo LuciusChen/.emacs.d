@@ -28,12 +28,12 @@
              gptel-default-mode 'org-mode
              gptel-temperature 0.7)))
 
-;; (setup immersive-translate
-;;   (:option immersive-translate-backend 'chatgpt
-;;            immersive-translate-chatgpt-host "api.openai.com")
-;;   (:with-mode elfeed-show-mode
-;;     (:hook immersive-translate-setup))
-;;   (:hooks nov-pre-html-render-hook immersive-translate-setup))
+(setup immersive-translate
+  (:option immersive-translate-backend 'chatgpt
+           immersive-translate-chatgpt-host "api.openai.com")
+  (:with-mode elfeed-show-mode
+    (:hook immersive-translate-setup))
+  (:hooks nov-pre-html-render-hook immersive-translate-setup))
 
 (setup elfeed
   (:global "C-x w" elfeed)
@@ -60,6 +60,7 @@
                ("https://blog.jcole.us/feed/" Database)
                ("https://karthinks.com/index.xml" Emacs)
                "https://leancrew.com/all-this/feed/"
+               ("https://feedx.net/rss/economistp.xml" Economics)
                ("https://www.allthingsdistributed.com/atom.xml" Program)
                ("https://samwho.dev/rss.xml" Program)
                ("https://morss.it/susam.net/" Emacs)

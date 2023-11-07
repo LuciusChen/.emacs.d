@@ -73,7 +73,7 @@
           (delete-window window)))))
   (advice-add #'keyboard-quit :before #'+popper-close-window-hack))
 
-(setup tabbar
+(setup tab-bar
   (:require lib-layout)
   (:global "s-{" tab-bar-switch-to-prev-tab
            "s-}" tab-bar-switch-to-next-tab

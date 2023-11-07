@@ -15,9 +15,12 @@
   ;; remove chat folder icons
   (setq telega-chat-folder-format nil)
   (:when-loaded
-    (:bind-into telega-prefix-map "p" telega-chatbuf-filter-search)
-    (:bind-into telega-msg-button-map "C" lucius/telega-save-file-to-clipboard)
-    (:bind-into telega-msg-button-map "s" lucius/telega-msg-save-to-cloud-copyleft)
+    (:bind-into telega-prefix-map
+      "p" telega-chatbuf-filter-search
+      "x" telega-chatbuf-thread-cancel)
+    (:bind-into telega-msg-button-map
+      "C" lucius/telega-save-file-to-clipboard
+      "s" lucius/telega-msg-save-to-cloud-copyleft)
     (:also-load telega-url-shorten
                 telega-bridge-bot
                 telega-mnz
@@ -70,23 +73,18 @@
        -1001873425044                ; @Emacs_CN Lite
        (420415423
         (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))))
-    (:with-mode telega-chat-mode (:hook lucius/telega-completion-setup))
+    ;; ignore messages from blocked senders (users or chats)
+    (add-hook 'telega-msg-ignore-predicates
+              (telega-match-gen-predicate 'msg '(sender is-blocked)))
     ;; 聊天列表高亮
     ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
     (:with-mode telega-root-mode (:hook lg-telega-root-mode))
+    (:with-mode telega-chat-mode (:hook lucius/telega-completion-setup))
     (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
     ;; telega-mnz
     (global-telega-mnz-mode 1)
-    (set-face-attribute 'telega-button nil
-                        :foreground "#986DB2"
-                        :box '(:line-width (-2 . -2)
-                               :color "#986DB2"
-                               :style nil))
-    (set-face-attribute 'telega-button-active nil
-                        :foreground "#ffffff"
-                        :background "#986DB2")
 
     ;; Linux settings
     (when *IS-LINUX*
