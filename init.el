@@ -95,6 +95,7 @@
     org-roam
     git-link
     webpaste
+    apheleia
     pdf-tools
     fullframe
     ox-pandoc
@@ -103,7 +104,6 @@
     orderless
     kind-icon
     git-modes
-    format-all
     ibuffer-vc
     git-blamed
     nerd-icons

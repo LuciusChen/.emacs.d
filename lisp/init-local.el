@@ -45,11 +45,10 @@
                            (frame-visible-p corfu--frame))))
   (:when-loaded (:hooks after-init-hook yas-global-mode)))
 
-;; brew install clang-format
-(setup format-all
-  (:when-loaded
-    (:with-mode prog-mode
-      (:hook format-all-mode)
-      (:hook format-all-ensure-formatter))))
+(setup apheleia
+  (:global "C-c C-x C-f" apheleis-format-buffer)
+  (:with-mode prog-mode
+    (apheleia-global-mode +1)
+    (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
 (provide 'init-local)
 ;;; init-local.el ends here
