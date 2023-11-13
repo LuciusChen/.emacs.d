@@ -42,7 +42,7 @@
       (file-size-human-readable (buffer-size)))))
 
 (setup popper
-  (:global "C-~"   popper-toggle-latest
+  (:global "C-~"   popper-toggle
            "M-~"   popper-cycle
            "C-M-`" popper-toggle-type)
   (:option popper-reference-buffers
@@ -79,7 +79,7 @@
            "s-}" tab-bar-switch-to-next-tab
            "s-t" tab-bar-new-tab
            "s-w" tab-bar-close-tab)
-  (:with-mode tab-bar-mode
+  (:when-loaded
     (:option tab-bar-separator ""
              tab-bar-close-button-show nil
              tab-bar-tab-hints t

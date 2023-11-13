@@ -31,26 +31,27 @@
                        "\n\n")))))
 
 ;; make left-fringe half
-(fringe-mode '(5 . 8))
+;; (fringe-mode '(5 . 8))
 ;; Better fringe symbol
 (define-fringe-bitmap 'right-curly-arrow
-    [#b00110000
+    [#b00000000
+     #b00000110
+     #b00001100
+     #b00011000
      #b00110000
-     #b00000000
-     #b00110000
-     #b00110000
-     #b00000000
-     #b00110000
-     #b00110000])
+     #b00011000
+     #b00001100
+     #b00000110])
+
 (define-fringe-bitmap 'left-curly-arrow
-    [#b00110000
+    [#b00000000
+     #b01100000
      #b00110000
-     #b00000000
+     #b00011000
+     #b00001100
+     #b00011000
      #b00110000
-     #b00110000
-     #b00000000
-     #b00110000
-     #b00110000])
+     #b01100000])
 
 ;; https://emacs-china.org/t/topic/25114/5
 (pixel-scroll-precision-mode 1)

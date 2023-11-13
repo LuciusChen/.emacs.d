@@ -40,7 +40,7 @@ Screen 版本粗体和 normal 有明显的区别，有利于组织文本。
 *** [[http://tsanger.cn/product?keyword=%E4%BB%8A%E6%A5%B7][仓耳今楷]]
 目前选用的是 02W04，这个系列的字体前面的序号越大越圆润，从接近宋体到接近楷体；W 开头的序号代表字重，04 的字重是和 Iosevka 的 normal 相近。相对于霞鹜文楷，仓耳今楷的笔画更加紧凑，显得更加正式。
 *** 特殊字体
-需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。
+需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。
 ** Themes
 [[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]
 ** .authinfo
@@ -79,6 +79,7 @@ npm install -g typescript-language-server
 - +回复样式修改字体颜色为绿色且 =| In reply to:= 变为 | ➦:+ （已在 commit 93fedce 实现）
 - 回复行中用户名过长，则省略以显示更多的「被回复」内容。
 - +转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 | ➥:+ （已在 commit 93fedce 实现）
+- 去除关于 bot 命令补全的断言。原本只能在与 bot 的私聊中使用 ~/~ 进行补全，修改后可以在群聊中使用 ~/~ 进行补全（作者原话指出这样会 controversial and even dangerous）。
 
 #+CAPTION: telega_forward
 #+ATTR_ORG: :width 600

@@ -23,8 +23,7 @@
 (setup corfu
   (:require nerd-icons)
   (:option corfu-cycle t
-           ;; org-mode 中关闭补全
-           corfu-exclude-modes '(org-mode)
+           global-corfu-modes '(prog-mode telega-chat-mode)
            ;; Using VS Code icons as an alternative
            kind-icon-mapping '((array          "a"   :icon "symbol-array"       :face font-lock-type-face              :collection "vscode")
                                (boolean        "b"   :icon "symbol-boolean"     :face font-lock-builtin-face           :collection "vscode")
@@ -43,7 +42,7 @@
                                (function       "f"   :icon "symbol-method"      :face font-lock-function-name-face     :collection "vscode")
                                (interface      "if"  :icon "symbol-interface"   :face font-lock-type-face              :collection "vscode")
                                (keyword        "kw"  :icon "symbol-keyword"     :face font-lock-keyword-face           :collection "vscode")
-                               (macro          "mc"  w:icon "lambda"             :face font-lock-keyword-face)
+                               (macro          "mc"  :icon "lambda"             :face font-lock-keyword-face)
                                (magic          "ma"  :icon "lightbulb-autofix"  :face font-lock-builtin-face           :collection "vscode")
                                (method         "m"   :icon "symbol-method"      :face font-lock-function-name-face     :collection "vscode")
                                (module         "{"   :icon "file-code-outline"  :face font-lock-preprocessor-face)
@@ -83,7 +82,7 @@
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 (setup eglot
   (:also-load lib-eglot)
-  (:with-mode (python-mode java-mode java-ts-mode typescript-mode)
+  (:with-mode (python-mode java-ts-mode typescript-mode)
     (:hook eglot-ensure))
   (:option eglot-events-buffer-size 0)
   (:when-loaded
@@ -97,7 +96,7 @@
                     (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
                     ;; npm install -g typescript-language-server
                     (typescript-mode . ("typescript-language-server" "--stdio"))
-                    ((java-mode java-ts-mode) . jdtls-command-contact)))
+                    (java-ts-mode . jdtls-command-contact)))
       (push item eglot-server-programs)))
   (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))

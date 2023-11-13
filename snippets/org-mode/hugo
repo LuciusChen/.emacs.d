@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: hugo-export-header
+# key: <hugo
+# --
+#+HUGO_BASE_DIR: ~/Library/CloudStorage/Dropbox/hugo/
+#+HUGO_SECTION: posts/main
+#+HUGO_WEIGHT: auto
+#+HUGO_AUTO_SET_LASTMOD: t
