@@ -34,6 +34,7 @@
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
      ;; telega-debug t
+     ;; telega-server-verbosity 4
      telega-autoplay-mode 1
      telega-url-shorten-regexps
      ;; telega-url-shorten

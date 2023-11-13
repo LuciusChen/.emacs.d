@@ -65,10 +65,7 @@
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
             org-mode-hook org-indent-mode
             org-after-todo-state-change-hook log-todo-next-creation-date
-            org-after-todo-state-change-hook org-roam-copy-todo-to-today
-            org-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook 'org-align-all-tags nil t)))))
+            org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
 (setup ob-core
   (:after org)
@@ -88,7 +85,8 @@
 (setup org-capture
   (:global "C-c c" org-capture)
   (:when-loaded
-    (:option org-capture-templates
+    (:option org-capture-bookmark nil
+             org-capture-templates
              `(("i" "inbox" entry  (file "agenda/inbox.org")
                     ,(concat "* TODO %?\n%U"))
                ("n" "note" entry (file "agenda/note.org")
