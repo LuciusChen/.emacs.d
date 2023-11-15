@@ -144,6 +144,7 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
+    (emt :host github :repo "roife/emt")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (anki-editor :host github :repo "LuciusChen/anki-editor")

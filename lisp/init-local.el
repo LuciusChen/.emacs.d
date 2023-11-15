@@ -48,7 +48,8 @@
 (setup apheleia
   (:global "C-c C-x C-f" apheleis-format-buffer)
   (:with-mode prog-mode
-    (apheleia-global-mode +1)
+    (:hook apheleia-global-mode))
+  (:when-loaded
     (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
 (provide 'init-local)
 ;;; init-local.el ends here
