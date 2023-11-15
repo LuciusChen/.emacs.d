@@ -96,7 +96,7 @@ npm install -g typescript-language-server
 
 #+CAPTION: telega-specific-reply
 #+ATTR_ORG: :width 800
-[[file:/Users/luciuschen/.emacs.d/assets/telega-specific-reply.png]]
+[[file:/assets/telega-specific-quote.png]]
 
 一些很方便的 contrib 中的插件。
 *** telega-url-shorten
