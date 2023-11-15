@@ -80,6 +80,7 @@ npm install -g typescript-language-server
 - 回复行中用户名过长，则省略以显示更多的「被回复」内容。
 - +转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 | ➥:+ （已在 commit 93fedce 实现）
 - 去除关于 bot 命令补全的断言。原本只能在与 bot 的私聊中使用 ~/~ 进行补全，修改后可以在群聊中使用 ~/~ 进行补全（作者原话指出这样会 controversial and even dangerous）。
+- 修改 Specific Quote 的样式，用 ~| (nerd-icons-mdicon "nf-md-format_quote_open"）~ 替代 ~(telega-symbol 'vertical-bar)~​。
 
 #+CAPTION: telega_forward
 #+ATTR_ORG: :width 600
@@ -92,6 +93,10 @@ npm install -g typescript-language-server
 #+CAPTION: telega_reply_username
 #+ATTR_ORG: :width 600
 [[file:assets/telega_reply_username.png]]
+
+#+CAPTION: telega-specific-reply
+#+ATTR_ORG: :width 800
+[[file:/Users/luciuschen/.emacs.d/assets/telega-specific-reply.png]]
 
 一些很方便的 contrib 中的插件。
 *** telega-url-shorten
