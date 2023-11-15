@@ -78,6 +78,16 @@
 
   (add-function :after after-focus-change-function 'lucius/meow-focus-change-function))
 
+(setup emt
+  (:hooks after-init-hook emt-mode)
+  (:global "M-f" emt-forward-word
+           "M-b" emt-backward-word)
+  (:option emt-lib-path
+           (expand-file-name
+            "straight/repos/emt/module/.build/release/libEMT.dylib"
+            user-emacs-directory))
+  (emt-ensure))
+
 (setup avy
   (:require ace-pinyin)
   (:global "C-;" avy-goto-char-timer
