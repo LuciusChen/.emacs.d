@@ -30,10 +30,47 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     telega-symbols-emojify '((verified (when (and telega-use-images (image-type-available-p 'svg))
+                                          (telega-etc-file-create-image "verified.svg" 2)))
+                              (horizontal-bar (when (and telega-use-images (image-type-available-p 'svg))
+                                                (telega-svg-create-horizontal-bar)))
+                              (underline-bar (when (and telega-use-images (image-type-available-p 'svg))
+                                               (telega-svg-create-horizontal-bar
+                                                1 0.7 telega-symbol-underline-bar)))
+                              alarm
+                              attachment audio
+                              bell bulp
+                              chat-list
+                              contact
+                              distance
+                              eye
+                              failed favorite flames folder
+                              (forum (when (and telega-use-images (image-type-available-p 'svg))
+                                       (telega-etc-file-create-image "symbols/forum.svg" 2)))
+                              (forward (when (and telega-use-images (image-type-available-p 'svg))
+                                         (telega-etc-file-create-image "symbols/forward.svg" 2)))
+                              game
+                              invoice
+                              leave-comment lightning lock location
+                              member multiple-folders
+                              pause pending phone photo pin poll play
+                              (premium (when (and telega-use-images (image-type-available-p 'svg))
+                                         (telega-etc-file-create-image "symbols/premium.svg" 2)))
+                              (reaction (when (and telega-use-images (image-type-available-p 'svg))
+                                          (telega-etc-file-create-image "symbols/reaction.svg" 2)))
+                              (reply (when (and telega-use-images (image-type-available-p 'svg))
+                                       (telega-etc-file-create-image "symbols/reply.svg" 2)))
+                              (reply-quote (when (and telega-use-images (image-type-available-p 'svg))
+                                             (telega-etc-file-create-image "symbols/reply-quote.svg" 2)))
+                              (right-arrow (when (and telega-use-images (image-type-available-p 'svg))
+                                             (telega-etc-file-create-image "symbols/right-arrow.svg" 2)))
+                              video video-chat-active video-chat-passive
+                              "⏪" "⏩")
+     telega-chat-fill-column 80
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
-     ;; telega-debug t
+     telega-debug t
      ;; telega-server-verbosity 4
      telega-autoplay-mode 1
      telega-url-shorten-regexps
@@ -81,7 +118,6 @@
     ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
     (:with-mode telega-root-mode (:hook lg-telega-root-mode))
     (:with-mode telega-chat-mode (:hook lucius/telega-completion-setup))
-    (:with-mode telega-chat-mode (:hook visual-fill-column-mode))
     (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
