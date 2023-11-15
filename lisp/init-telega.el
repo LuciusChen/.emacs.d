@@ -81,6 +81,7 @@
     ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
     (:with-mode telega-root-mode (:hook lg-telega-root-mode))
     (:with-mode telega-chat-mode (:hook lucius/telega-completion-setup))
+    (:with-mode telega-chat-mode (:hook visual-fill-column-mode))
     (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
@@ -103,6 +104,9 @@
       (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))
     ;; 让 heading 不充满整行
     (advice-add 'telega-ins--message-header :override #'lucius/telega-ins--message-header)
-    (advice-add 'telega-ins--aux-msg-one-line :override #'lucius/telega-ins--aux-msg-one-line)))
+    ;; reply 中过长用户名省略
+    (advice-add 'telega-ins--aux-msg-one-line :override #'lucius/telega-ins--aux-msg-one-line)
+    ;; 修改 Specific reply 结构和样式
+    (advice-add 'telega-ins--msg-reply-to-message-inline :override #'lucius/telega-ins--msg-reply-to-message-inline)))
 (provide 'init-telega)
 ;;; init-telega.el ends here

@@ -99,6 +99,7 @@ NOTE: macOS only."
 (defun lg-telega-chat-update (chat)
   (with-telega-root-buffer
     (hl-line-highlight)))
+
 ;; 让 heading 不充满整行
 (defun lucius/telega-ins--message-header (msg &optional msg-chat msg-sender
                                                 addon-inserter)
@@ -107,27 +108,28 @@ MSG-CHAT - Chat for which to insert message header.
 MSG-SENDER - Sender of the message.
 If ADDON-INSERTER function is specified, it is called with one
 argument - MSG to insert additional information after header."
-  ;; twidth including 10 chars of date
-  (let* ((topic (telega-msg-topic msg))
-         (topic-title (when topic
-                        (telega-ins--as-string
-                         (telega-ins " → ")
-                         (telega-ins--topic-icon topic)
-                         (telega-ins (car telega-symbol-topic-brackets))
-                         (telega-ins--topic-title topic)
-                         (telega-ins (cdr telega-symbol-topic-brackets)))))
-         (fwidth (- telega-chat-fill-column (telega-current-column)
-                    (string-width (or topic-title ""))))
-         (twidth (+ 10 fwidth))
+  (let* ((date-and-status (telega-ins--as-string
+                           (when telega-msg-heading-with-date-and-status
+                             (telega-ins--message-date-and-status msg))))
+         (dwidth (- telega-chat-fill-column
+                    (string-width date-and-status)))
          (chat (or msg-chat (telega-msg-chat msg)))
          (sender (or msg-sender (telega-msg-sender msg))))
     (cl-assert sender)
     (telega-ins--with-face 'telega-msg-heading
-      (telega-ins--with-attrs (list :max twidth
+      (telega-ins--with-attrs (list :max (- dwidth (telega-current-column))
                                     :align 'left
                                     :elide t
-                                    :elide-trail 8)
-        (telega-ins--msg-sender sender :with-username-p t)
+                                    :elide-trail 20)
+        ;; NOTE: if channel post has a signature, then use it instead
+        ;; of username to shorten message header
+        (let ((signature (telega-tl-str msg :author_signature)))
+          (telega-ins--msg-sender sender
+            :with-username-p (not signature))
+          (when signature
+            (telega-ins--with-face (telega-msg-sender-title-faces sender)
+              (telega-ins " --" signature))))
+
         ;; Admin badge if any
         (when (telega-user-p sender)
           (when-let ((admin (telega-chat-admin-get chat sender)))
@@ -138,11 +140,6 @@ argument - MSG to insert additional information after header."
                                   (telega-i18n "lng_owner_badge")
                                 (telega-i18n "lng_admin_badge")))
                           ")"))))
-
-        ;; Signature for channel posts and anonymous admin messages
-        (when-let ((signature (telega-tl-str msg :author_signature)))
-          (telega-ins--with-face (telega-msg-sender-title-faces sender)
-            (telega-ins " --" signature)))
 
         ;; via <bot>
         (let* ((via-bot-user-id (plist-get msg :via_bot_user_id))
@@ -181,14 +178,23 @@ argument - MSG to insert additional information after header."
 
         ;; Copyright if can't be saved
         (unless (plist-get msg :can_be_saved)
-          (telega-ins (telega-symbol 'copyright)))
+          (telega-ins " " (telega-symbol 'copyright)))
+
+        ;; message auto-deletion time
+        (let ((auto-delete-in (plist-get msg :auto_delete_in)))
+          (unless (telega-zerop auto-delete-in)
+            (telega-ins " " (telega-symbol 'flames)
+                        (telega-duration-human-readable auto-delete-in 1))))
 
         ;; Show language code if translation replaces message's content
         (when-let ((translated (plist-get msg :telega-translated)))
           (when (with-telega-chatbuf chat
                   telega-translate-replace-content)
             (telega-ins--with-face 'telega-shadow
-              (telega-ins " [→" (plist-get translated :to_language_code) "]"))))
+              (telega-ins " ["
+                          (telega-symbol 'right-arrow)
+                          (plist-get translated :to_language_code)
+                          "]"))))
 
         (when (numberp telega-debug)
           (telega-ins-fmt " (ID=%d)" (plist-get msg :id)))
@@ -200,21 +206,31 @@ argument - MSG to insert additional information after header."
                      (plist-get send-state :can_retry))
             (telega-ins " ")
             (telega-ins--button "RESEND"
-              :action 'telega--resendMessage)))
+              :action #'telega--resendMessages)))
 
         (when addon-inserter
           (cl-assert (functionp addon-inserter))
           (funcall addon-inserter msg))
-        )
 
-      ;; Message's topic aligned to the right
-      (when topic
-        (telega-ins--move-to-column twidth)
-        (telega-ins--with-props
-            (list 'face 'telega-topic-button
-                  :action #'telega-msg-show-topic-info
-                  :help-echo "Show topic info")
-          (telega-ins topic-title)))
+        ;; Message's topic aligned to the right
+        (when-let* ((topic (telega-msg-topic msg))
+                    (show-topic-p (or telega-msg-always-show-topic-info
+                                      (not (telega-chatbuf--thread-topic))))
+                    (topic-title (telega-ins--as-string
+                                  (telega-ins (telega-symbol 'right-arrow)
+                                              (telega-symbol 'topic))
+                                  (telega-ins--topic-icon topic)
+                                  (telega-ins--topic-title topic))))
+          (telega-ins--move-to-column
+           (- dwidth (string-width topic-title)))
+          (telega-ins--with-props
+              (list 'face 'telega-topic-button
+                    :action #'telega-msg-show-topic-info
+                    :help-echo "Show topic info")
+            (telega-ins topic-title))))
+
+      (when date-and-status
+        (telega-ins date-and-status))
       (if telega-msg-heading-whole-line
           (telega-ins "\n")))
 
@@ -222,14 +238,15 @@ argument - MSG to insert additional information after header."
       (telega-ins "\n"))))
 ;; 用户名过长时，在 Reply 中省略部分。
 (cl-defun lucius/telega-ins--aux-msg-one-line (msg &key with-username
-                                                     username-face remove-caption)
+                                                     username-face remove)
   "Insert contents for aux message MSG as one line.
 If WITH-USERNAME is non-nil then insert MSG sender as well.
 If WITH-USERNAME is `unread-mention', then outline sender with
 `telega-mention-count' face.
 If WITH-USERNAME is a string, then use it as title of the MSG sender.
 USERNAME-FACE specifies face to use for sender's title.
-REMOVE-CAPTION is passed directly to `telega-ins--content-one-line'."
+If REMOVE is `message', then do not insert the message MSG content.
+If REMOVE is `caption', then do not insert message's MSG caption."
   (declare (indent 1))
   (when (and with-username
              (telega-ins--with-face username-face
@@ -240,16 +257,90 @@ REMOVE-CAPTION is passed directly to `telega-ins--content-one-line'."
                                      with-username)
                                    (telega-msg-sender-username sender 'with-@)
                                    (telega-msg-sender-title sender)))))))
-    (when-let ((topic (telega-msg-topic msg))
-               (show-topic-p
-                (or telega-msg-always-show-topic-info
-                    (not (eq topic (telega-chatbuf--thread-topic))))))
-      (telega-ins--with-face 'telega-shadow
-        (telega-ins " → " (telega-symbol 'topic))
-        (telega-ins--topic-icon topic)))
+    (telega-ins--aux-msg-topic-one-line msg :prefix (telega-symbol 'right-arrow))
     (telega-ins (telega-symbol 'sender-and-text-delim) " "))
-  (telega-ins--content-one-line msg remove-caption))
+  (unless (eq remove 'message)
+    (telega-ins--content-one-line msg
+      :remove-caption remove)))
 
+(defun lucius/telega-ins--msg-reply-to-message-inline (msg &optional reply-to)
+  "Inline reply to a message."
+  (unless reply-to
+    (setq reply-to (plist-get msg :reply_to)))
+
+  ;; If replied message is not instantly available, it will be fetched
+  ;; later by the `telega-msg--replied-message-fetch'
+  (let* ((replied-msg (telega-msg--replied-message msg))
+         (reply-quote (plist-get reply-to :quote))
+         (origin (plist-get reply-to :origin)))
+    ;; Sender and content part
+    (telega-ins--aux-inline "| " (telega-chat--aux-inline-reply-symbol
+                                  (plist-get reply-to :is_quote_manual))
+        " "
+        'telega-msg-inline-reply
+      (cond (origin
+             (telega-ins--msg-sender-chat-date (telega--msg-origin-sender origin)
+               :from-chat-id (plist-get reply-to :chat_id)
+               :signature (telega-tl-str origin :signature)
+               :topic (telega-msg-topic replied-msg)
+               :date (plist-get reply-to :origin_send_date)))
+            ((or (null replied-msg) (eq replied-msg 'loading))
+             ;; NOTE: replied message will be fetched by the
+             ;; `telega-msg--replied-message-fetch'
+             (telega-ins-i18n "lng_profile_loading"))
+            ((telega--tl-error-p replied-msg)
+             (telega-ins--with-face 'telega-shadow
+               (telega-ins (telega-i18n "lng_deleted_message"))))
+            ((telega-msg-match-p replied-msg 'ignored)
+             (telega-ins--message-ignored replied-msg))
+            (t
+             ;; NOTE: If forwarded message replies to a forwarded
+             ;; message, then use fwd-info origin sender to resemble
+             ;; origin thread
+             (let* ((fwd-origin
+                     (when (plist-get msg :forward_info)
+                       (telega--tl-get replied-msg :forward_info :origin)))
+                    (sender
+                     (if fwd-origin
+                         (telega--msg-origin-sender fwd-origin)
+                       (telega-msg-sender replied-msg)))
+                    (sender-faces
+                     (if (stringp sender)
+                         (list 'telega-msg-user-title)
+                       (telega-msg-sender-title-faces sender))))
+               ;; Add special face if message contains unread mention
+               (when (and (not (stringp sender))
+                          (telega-sender-match-p sender 'me)
+                          (plist-get replied-msg :contains_unread_mention))
+                 (setq sender-faces (append sender-faces
+                                            '(telega-entity-type-mention))))
+               (telega-ins--with-face sender-faces
+                 (telega-ins (or (when (stringp sender) sender)
+                                 (telega-msg-sender-username sender 'with-@)
+                                 (telega-msg-sender-title sender)))))
+
+             ;; If message is replied in the same topic, then there is
+             ;; no need show topic icon
+             (unless (eq (telega-msg-topic msg)
+                         (telega-msg-topic replied-msg))
+               (telega-ins--aux-msg-topic-one-line replied-msg))))
+
+      (when-let ((content (or (plist-get reply-to :content)
+                              (plist-get replied-msg :content))))
+        (telega-ins (telega-symbol 'sender-and-text-delim) " ")
+        (telega-ins--content-one-line replied-msg
+          :content content)))
+
+    (when reply-quote
+      (telega-ins--line-wrap-prefix
+          (concat (propertize "| " 'face 'telega-entity-type-blockquote)
+                  (nerd-icons-faicon "nf-fa-quote_left"
+                                     :face '(:inherit telega-entity-type-blockquote))
+                  " ")
+        (telega-ins--with-face 'telega-entity-type-blockquote
+          (telega-ins--fmt-text reply-quote replied-msg))
+        (telega-ins "\n")))
+    t))
 ;; avatar
 (defcustom telega-avatar-slice-2-raise 0.5
   "Raise of the second slice of the avatar.
@@ -361,7 +452,7 @@ If SHOW-PHONE-P is non-nil, then show USER's phone number."
     (when show-phone-p
       (when-let ((phone-number (telega-tl-str user :phone_number)))
         (telega-ins--with-face 'telega-shadow
-          (telega-ins " • "))
+          (telega-ins telega-symbol-nbsp "•" telega-symbol-nbsp))
         (telega-ins "+" phone-number)))
 
     ;; Insert (him)in<-->out(me) relationship
@@ -399,13 +490,12 @@ If SHOW-PHONE-P is non-nil, then show USER's phone number."
         (telega-ins--msg-sender inviter-user :with-avatar-p t)))
     t))
 
-(defun telega-ins--message0 (msg &optional no-header
-                                   addon-header-inserter no-footer)
+(cl-defun telega-ins--message0 (msg &key no-header addon-header-inserter)
   "Insert message MSG.
 If NO-HEADER is non-nil, then do not display message header
 unless message is edited.
 ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
-  (declare (indent 2))
+  (declare (indent 1))
   (if (telega-msg-special-p msg)
       (telega-ins--with-attrs (list :min (- telega-chat-fill-column
                                             (telega-current-column))
@@ -421,7 +511,7 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
            ;; outgoing messages [what?] for example)
            (msg-for-replies-p (and (telega-replies-p chat) fwd-info))
            (sender (if msg-for-replies-p
-                       (telega-replies-msg-sender msg)
+                       (telega--msg-origin-sender (plist-get fwd-info :origin))
                      (telega-msg-sender msg)))
            (sender-name (if (telega-user-p sender)
                             (telega-user-title sender 'full-name)
@@ -463,13 +553,9 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
       (when msg-for-replies-p
         (telega-ins--image avatar 2
                            :no-display-if (not telega-chat-show-avatars)))
-      (when (< (telega-current-column) ccol)
-        (telega-ins--move-to-column ccol))
-      (when (< (telega-current-column) ccol)
-        (telega-ins--move-to-column ccol))
-      (telega-ins--msg-reply-inline msg)
 
-      (telega-ins--column ccol telega-chat-fill-column
+      (telega-ins--line-wrap-prefix (make-string ccol ?\s)
+        (telega-ins--msg-reply-inline msg)
         (telega-ins--content msg)
 
         (telega-ins-prefix "\n"
@@ -481,17 +567,18 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
           (telega-ins--reply-markup msg))
         (telega-ins-prefix "\n"
           (telega-ins--msg-comments msg chat))
-        )))
+        ))
 
-  (unless no-footer
-    ;; Footer: Date/status starts at `telega-chat-fill-column' column
-    (telega-ins--move-to-column telega-chat-fill-column)
-    (telega-ins--with-attrs (list :align 'right :min 10)
-      ;; NOTE: telegaInternal messages has no `:date' property
-      (when-let ((date (or (telega--tl-get msg :scheduling_state :send_date)
-                           (plist-get msg :date))))
-        (telega-ins--date date)))
-    (telega-ins--outgoing-status msg))
+    (unless telega-msg-heading-with-date-and-status
+      (let* ((date-and-status (telega-ins--as-string
+                               (telega-ins--message-date-and-status msg)))
+             (dswidth (string-width date-and-status))
+             (dsoffset 2))              ;XXX
+        (when (> (telega-current-column)
+                 (- telega-chat-fill-column dswidth dsoffset))
+          (telega-ins "\n"))
+        (telega-ins--move-to-column (- telega-chat-fill-column dswidth))
+        (telega-ins date-and-status))))
   t)
 (provide 'lib-telega)
 ;;; lib-telega.el ends here
