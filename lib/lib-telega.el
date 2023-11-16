@@ -333,13 +333,10 @@ If REMOVE is `caption', then do not insert message's MSG caption."
 
     (when reply-quote
       (telega-ins--line-wrap-prefix
-          (concat (propertize "| " 'face 'telega-entity-type-blockquote)
-                  (nerd-icons-mdicon "nf-md-format_quote_open"
-                                     :face
-                                     '(:inherit telega-entity-type-blockquote))
-                  (propertize " " 'face 'telega-entity-type-blockquote))
+          (propertize "| ❝ " 'face 'telega-entity-type-blockquote)
         (telega-ins--with-face 'telega-entity-type-blockquote
-          (telega-ins--fmt-text reply-quote replied-msg))
+          (telega-ins--fmt-text reply-quote replied-msg)
+          (telega-ins " ❞"))
         (telega-ins "\n")))
     t))
 

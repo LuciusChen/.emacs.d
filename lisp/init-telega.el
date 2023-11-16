@@ -30,6 +30,9 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     telega-symbol-reply "➦"
+     telega-symbol-reply-quote "➦⑆"
+     telega-symbol-forward "➲"
      telega-symbols-emojify '((verified (when (and telega-use-images (image-type-available-p 'svg))
                                           (telega-etc-file-create-image "verified.svg" 2)))
                               (horizontal-bar (when (and telega-use-images (image-type-available-p 'svg))
@@ -47,8 +50,6 @@
                               failed favorite flames folder
                               (forum (when (and telega-use-images (image-type-available-p 'svg))
                                        (telega-etc-file-create-image "symbols/forum.svg" 2)))
-                              (forward (when (and telega-use-images (image-type-available-p 'svg))
-                                         (telega-etc-file-create-image "symbols/forward.svg" 2)))
                               game
                               invoice
                               leave-comment lightning lock location
@@ -58,10 +59,10 @@
                                          (telega-etc-file-create-image "symbols/premium.svg" 2)))
                               (reaction (when (and telega-use-images (image-type-available-p 'svg))
                                           (telega-etc-file-create-image "symbols/reaction.svg" 2)))
-                              (reply (when (and telega-use-images (image-type-available-p 'svg))
-                                       (telega-etc-file-create-image "symbols/reply.svg" 2)))
-                              (reply-quote (when (and telega-use-images (image-type-available-p 'svg))
-                                             (telega-etc-file-create-image "symbols/reply-quote.svg" 2)))
+                              ;; (reply (when (and telega-use-images (image-type-available-p 'svg))
+                              ;;          (telega-etc-file-create-image "symbols/reply.svg" 2)))
+                              ;; (reply-quote (when (and telega-use-images (image-type-available-p 'svg))
+                              ;;                (telega-etc-file-create-image "symbols/reply-quote.svg" 2)))
                               (right-arrow (when (and telega-use-images (image-type-available-p 'svg))
                                              (telega-etc-file-create-image "symbols/right-arrow.svg" 2)))
                               video video-chat-active video-chat-passive
