@@ -335,8 +335,7 @@ If REMOVE is `caption', then do not insert message's MSG caption."
       (telega-ins--line-wrap-prefix
           (propertize "| ❝ " 'face 'telega-entity-type-blockquote)
         (telega-ins--with-face 'telega-entity-type-blockquote
-          (telega-ins--fmt-text reply-quote replied-msg)
-          (telega-ins " ❞"))
+          (telega-ins--fmt-text reply-quote replied-msg))
         (telega-ins "\n")))
     t))
 
@@ -524,7 +523,7 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
            ;; inside `telega--entity-to-properties'
            (telega-msg-contains-unread-mention
             (plist-get msg :contains_unread_mention))
-           ccol)
+           content-prefix)
       (if (and no-header
                (zerop (plist-get msg :edit_date))
                (zerop (plist-get msg :via_bot_user_id)))
@@ -546,14 +545,16 @@ ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
                              :image-raise telega-avatar-slice-2-raise
                              :no-display-if (not telega-chat-show-avatars))))
 
-      (setq ccol (telega-current-column))
+      ;; NOTE: we use `current-column' because line/wrap prefix could
+      ;; be already in use by marked message for example
+      (setq content-prefix (make-string (current-column) ?\s))
       (telega-ins--fwd-info-inline fwd-info)
       ;; NOTE: Three lines avatars in "Replies" chat
       (when msg-for-replies-p
         (telega-ins--image avatar 2
                            :no-display-if (not telega-chat-show-avatars)))
 
-      (telega-ins--line-wrap-prefix (make-string ccol ?\s)
+      (telega-ins--line-wrap-prefix content-prefix
         (telega-ins--msg-reply-inline msg)
         (telega-ins--content msg)
 
