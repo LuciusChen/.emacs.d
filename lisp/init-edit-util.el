@@ -169,6 +169,6 @@
 
 (setup webpaste
   (require 'webpaste)
-  (:option webpaste-provider-priority '("paste.mozilla.org")))
+  (:option webpaste-provider-priority '("paste.mozilla.org" "dpaste.org")))
 (provide 'init-edit-util)
 ;;; init-edit-util.el ends here
