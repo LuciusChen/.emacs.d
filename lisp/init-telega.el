@@ -30,9 +30,15 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
-     telega-symbol-reply "➦"
-     telega-symbol-reply-quote "➦⑆"
-     telega-symbol-forward "➲"
+     telega-avatar-workaround-gaps-for '(return t)
+     telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
+     ;; nerd-icons
+     telega-symbol-reply (nerd-icons-faicon "nf-fa-reply")
+     telega-symbol-reply-quote (nerd-icons-faicon "nf-fa-reply_all")
+     telega-symbol-forward (nerd-icons-mdicon "nf-md-comment_arrow_right_outline")
+     telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
+     telega-symbol-right-arrow (nerd-icons-octicon "nf-oct-arrow_right")
+     telega-symbol-reaction (nerd-icons-mdicon "nf-md-heart_circle")
      telega-symbols-emojify '((verified (when (and telega-use-images (image-type-available-p 'svg))
                                           (telega-etc-file-create-image "verified.svg" 2)))
                               (horizontal-bar (when (and telega-use-images (image-type-available-p 'svg))
@@ -57,14 +63,6 @@
                               pause pending phone photo pin poll play
                               (premium (when (and telega-use-images (image-type-available-p 'svg))
                                          (telega-etc-file-create-image "symbols/premium.svg" 2)))
-                              (reaction (when (and telega-use-images (image-type-available-p 'svg))
-                                          (telega-etc-file-create-image "symbols/reaction.svg" 2)))
-                              ;; (reply (when (and telega-use-images (image-type-available-p 'svg))
-                              ;;          (telega-etc-file-create-image "symbols/reply.svg" 2)))
-                              ;; (reply-quote (when (and telega-use-images (image-type-available-p 'svg))
-                              ;;                (telega-etc-file-create-image "symbols/reply-quote.svg" 2)))
-                              (right-arrow (when (and telega-use-images (image-type-available-p 'svg))
-                                             (telega-etc-file-create-image "symbols/right-arrow.svg" 2)))
                               video video-chat-active video-chat-passive
                               "⏪" "⏩")
      telega-chat-fill-column 80
@@ -111,7 +109,8 @@
         (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
        -1001873425044                ; @Emacs_CN Lite
        (420415423
-        (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))))
+        (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix)))
+     )
     ;; ignore messages from blocked senders (users or chats)
     (add-hook 'telega-msg-ignore-predicates
               (telega-match-gen-predicate 'msg '(sender is-blocked)))
@@ -139,11 +138,13 @@
     (if *IS-MAC*
         (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
       (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))
+    ;; (advice-add 'telega-ins--user-emoji-status :around #'ignore)
     ;; 让 heading 不充满整行
     (advice-add 'telega-ins--message-header :override #'lucius/telega-ins--message-header)
     ;; reply 中过长用户名省略
     (advice-add 'telega-ins--aux-msg-one-line :override #'lucius/telega-ins--aux-msg-one-line)
-    ;; 修改 Specific reply 结构和样式
-    (advice-add 'telega-ins--msg-reply-to-message-inline :override #'lucius/telega-ins--msg-reply-to-message-inline)))
+    ;; 修改 Specific quote 和 Quote 结构和样式
+    (advice-add 'telega-ins--msg-reply-to-message-inline :override #'lucius/telega-ins--msg-reply-to-message-inline)
+    (advice-add 'telega--entity-type-to-text-props :override #'lucius/telega--entity-type-to-text-props)))
 (provide 'init-telega)
 ;;; init-telega.el ends here

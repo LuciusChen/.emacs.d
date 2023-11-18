@@ -116,12 +116,13 @@ npm install -g typescript-language-server
 
 聊天界面
 
-| =r= | 回复该消息 |
-| =e= | 编辑该消息 |
-| =d= | 删除该消息 |
-| =f= | forward    |
-| =s= | save       |
-| =c= | copy       |
+| =r=     | 回复该消息               |
+| =C-u r= | 在另一个聊天内回复该消息 |
+| =e=     | 编辑该消息               |
+| =d=     | 删除该消息               |
+| =f=     | forward                  |
+| =s=     | save                     |
+| =c=     | copy                     |
 ** Tricks
 =C-x C-e= 可以执行 elisp 或者在 Scratch 中开启 =lisp-interaction-mode= 后，在需要执行的函数最后 =C-j= 执行。
 *** Working with Frame
