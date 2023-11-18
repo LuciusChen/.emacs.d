@@ -332,15 +332,13 @@ If REMOVE is `caption', then do not insert message's MSG caption."
           :content content)))
 
     (when reply-quote
-      (telega-ins--line-wrap-prefix
-          (concat (propertize "| " 'face 'telega-entity-type-blockquote)
-                  (nerd-icons-mdicon "nf-md-format_quote_open"
-                                     :face
-                                     '(:inherit telega-entity-type-blockquote))
-                  (propertize " " 'face 'telega-entity-type-blockquote))
-        (telega-ins--with-face 'telega-entity-type-blockquote
-          (telega-ins--fmt-text reply-quote replied-msg))
-        (telega-ins "\n")))
+      (telega-ins
+       (concat (nerd-icons-mdicon "nf-md-format_quote_open" :face '(:inherit telega-msg-inline-forward))
+               " "))
+      (telega-ins--with-face 'telega-entity-type-blockquote
+        (telega-ins--line-wrap-prefix "   "
+          (telega-ins--fmt-text reply-quote replied-msg)))
+      (telega-ins "\n"))
     t))
 (defun lucius/telega--entity-type-to-text-props (ent-type text)
   "Convert telegram TextEntityType ENT-TYPE to Emacs text properties."
@@ -424,13 +422,11 @@ If REMOVE is `caption', then do not insert message's MSG caption."
                                      telega--custom-emoji-stickers)))
           (list 'display (telega-sticker--image sticker)))))
      (textEntityTypeBlockQuote
-      (let* ((lwprefix (concat (propertize "| " 'face 'telega-entity-type-blockquote)
-                               (nerd-icons-mdicon "nf-md-format_quote_open"
-                                                  :face
-                                                  '(:inherit telega-entity-type-blockquote))
-                               (propertize " " 'face 'telega-entity-type-blockquote)))
+      (let* ((lwprefix (concat
+                        (nerd-icons-mdicon "nf-md-format_quote_open" :face '(:inherit telega-msg-inline-forward))
+                        " "))
              (lwprops (list 'line-prefix lwprefix
-                            'wrap-prefix lwprefix
+                            'wrap-prefix "   "
                             'face 'telega-entity-type-blockquote))
              (repr (concat "\n" (apply #'propertize text lwprops) "\n")))
         (list 'telega-display repr))))))

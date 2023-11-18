@@ -30,15 +30,17 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     ;; avatar
      telega-avatar-workaround-gaps-for '(return t)
+     ;; telega-symbol
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
-     ;; nerd-icons
      telega-symbol-reply (nerd-icons-faicon "nf-fa-reply")
      telega-symbol-reply-quote (nerd-icons-faicon "nf-fa-reply_all")
      telega-symbol-forward (nerd-icons-mdicon "nf-md-comment_arrow_right_outline")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
      telega-symbol-right-arrow (nerd-icons-octicon "nf-oct-arrow_right")
-     telega-symbol-reaction (nerd-icons-mdicon "nf-md-heart_circle")
+     telega-symbol-reaction "❤"
+     telega-symbol-reaction-mark telega-symbol-reaction
      telega-symbols-emojify '((verified (when (and telega-use-images (image-type-available-p 'svg))
                                           (telega-etc-file-create-image "verified.svg" 2)))
                               (horizontal-bar (when (and telega-use-images (image-type-available-p 'svg))
