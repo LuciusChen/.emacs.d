@@ -41,8 +41,8 @@
      telega-symbol-forward (nerd-icons-mdicon "nf-md-comment_arrow_right_outline")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
      telega-symbol-right-arrow (nerd-icons-octicon "nf-oct-arrow_right")
-     telega-symbol-reaction "❤"
-     telega-symbol-reaction-mark (propertize "❤" 'face 'telega-mention-count)
+     telega-symbol-reaction (propertize "❤" 'face 'telega-mention-count)
+     telega-symbol-reaction-mark "❤"
      telega-symbols-emojify '((verified (when (and telega-use-images (image-type-available-p 'svg))
                                           (telega-etc-file-create-image "verified.svg" 2)))
                               (horizontal-bar (when (and telega-use-images (image-type-available-p 'svg))
@@ -142,8 +142,10 @@
     ;; (advice-add 'telega-ins--user-emoji-status :around #'ignore)
     ;; 让 heading 不充满整行
     (advice-add 'telega-ins--message-header :override #'lucius/telega-ins--message-header)
-    ;; reply 中过长用户名省略
-    (advice-add 'telega-ins--aux-msg-one-line :override #'lucius/telega-ins--aux-msg-one-line)
+    ;; 修改 reaction 颜色
+    (advice-add 'telega-ins--message0 :override #'lucius/telega-ins--message0)
+    ;; 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
+    (advice-add 'telega-ins--msg-interaction-info :override #'lucius/telega-ins--msg-interaction-info)
     ;; 修改 Specific quote 和 Quote 结构和样式
     (advice-add 'telega-ins--msg-reply-to-message-inline :override #'lucius/telega-ins--msg-reply-to-message-inline)
     (advice-add 'telega--entity-type-to-text-props :override #'lucius/telega--entity-type-to-text-props)))

@@ -236,32 +236,6 @@ argument - MSG to insert additional information after header."
 
     (unless telega-msg-heading-whole-line
       (telega-ins "\n"))))
-;; 用户名过长时，在 Reply 中省略部分。
-(cl-defun lucius/telega-ins--aux-msg-one-line (msg &key with-username
-                                                     username-face remove)
-  "Insert contents for aux message MSG as one line.
-If WITH-USERNAME is non-nil then insert MSG sender as well.
-If WITH-USERNAME is `unread-mention', then outline sender with
-`telega-mention-count' face.
-If WITH-USERNAME is a string, then use it as title of the MSG sender.
-USERNAME-FACE specifies face to use for sender's title.
-If REMOVE is `message', then do not insert the message MSG content.
-If REMOVE is `caption', then do not insert message's MSG caption."
-  (declare (indent 1))
-  (when (and with-username
-             (telega-ins--with-face username-face
-               (let ((sender (telega-msg-sender msg)))
-                 (telega-ins--with-attrs
-                     (list :max (/ telega-chat-fill-column 3) :elide t)
-                   (telega-ins (or (when (stringp with-username)
-                                     with-username)
-                                   (telega-msg-sender-username sender 'with-@)
-                                   (telega-msg-sender-title sender)))))))
-    (telega-ins--aux-msg-topic-one-line msg :prefix (telega-symbol 'right-arrow))
-    (telega-ins (telega-symbol 'sender-and-text-delim) " "))
-  (unless (eq remove 'message)
-    (telega-ins--content-one-line msg
-      :remove-caption remove)))
 
 (defun lucius/telega-ins--msg-reply-to-message-inline (msg &optional reply-to)
   "Inline reply to a message."
@@ -430,5 +404,158 @@ If REMOVE is `caption', then do not insert message's MSG caption."
                             'face 'telega-entity-type-blockquote))
              (repr (format "%s" (apply #'propertize text lwprops))))
         (list 'telega-display repr))))))
+
+(cl-defun lucius/telega-ins--message0 (msg &key no-header addon-header-inserter)
+  "Insert message MSG.
+If NO-HEADER is non-nil, then do not display message header
+unless message is edited.
+ADDON-HEADER-INSERTER is passed directly to `telega-ins--message-header'."
+  (declare (indent 1))
+  (if (telega-msg-special-p msg)
+      (telega-ins--with-attrs (list :min (- telega-chat-fill-column
+                                            (telega-current-column))
+                                    :align 'center
+                                    :align-symbol 'horizontal-bar)
+        (telega-ins--content msg))
+
+    ;; Message header needed
+    (let* ((chat (telega-msg-chat msg))
+           (fwd-info (plist-get msg :forward_info))
+           ;; Is formatting done for "Replies" chat?
+           ;; Workaround for case when `:forward_info' is unset (for
+           ;; outgoing messages [what?] for example)
+           (msg-for-replies-p (and (telega-replies-p chat) fwd-info))
+           (sender (if msg-for-replies-p
+                       (telega--msg-origin-sender (plist-get fwd-info :origin))
+                     (telega-msg-sender msg)))
+           (avatar (if msg-for-replies-p
+                       (telega-msg-sender-avatar-image-three-lines sender)
+                     (telega-msg-sender-avatar-image sender)))
+           (awidth (length (telega-image--telega-text avatar 0)))
+           (gaps-workaround-p
+            (telega-chatbuf-match-p telega-avatar-workaround-gaps-for))
+           ;; NOTE: `telega-msg-contains-unread-mention' is used
+           ;; inside `telega--entity-type-to-text-props'
+           (telega-msg-contains-unread-mention
+            (plist-get msg :contains_unread_mention))
+           (l1width (if telega-msg-contains-unread-mention
+                        (string-width (telega-symbol 'mention-mark))
+                      0))
+           content-prefix)
+
+      (if (and no-header
+               (zerop (plist-get msg :edit_date))
+               (zerop (plist-get msg :via_bot_user_id)))
+          (telega-ins--line-wrap-prefix (when telega-msg-contains-unread-mention
+                                          (telega-symbol 'mention-mark))
+            (telega-ins (make-string awidth ?\s)))
+
+        ;; Show user profile when clicked on avatar, header
+        (telega-ins--with-props
+            (list 'action (lambda (button)
+                            ;; NOTE: check for custom message :action first
+                            ;; - [RESEND] button uses :action
+                            ;; - via @bot link uses :action
+                            (or (telega-button--action button)
+                                (telega-describe-msg-sender sender))))
+          (telega-ins--line-wrap-prefix (when telega-msg-contains-unread-mention
+                                          (telega-symbol 'mention-mark))
+            (telega-ins--image
+             avatar (if gaps-workaround-p
+                        (list 0 0 (telega-chars-xheight 2))
+                      0)
+             :no-display-if (not telega-chat-show-avatars))
+            (telega-ins--message-header msg chat sender addon-header-inserter))
+
+          (unless gaps-workaround-p
+            (telega-ins--line-wrap-prefix (make-string l1width ?\s)
+              (telega-ins--image
+               avatar 1
+               :no-display-if (not telega-chat-show-avatars))))))
+
+      (setq content-prefix (make-string (+ awidth l1width) ?\s))
+      (telega-ins--line-wrap-prefix content-prefix
+        (telega-ins--fwd-info-inline fwd-info))
+      ;; NOTE: Three lines avatars in "Replies" chat
+      (when msg-for-replies-p
+        (unless gaps-workaround-p
+          (telega-ins--line-wrap-prefix (make-string l1width ?\s)
+            (telega-ins--image
+             avatar 2
+             :no-display-if (not telega-chat-show-avatars)))))
+
+      (telega-ins--line-wrap-prefix content-prefix
+        (telega-ins--msg-reply-inline msg)
+        (telega-ins--content msg)
+
+        (telega-ins-prefix "\n"
+          (telega-ins--msg-sending-state-failed msg)))
+
+      (when (telega-msg-match-p msg telega-msg-temex-show-reactions)
+        (telega-ins--line-wrap-prefix
+            (if (telega-msg-match-p msg 'unread-reactions)
+                (let ((reaction-prefix
+                       (propertize (telega-symbol 'reaction-mark)
+                                   'face 'telega-mention-count)))
+                  (concat reaction-prefix
+                          (substring content-prefix
+                                     (string-width reaction-prefix))))
+              content-prefix)
+          (telega-ins-prefix "\n"
+            (telega-ins--msg-reaction-list msg))))
+
+      (telega-ins--line-wrap-prefix content-prefix
+        (telega-ins-prefix "\n"
+          (telega-ins--reply-markup msg))
+        (telega-ins-prefix "\n"
+          (telega-ins--msg-comments msg chat))
+        ))
+
+    (unless telega-msg-heading-with-date-and-status
+      (let* ((date-and-status (telega-ins--as-string
+                               (telega-ins--message-date-and-status msg)))
+             (dswidth (string-width date-and-status))
+             (dsoffset 2))              ;XXX
+        (when (> (telega-current-column)
+                 (- telega-chat-fill-column dswidth dsoffset))
+          (telega-ins "\n"))
+        (telega-ins--move-to-column (- telega-chat-fill-column dswidth))
+        (telega-ins date-and-status))))
+  t)
+
+(defun lucius/telega-ins--msg-interaction-info (msg &optional msg-chat)
+  "Insert interaction info for message MSG.
+MSG-CHAT is already calculated chat of the message, used for
+performance."
+  (unless msg-chat
+    (setq msg-chat (telega-msg-chat msg)))
+
+  (let* ((msg-ii (plist-get msg :interaction_info))
+         (view-count (plist-get msg-ii :view_count))
+         (fwd-count (plist-get msg-ii :forward_count))
+         (reply-count (telega-msg-replies-count msg)))
+    (when (and view-count (not (zerop view-count)))
+      (telega-ins " " (telega-symbol 'eye) " "
+                  (telega-number-human-readable view-count "%d")))
+    (when (and fwd-count (not (zerop fwd-count)))
+      (telega-ins " ")
+      (let ((fwd-count-label
+             (format "%s %d" (telega-symbol 'forward) fwd-count)))
+        (if (and (telega-chat-channel-p msg-chat)
+                 (telega-chat-match-p msg-chat '(me-is-owner or-admin)))
+            (telega-ins--button fwd-count-label
+              'face 'telega-link
+              :value msg
+              :action #'telega-msg-public-forwards)
+          (telega-ins fwd-count-label))))
+    (when (and (plist-get msg :can_get_message_thread)
+               (> reply-count 0))
+      (telega-ins " ")
+      (telega-ins--button
+          (format "%s %d" (telega-symbol 'reply) reply-count)
+        'face 'telega-link
+        :action #'telega-msg-open-thread-or-topic
+        :help-echo "Show message thread"))
+    t))
 (provide 'lib-telega)
 ;;; lib-telega.el ends here
