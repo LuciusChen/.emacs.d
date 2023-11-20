@@ -77,10 +77,12 @@ npm install -g typescript-language-server
 - 修改了 msg-heading 的背景，只保留用户名所在行的背景，并且适应长度。
 - +修改了按钮的样式+ （移到 forkd 的主题中去了）
 - +回复样式修改字体颜色为绿色且 =| In reply to:= 变为 | ➦:+ （已在 commit 93fedce 实现）
-- 回复行中用户名过长，则省略以显示更多的「被回复」内容。
+- +回复行中用户名过长，则省略以显示更多的「被回复」内容。+
 - +转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 | ➥:+ （已在 commit 93fedce 实现）
 - 去除关于 bot 命令补全的断言。原本只能在与 bot 的私聊中使用 ~/~ 进行补全，修改后可以在群聊中使用 ~/~ 进行补全（作者原话指出这样会 controversial and even dangerous）。
 - 修改 Specific Quote 以及正文中包含的 Quote 的样式，用 ~❝~ 标识，并在每行前插入空格对齐。
+- 修改 reactions 的颜色
+- 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
 
 #+CAPTION: telega_collection
 #+ATTR_ORG: :width 600
