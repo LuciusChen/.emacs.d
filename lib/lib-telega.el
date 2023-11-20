@@ -333,7 +333,7 @@ If REMOVE is `caption', then do not insert message's MSG caption."
 
     (when reply-quote
       (telega-ins
-       (concat (nerd-icons-mdicon "nf-md-format_quote_open" :face '(:inherit telega-msg-inline-forward))
+       (concat (nerd-icons-mdicon "nf-md-format_quote_open" :face '(:inherit telega-msg-inline-reply))
                " "))
       (telega-ins--with-face 'telega-entity-type-blockquote
         (telega-ins--line-wrap-prefix "   "
@@ -423,12 +423,12 @@ If REMOVE is `caption', then do not insert message's MSG caption."
           (list 'display (telega-sticker--image sticker)))))
      (textEntityTypeBlockQuote
       (let* ((lwprefix (concat
-                        (nerd-icons-mdicon "nf-md-format_quote_open" :face '(:inherit telega-msg-inline-forward))
+                        (nerd-icons-mdicon "nf-md-format_quote_open" :face '(:inherit telega-msg-inline-reply))
                         " "))
              (lwprops (list 'line-prefix lwprefix
                             'wrap-prefix "   "
                             'face 'telega-entity-type-blockquote))
-             (repr (concat "\n" (apply #'propertize text lwprops) "\n")))
+             (repr (format "%s" (apply #'propertize text lwprops))))
         (list 'telega-display repr))))))
 (provide 'lib-telega)
 ;;; lib-telega.el ends here

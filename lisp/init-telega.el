@@ -30,6 +30,8 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     ;; telega-debug t
+     ;; telega-server-verbosity 4
      ;; avatar
      telega-avatar-workaround-gaps-for '(return t)
      ;; telega-symbol
@@ -40,7 +42,7 @@
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
      telega-symbol-right-arrow (nerd-icons-octicon "nf-oct-arrow_right")
      telega-symbol-reaction "❤"
-     telega-symbol-reaction-mark telega-symbol-reaction
+     telega-symbol-reaction-mark (propertize "❤" 'face 'telega-mention-count)
      telega-symbols-emojify '((verified (when (and telega-use-images (image-type-available-p 'svg))
                                           (telega-etc-file-create-image "verified.svg" 2)))
                               (horizontal-bar (when (and telega-use-images (image-type-available-p 'svg))
@@ -71,8 +73,6 @@
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
-     ;; telega-debug t
-     ;; telega-server-verbosity 4
      telega-autoplay-mode 1
      telega-url-shorten-regexps
      ;; telega-url-shorten
@@ -111,8 +111,7 @@
         (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
        -1001873425044                ; @Emacs_CN Lite
        (420415423
-        (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix)))
-     )
+        (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))))
     ;; ignore messages from blocked senders (users or chats)
     (add-hook 'telega-msg-ignore-predicates
               (telega-match-gen-predicate 'msg '(sender is-blocked)))
