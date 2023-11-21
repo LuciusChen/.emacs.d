@@ -52,6 +52,7 @@
     ;; Do not use 'unicode charset, it will cause the English font setting invalid
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
       (set-fontset-font (frame-parameter nil 'font)
-                        charset zh-font))))
+                        charset zh-font))
+    (set-fontset-font t 'javanese "Noto Sans Javanese")))
 (provide 'lib-font)
 ;;; lib-font.el ends here

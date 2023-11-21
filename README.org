@@ -74,15 +74,18 @@ npm install -g typescript-language-server
 #+end_src
 ** Telega
 针对 UI 做了一些修改
-- 修改了 msg-heading 的背景，只保留用户名所在行的背景，并且适应长度。
-- +修改了按钮的样式+ （移到 forkd 的主题中去了）
+[[https://github.com/LuciusChen/telega.el][GitHub - LuciusChen/telega.el: GNU Emacs telegram client (unofficial)]]
+
+- +修改了 msg-heading 的背景，只保留用户名所在行的背景+​（移到👆🏻上面 forkd 的主题中去了），只保留用户名长度的背景。
+- +修改了按钮的样式+ （移到👆🏻上面 forkd 的主题中去了）
 - +回复样式修改字体颜色为绿色且 =| In reply to:= 变为 | ➦:+ （已在 commit 93fedce 实现）
 - +回复行中用户名过长，则省略以显示更多的「被回复」内容。+
 - +转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 | ➥:+ （已在 commit 93fedce 实现）
 - 去除关于 bot 命令补全的断言。原本只能在与 bot 的私聊中使用 ~/~ 进行补全，修改后可以在群聊中使用 ~/~ 进行补全（作者原话指出这样会 controversial and even dangerous）。
 - 修改 Specific Quote 以及正文中包含的 Quote 的样式，用 ~❝~ 标识，并在每行前插入空格对齐。
-- 修改 reactions 的颜色
+- 修改 reactions 图标为字符而非 emoji 以及其颜色
 - 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
+- 去除 ~telega-root~ 顶部空行
 
 #+CAPTION: telega_collection
 #+ATTR_ORG: :width 600
@@ -91,11 +94,10 @@ npm install -g typescript-language-server
 #+CAPTION: telega_reply_username
 #+ATTR_ORG: :width 600
 [[file:assets/telega_reply_username.png]]
-
-一些很方便的 contrib 中的插件。
-*** telega-url-shorten
+*** contrib 中的插件。
+**** telega-url-shorten
 原先插件的做法是针对每个网站的 URL 进行适配，并且配上与之相应的 icons，并不能完全满足所有 URL 缩短的目的，所以这里用 =^\\(https?://\\)\\(.\\{55\\}\\).*?$= 正则处理所有的 URL，超过一定长度后省略。
-*** telega-bridge-bot
+**** telega-bridge-bot
 可以方便的同步 Matrix 那边的头像到 Telega 这边，对于「图象记忆者」来说，根据「头像 + username」记忆人远比单独的 username 记忆要牢固快速的多。
 #+CAPTION: telega-bridge-bot
 #+ATTR_ORG: :width 800
@@ -105,37 +107,37 @@ npm install -g typescript-language-server
 *** Adjust the ascent to avoid gaps between slices.
 
 *** Frequent Shortcuts
-| =C-u C-c C-k= | 取消回复和附带的文件，不保留所输入文字（用得最多）        |
+| =C-u C-c C-k= | 取消回复和附带的文件，不保留所输入文字（用得最多）       |
 | =C-c C-k=     | 取消回复和附带的文件，但保留所输入文字（不用 只用上面↑） |
 
-| =C-c  C-a= | 粘贴一切（常用，可覆盖以下两个场景：）                 |
+| =C-c  C-a= | 粘贴一切（常用，可覆盖以下两个场景：）               |
 | =C-c  C-v= | 贴 clipboard 里的东西（常用，比如刚截的图在剪贴板里） |
-| =C-c  C-f= | 粘媒体文件（偶用）                                    |
+| =C-c  C-f= | 粘媒体文件（偶用）                                 |
 
-| =M-g  m= | 下一个提醒（常用）        |
-| =M-g  r= | 直接跳到最新消息（常用）  |
-| =M-g  != | 跳转到最新的 reactions |
+| =M-g  m= | 下一个提醒（常用）       |
+| =M-g  r= | 直接跳到最新消息（常用） |
+| =M-g  != | 跳转到最新的 reactions  |
 
 聊天界面
 
-| =r=     | 回复该消息               |
+| =r=     | 回复该消息              |
 | =C-u r= | 在另一个聊天内回复该消息 |
-| =e=     | 编辑该消息               |
-| =d=     | 删除该消息               |
-| =f=     | forward                  |
-| =s=     | save                     |
-| =c=     | copy                     |
+| =e=     | 编辑该消息              |
+| =d=     | 删除该消息              |
+| =f=     | forward               |
+| =s=     | save                  |
+| =c=     | copy                  |
 ** Tricks
 =C-x C-e= 可以执行 elisp 或者在 Scratch 中开启 =lisp-interaction-mode= 后，在需要执行的函数最后 =C-j= 执行。
 *** Working with Frame
 | Command | What it does                            |
-| ~C-x 5 0~ | Close current frame                     |
-| ~C-x 5 1~ | Close all frames except the current one |
-| ~C-x 5 2~ | Create a new frame                      |
+| =C-x 5 0= | Close current frame                     |
+| =C-x 5 1= | Close all frames except the current one |
+| =C-x 5 2= | Create a new frame                      |
 *** Working with windows
 | Command | What it does                             |
-| ~C-x 0~ | Close current window                     |
-| ~C-x 1~ | Close all windows except the current one |
-| ~C-x 2~ | Split current window in two vertically   |
-| ~C-x 3~ | Split current window in two horizontally |
-| ~C-x o~ | Switch to other window                   |
+| =C-x 0=   | Close current window                     |
+| =C-x 1=   | Close all windows except the current one |
+| =C-x 2=   | Split current window in two vertically   |
+| =C-x 3=   | Split current window in two horizontally |
+| =C-x o=   | Switch to other window                   |
