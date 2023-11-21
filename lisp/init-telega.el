@@ -41,34 +41,6 @@
      telega-symbol-forward (nerd-icons-mdicon "nf-md-comment_arrow_right_outline")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
      telega-symbol-right-arrow (nerd-icons-octicon "nf-oct-arrow_right")
-     telega-symbol-reaction (propertize "❤" 'face 'telega-mention-count)
-     telega-symbol-reaction-mark "❤"
-     telega-symbols-emojify '((verified (when (and telega-use-images (image-type-available-p 'svg))
-                                          (telega-etc-file-create-image "verified.svg" 2)))
-                              (horizontal-bar (when (and telega-use-images (image-type-available-p 'svg))
-                                                (telega-svg-create-horizontal-bar)))
-                              (underline-bar (when (and telega-use-images (image-type-available-p 'svg))
-                                               (telega-svg-create-horizontal-bar
-                                                1 0.7 telega-symbol-underline-bar)))
-                              alarm
-                              attachment audio
-                              bell bulp
-                              chat-list
-                              contact
-                              distance
-                              eye
-                              failed favorite flames folder
-                              (forum (when (and telega-use-images (image-type-available-p 'svg))
-                                       (telega-etc-file-create-image "symbols/forum.svg" 2)))
-                              game
-                              invoice
-                              leave-comment lightning lock location
-                              member multiple-folders
-                              pause pending phone photo pin poll play
-                              (premium (when (and telega-use-images (image-type-available-p 'svg))
-                                         (telega-etc-file-create-image "symbols/premium.svg" 2)))
-                              video video-chat-active video-chat-passive
-                              "⏪" "⏩")
      telega-chat-fill-column 80
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
@@ -118,7 +90,9 @@
     ;; 聊天列表高亮
     ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
     (:with-mode telega-root-mode (:hook lg-telega-root-mode))
-    (:with-mode telega-chat-mode (:hook lucius/telega-completion-setup))
+    (:with-mode telega-chat-mode
+      (:require company)
+      (:hook lucius/telega-completion-setup))
     (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
@@ -138,16 +112,6 @@
     ;; Opening files using external programs
     (if *IS-MAC*
         (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
-      (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))
-    ;; (advice-add 'telega-ins--user-emoji-status :around #'ignore)
-    ;; 让 heading 不充满整行
-    (advice-add 'telega-ins--message-header :override #'lucius/telega-ins--message-header)
-    ;; 修改 reaction 颜色
-    (advice-add 'telega-ins--message0 :override #'lucius/telega-ins--message0)
-    ;; 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
-    (advice-add 'telega-ins--msg-interaction-info :override #'lucius/telega-ins--msg-interaction-info)
-    ;; 修改 Specific quote 和 Quote 结构和样式
-    (advice-add 'telega-ins--msg-reply-to-message-inline :override #'lucius/telega-ins--msg-reply-to-message-inline)
-    (advice-add 'telega--entity-type-to-text-props :override #'lucius/telega--entity-type-to-text-props)))
+      (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))))
 (provide 'init-telega)
 ;;; init-telega.el ends here
