@@ -30,8 +30,6 @@
                                         straight--profile-cache)))
                        "\n\n")))))
 
-;; make left-fringe half
-;; (fringe-mode '(5 . 8))
 ;; Better fringe symbol
 (define-fringe-bitmap 'right-curly-arrow
     [#b00000000
@@ -54,22 +52,22 @@
      #b01100000])
 
 ;; https://emacs-china.org/t/topic/25114/5
-(pixel-scroll-precision-mode 1)
-(setq pixel-scroll-precision-interpolate-page t)
-(defun +pixel-scroll-interpolate-down (&optional lines)
-  (interactive)
-  (if lines
-      (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
-    (pixel-scroll-interpolate-down)))
+;; (pixel-scroll-precision-mode 1)
+;; (setq pixel-scroll-precision-interpolate-page t)
+;; (defun +pixel-scroll-interpolate-down (&optional lines)
+;;   (interactive)
+;;   (if lines
+;;       (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+;;     (pixel-scroll-interpolate-down)))
 
-(defun +pixel-scroll-interpolate-up (&optional lines)
-  (interactive)
-  (if lines
-      (pixel-scroll-precision-interpolate (* lines (pixel-line-height))))
-  (pixel-scroll-interpolate-up))
+;; (defun +pixel-scroll-interpolate-up (&optional lines)
+;;   (interactive)
+;;   (if lines
+;;       (pixel-scroll-precision-interpolate (* lines (pixel-line-height))))
+;;   (pixel-scroll-interpolate-up))
 
-(defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
-(defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+;; (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+;; (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
 
 ;; tab 键来补全
 (setq tab-always-indent 'complete)
