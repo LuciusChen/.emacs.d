@@ -15,24 +15,22 @@
   ;; https://github.com/be5invis/Iosevka/blob/v21.0.0/doc/PACKAGE-LIST.md
   (let ((en-font (make-font-string
                   (cl-find-if #'font-list-existsp
-                              '("Iosevka Lucius"
-                                "Fira Code"
-                                "IBM Plex Mono")) 14))
+                              '("IBM Plex Mono"
+                                "Iosevka Lucius")) 14))
         (zh-font (font-spec
                   :family
                   (cl-find-if #'font-list-existsp
                               '("TsangerJinKai02"
-                                "LXGW WenKai Screen"
-                                "HanaMinB")))))
+                                "LXGW WenKai Screen")))))
     ;; Set the default English font
     (set-face-attribute 'default nil :font en-font :weight 'normal)
     ;; 特殊字符需要安装 Symbola 字体
     ;; https://www.wfonts.com/font/symbola
-    ;; "emacs 28 now has 'emoji . before, emoji is part of 'symbol"
+    ;; "Emacs 28 now has 'emoji . before, emoji is part of 'symbol"
     ;; 根据上面这句话应该写成 'emoji 就可以了，但是由于 Emoji 本身
     ;; 分布比较散，所以还是先设置 'unicode 后再设置 CJK 比较靠谱。
     ;; 特例：'emoji 就会导致 ⛈️ fallback 到 ⛈
-    ;; https://emacs-china.org/t/emacs/15676/34?u=luciuschen
+    ;; https://emacs-china.org/t/emacs/15676/34
     (cl-loop for font in '("Apple Color Emoji"
                            "Noto Color Emoji"
                            "Noto Emoji"
@@ -53,6 +51,10 @@
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
       (set-fontset-font (frame-parameter nil 'font)
                         charset zh-font))
+    ;; IBM Plex Mono 没有这几个字符，自己编辑字体后添加，可以省去下面的设置。
+    ;; (set-fontset-font nil ?❤ "Arial Unicode MS")
+    ;; (set-fontset-font nil ?☑ "Arial Unicode MS")
+    ;; (set-fontset-font nil ?☐ "Arial Unicode MS")
     (set-fontset-font t 'javanese "Noto Sans Javanese")))
 (provide 'lib-font)
 ;;; lib-font.el ends here

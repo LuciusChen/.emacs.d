@@ -16,6 +16,19 @@
        '(("『\\(\\(?:.\\|\n\\)*?\\)』" . 'lucius/nov-annotate-face)))
       (font-lock-flush))))
 
+(setup org-remark
+  (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
+  (:global "C-c i m" org-remark-mark)
+  (:bind-into org-remark-mode-map
+    "C-c i o" org-remark-open
+    "C-c i ]" org-remark-view-next
+    "C-c i [" org-remark-view-prev
+    "C-c i r" org-remark-remove
+    "C-c i d" org-remark-delete))
+
+(setup org-remark-nov
+  (:after nov (org-remark-nov-mode +1)))
+
 (setup gptel
   (:when-loaded
     (:also-load org)
@@ -59,6 +72,7 @@
                ("https://fasterthanli.me/index.xml" Program)
                ("https://blog.jcole.us/feed/" Database)
                ("https://karthinks.com/index.xml" Emacs)
+               ("https://morss.it/https://www.joshwcomeau.com/rss.xml" Front-end)
                "https://leancrew.com/all-this/feed/"
                ("https://feedx.net/rss/economistp.xml" Economics)
                ("https://www.allthingsdistributed.com/atom.xml" Program)

@@ -134,7 +134,7 @@
      org-agenda-start-on-weekday nil
      org-agenda-span 'day
      org-agenda-include-diary nil
-     org-agenda-current-time-string (concat "◀┈┈┈┈┈┈┈┈┈┈┈┈┈ " (nerd-icons-faicon "nf-fa-clock_o"))
+     org-agenda-current-time-string (concat "◀┈┈┈┈┈┈┈┈┈┈┈┈┈ ⏰")
      org-agenda-sorting-strategy
      '((agenda habit-down time-up user-defined-up effort-up category-keep)
        (todo category-up effort-up)
@@ -415,25 +415,6 @@
      :function #'citar-is-cited
      :padding "  "
      :tag "is:cited")))
-
-;; (setup org-remark
-;;   (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
-;;   (:global "C-c i m" org-remark-mark)
-;;   (:bind-into org-remark-mode-map
-;;     "C-c i o" org-remark-open
-;;     "C-c i ]" org-remark-view-next
-;;     "C-c i [" org-remark-view-prev
-;;     "C-c i r" org-remark-remove
-;;     "C-c i d" org-remark-delete)
-;;   (:when-loaded
-;;     (defface org-remark-highlighter
-;;         '((((class color) (min-colors 88) (background light))
-;;            :underline (:color "#FF6DB3" :style line :position 5) :background "#ADF6D9")
-;;           (((class color) (min-colors 88) (background dark))
-;;            :underline (:color "#FCFAC7" :style line :position 5) :background "#3F3F3F")
-;;           (t
-;;            :inherit highlight))
-;;       "Face for the default highlighter pen.")))
 
 (setup org-modern
   (:load-after org)

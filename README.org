@@ -1,5 +1,6 @@
 * .emacs.d
 ** 字体
+字体这块折腾的真的比较多了，目前使用 [[https://github.com/IBM/plex][IBM Plex Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了），从 Iosevka 中复制了 "❤ ☑ ☐" 等一些字符到其中。
 *** [[https://github.com/be5invis/Iosevka][Iosevka]]
 Iosevka 设计之初就是和大部分 CJK 字体等高，1:2 的比例，可以很好的解决中英文字体不对齐的问题。
 
@@ -114,10 +115,11 @@ npm install -g typescript-language-server
 | =C-c  C-v= | 贴 clipboard 里的东西（常用，比如刚截的图在剪贴板里） |
 | =C-c  C-f= | 粘媒体文件（偶用）                                    |
 
-| =M-g  m= | 下一个提醒（常用）        |
-| =M-g  r= | 直接跳到最新消息（常用）  |
-| =M-g  != | 跳转到最新的 reactions |
-| =M-g ^=  | 跳转到最新的 Pin 消息  |
+| =M-g  m= | 下一个提醒（常用）                 |
+| =M-g  r= | 直接跳到最新消息（常用）           |
+| =M-g  != | 跳转到最新的 reactions          |
+| =M-g ^=  | 跳转到最新的 Pin 消息           |
+| =M-g x=  | 编辑消息发送后，回到被编辑消息位置 |
 
 聊天界面
 

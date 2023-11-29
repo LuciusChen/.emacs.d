@@ -30,18 +30,26 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     ;; 改善 CJK 换行
+     word-wrap-by-category t
      ;; telega-debug t
      ;; telega-server-verbosity 4
+     ;; adjust the size for sticker
+     telega-chat-fill-column 80
+     telega-sticker-size '(6 . 24)
      ;; avatar
      telega-avatar-workaround-gaps-for '(return t)
      ;; telega-symbol
+     ;; remove iterm from `telega-symbols-emojify`
+     telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
+     telega-symbol-flames (nerd-icons-mdicon "nf-md-fire")
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
      telega-symbol-reply (nerd-icons-faicon "nf-fa-reply")
      telega-symbol-reply-quote (nerd-icons-faicon "nf-fa-reply_all")
-     telega-symbol-forward (nerd-icons-mdicon "nf-md-comment_arrow_right_outline")
+     telega-symbol-forward (nerd-icons-octicon "nf-oct-cross_reference")
+     telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
      telega-symbol-right-arrow (nerd-icons-octicon "nf-oct-arrow_right")
-     telega-chat-fill-column 80
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")

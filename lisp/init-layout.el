@@ -45,7 +45,8 @@
   (:global "C-~"   popper-toggle
            "M-~"   popper-cycle
            "C-M-`" popper-toggle-type)
-  (:option popper-reference-buffers
+  (:option popper-window-height 30
+           popper-reference-buffers
            '(("\\*Messages\\*"
               "Output\\*$"
               "\\*Async Shell Command\\*"

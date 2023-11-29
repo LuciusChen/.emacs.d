@@ -114,6 +114,7 @@
     git-commit
     elfeed-tube
     org-roam-ui
+    org-remark
     magit-todos
     prettier-js
     consult-dir
