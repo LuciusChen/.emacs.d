@@ -25,7 +25,8 @@
 (add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 ;; Disable package.el in favor of straight.el
-(setq package-enable-at-startup nil)
+(setq package-enable-at-startup nil
+      package-quickstart nil)
 ;; Inhibit resizing Puremacs frame
 (setq frame-inhibit-implied-resize t)
 ;; no title bar and round corners

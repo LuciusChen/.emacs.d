@@ -16,9 +16,10 @@
 
 (setup kind-icon
   (:after corfu
-    ;; (:option kind-icon-default-face 'corfu-default)
     (add-to-list 'corfu-margin-formatters
-                 #'kind-icon-margin-formatter)))
+                 #'kind-icon-margin-formatter))
+  (:when-loaded
+    (advice-add 'reapply-themes :after 'kind-icon-reset-cache)))
 
 (setup corfu
   (:require nerd-icons)

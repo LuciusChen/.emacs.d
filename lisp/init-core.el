@@ -3,7 +3,7 @@
 ;;; Code:
 (setq-default initial-scratch-message
               (propertize
-               (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you") 'face 'italic))
+               (concat ";; Happy hacking, " user-login-name " - Emacs ❤ you") 'face 'italic))
 ;; 启动时间、加载包数量以及 gc 次数
 (add-hook 'emacs-startup-hook
           (lambda ()

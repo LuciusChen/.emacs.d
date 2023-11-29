@@ -7,10 +7,7 @@
   (dolist (theme custom-enabled-themes)
     (unless (custom-theme-p theme)
       (load-theme theme)))
-  (custom-set-variables `(custom-enabled-themes (quote ,custom-enabled-themes)))
-  ;; reset kind-icon cache
-    (when (fboundp 'kind-icon-reset-cache)
-      (kind-icon-reset-cache)))
+  (custom-set-variables `(custom-enabled-themes (quote ,custom-enabled-themes))))
 
 (defun set-dividers-and-fringe-color ()
   "Set the color of dividers and fringe to match the current theme."
