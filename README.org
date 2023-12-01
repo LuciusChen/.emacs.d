@@ -51,7 +51,6 @@ machine matrix.org login @lucius_chen:matrix.org  password ****
 #+end_example
 
 Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获取。
-
 ** Reader
 用过一段时间的 [[https://read.readwise.io][Readwise Reader]]，选择其的原因在于可以配合沉浸式翻译，达到快速阅读英文书籍及文章的目的。但是目前在 Emacs 当中也可以通过 gpt 的应用达到相同的目的。
 
@@ -87,6 +86,8 @@ npm install -g typescript-language-server
 - 修改 reactions 图标为字符而非 emoji 以及其颜色
 - 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
 - 去除 ~telega-root~ 顶部空行
+- 修改 code blocks 样式
+- 以上 nerd-icons 修改在终端同样有效
 
 #+CAPTION: telega_collection
 #+ATTR_ORG: :width 600

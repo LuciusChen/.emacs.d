@@ -51,5 +51,14 @@
     (:hook apheleia-global-mode))
   (:when-loaded
     (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
+
+(defun lucius/insert-zero-width-space ()
+  "在中文字符和英文的 ~ 和 = 等符号间插入零宽空格."
+  (interactive)
+  (save-excursion
+    (when (and (looking-at "[[:ascii:]]")
+               (or (looking-back "[[:multibyte:]]" 1)
+                   (looking-at-p "[[:multibyte:]]")))
+      (insert-char #x200B))))
 (provide 'init-local)
 ;;; init-local.el ends here
