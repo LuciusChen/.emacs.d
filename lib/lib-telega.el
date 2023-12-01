@@ -1,5 +1,12 @@
 ;;; lib-telega.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary
+(defun lucius/telega-webpage-open-url-in-xwidget ()
+  (interactive)
+  (let ((entry-link
+         (if (eq major-mode 'telega-chat-mode)
+             (telega-url-at-point))))
+    (xwidget-webkit-browse-url entry-link)))
+
 (defun replace-end-image-space-with-X (string)
   "Replace the last space in STRING with an X if it has text properties."
   (if-let* ((end-pos (- (length string) 1))

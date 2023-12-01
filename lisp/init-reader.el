@@ -82,6 +82,7 @@
                ("https://guangzhengli.com/index.xml" Program)
                ("https://rsshub.app/youtube/user/@lijxse" Youtube)
                ("https://rsshub.app/youtube/user/@TimelabPro" Youtube)
+               ("https://openrss.org/www.instagram.com/zhonglin_/" Instagram)
                ("https://rsshub.app/youtube/user/@xiao_lin_shuo" Youtube)
                ("https://rsshub.app/youtube/user/@MacroRoom" Youtube)
                ("https://rsshub.app/youtube/user/@BrandonLiUnscripted" Youtube)))

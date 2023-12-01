@@ -11,7 +11,7 @@
   ;; @Eli
   ;; :bind-into 里面用 :ensure 规定了 func`，直接传的话就会给你加 #'。
   ;; 改成 (identity xxx-prefix-map) 即可
-  (:bind-into global-map "C-c t" (identity telega-prefix-map))
+  (:global "C-c t" (identity telega-prefix-map))
   ;; remove chat folder icons
   (setq telega-chat-folder-format nil)
   (:when-loaded
@@ -41,6 +41,7 @@
      telega-avatar-workaround-gaps-for '(return t)
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
+     telega-symbol-codeblock (nerd-icons-devicon "nf-dev-code")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
      telega-symbol-flames (nerd-icons-mdicon "nf-md-fire")
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
@@ -49,7 +50,6 @@
      telega-symbol-forward (nerd-icons-octicon "nf-oct-cross_reference")
      telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
-     telega-symbol-right-arrow (nerd-icons-octicon "nf-oct-arrow_right")
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
