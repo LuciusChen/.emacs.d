@@ -51,41 +51,9 @@
 (setup elfeed
   (:global "C-x w" elfeed)
   (:when-loaded
-    (:also-load lib-reader)
-    ;; tags face
-    (defface program-elfeed-entry `((t :foreground "#D05A6E"))
-      "Marks program tag Elfeed entry.")
-    (defface youtube-elfeed-entry `((t :foreground "#EBB471"))
-      "Marks youtube tag Elfeed entry.")
-    (defface emacs-elfeed-entry `((t :foreground "#3A8FB7"))
-      "Marks emacs tag Elfeed entry.")
-    (defface database-elfeed-entry `((t :foreground "#986DB2"))
-      "Marks database tag Elfeed entry.")
-    (push '(Program program-elfeed-entry) elfeed-search-face-alist)
-    (push '(Youtube youtube-elfeed-entry) elfeed-search-face-alist)
-    (push '(Emacs emacs-elfeed-entry) elfeed-search-face-alist)
-    (push '(Database database-elfeed-entry) elfeed-search-face-alist)
-    ;; full-text RSS https://morss.it/
-    (:option elfeed-feeds
-             '(("https://andreyorst.gitlab.io/feed.xml" Emacs)
-               ("https://blog.dornea.nu/feed.xml" Emacs)
-               ("https://fasterthanli.me/index.xml" Program)
-               ("https://blog.jcole.us/feed/" Database)
-               ("https://karthinks.com/index.xml" Emacs)
-               ("https://morss.it/https://www.joshwcomeau.com/rss.xml" Front-end)
-               "https://leancrew.com/all-this/feed/"
-               ("https://feedx.net/rss/economistp.xml" Economics)
-               ("https://www.allthingsdistributed.com/atom.xml" Program)
-               ("https://samwho.dev/rss.xml" Program)
-               ("https://morss.it/susam.net/" Emacs)
-               ("https://morss.it/https://matt-rickard.com/" Program)
-               ("https://guangzhengli.com/index.xml" Program)
-               ("https://rsshub.app/youtube/user/@lijxse" Youtube)
-               ("https://rsshub.app/youtube/user/@TimelabPro" Youtube)
-               ("https://openrss.org/www.instagram.com/zhonglin_/" Instagram)
-               ("https://rsshub.app/youtube/user/@xiao_lin_shuo" Youtube)
-               ("https://rsshub.app/youtube/user/@MacroRoom" Youtube)
-               ("https://rsshub.app/youtube/user/@BrandonLiUnscripted" Youtube)))
+    (:also-load lib-elfeed)
+    (:option elfeed-feeds lucius/elfeed-feeds
+             elfeed-search-print-entry-function #'lucius/elfeed-search-print-entry--better-default)
     (:bind-into elfeed-show-mode-map
       "N" lucius/menu-dwim--org-capture-elfeed-show)
     (:bind-into elfeed-search-mode-map
