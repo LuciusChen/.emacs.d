@@ -41,6 +41,7 @@
      telega-avatar-workaround-gaps-for '(return t)
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
+     telega-symbol-vertical-bar "│"
      telega-symbol-codeblock (nerd-icons-devicon "nf-dev-code")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
      telega-symbol-flames (nerd-icons-mdicon "nf-md-fire")
