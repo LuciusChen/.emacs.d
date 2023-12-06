@@ -158,13 +158,13 @@
                          (org-tags-match-list-sublevels t)
                          (org-agenda-sorting-strategy
                           '(todo-state-down effort-up category-keep))))
-             (tags-todo "-reading&-book/PROJECT"
+             (tags-todo "-reading/PROJECT"
                         ((org-agenda-overriding-header "Project")
                          (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
                          (org-tags-match-list-sublevels t)
                          (org-agenda-sorting-strategy
                           '(category-keep))))
-             (tags-todo "+reading&+book/PROJECT"
+             (tags-todo "+reading/PROJECT"
                         ((org-agenda-overriding-header "Reading")
                          (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
                          (org-tags-match-list-sublevels t)
