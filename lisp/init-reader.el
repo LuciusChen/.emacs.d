@@ -55,9 +55,9 @@
     (:option elfeed-feeds lucius/elfeed-feeds
              elfeed-search-print-entry-function #'lucius/elfeed-search-print-entry--better-default)
     (:bind-into elfeed-show-mode-map
-      "N" lucius/menu-dwim--org-capture-elfeed-show)
-    (:bind-into elfeed-search-mode-map
-      "L" eli/elfeed-overview)))
+      "N" lucius/menu-dwim--org-capture-elfeed-show
+      "o" open-link-with-mpv)
+    (:bind-into elfeed-search-mode-map "L" eli/elfeed-overview)))
 
 (setup elfeed-tube
   (:after elfeed
@@ -67,7 +67,10 @@
     (:bind-into     elfeed-search-mode-map
       "F" elfeed-tube-fetch
       [remap save-buffer] elfeed-tube-save))
-  (:when-loaded (elfeed-tube-setup)))
+  (:when-loaded
+    (elfeed-tube-setup)
+    (:option mpv-default-options '("--http-proxy=http://127.0.0.1:7890"
+                                   "--ytdl-raw-options-append=proxy=http://127.0.0.1:7890"))))
 
 (setup elfeed-tube-mpv
   (:bind-into elfeed-show-mode-map
