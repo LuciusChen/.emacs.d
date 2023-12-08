@@ -33,7 +33,8 @@
   (:when-loaded
     (:also-load org)
     (:option gptel-api-key (auth-source-pick-first-password :host "api.openai.com" :user "apikey")
-             gptel-model "gpt-3.5-turbo"
+             ;; gptel-model "gpt-3.5-turbo"
+             gptel-model "gpt-4"
              gptel-stream t
              gptel-host "api.openai.com"
              ;; gptel-proxy "socks://127.0.0.1:7891"
