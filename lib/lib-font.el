@@ -21,7 +21,8 @@
                   :family
                   (cl-find-if #'font-list-existsp
                               '("TsangerJinKai02"
-                                "LXGW WenKai Screen")))))
+                                "LXGW WenKai Screen"
+                                "HanaMinB")))))
     ;; Set the default English font
     (set-face-attribute 'default nil :font en-font :weight 'normal)
     ;; 特殊字符需要安装 Symbola 字体

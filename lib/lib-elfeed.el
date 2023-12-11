@@ -76,19 +76,23 @@
 
 ;; Full-text RSS https://morss.it/
 (defvar lucius/elfeed-feeds
-  '(("https://andreyorst.gitlab.io/feed.xml" emacs)
-    ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
-    ("https://fasterthanli.me/index.xml" program)
-    ("https://karthinks.com/index.xml" emacs)
+  '(
     ("https://morss.it/https://www.joshwcomeau.com/rss.xml" front-end)
     ("https://leancrew.com/all-this/feed/" blog)
-    ("https://feedx.net/rss/economistp.xml" economics)
     ("https://morss.it/https://www.allthingsdistributed.com/atom.xml" program)
     ("https://samwho.dev/rss.xml" program)
-    ("https://morss.it/susam.net/" emacs)
     ("https://morss.it/https://matt-rickard.com/" program)
     ("https://guangzhengli.com/index.xml" program)
+    ("https://rsshub-production-2fb8.up.railway.app/meituan/tech/home" meituan)
+    ;; Emacs
+    ("https://andreyorst.gitlab.io/feed.xml" emacs)
+    ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
+    ("https://morss.it/susam.net/" emacs)
+    ("https://karthinks.com/index.xml" emacs)
+    ;; Forum
     ("https://rsshub.app/chiphell/forum/319" forum)
+    ;; Economics
+    ("https://rsshub-production-2fb8.up.railway.app/economist/latest" economics)
     ;; Novel
     ("https://rsshub.app/biquge/http://www.biqu5200.net/194_194173/" novel) ;; 玄鉴仙族
     ("https://rsshub.app/biquge/http://www.biqu5200.net/192_192713/" novel) ;; 我本无意成仙
@@ -113,7 +117,8 @@
     ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/nah_ill_"                instagram)
     ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/itseriksen"              instagram)
     ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/aron_ch"                 instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/mark.smith.photography" instagram)
+    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/mark.smith.photography"  instagram)
+    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/der_greif"               instagram)
     ;; YouTube
     ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@lijxse"              youtube)
     ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@TimelabPro"          youtube)
@@ -123,13 +128,13 @@
     ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@cherry_official"     youtube)
     ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@mediastorm6801"      youtube)
     ;; Bilibili
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/video/72270557"   bilibili) ;; 芳斯塔芙
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/video/18706318"   bilibili) ;; 龙女之声
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/video/7487399"    bilibili) ;; 努力的Lorre
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/video/470156882"  bilibili) ;; 小艾大叔
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/video/38053181"   bilibili) ;; oooooohmygosh
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/video/6330633"    bilibili) ;; 小胡仙儿
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/video/18202105"   bilibili) ;; 绵羊料理
+    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/72270557"   bilibili) ;; 芳斯塔芙
+    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/18706318"   bilibili) ;; 龙女之声
+    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/7487399"    bilibili) ;; 努力的Lorre
+    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/470156882"  bilibili) ;; 小艾大叔
+    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/38053181"   bilibili) ;; oooooohmygosh
+    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/6330633"    bilibili) ;; 小胡仙儿
+    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/18202105"   bilibili) ;; 绵羊料理
     ))
 
 (defun nerd-icon-for-tags (tags)
@@ -142,7 +147,7 @@
         ((member "database" tags) (nerd-icons-devicon "nf-dev-database" :face '(:foreground "#0574E8")))
         ((member "bilibili" tags) (nerd-icons-mdicon "nf-md-television_classic" :face '(:foreground "#008BBE")))
         ((member "novel" tags) (nerd-icons-faicon "nf-fa-book" :face '(:foreground "#02C298")))
-        ((member "forum" tags) (nerd-icons-mdicon "nf-md-forum" :face '(:foreground "#EF9120")))
+        ((member "forum" tags) (nerd-icons-faicon "nf-fa-forumbee" :face '(:foreground "#EF9120")))
         ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
         (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
 

@@ -30,8 +30,6 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
-     ;; 改善 CJK 换行
-     word-wrap-by-category t
      ;; telega-debug t
      ;; telega-server-verbosity 4
      ;; adjust the size for sticker
