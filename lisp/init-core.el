@@ -76,7 +76,8 @@
       completion-category-overrides nil)
 ;; 将阈值设置为 4 表示只有当需要补全的字符数大于4时才会执行循环补全
 (setq completion-cycle-threshold 4)
-
+;; 改善 CJK 换行
+(setq word-wrap-by-category t)
 ;; For Emacs >= 27
 (setq read-process-output-max (* 1024 1024))
 

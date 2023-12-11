@@ -1,9 +1,9 @@
 ;;; init-reader.el  --- Custom configuration
 ;;; Commentary
 (setup nov
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   (:when-loaded
     (:hooks nov-mode-hook lucius/nov-annotate-font-lock)
-    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
     (defface lucius/nov-annotate-face
         '((t (:foreground "#86C166")))
       "Face for # in nov-annotate-face."
