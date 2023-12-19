@@ -52,59 +52,47 @@
   (:when-loaded
     (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
 
-(defun lucius/insert-zero-width-space ()
-  "在中文字符和英文的 ~ 和 = 等符号间插入零宽空格."
-  (interactive)
-  (save-excursion
-    (when (and (looking-at "[[:ascii:]]")
-               (or (looking-back "[[:multibyte:]]" 1)
-                   (looking-at-p "[[:multibyte:]]")))
-      (insert-char #x200B))))
+(setup git-messenger
+  (:global "C-x v p" git-messenger:popup-message)
+  (:option git-messenger:show-detail t))
 
-(defun z/telega-emacs-Q-command-async ()
-  "Run telega emacs -Q async."
+(defun z/emacs-Q-test ()
+  "Run emacs -Q async for packages you choose."
   (interactive)
-  (let* ((path-getter (lambda (lib) (file-name-directory (locate-library lib))))
+  (let* ((pkgs    (completing-read-multiple "Packages: " features))
          (process (start-process
-                   "*telega-test*" "*telega-test*"
+                   "*emacs-Q*" "*emacs-Q*"
                    (concat invocation-directory invocation-name)
                    "-Q"
-                   ;; eval: anything builtin - like debug
-                   "--eval" "(progn
-(setq debug-on-error t)
-(setq load-prefer-newer t)
+                   ;; EVAL basics before everything
+                   "--eval" "(progn                           \
+(setq debug-on-error t)                                       \
+(setq load-prefer-newer t)                                    \
 )"
-                   ;; LOAD-PATH
-                   ;; 1. vertico and deps
-                   "-L" (funcall path-getter "compat")
-                   "-L" (funcall path-getter "vertico")
-                   "-L" (funcall path-getter "nerd-icons")
-                   ;; 2. telega and deps
-                   "-L" (funcall path-getter "rainbow-identifiers")
-                   "-L" (funcall path-getter "visual-fill-column")
-                   "-L" (funcall path-getter "telega")
-                   ;; LOAD FILE
-                   "-l" (file-name-sans-extension (locate-library "nerd-icons"))
-                   "-l" (file-name-sans-extension (locate-library "vertico"))
-                   "-l" (file-name-sans-extension (locate-library "telega"))
-                   ;; eval: after dependancies loaded.
-                   "--eval" "(progn \
-(global-set-key (kbd \"<mouse-1>\") #'top-level) \
-(vertico-mode 1) \
-(defun sk-stop-using-minibuffer ()                                \
-  (when (and (>= (recursion-depth) 1) (active-minibuffer-window)) \
-    (top-level)))                                                 \
-(add-hook 'mouse-leave-buffer-hook 'sk-stop-using-minibuffer)     \
+                   ;; LOAD PATH from current running emacs
+                   "--eval" (format "(setq load-path '%s)"
+                                    (with-output-to-string (prin1 load-path)))
+                   ;; LOAD some goodies first
+                   "--eval" "(progn                           \
+(defun sk-stop-using-minibuffer ()                            \
+  (when (and (>= (recursion-depth) 1)                         \
+             (active-minibuffer-window))                      \
+    (top-level)))                                             \
+(add-hook 'mouse-leave-buffer-hook 'sk-stop-using-minibuffer) \
+(require 'vertico)                                            \
+(vertico-mode 1)                                              \
+(require 'orderless)                                          \
+(setq completion-styles '(orderless basic emacs22))           \
+)"
+                   ;; LOAD testing packages
+                   "--eval" (format "(dolist (pkg '%s) (require (intern-soft pkg)))" pkgs)
+                   ;; EVAL: more
+                   "--eval" "(progn                           \
 )")))
     (set-process-sentinel
-     process (lambda (proc _) (kill-buffer (process-buffer proc))))))
-​
-(defun z/telega-kill-test ()
-  "Kill all telega related tests."
-  (interactive)
-  (dolist (proc (process-list))
-    (when (string-match-p "*telega-test*" (process-name proc))
-      (kill-process proc)))
-  (message "All `telega' processes killed."))
+     process
+     (lambda (proc _)
+       (kill-buffer (process-buffer proc))))))
+
 (provide 'init-local)
 ;;; init-local.el ends here

@@ -75,6 +75,7 @@
     (xwidget-webkit-browse-url entry-link)))
 
 ;; Full-text RSS https://morss.it/
+;; https://rsshub.sheerwill.live
 (defvar lucius/elfeed-feeds
   '(
     ("https://morss.it/https://www.joshwcomeau.com/rss.xml" front-end)
@@ -83,58 +84,60 @@
     ("https://samwho.dev/rss.xml" program)
     ("https://morss.it/https://matt-rickard.com/" program)
     ("https://guangzhengli.com/index.xml" program)
-    ("https://rsshub-production-2fb8.up.railway.app/meituan/tech/home" meituan)
+    ("https://rsshub.sheerwill.live/meituan/tech/home" meituan)
     ;; Emacs
     ("https://andreyorst.gitlab.io/feed.xml" emacs)
     ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
     ("https://morss.it/susam.net/" emacs)
     ("https://karthinks.com/index.xml" emacs)
     ;; Forum
-    ("https://rsshub.app/chiphell/forum/319" forum)
+    ("https://rsshub.sheerwill.live/chiphell/forum/319" forum)
     ;; Economics
-    ("https://rsshub-production-2fb8.up.railway.app/economist/latest" economics)
+    ("https://rsshub-production-bb40.up.railway.app/economist/latest" economics)
     ;; Novel
-    ("https://rsshub.app/biquge/http://www.biqu5200.net/194_194173/" novel) ;; 玄鉴仙族
-    ("https://rsshub.app/biquge/http://www.biqu5200.net/192_192713/" novel) ;; 我本无意成仙
+    ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/194_194173/" novel) ;; 玄鉴仙族
+    ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/192_192713/" novel) ;; 我本无意成仙
     ;; Github
     ("https://github.com/zevlg/telega.el/commits.atom" github)
+    ("https://github.com/tdlib/td/commits.atom" github)
     ;; Instagram
     ;; backup https://openrss.org/www.instagram.com/user
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/zhonglin_"               instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/sakaitakahiro_"          instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/misselvani"              instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/miantanzhou"             instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/satosi_photo"            instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/yiiooi"                  instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/ramaworks"               instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/tanaka_tatsuya"          instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/roywanglightart"         instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/dailypurrr"              instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/yongsundrawing"          instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/dailypurrr"              instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/octo8"                   instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/iilucius.image"          instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/nah_ill_"                instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/itseriksen"              instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/aron_ch"                 instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/mark.smith.photography"  instagram)
-    ("https://rsshub-production-2fb8.up.railway.app/instagram/2/user/der_greif"               instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/zhonglin_"               instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/sakaitakahiro_"          instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/misselvani"              instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/miantanzhou"             instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/satosi_photo"            instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/yiiooi"                  instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/ramaworks"               instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/tanaka_tatsuya"          instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/roywanglightart"         instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/dailypurrr"              instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/yongsundrawing"          instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/dailypurrr"              instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/octo8"                   instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/iilucius.image"          instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/nah_ill_"                instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/itseriksen"              instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/aron_ch"                 instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/mark.smith.photography"  instagram)
+    ("https://rsshub.sheerwill.live/instagram/2/user/der_greif"               instagram)
     ;; YouTube
-    ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@lijxse"              youtube)
-    ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@TimelabPro"          youtube)
-    ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@xiao_lin_shuo"       youtube)
-    ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@MacroRoom"           youtube)
-    ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@BrandonLiUnscripted" youtube)
-    ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@cherry_official"     youtube)
-    ("https://rsshub-production-2fb8.up.railway.app/youtube/user/@mediastorm6801"      youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@lijxse"              youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@TimelabPro"          youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@xiao_lin_shuo"       youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@MacroRoom"           youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@BrandonLiUnscripted" youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@cherry_official"     youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@mediastorm6801"      youtube)
     ;; Bilibili
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/72270557"   bilibili) ;; 芳斯塔芙
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/18706318"   bilibili) ;; 龙女之声
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/7487399"    bilibili) ;; 努力的Lorre
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/470156882"  bilibili) ;; 小艾大叔
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/38053181"   bilibili) ;; oooooohmygosh
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/6330633"    bilibili) ;; 小胡仙儿
-    ("https://rsshub-production-2fb8.up.railway.app/bilibili/user/dynamic/18202105"   bilibili) ;; 绵羊料理
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/72270557"   bilibili) ;; 芳斯塔芙
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18706318"   bilibili) ;; 龙女之声
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/7487399"    bilibili) ;; 努力的Lorre
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/470156882"  bilibili) ;; 小艾大叔
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/38053181"   bilibili) ;; oooooohmygosh
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/6330633"    bilibili) ;; 小胡仙儿
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18202105"   bilibili) ;; 绵羊料理
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/125526"     bilibili) ;; -LKs-
     ))
 
 (defun nerd-icon-for-tags (tags)

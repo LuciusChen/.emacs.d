@@ -78,6 +78,7 @@
     xenops
     bibtex
     auctex
+    git-messenger
     dimmer
     vertico
     diredfl

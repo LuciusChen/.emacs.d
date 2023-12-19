@@ -44,8 +44,7 @@
            sis-english-source "com.apple.keylayout.ABC"
            sis-inline-tighten-head-rule nil
            sis-default-cursor-color "#cf7fa7"
-           sis-other-cursor-color "orange"
-           sis-prefix-override-keys (list "C-c" "C-x" "C-h"))
+           sis-other-cursor-color "orange")
   (:hooks meow-leaving-insert-mode-hook sis-set-english)
   (if *IS-MAC*
       (sis-ism-lazyman-config
