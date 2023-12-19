@@ -33,14 +33,14 @@
      ;; telega-debug t
      ;; telega-server-verbosity 4
      ;; adjust the size for sticker
+     telega-open-file-function 'org-open-file
      telega-chat-fill-column 80
      telega-sticker-size '(6 . 24)
      ;; avatar
      telega-avatar-workaround-gaps-for '(return t)
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
-     telega-symbol-vertical-bar "│"
-     telega-symbol-codeblock (nerd-icons-devicon "nf-dev-code")
+     telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
      telega-symbol-flames (nerd-icons-mdicon "nf-md-fire")
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)

@@ -9,5 +9,19 @@
           (magit-log-buffer-file-popup)
         (magit-log-buffer-file t))
     (vc-print-log)))
+
+;; https://github.com/magit/magit/issues/3402
+(defun magit-log-dangling ()
+  (interactive)
+  (magit-log-setup-buffer
+   (-filter
+    (lambda (x) (not (or (equal "" x) (s-match "error" x))))
+    (s-lines
+     (shell-command-to-string
+      "git fsck --no-reflogs | awk '/dangling commit/ {print $3}'")))
+   '("--no-walk" "--color" "--decorate" "--follow")'
+   nil))
+
+(transient-append-suffix 'magit-log "s" '("d" "dangling" magit-log-dangling))
 (provide 'lib-vc)
 ;;; lib-vc.el ends here
