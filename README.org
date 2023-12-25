@@ -48,6 +48,7 @@ Screen 版本粗体和 normal 有明显的区别，有利于组织文本。
 #+begin_example
 machine api.openai.com login apikey password ****
 machine matrix.org login @lucius_chen:matrix.org  password ****
+machine api.github.com login LuciusChen^forge password ****
 #+end_example
 
 Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获取。
