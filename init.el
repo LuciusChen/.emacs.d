@@ -116,6 +116,7 @@
     elfeed-tube
     org-roam-ui
     org-remark
+    forge
     magit-todos
     prettier-js
     consult-dir

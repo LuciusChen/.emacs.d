@@ -85,6 +85,7 @@
     ("https://morss.it/https://matt-rickard.com/" program)
     ("https://guangzhengli.com/index.xml" program)
     ("https://rsshub.sheerwill.live/meituan/tech/home" meituan)
+    ("https://rsshub.sheerwill.live/scmp/3" NEWS)
     ;; Emacs
     ("https://andreyorst.gitlab.io/feed.xml" emacs)
     ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
@@ -100,6 +101,7 @@
     ;; Github
     ("https://github.com/zevlg/telega.el/commits.atom" github)
     ("https://github.com/tdlib/td/commits.atom" github)
+    ("https://github.com/reorx/hugo-PaperModX/commits.atom" github)
     ;; Instagram
     ;; backup https://openrss.org/www.instagram.com/user
     ("https://rsshub.sheerwill.live/instagram/2/user/zhonglin_"               instagram)

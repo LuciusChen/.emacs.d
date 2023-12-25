@@ -85,6 +85,7 @@
 (setq completion-styles '(orderless basic emacs22))           \
 )"
                    ;; LOAD testing packages
+                   ;; replace (intern-soft pkg)
                    "--eval" (format "(dolist (pkg '%s) (require (intern-soft pkg)))" pkgs)
                    ;; EVAL: more
                    "--eval" "(progn                           \

@@ -6,6 +6,7 @@
 (setup magit
   (:when-loaded
     (:also-load lib-vc)
+    (:also-load forge)
     (:load-after vc)
     (:bind-into magit-status-mode-map "C-M-<up>" magit-section-up)
     (:bind-into vc-prefix-map
