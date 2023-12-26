@@ -4,7 +4,7 @@
 (defun lucius/setup-fonts ()
   ;; https://typeof.net/Iosevka/customizer
   ;; https://github.com/be5invis/Iosevka/blob/v21.0.0/doc/PACKAGE-LIST.md
-  ;; Set the default English font
+  ;; Setting the default
   (set-face-attribute 'default nil :font "IBM Plex Mono 14" :weight 'normal)
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
@@ -33,9 +33,12 @@
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family "TsangerJinKai02")))
-  ;; 指定 fallback font
   ;; https://idiocy.org/emacs-fonts-and-fontsets.html
-  (set-fontset-font "fontset-default" 'han "HanaMinB" nil 'append)
+  ;; Setting fall-back fonts
+  (dolist (font '("Jigmo" "Jigmo2" "Jigmo3"))
+    (when (member font (font-family-list))
+      (set-fontset-font "fontset-default" 'han font nil 'append)))
+  ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
   ;; IBM Plex Mono 没有这几个字符，自己编辑字体后添加，可以省去下面的设置。
   ;; (set-fontset-font nil ?❤ "Arial Unicode MS")
