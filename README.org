@@ -58,6 +58,7 @@ npm run build -- ttf::iosevka-lucius
 | 方正楷体T-超大字符集   | 20,924     | 6,582        | 42,711        |               |               |               |               |               |               | 70,217 |
 | 花园明朝             | 20,971     | 6,582        | 42,711        | 4,149         |           222 | 5,762         | 7,473         |               |               | 87,870 |
 | Jigmo               | 20,992     | 6,592        | 42,720        | 4,154         |           222 | 5,762         | 7,473         | 4,939         | 4,192         | 96,299 |
+
 *** 特殊字体
 需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。
 ** Themes
