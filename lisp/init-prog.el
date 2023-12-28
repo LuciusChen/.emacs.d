@@ -41,6 +41,12 @@
 ;;; Basic js-mode setup
 (setup js-mode (:file-match "\\.\\(js\\|es6\\)\\(\\.erb\\)?\\'"))
 
+(setup sql
+  ;; or the product can be set from a comment on the first line
+  ;; -- -*- mode: sql; sql-product: mysql; -*-
+  ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
+  (:when-loaded (sql-set-product 'mysql)))
+
 (setup js
   (:also-load lib-js)
   (:when-loaded

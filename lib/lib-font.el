@@ -33,8 +33,8 @@
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family "TsangerJinKai02")))
-  ;; https://idiocy.org/emacs-fonts-and-fontsets.html
   ;; Setting fall-back fonts
+  ;; https://idiocy.org/emacs-fonts-and-fontsets.html
   (dolist (font '("Jigmo" "Jigmo2" "Jigmo3"))
     (when (member font (font-family-list))
       (set-fontset-font "fontset-default" 'han font nil 'append)))

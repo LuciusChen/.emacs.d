@@ -167,8 +167,5 @@ npm install -g typescript-language-server
 | =C-x 2=   | Split current window in two vertically   |
 | =C-x 3=   | Split current window in two horizontally |
 | =C-x o=   | Switch to other window                   |
-*** MySQL Highlight
-在文件头部添加
-
 *** Rollback emacs-plus with Homebrew
-=brew edit emacs-plus@30= 后找到 =url "https://github.com/emacs-mirror/emacs.git", :branch => "master"= 替换成 =url "https://github.com/emacs-mirror/emacs.git", :revision => "6abea4d98d1d964c68a78cb9b5321071da851654"=
+=brew edit emacs-plus@30= 后找到 =:branch => "master"= 替换成 =:revision => "6abea4d98d1d964c68a78cb9b5321071da851654"=
