@@ -168,4 +168,4 @@ npm install -g typescript-language-server
 | =C-x 3=   | Split current window in two horizontally |
 | =C-x o=   | Switch to other window                   |
 *** Rollback emacs-plus with Homebrew
-=brew edit emacs-plus@30= 后找到 =:branch => "master"= 替换成 =:revision => "6abea4d98d1d964c68a78cb9b5321071da851654"=
+=brew edit emacs-plus@30= 后找到 ~:branch => "master"~ 替换成 ~:revision => "6abea4d98d1d964c68a78cb9b5321071da851654"~
