@@ -265,6 +265,11 @@
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
                  ("%<%a, %d %b %Y>")))
+       ("e" "Diet" entry "*** %?"
+        :if-new (file+head+olp
+                 "%<%Y-%m-%d>.org"
+                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
+                 ("%<%a, %d %b %Y>" "Food Journal :food:")))
        ("r" "Read" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
