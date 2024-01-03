@@ -52,9 +52,11 @@
   (:when-loaded
     (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
 
-(setup git-messenger
-  (:global "C-x v p" git-messenger:popup-message)
-  (:option git-messenger:show-detail t))
+(setup blamer
+  (:option blamer-author-formatter "  ✎ %s "
+           blamer-idle-time 0.3
+           blamer-min-offset 70
+           blamer-max-commit-message-length 70))
 
 (defun z/emacs-Q-test ()
   "Run emacs -Q async for packages you choose."

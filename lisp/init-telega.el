@@ -41,6 +41,11 @@
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
+     telega-symbol-checkbox-on (nerd-icons-octicon "nf-oct-checkbox")
+     telega-symbol-checkbox-off (nerd-icons-sucicon "nf-seti-checkbox_unchecked")
+     telega-symbol-button-close (nerd-icons-faicon "nf-fa-close")
+     telega-symbol-radiobox-on (nerd-icons-faicon "nf-fa-circle")
+     telega-symbol-radiobox-off (nerd-icons-octicon "nf-oct-circle")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
      telega-symbol-flames (nerd-icons-mdicon "nf-md-fire")
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)

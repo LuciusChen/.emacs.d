@@ -39,7 +39,10 @@
              ;; gptel-proxy "socks://127.0.0.1:7891"
              gptel-proxy ""
              gptel-default-mode 'org-mode
-             gptel-temperature 0.7)))
+             gptel-temperature 0.7)
+    (:hooks  gptel-post-stream-hook (lambda ()(meow-insert-exit))
+             gptel-post-stream-hook gptel-auto-scroll
+             gptel-post-response-hook gptel-end-of-response)))
 
 (setup immersive-translate
   (:option immersive-translate-backend 'chatgpt
