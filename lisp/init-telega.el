@@ -40,6 +40,7 @@
      telega-avatar-workaround-gaps-for '(return t)
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
+     telega-symbol-premium (nerd-icons-faicon "nf-fa-superpowers" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
      telega-symbol-checkbox-on (nerd-icons-octicon "nf-oct-checkbox")
      telega-symbol-checkbox-off (nerd-icons-sucicon "nf-seti-checkbox_unchecked")

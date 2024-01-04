@@ -78,7 +78,6 @@
     xenops
     bibtex
     auctex
-    git-messenger
     dimmer
     vertico
     diredfl
@@ -147,7 +146,9 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
+    (blamer :host github :repo "LuciusChen/blamer.el")
     (emt :host github :repo "roife/emt")
+    (dape :host github :repo "LuciusChen/dape")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (anki-editor :host github :repo "LuciusChen/anki-editor")

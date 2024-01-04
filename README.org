@@ -18,15 +18,13 @@ $ touch private-build-plans.toml
 family = "Iosevka Lucius"
 spacing = "normal"
 serifs = "sans"
-no-cv-ss = true
-export-glyph-names = false
+noCvSs = true
+exportGlyphNames = false
 
   [buildPlans.iosevka-lucius.variants]
   inherits = "ss08"
 
     [buildPlans.iosevka-lucius.variants.design]
-    capital-n = "standard"
-    r = "compact"
     dollar = "interrupted"
     question = "corner-flat-hooked"
 #+end_src
@@ -47,7 +45,7 @@ npm run build -- ttf::iosevka-lucius
 |                        | ..         | ..           | ..            | ..            |            .. | ..            | ..            | ..            | ..            |        |
 |                        | U+9FFF URO | U+4DBF Ext.A | U+2A6DF Ext.B | U+2B739 Ext.C | U+2B81D Ext.D | U+2CEA1 Ext.E | U+2EBE0 Ext.F | U+3134A Ext.G | U+323AF Ext.H |        |
 |------------------------+------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+---------------+--------|
-| 编码区总字数           | 20,992     | 6,592        | 42,720        | 4,154         |           222 | 5,762         | 7,473         | 4,939         | 4,939         | 97,046 |
+| 编码区总字数           | 20,992     | 6,592        | 42,720        | 4,154         |           222 | 5,762         | 7,473         | 4,939         | 4,192         | 97,046 |
 | 中易宋体               | 20,992     | 6,592        | 42,711        | 4,149         |           222 | 5,762         | 7,473         |               |               | 87,901 |
 | 中华书局宋体           | 20,989     | 6,584        | 42,713        | 4,149         |           222 | 5,762         | 7,473         |               |               | 87,892 |
 | 方正宋体S-超大字符集   | 20,924     | 6,582        | 42,711        |               |               |               |               |               |               | 70,217 |
@@ -58,7 +56,7 @@ npm run build -- ttf::iosevka-lucius
 | 全字库正楷体           | 20,920     | 6,582        | 42,711        | 4,099         |           195 | 1,256         | 1             |               |               | 75,764 |
 | 方正楷体T-超大字符集   | 20,924     | 6,582        | 42,711        |               |               |               |               |               |               | 70,217 |
 | 花园明朝               | 20,971     | 6,582        | 42,711        | 4,149         |           222 | 5,762         | 7,473         |               |               | 87,870 |
-| Jigmo                  | 20,992     | 6,592        | 42,720        | 4,154         |           222 | 5,762         | 7,473         | 4,939         | 4,192         | 96,299 |
+| Jigmo                  | 20,992     | 6,592        | 42,720        | 4,154         |           222 | 5,762         | 7,473         | 4,939         | 4,192         | 97,046 |
 |------------------------+------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+---------------+--------|
 
 *** 特殊字体
@@ -81,6 +79,11 @@ Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获
 阅读书籍 ePub 用 [[https://depp.brause.cc/nov.el/][nov.el]]，阅读 PDF 用 [[https://github.com/vedang/pdf-tools][vedang/pdf-tools]]；RSS 订阅用 [[https://github.com/skeeto/elfeed][skeeto/elfeed]] 和 [[https://github.com/karthink/elfeed-tube][karthink/elfeed-tube]]，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
 
 ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
+** Version Control
+#+begin_src shell
+brew install git-delta
+#+end_src
+[[https://github.com/dandavison/magit-delta][dandavison/magit-delta]] 可以增强 magit 的 diff 功能，具体到 word 级别。
 ** Program
 #+begin_src shell
 # java
@@ -118,6 +121,45 @@ npm install -g typescript-language-server
 #+CAPTION: telega_reply_username
 #+ATTR_ORG: :width 600
 [[file:assets/telega_reply_username.png]]
+
+#+CAPTION: SCR-20240103-spxk
+#+ATTR_ORG: :width 800
+[[file:/Users/luciuschen/.emacs.d/assets/SCR-20240103-spxk.png]]
+*** Building TDLib
+
+~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。
+
+#+begin_src shell
+xcode-select --install
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install gperf cmake openssl
+git clone https://github.com/tdlib/td.git
+cd td
+rm -rf build
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ -DCMAKE_INSTALL_PREFIX:PATH=/usr/local ..
+cmake --build . --target install
+cd ..
+cd ..
+ls -l /usr/local
+#+end_src
+
+如果报错 ~"user-error: TDLib is not installed into "/usr/local". Set ‘telega-server-libs-prefix’ to the TDLib installion path"~​，则可以通过 ~M-: (setq telega-server-libs-prefix “/path/to/tdlib/install/path”) RET~ 然后 ~M-x telega-server-build RET~ 重新构建。
+*** Animated Stickers
+
+#+begin_src shell
+git clone https://github.com/zevlg/tgs2png.git
+git submodule init
+git submodule update
+mkdir build
+cd build
+cmake ..
+make
+copy tgs2png somewhere into $PATH
+#+end_src
+
+这里我编译完就已经是可用的了。
 *** contrib 中的插件。
 **** telega-url-shorten
 原先插件的做法是针对每个网站的 URL 进行适配，并且配上与之相应的 icons，并不能完全满足所有 URL 缩短的目的，所以这里用 =^\\(https?://\\)\\(.\\{55\\}\\).*?$= 正则处理所有的 URL，超过一定长度后省略。
@@ -131,17 +173,17 @@ npm install -g typescript-language-server
 *** Adjust the ascent to avoid gaps between slices.
 
 *** Frequent Shortcuts
-| =C-u C-c C-k= | 取消回复和附带的文件，不保留所输入文字（用得最多）       |
+| =C-u C-c C-k= | 取消回复和附带的文件，不保留所输入文字（用得最多）        |
 | =C-c C-k=     | 取消回复和附带的文件，但保留所输入文字（不用 只用上面↑） |
 
-| =C-c  C-a= | 粘贴一切（常用，可覆盖以下两个场景：）                |
+| =C-c  C-a= | 粘贴一切（常用，可覆盖以下两个场景：）                 |
 | =C-c  C-v= | 贴 clipboard 里的东西（常用，比如刚截的图在剪贴板里） |
 | =C-c  C-f= | 粘媒体文件（偶用）                                    |
 
-| =M-g  m= | 下一个提醒（常用）                 |
-| =M-g  r= | 直接跳到最新消息（常用）           |
-| =M-g  != | 跳转到最新的 reactions             |
-| =M-g ^=  | 跳转到最新的 Pin 消息              |
+| =M-g  m= | 下一个提醒（常用）                   |
+| =M-g  r= | 直接跳到最新消息（常用）             |
+| =M-g  != | 跳转到最新的 reactions            |
+| =M-g ^=  | 跳转到最新的 Pin 消息             |
 | =M-g x=  | 编辑消息发送后，回到被编辑消息位置 |
 
 聊天界面
