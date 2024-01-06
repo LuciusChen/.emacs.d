@@ -32,7 +32,9 @@
 (setup gptel
   (:when-loaded
     (:also-load org)
-    (:option gptel-api-key (auth-source-pick-first-password :host "api.openai.com" :user "apikey")
+    (:option gptel-api-key (auth-source-pick-first-password
+                            :host "api.openai.com"
+                            :user "apikey")
              gptel-model "gpt-3.5-turbo"
              gptel-stream t
              gptel-host "api.openai.com"
