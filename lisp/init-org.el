@@ -119,6 +119,38 @@
               org-after-todo-state-change-hook lucius/done-with-auto-clock-out))
     (:after org (org-clock-persistence-insinuate))))
 
+(setup org-latex-preview
+  (:option org-latex-preview-process-default 'dvisvgm
+           org-latex-preview-numbered t
+           ;; org-latex-preview-live t
+           org-startup-with-latex-preview t)
+  (:when-loaded
+    ;; Increase preview width
+    (plist-put org-latex-preview-appearance-options
+               :page-width 0.8)
+    ;; Turn on auto-mode, it's built into Org and much faster/more featured than
+    ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
+    (:hooks org-mode-hook org-latex-preview-auto-mode
+            ;; Block C-n and C-p from opening up previews when using auto-mode
+            org-latex-preview-auto-ignored-commands next-line
+            org-latex-preview-auto-ignored-commands previous-line
+            ;; code for centering LaTeX previews -- a terrible idea
+            org-latex-preview-overlay-open-functions
+            (lambda (ov) (overlay-put ov 'before-string nil))
+            org-latex-preview-overlay-close-functions
+            (lambda (ov) (overlay-put ov 'before-string (overlay-get ov 'justify)))
+            org-latex-preview-overlay-update-functions
+            (lambda (ov) (save-excursion
+                           (goto-char (overlay-start ov))
+                           (when-let* ((elem (org-element-context))
+                                       ((or (eq (org-element-type elem) 'latex-environment)
+                                            (string-match-p "^\\\\\\[" (org-element-property :value elem))))
+                                       (img (overlay-get ov 'display))
+                                       (prop `(space :align-to (- center (0.55 . ,img))))
+                                       (justify (propertize " " 'display prop 'face 'default)))
+                             (overlay-put ov 'justify justify)
+                             (overlay-put ov 'before-string (overlay-get ov 'justify))))))))
+
 (setup org-agenda
   (:global "C-c a" org-agenda)
   (:when-loaded
@@ -441,7 +473,7 @@
            org-modern-table-horizontal 0.2
            org-modern-checkbox nil
            org-modern-list '((43 . "▻")
-                             (45 . "►"))
+                             (45 . "➤"))
            org-ellipsis "[+]")
   (:when-loaded
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
