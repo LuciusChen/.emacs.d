@@ -100,6 +100,11 @@ See also `org-save-all-org-buffers'"
   "Create inactive timestamp for the Org mode note."
   (let ((org-time-stamp-custom-formats org-time-stamp-custom-formats))
     (format "%s" (with-temp-buffer (org-time-stamp-inactive nil)))))
+
+(defun lucius/org-latex-preview-reload ()
+  (interactive)
+  (call-interactively 'org-latex-preview-clear-cache)
+  (org-latex-preview 'buffer))
 ;;;; provide
 (provide 'lib-org)
 ;;; lib-org.el ends here.

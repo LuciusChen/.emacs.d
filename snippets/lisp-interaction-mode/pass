@@ -4,4 +4,4 @@
 # --
 $1
 URL: $2
-USERNAME: $3
+Username: $3
