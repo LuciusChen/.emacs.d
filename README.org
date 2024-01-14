@@ -79,6 +79,8 @@ Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获
 阅读书籍 ePub 用 [[https://depp.brause.cc/nov.el/][nov.el]]，阅读 PDF 用 [[https://github.com/vedang/pdf-tools][vedang/pdf-tools]]；RSS 订阅用 [[https://github.com/skeeto/elfeed][skeeto/elfeed]] 和 [[https://github.com/karthink/elfeed-tube][karthink/elfeed-tube]]，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
 
 ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
+*** org-latex-preview
+使用 [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本的 org 进行实时预览，配置可以参考 [[https://abode.karthinks.com/org-latex-preview/][=org-latex-preview=: Set up and troubleshooting]]。
 ** Version Control
 #+begin_src shell
 brew install git-delta

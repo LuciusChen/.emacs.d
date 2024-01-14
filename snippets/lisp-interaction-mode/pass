@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: pass
+# key: <pass
+# --
+$1
+URL: $2
+USERNAME: $3

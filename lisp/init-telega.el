@@ -40,7 +40,8 @@
      telega-avatar-workaround-gaps-for '(return t)
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
-     telega-symbol-premium (nerd-icons-faicon "nf-fae-crown" :face 'telega-blue)
+     telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
+     telega-symbol-premium (nerd-icons-mdicon "nf-md-star_check" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
      telega-symbol-checkbox-on (nerd-icons-octicon "nf-oct-checkbox")
      telega-symbol-checkbox-off (nerd-icons-sucicon "nf-seti-checkbox_unchecked")
@@ -48,7 +49,7 @@
      telega-symbol-radiobox-on (nerd-icons-faicon "nf-fa-circle")
      telega-symbol-radiobox-off (nerd-icons-octicon "nf-oct-circle")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
-     telega-symbol-flames (nerd-icons-mdicon "nf-md-fire")
+     telega-symbol-flames (nerd-icons-octicon "nf-oct-trash")
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
      telega-symbol-reply (nerd-icons-faicon "nf-fa-reply")
      telega-symbol-reply-quote (nerd-icons-faicon "nf-fa-reply_all")
