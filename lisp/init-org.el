@@ -122,9 +122,36 @@
 (setup org-latex-preview
   (:option org-latex-preview-process-default 'dvisvgm
            org-latex-preview-numbered t
-           ;; org-latex-preview-live t
-           org-startup-with-latex-preview t)
+           org-latex-preview-live t
+           org-startup-with-latex-preview t
+           org-latex-preview-preamble
+           "\\documentclass{article}
+            [DEFAULT-PACKAGES]
+            [PACKAGES]
+            \\usepackage{xcolor}
+            \\usephysicsmodule{ab,ab.braket,diagmat,xmat}%")
   (:when-loaded
+    ;; hook right arrow with text above and below
+    ;; https://tex.stackexchange.com/questions/186896/xhookrightarrow-and-xmapsto
+    (add-to-list 'org-latex-packages-alist '("" "svg" t))
+    (add-to-list 'org-latex-packages-alist '("" "svg-extract" t))
+    ;;
+    (add-to-list 'org-latex-packages-alist '("" "mathtools" t))
+    (add-to-list 'org-latex-packages-alist '("" "amsmath" t))
+    (add-to-list 'org-latex-packages-alist '("" "amssymb" t))
+    ;; for mapsfrom
+    ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
+    (add-to-list 'org-latex-packages-alist '("" "stmaryrd" t))
+    (add-to-list 'org-latex-packages-alist '("" "mathrsfs" t))
+    (add-to-list 'org-latex-packages-alist '("" "tikz" t))
+    (add-to-list 'org-latex-packages-alist '("" "tikz-cd" t))
+    ;; (add-to-list 'org-latex-packages-alist '("" "quiver" t))
+
+    ;; see https://castel.dev/post/lecture-notes-2/
+    (add-to-list 'org-latex-packages-alist '("" "import" t))
+    (add-to-list 'org-latex-packages-alist '("" "xifthen" t))
+    (add-to-list 'org-latex-packages-alist '("" "pdfpages" t))
+    (add-to-list 'org-latex-packages-alist '("" "transparent" t))
     ;; Increase preview width
     (plist-put org-latex-preview-appearance-options
                :page-width 0.8)
@@ -472,8 +499,8 @@
            org-insert-heading-respect-content t
            org-modern-table-horizontal 0.2
            org-modern-checkbox nil
-           org-modern-list '((43 . "▻")
-                             (45 . "➤"))
+           org-modern-list '((43 . "➢")
+                             (45 . "➣"))
            org-ellipsis "[+]")
   (:when-loaded
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
