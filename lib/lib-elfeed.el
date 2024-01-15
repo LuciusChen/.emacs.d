@@ -26,14 +26,14 @@
   (interactive)
   (with-current-buffer (elfeed-search-buffer)
     (elfeed-save-excursion
-        (let* ((inhibit-read-only t)
-               (standard-output (current-buffer)))
-          (erase-buffer)
-          (eli/elfeed-overview--update-list)
-          (dolist (entry elfeed-search-entries)
-            (funcall elfeed-search-print-entry-function entry)
-            (insert "\n"))
-          (setf elfeed-search-last-update (float-time))))
+     (let* ((inhibit-read-only t)
+            (standard-output (current-buffer)))
+       (erase-buffer)
+       (eli/elfeed-overview--update-list)
+       (dolist (entry elfeed-search-entries)
+         (funcall elfeed-search-print-entry-function entry)
+         (insert "\n"))
+       (setf elfeed-search-last-update (float-time))))
     (when (zerop (buffer-size))
       ;; If nothing changed, force a header line update
       (force-mode-line-update))
@@ -51,11 +51,11 @@
                                       feed))))
              (func (byte-compile (elfeed-search-compile-filter filter))))
         (with-elfeed-db-visit (entry feed)
-            (when (funcall func entry feed count)
-              (setf (cdr tail) (list entry)
-                    tail (cdr tail)
-                    count (1+ count))
-              (elfeed-db-return)))))
+          (when (funcall func entry feed count)
+            (setf (cdr tail) (list entry)
+                  tail (cdr tail)
+                  count (1+ count))
+            (elfeed-db-return)))))
     (let ((entries (cdr head))
           (elfeed-search-sort-function
            (lambda (a b)
@@ -142,6 +142,7 @@
     ("https://rsshub.sheerwill.live/bilibili/user/dynamic/6330633"    bilibili) ;; 小胡仙儿
     ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18202105"   bilibili) ;; 绵羊料理
     ("https://rsshub.sheerwill.live/bilibili/user/dynamic/125526"     bilibili) ;; -LKs-
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/20375812"   bilibili) ;; 博士萌
     ))
 
 (defun nerd-icon-for-tags (tags)
