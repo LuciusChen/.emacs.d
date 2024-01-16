@@ -41,7 +41,7 @@
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
-     telega-symbol-premium (nerd-icons-mdicon "nf-md-star_check" :face 'telega-blue)
+     telega-symbol-premium (nerd-icons-octicon "nf-oct-star_fill" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
      telega-symbol-checkbox-on (nerd-icons-octicon "nf-oct-checkbox")
      telega-symbol-checkbox-off (nerd-icons-sucicon "nf-seti-checkbox_unchecked")
