@@ -170,7 +170,7 @@
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
     all-the-icons-completion
-    pass
+    (password-store :host github :repo "zx2c4/password-store" :files ("contrib/emacs/*.el"))
     (blamer :host github :repo "LuciusChen/blamer.el")
     (emt :host github :repo "roife/emt")
     (dape :host github :repo "LuciusChen/dape")
