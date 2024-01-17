@@ -118,7 +118,8 @@
 
 ;; http://yitang.uk/2024/01/06/gpg-in-emacs-functions-to-decrypt-and-delete-all/
 (defun lucius/gpg--decrypt-recursively (root-dir)
-  "Decrypt all '.gpg' files under ROOT-DIR. Decrypted files have the same filename but without the '.gpg' extension.
+  "Decrypt all '.gpg' files under ROOT-DIR.
+Decrypted files have the same filename but without the '.gpg' extension.
 It stops if the decryption fails."
   (interactive "DDirectory: ")
   (dolist (file (directory-files-recursively root-dir "\\.gpg\\'"))

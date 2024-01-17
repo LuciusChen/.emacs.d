@@ -123,7 +123,7 @@
   (:option org-latex-preview-process-default 'dvisvgm
            org-latex-preview-numbered t
            org-latex-preview-live t
-           org-startup-with-latex-preview t
+           ;; org-startup-with-latex-preview t
            org-latex-preview-preamble
            "\\documentclass{article}
             [DEFAULT-PACKAGES]
