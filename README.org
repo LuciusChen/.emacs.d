@@ -113,8 +113,9 @@ npm install -g typescript-language-server
 - 修改 reactions 图标为字符而非 emoji 以及其颜色
 - 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
 - 去除 ~telega-root~ 顶部空行
-- 修改 code blocks 样式
+- 修改 code blocks 样式，替换 codeblock 符号为 nerd-icons 对应语言的 icons，没有则显示 codeblock 符号。
 - 以上 nerd-icons 修改在终端同样有效
+- 重新排布了 edited-date、消息查看数量、回复数量、转发数量的位置，兼容 =telega-ins--message-date-and-status= 为 =non-nil= 的情况。并且对于消息同一个人发的尽量合并到一个 header 下。
 
 #+CAPTION: telega_collection
 #+ATTR_ORG: :width 600
