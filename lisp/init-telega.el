@@ -30,6 +30,7 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     ;; telega-msg-heading-with-date-and-status t
      ;; telega-debug t
      ;; telega-server-verbosity 4
      ;; adjust the size for sticker
@@ -38,6 +39,7 @@
      telega-sticker-size '(6 . 24)
      ;; avatar
      telega-avatar-workaround-gaps-for '(return t)
+     telega-symbol-codeblock (nerd-icons-devicon "nf-dev-code")
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
