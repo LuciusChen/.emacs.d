@@ -51,7 +51,7 @@
      telega-symbol-radiobox-on (nerd-icons-faicon "nf-fa-circle")
      telega-symbol-radiobox-off (nerd-icons-octicon "nf-oct-circle")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
-     telega-symbol-flames (nerd-icons-octicon "nf-oct-trash")
+     telega-symbol-flames (nerd-icons-mdicon "nf-md-delete_clock")
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
      telega-symbol-reply (nerd-icons-faicon "nf-fa-reply")
      telega-symbol-reply-quote (nerd-icons-faicon "nf-fa-reply_all")
