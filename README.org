@@ -114,8 +114,9 @@ npm install -g typescript-language-server
 - 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
 - 去除 ~telega-root~ 顶部空行
 - 修改 code blocks 样式，替换 codeblock 符号为 nerd-icons 对应语言的 icons，没有则显示 codeblock 符号。
-- 以上 nerd-icons 修改在终端同样有效
 - 重新排布了 edited-date、消息查看数量、回复数量、转发数量的位置，兼容 =telega-ins--message-date-and-status= 为 =non-nil= 的情况。并且对于消息同一个人发的尽量合并到一个 header 下。
+- 由于上一条的改动，多条消息都会在一个 header 下，因此在 no-header 的消息上方增加了 25% 行高的行距。
+- 以上 nerd-icons 修改在终端同样有效
 
 #+CAPTION: telega_collection
 #+ATTR_ORG: :width 600
@@ -127,7 +128,11 @@ npm install -g typescript-language-server
 
 #+CAPTION: SCR-20240103-spxk
 #+ATTR_ORG: :width 800
-[[file:/Users/luciuschen/.emacs.d/assets/SCR-20240103-spxk.png]]
+[[file:/Users/luciuschen/.emacs.d/assets/SCR-20240122-povn.png]]
+
+#+CAPTION: SCR-20240122-ppqy
+#+ATTR_ORG: :width 800
+[[file:/Users/luciuschen/.emacs.d/assets/SCR-20240122-ppqy.png]]
 *** Building TDLib
 
 ~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。
