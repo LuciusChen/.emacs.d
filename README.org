@@ -128,11 +128,11 @@ npm install -g typescript-language-server
 
 #+CAPTION: SCR-20240103-spxk
 #+ATTR_ORG: :width 800
-[[file:/Users/luciuschen/.emacs.d/assets/SCR-20240122-povn.png]]
+[[file:assets/SCR-20240122-povn.png]]
 
 #+CAPTION: SCR-20240122-ppqy
 #+ATTR_ORG: :width 800
-[[file:/Users/luciuschen/.emacs.d/assets/SCR-20240122-ppqy.png]]
+[[file:assets/SCR-20240122-ppqy.png]]
 *** Building TDLib
 
 ~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。
