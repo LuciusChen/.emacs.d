@@ -80,6 +80,7 @@
     (org-babel-do-load-languages
      'org-babel-load-languages '((plantuml . t)
                                  (python . t)
+                                 (shell . t)
                                  (latex . t)))))
 
 (setup org-capture
