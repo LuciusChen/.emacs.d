@@ -128,7 +128,7 @@ npm install -g typescript-language-server
 
 #+CAPTION: SCR-20240123-napd
 #+ATTR_ORG: :width 800
-[[file:assets/SCR-20240123-napd.png]]
+[[file:assets/SCR-20240125-oqao.png]]
 
 #+CAPTION: SCR-20240122-ppqy
 #+ATTR_ORG: :width 800
