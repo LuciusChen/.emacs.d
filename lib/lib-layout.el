@@ -31,9 +31,11 @@
 (defun lucius/tab-bar-tab-name-format-function (tab i)
   (let ((face (funcall tab-bar-tab-face-function tab)))
     (concat
-     (propertize " " 'face face)
+     ;; change tab-bar's height
+     (propertize " " 'display '(raise 0.25))
      (propertize (format "%d:" i) 'face `(:inherit ,face :weight ultra-bold))
-     (propertize (concat " " (alist-get 'name tab) " ") 'face face))))
+     (propertize (concat " " (alist-get 'name tab) " ") 'face face)
+     (propertize " " 'display '(raise -0.25)))))
 ;; telega notification
 (defvar lucius/tab-bar-telega-indicator-cache nil)
 
