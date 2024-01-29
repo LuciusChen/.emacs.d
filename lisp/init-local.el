@@ -133,5 +133,25 @@ e.g. if there's a file foo.tar.gz.gpg, it attempts to remove the foo.tar.gz file
   (interactive "DDirectory: ")
   (dolist (file (directory-files-recursively root-dir "\\.gpg\\'"))
     (delete-file (file-name-sans-extension file))))
+
+(defun z/last-message (&optional num)
+  (or num (setq num 1))
+  (if (= num 0)
+      (current-message)
+    (save-excursion
+      (set-buffer "*Messages*")
+      (save-excursion
+        (forward-line (- 1 num))
+        (backward-char)
+        (let ((end (point)))
+          (forward-line 0)
+          (buffer-substring-no-properties (point) end))))))
+
+(defun z/copy-last-message (&optional num)
+  (interactive "*p")
+  (kill-new (z/last-message num)))
+
+;; also, if want to insert last message after C-x C-e, prefix it with C-u.
+(keymap-global-set "C-h E" 'z/copy-last-message)
 (provide 'init-local)
 ;;; init-local.el ends here

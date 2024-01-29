@@ -35,11 +35,13 @@
      ;; telega-server-verbosity 4
      ;; adjust the size for sticker
      telega-open-file-function 'org-open-file
-     telega-chat-fill-column 80
+     telega-chat-fill-column 90
      telega-sticker-size '(6 . 24)
-     ;; avatar
+     ;; 替代两行头像，防止头像因为字符高度不统一裂开。
      telega-avatar-workaround-gaps-for '(return t)
+     telega-symbol-eye (nerd-icons-faicon "nf-fa-eye")
      telega-symbol-codeblock (nerd-icons-devicon "nf-dev-code")
+     ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)

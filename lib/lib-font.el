@@ -25,9 +25,9 @@
                 'unicode
                 (font-spec :family font
                            :size
-                           (cond ((eq system-type 'darwin) 11.5)
-                                 ((eq system-type 'gnu/linux) 11.5)
-                                 ((eq system-type 'windows-nt) 11.5)))
+                           (cond ((eq system-type 'darwin) 12)
+                                 ((eq system-type 'gnu/linux) 12)
+                                 ((eq system-type 'windows-nt) 12)))
                 nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
