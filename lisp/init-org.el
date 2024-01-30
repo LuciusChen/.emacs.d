@@ -17,6 +17,7 @@
      ;; remove org-src content indent
      org-edit-src-content-indentation 0
      org-src-preserve-indentation nil
+     org-goto-interface 'outline-path-completion
      ;; Various preferences
      org-log-done t
      org-edit-timestamp-down-means-later t
