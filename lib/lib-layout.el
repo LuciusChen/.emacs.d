@@ -46,6 +46,7 @@
                    (buffer-live-p telega-server--buffer))
           (let* ((me-user (telega-user-me 'locally))
                  (online-p (and me-user (telega-user-online-p me-user)))
+                 (keyword-count (length (ring-elements telega--notification-messages-ring)))
                  (unread-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
                  (mentioned-count (apply '+ (mapcar (telega--tl-prop :unread_mention_count)
                                                     (telega-filter-chats telega--ordered-chats '(mention)))))
@@ -53,7 +54,7 @@
                  ;; 此类聊天，例如对频道中的帖子发表评论，或者您进入、写下一些内容然后离开，然后有人做出反应的聊天
                  (reaction-count (apply '+ (mapcar (telega--tl-prop :unread_reaction_count)
                                                    (telega-filter-chats telega--ordered-chats '(and is-known unread-reactions)))))
-                 (notification-count (+ mentioned-count unread-count reaction-count)))
+                 (notification-count (+ mentioned-count unread-count reaction-count keyword-count)))
             (when (> notification-count 0)
               (concat "[" (nerd-icons-faicon "nf-fae-telegram" :face '(:inherit nerd-icons-purple))
                       (when (> unread-count 0)
@@ -65,6 +66,9 @@
                       (when (> reaction-count 0)
                         (propertize (concat " ❤​​​" (number-to-string reaction-count))
                                     'face 'telega-mention-count))
+                      (when (> keyword-count 0)
+                        (propertize (concat " #​​​" (number-to-string keyword-count))
+                                    'face 'telega-unmuted-count))
                       "] "))))))
 
 (defun lucius/tab-bar-telega-icon ()
