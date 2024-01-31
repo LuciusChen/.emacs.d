@@ -35,7 +35,8 @@
   (add-to-list 'auto-mode-alist '("\\.jsp\\'" . my-jsp-mode)))
 
 (setup sly-el-indent
-  (:hooks emacs-lisp-mode-hook sly-el-indent-setup))
+  (:hooks emacs-lisp-mode-hook sly-el-indent-setup
+          emacs-lisp-mode-hook sly-lisp-indent-compatibility-mode))
 
 ;; js
 ;;; Basic js-mode setup
