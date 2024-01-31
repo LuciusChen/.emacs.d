@@ -60,7 +60,8 @@
              ("\\*Telega User\\*$")
              ("\\*Telegram Chat Info\\*$")
              ("\\*Telegram Message Info\\*$")
-             ("\\*Telegram Sticker Set\\*$")))
+             ("\\*Telegram Sticker Set\\*$")
+             ("\\*Telegram Notification Messages\\*$")))
   (popper-mode +1)
   (popper-echo-mode +1)
   ;; HACK: close popper window with `C-g'
@@ -100,6 +101,7 @@
             telega-kill-hook lucius/tab-bar-telega-icon-update)
     (advice-add 'telega--on-updateUnreadChatCount :after #'lucius/tab-bar-telega-icon-update)
     (advice-add 'telega--on-updateChatUnreadMentionCount :after #'lucius/tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'lucius/tab-bar-telega-icon-update)))
+    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'lucius/tab-bar-telega-icon-update)
+    (advice-add 'telega-msg-observable-p :after  #'lucius/tab-bar-telega-icon-update)))
 (provide 'init-layout)
 ;;; init-layout.el ends here

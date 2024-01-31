@@ -25,11 +25,16 @@
                 telega-bridge-bot
                 telega-mnz
                 lib-telega
+                telega-notifications
                 ;; If language-detection is available,
                 ;; then laguage could be detected automatically
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     telega-notifications-mode 1
+     telega-notifications-msg-temex '(and (not outgoing)
+                                      (not (chat (or (type channel))))
+                                      (contains "dape\\|jdtls\\|eglot\\|meow\\|emacs\\|telega\\|[тТ]елег[^р]"))
      ;; telega-msg-heading-with-date-and-status t
      ;; telega-debug t
      ;; telega-server-verbosity 4

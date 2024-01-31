@@ -14,17 +14,23 @@ $ touch private-build-plans.toml
 #+end_src
 
 #+begin_src toml
-[buildPlans.iosevka-lucius]
+[buildPlans.IosevkaLucius]
 family = "Iosevka Lucius"
 spacing = "normal"
 serifs = "sans"
 noCvSs = true
 exportGlyphNames = false
 
-  [buildPlans.iosevka-lucius.variants]
+  [buildPlans.IosevkaLucius.variants]
   inherits = "ss08"
 
-    [buildPlans.iosevka-lucius.variants.design]
+    [buildPlans.IosevkaLucius.variants.design]
+    capital-n = "standard-serifless"
+    dollar = "interrupted"
+    question = "corner-flat-hooked"
+
+    [buildPlans.IosevkaLucius.variants.oblique]
+    capital-n = "standard-serifless"
     dollar = "interrupted"
     question = "corner-flat-hooked"
 #+end_src
@@ -117,6 +123,7 @@ npm install -g typescript-language-server
 - 重新排布了 edited-date、消息查看数量、回复数量、转发数量的位置，兼容 =telega-ins--message-date-and-status= 为 =non-nil= 的情况。并且对于消息同一个人发的尽量合并到一个 header 下。
 - 由于上一条的改动，多条消息都会在一个 header 下，因此在 no-header 的消息上方增加了 25% 行高的行距。
 - 以上 nerd-icons 修改在终端同样有效
+- 去掉 notification 的 dbus 依赖，改为数量显示在 tab-bar 当中，同时被查看过的会从 `telega-notifications-history` 中删除。
 
 #+CAPTION: telega_collection
 #+ATTR_ORG: :width 600
