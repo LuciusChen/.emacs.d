@@ -44,7 +44,7 @@
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
@@ -68,14 +68,14 @@
      (with-temp-file "org-version.el"
        (require 'lisp-mnt)
        (let ((version
-              (with-temp-buffer
-                (insert-file-contents "lisp/org.el")
-                (lm-header "version")))
-             (git-version
-              (string-trim
                (with-temp-buffer
-                 (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
-                 (buffer-string)))))
+                 (insert-file-contents "lisp/org.el")
+                 (lm-header "version")))
+             (git-version
+               (string-trim
+                (with-temp-buffer
+                  (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
+                  (buffer-string)))))
          (insert
           (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
           (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
@@ -183,7 +183,7 @@
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "LuciusChen/telega.el")
     (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
-    (sly-el-indent :host github :repo "cireu/sly-el-indent" :files ("*.el" "lib"))
+    (sly-el-indent :host github :repo "LuciusChen/sly-el-indent" :files ("*.el" "lib"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     ))
 

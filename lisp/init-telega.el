@@ -17,6 +17,7 @@
   (:when-loaded
     (:bind-into telega-prefix-map
       "p" telega-chatbuf-filter-search
+      "h" telega-notifications-history
       "x" telega-chatbuf-thread-cancel)
     (:bind-into telega-msg-button-map
       "C" lucius/telega-save-file-to-clipboard
