@@ -370,6 +370,7 @@
            "C-c e j" journal-transient)
   (:when-loaded
     (:also-load lib-transient)
+    (:option transient-semantic-coloring t)
     (transient-define-prefix  agenda-transient ()
       "Agenda menu"
       :info-manual "Agenda menu"
