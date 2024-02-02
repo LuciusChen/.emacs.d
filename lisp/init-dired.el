@@ -5,12 +5,9 @@
   (:bind-into ctl-x-map "\C-j" 'dired-jump)
   (:bind-into ctl-x-4-map "\C-j" 'dired-jump-other-window)
   (:option dired-recursive-deletes 'top
-           dired-listing-switches "-alGhv --group-directories-first"
            dired-dwim-target t
            dired-recursive-copies 'always
            dired-kill-when-opening-new-dired-buffer t)
-  ;; (:also-load dired-x)
-  ;; (:also-load nerd-icons-dired)
   (setq-default dired-dwim-target t)
   ;; Prefer g-prefixed coreutils version of standard utilities when available
   (let ((gls (executable-find "gls")))
