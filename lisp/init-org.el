@@ -65,6 +65,7 @@
     ;; only hook in org-mode
     (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
             org-mode-hook org-indent-mode
+            org-mode-hook (lambda () (setq truncate-lines nil))
             org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 

@@ -116,7 +116,8 @@
     (:with-mode telega-root-mode (:hook lg-telega-root-mode))
     (:with-mode telega-chat-mode
       (:require company)
-      (:hook lucius/telega-completion-setup))
+      (:hook lucius/telega-completion-setup)
+      (:hook (lambda () (electric-pair-local-mode -1))))
     (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
