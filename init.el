@@ -111,6 +111,7 @@
     scratch
     diff-hl
     company
+    rainbow-mode
     flymake
     web-mode
     js2-mode
