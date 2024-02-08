@@ -155,11 +155,10 @@ e.g. if there's a file foo.tar.gz.gpg, it attempts to remove the foo.tar.gz file
 (keymap-global-set "C-h E" 'z/copy-last-message)
 
 (setup magit-gptcommit
-  (:after magit)
-  (magit-gptcommit-mode 1)
+  (:after magit
+    (magit-gptcommit-mode 1)
+    (magit-gptcommit-status-buffer-setup))
   (:when-loaded
-    (:bind-into git-commit-mode-map
-      "C-x C-g" . magit-gptcommit-commit-accept)
-    (magit-gptcommit-status-buffer-setup)))
+    (:global "C-c C-g" magit-gptcommit-commit-accept)))
 (provide 'init-local)
 ;;; init-local.el ends here
