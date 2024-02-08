@@ -153,5 +153,12 @@ e.g. if there's a file foo.tar.gz.gpg, it attempts to remove the foo.tar.gz file
 
 ;; also, if want to insert last message after C-x C-e, prefix it with C-u.
 (keymap-global-set "C-h E" 'z/copy-last-message)
+
+(setup magit-gptcommit
+  (:after magit)
+  (:option magit-gptcommit-mode 1)
+  (magit-gptcommit-status-buffer-setup)
+  (:bind-into git-commit-mode-map
+    "C-c C-g" . magit-gptcommit-commit-accept))
 (provide 'init-local)
 ;;; init-local.el ends here

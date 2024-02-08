@@ -180,6 +180,7 @@
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (anki-editor :host github :repo "LuciusChen/anki-editor")
     (eglot-hierarchy :host github :repo "dolmens/eglot-hierarchy")
+    (magit-gptcommit :host github :repo "douo/magit-gptcommit")
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "LuciusChen/telega.el")
     (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
