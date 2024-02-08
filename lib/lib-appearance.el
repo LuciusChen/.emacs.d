@@ -23,28 +23,6 @@
 (defvar light-theme nil "The light theme.")
 (defvar dark-theme nil "The dark theme.")
 
-(defun light ()
-  "Activate a light color theme."
-  (interactive)
-  (when custom-enabled-themes
-    (disable-theme (car custom-enabled-themes)))
-  (setq custom-enabled-themes (list light-theme))
-  (reapply-themes)
-  (set-dividers-and-fringe-color))
-
-(defun dark ()
-  "Activate a dark color theme."
-  (interactive)
-  (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes (list dark-theme))
-  (reapply-themes)
-  (set-dividers-and-fringe-color))
-
-(defun lucius/maybe-suspend-frame ()
-  (interactive)
-  (unless (and *IS-MAC* window-system)
-    (suspend-frame)))
-
 (defun lucius/adjust-opacity (frame incr)
   "Adjust the background opacity of FRAME by increment INCR."
   (unless (display-graphic-p frame)
@@ -56,5 +34,29 @@
          (newalpha (+ incr oldalpha)))
     (when (and (<= frame-alpha-lower-limit newalpha) (>= 100 newalpha))
       (modify-frame-parameters frame (list (cons 'alpha-background newalpha))))))
+
+(defun light ()
+  "Activate a light color theme."
+  (interactive)
+  (when custom-enabled-themes
+    (disable-theme (car custom-enabled-themes)))
+  (setq custom-enabled-themes (list light-theme))
+  (reapply-themes)
+  (set-dividers-and-fringe-color)
+  (lucius/adjust-opacity (selected-frame) +40))
+
+(defun dark ()
+  "Activate a dark color theme."
+  (interactive)
+  (disable-theme (car custom-enabled-themes))
+  (setq custom-enabled-themes (list dark-theme))
+  (reapply-themes)
+  (set-dividers-and-fringe-color)
+  (lucius/adjust-opacity (selected-frame) -40))
+
+(defun lucius/maybe-suspend-frame ()
+  (interactive)
+  (unless (and *IS-MAC* window-system)
+    (suspend-frame)))
 (provide 'lib-appearance)
 ;;; lib-appearance.el ends here

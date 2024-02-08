@@ -156,9 +156,10 @@ e.g. if there's a file foo.tar.gz.gpg, it attempts to remove the foo.tar.gz file
 
 (setup magit-gptcommit
   (:after magit)
-  (:option magit-gptcommit-mode 1)
-  (magit-gptcommit-status-buffer-setup)
-  (:bind-into git-commit-mode-map
-    "C-c C-g" . magit-gptcommit-commit-accept))
+  (magit-gptcommit-mode 1)
+  (:when-loaded
+    (:bind-into git-commit-mode-map
+      "C-x C-g" . magit-gptcommit-commit-accept)
+    (magit-gptcommit-status-buffer-setup)))
 (provide 'init-local)
 ;;; init-local.el ends here
