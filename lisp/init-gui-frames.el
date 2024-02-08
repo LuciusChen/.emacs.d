@@ -27,6 +27,7 @@
     (add-to-list 'initial-frame-alist no-border))
 
   ;; 调整背景透明度（假透明）
+  (add-hook 'after-init-hook (lambda()(lucius/adjust-opacity (selected-frame) -40)))
   (global-set-key (kbd "M-C-8") (lambda () (interactive) (lucius/adjust-opacity nil -2)))
   (global-set-key (kbd "M-C-7") (lambda () (interactive) (lucius/adjust-opacity nil 2)))
 
