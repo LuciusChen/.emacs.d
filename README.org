@@ -69,6 +69,10 @@ npm run build -- ttf::iosevka-lucius
 需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。
 ** Themes
 [[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]
+
+透明以及毛玻璃效果可以参考下面两个 patch
+- [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]]
+- [[https://github.com/jaaasonSun/homebrew-emacs-plus/blob/master/patches/emacs-29/blur.patch]]
 ** .authinfo
 #+begin_example
 machine api.openai.com login apikey password ****

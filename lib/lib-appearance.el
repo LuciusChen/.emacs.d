@@ -52,7 +52,7 @@
   (setq custom-enabled-themes (list dark-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (lucius/adjust-opacity (selected-frame) -40))
+  (lucius/adjust-opacity (selected-frame) -60))
 
 (defun lucius/maybe-suspend-frame ()
   (interactive)
