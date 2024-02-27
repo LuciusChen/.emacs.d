@@ -170,7 +170,7 @@ ls -l /usr/local
 #+begin_src shell
 git clone https://github.com/zevlg/tgs2png.git
 git submodule init
-git submodule update
+git submodule update --init --recursive
 mkdir build
 cd build
 cmake ..
@@ -178,7 +178,7 @@ make
 copy tgs2png somewhere into $PATH
 #+end_src
 
-这里我编译完就已经是可用的了。
+可以 =C-h v= 查看 =exec-path= 变量的值，将 tsg2png 复制到对应的路径即可。
 *** contrib 中的插件。
 **** telega-url-shorten
 原先插件的做法是针对每个网站的 URL 进行适配，并且配上与之相应的 icons，并不能完全满足所有 URL 缩短的目的，所以这里用 =^\\(https?://\\)\\(.\\{55\\}\\).*?$= 正则处理所有的 URL，超过一定长度后省略。
