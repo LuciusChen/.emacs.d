@@ -66,7 +66,7 @@ npm run build -- ttf::iosevka-lucius
 |------------------------+------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+---------------+--------|
 
 *** 特殊字体
-需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。
+需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。（由于 Symbola 和 nerd-icons 所需字体有一些重复，所以需要先安装 Symbola 再安装 nerd-icons 所需字体。）
 ** Themes
 [[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]
 
