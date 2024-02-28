@@ -91,6 +91,8 @@ Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获
 ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
 *** org-latex-preview
 使用 [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本的 org 进行实时预览，配置可以参考 [[https://abode.karthinks.com/org-latex-preview/][=org-latex-preview=: Set up and troubleshooting]]。
+
+如果用 Homebrew 安装的 texlive，dvisvgm 包含在 texlive 当中，从 =/Library/TeX/texbin/= 复制到 =/opt/homebrew/bin/= 就可以了。
 ** Version Control
 #+begin_src shell
 brew install git-delta
@@ -178,7 +180,7 @@ make
 copy tgs2png somewhere into $PATH
 #+end_src
 
-可以 =C-h v= 查看 =exec-path= 变量的值，将 tsg2png 复制到对应的路径即可。
+可以 =C-h v= 查看 =exec-path= 变量的值，将 tsg2png 复制到对应的路径即可。另外针对 video stickers 需要 =brew install ffmpeg= 才可以播放。
 *** contrib 中的插件。
 **** telega-url-shorten
 原先插件的做法是针对每个网站的 URL 进行适配，并且配上与之相应的 icons，并不能完全满足所有 URL 缩短的目的，所以这里用 =^\\(https?://\\)\\(.\\{55\\}\\).*?$= 正则处理所有的 URL，超过一定长度后省略。
