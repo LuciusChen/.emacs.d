@@ -170,7 +170,6 @@
     nerd-icons-completion
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
-    all-the-icons-completion
     password-store-otp
     password-store
     (blamer :host github :repo "LuciusChen/blamer.el")
