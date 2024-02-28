@@ -78,6 +78,7 @@
            embark-help-key "?"))
 
 (setup affe
+  ;; brew install ripgrep
   (when (executable-find "rg")
     (:autoload lucius/affe-grep-at-point)
     (:global "C-c f"  lucius/affe-grep-at-point)
