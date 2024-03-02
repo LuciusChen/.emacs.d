@@ -36,7 +36,7 @@
      org-refile-allow-creating-parent-nodes 'confirm
      ;; Targets start with the file name - allows creating level 1 tasks
      ;; org-refile-use-outline-path (quote file))
-     org-refile-use-outline-path t
+     org-refile-use-outline-path 'file
      org-outline-path-complete-in-steps nil
      ;; archive
      org-archive-mark-done nil

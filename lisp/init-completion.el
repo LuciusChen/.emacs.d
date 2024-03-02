@@ -80,13 +80,30 @@
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
+;; 手动触发 eldoc
+(use-package eldoc
+  :bind (("C-h ." . eldoc))
+  :config
+  (setq eldoc-echo-area-display-truncation-message t
+        eldoc-echo-area-prefer-doc-buffer t
+        eldoc-echo-area-use-multiline-p nil
+        eglot-extend-to-xref t))
+
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 (setup eglot
   (:also-load lib-eglot)
   (:with-mode (python-mode java-ts-mode typescript-mode)
     (:hook eglot-ensure))
-  (:option eglot-events-buffer-size 0)
+  ;; 关闭 eldoc_mode
+  (:with-mode eglot-managed-mode
+    (:hook (lambda () ((when (eglot-managed-p)
+                         (eldoc-mode -1))))))
+  (:option eglot-events-buffer-size 0
+           ;; 取消 eglot log
+           eglot-events-buffer-config '(:size 0 :format full))
   (:when-loaded
+    ;; 关闭 flymake
+    (add-to-list 'eglot-stay-out-of 'flymake)
     ;; Java $brew install jdtls
     ;; Python $pip3 install pyright
     (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
