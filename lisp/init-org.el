@@ -367,6 +367,7 @@
       (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
 
 (setup transient
+  (:defer (require 'transient))
   (:global "C-c e a" agenda-transient
            "C-c e j" journal-transient)
   (:when-loaded

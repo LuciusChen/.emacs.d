@@ -43,7 +43,8 @@
   (setq custom-enabled-themes (list light-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (lucius/adjust-opacity (selected-frame) +40))
+  (when window-system
+    (lucius/adjust-opacity (selected-frame) +40)))
 
 (defun dark ()
   "Activate a dark color theme."
@@ -52,7 +53,8 @@
   (setq custom-enabled-themes (list dark-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (lucius/adjust-opacity (selected-frame) -40))
+  (when window-system
+    (lucius/adjust-opacity (selected-frame) -40)))
 
 (defun lucius/maybe-suspend-frame ()
   (interactive)
