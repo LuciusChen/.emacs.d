@@ -23,5 +23,13 @@
    nil))
 
 (transient-append-suffix 'magit-log "s" '("d" "dangling" magit-log-dangling))
+
+(defun magit-fullscreen (orig-fun &rest args)
+  (window-configuration-to-register :magit-fullscreen)
+  (apply orig-fun args)
+  (delete-other-windows))
+
+(defun magit-restore-screen (&rest args)
+  (jump-to-register :magit-fullscreen))
 (provide 'lib-vc)
 ;;; lib-vc.el ends here

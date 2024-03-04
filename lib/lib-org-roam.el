@@ -113,7 +113,7 @@ TEMPLATE is the processed template used to format the entry."
 
   Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
   (interactive)
-  (org-transclusion-mode 1)
+  ;; (org-transclusion-mode 1)
   (let* ((org-files-root-dir (or org-files-root-dir default-directory))
          (dont-recurse (or dont-recurse (and current-prefix-arg t)))
          (search-path (file-name-as-directory (expand-file-name org-files-root-dir)))
@@ -134,7 +134,7 @@ TEMPLATE is the processed template used to format the entry."
             (message (format "[ox-hugo/export-all file %d/%d] Exporting %s" cnt num-files org-file))
             (org-hugo-export-wim-to-md :all-subtrees)
             (setq cnt (1+ cnt))))
-        (org-transclusion-mode -1)
+        ;; (org-transclusion-mode -1)
         (message "Done!")))))
 
 (defun lucius/org-refile-anywhere (&optional goto default-buffer rfloc msg)
