@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: mathjax
+# key: <mathjax
+# --
+#+HUGO_CUSTOM_FRONT_MATTER: :mathjax true

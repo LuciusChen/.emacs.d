@@ -9,7 +9,7 @@ Iosevka 设计之初就是和大部分 CJK 字体等高，1:2 的比例，可以
 #+begin_src shell
 $ brew install ttfautohint
 $ cd Iosevka
-$ npm install
+$ pnpm install
 $ touch private-build-plans.toml
 #+end_src
 
@@ -36,7 +36,7 @@ exportGlyphNames = false
 #+end_src
 
 #+begin_src shell
-npm run build -- ttf::iosevka-lucius
+pnpm run build -- ttf::IosevkaLucius
 #+end_src
 
 和 Iosevka 等高的中文字体目前有：霞鹜文楷、仓耳今楷。

@@ -3,8 +3,7 @@
   '(consult-line
     consult-outline
     consult-git-grep
-    consult-ripgrep
-    my-search-with-chrome))
+    consult-ripgrep))
 
 (defvar mcfly-back-commands
   '(self-insert-command

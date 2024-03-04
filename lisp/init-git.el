@@ -19,13 +19,11 @@
     (:global [(meta f12)] magit-status
              "C-x g" magit-status
              "C-x M-g" magit-dispatch)
+    (:advice magit-status :around #'magit-fullscreen)
+    (:advice magit-mode-quit-window :after #'magit-restore-screen)
     (setq-default magit-diff-refine-hunk t)
     (when *IS-MAC*
       (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))))
-
-(setup fullframe
-  (:load-after magit)
-  (:when-loaded (fullframe magit-status magit-mode-quit-window)))
 
 (setup git-commit
   (:with-mode git-commit-mode

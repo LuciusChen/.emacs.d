@@ -45,10 +45,7 @@
   (:global "C-~"   popper-toggle
            "M-~"   popper-cycle
            "C-M-`" popper-toggle-type)
-  (:option popper-window-height (lambda (win)
-                                  (fit-window-to-buffer
-                                   win
-                                   (floor (frame-height) 2)))
+  (:option popper-window-height 15
            popper-reference-buffers
            '(("\\*Messages\\*"
               "Output\\*$"

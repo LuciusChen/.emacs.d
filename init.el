@@ -122,7 +122,6 @@
     webpaste
     apheleia
     pdf-tools
-    fullframe
     ox-pandoc
     macrostep
     json-mode
