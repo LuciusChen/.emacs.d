@@ -31,11 +31,7 @@
  ;; 将阈值设置为 4 表示只有当需要补全的字符数大于4时才会执行循环补全
  completion-cycle-threshold 4
  global-auto-revert-non-file-buffers t
- auto-revert-verbose nil
- ;; recentf
- recentf-max-saved-items 1000
- recentf-exclude `("/tmp/" "/ssh:" ,(concat package-user-dir "/.*-autoloads\\.el\\'"))
- )
+ auto-revert-verbose nil)
 
 ;; 启动时间、加载包数量以及 gc 次数
 (add-hook 'emacs-startup-hook
@@ -63,12 +59,30 @@
                                         straight--profile-cache)))
                        "\n\n")))))
 
-(add-hook 'after-init-hook 'recentf-mode)
 (add-hook 'after-init-hook 'delete-selection-mode)
 (add-hook 'after-init-hook 'global-auto-revert-mode)
 (add-hook 'after-init-hook 'savehist-mode)
 (add-hook 'after-init-hook 'transient-mark-mode)
 (add-hook 'after-init-hook 'electric-pair-mode)
+
+(setup recentf
+  (:hooks after-init-hook recentf-mode)
+  (:when-loaded
+    (:option recentf-auto-cleanup 'never
+             recentf-max-saved-items 200
+             recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                                   "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                                   "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                                   (lambda (file) (file-in-directory-p file package-user-dir))
+                                   (expand-file-name recentf-save-file))
+             recentf-keep nil)
+    ;; Add dired directories to recentf file list.
+    (:with-mode dired-mode
+      (:hook (lambda () ((recentf-add-file default-directory)))))
+    (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
+    ;; HACK: Text properties inflate the size of recentf's files, and there is
+    ;; no purpose in persisting them (Must be first in the list!)
+    (add-to-list 'recentf-filename-handlers #'substring-no-properties)))
 
 ;; Better fringe symbol
 (define-fringe-bitmap 'right-curly-arrow
