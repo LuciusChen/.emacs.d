@@ -63,10 +63,11 @@
     (:also-load lib-org)
     (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     ;; only hook in org-mode
-    (:hooks org-mode-hook (lambda () (electric-pair-local-mode -1))
-            org-mode-hook org-indent-mode
-            org-mode-hook (lambda () (setq truncate-lines nil))
-            org-after-todo-state-change-hook log-todo-next-creation-date
+    (:with-mode org-mode
+      (:hook (lambda () (electric-pair-local-mode -1)))
+      (:hook org-indent-mode)
+      (:hook (lambda () (setq truncate-lines nil))))
+    (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
 (setup ob-core
@@ -132,7 +133,8 @@
             [DEFAULT-PACKAGES]
             [PACKAGES]
             \\usepackage{xcolor}
-            \\usephysicsmodule{ab,ab.braket,diagmat,xmat}%"
+            \\usephysicsmodule{ab,ab.braket,diagmat,xmat}%
+            \\DeclareUnicodeCharacter{2212}{-}"
            org-latex-packages-alist '(;; hook right arrow with text above and below
                                       ;; https://tex.stackexchange.com/questions/186896/xhookrightarrow-and-xmapsto
                                       ("" "svg" t)
@@ -152,7 +154,13 @@
                                       ("" "import" t)
                                       ("" "xifthen" t)
                                       ("" "pdfpages" t)
-                                      ("" "transparent" t)))
+                                      ("" "transparent" t)
+                                      ;; algorithm
+                                      ;; https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused
+                                      ("ruled,linesnumbered" "algorithm2e" t)
+                                      ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
+                                      ;; ("" "algpseudocode" t)
+                                      ))
   (:when-loaded
     ;; Increase preview width
     (plist-put org-latex-preview-appearance-options
