@@ -93,6 +93,14 @@ ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gpte
 使用 [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本的 org 进行实时预览，配置可以参考 [[https://abode.karthinks.com/org-latex-preview/][=org-latex-preview=: Set up and troubleshooting]]。
 
 如果用 Homebrew 安装的 texlive，dvisvgm 包含在 texlive 当中，从 =/Library/TeX/texbin/= 复制到 =/opt/homebrew/bin/= 就可以了。
+
+对于有 mathjax 不支持显示的文章可以通过头部添加 =#+OPTIONS: tex:dvisvgm= 来将内容都以图片的形式导出嵌入文章中。若是出现图片偏离文本基线的问题，很可能是 Hugo 主题中定义了 =img= 标签的 =margin= 属性，比如正在用的 [[https://github.com/reorx/hugo-PaperModX/][reorx/hugo-PaperModX]] 主题中就定义了，覆盖就好。
+
+#+begin_src css
+img.org-latex.org-latex-inline.medium-zoom-image {
+    margin: 0.25em;
+}
+#+end_src
 ** Version Control
 #+begin_src shell
 brew install git-delta

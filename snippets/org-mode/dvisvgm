@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: dvisvgm
+# key: <dvi
+# --
+#+OPTIONS: tex:dvisvgm
