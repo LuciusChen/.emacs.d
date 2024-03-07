@@ -69,7 +69,7 @@
   (:hooks after-init-hook recentf-mode)
   (:when-loaded
     (:option recentf-auto-cleanup 'never
-             recentf-max-saved-items 200
+             recentf-max-saved-items 100
              recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
                                    "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
                                    "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
@@ -78,7 +78,7 @@
              recentf-keep nil)
     ;; Add dired directories to recentf file list.
     (:with-mode dired-mode
-      (:hook (lambda () ((recentf-add-file default-directory)))))
+      (:hook (lambda () (recentf-add-file default-directory))))
     (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
     ;; HACK: Text properties inflate the size of recentf's files, and there is
     ;; no purpose in persisting them (Must be first in the list!)

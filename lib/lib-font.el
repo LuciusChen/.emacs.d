@@ -19,21 +19,21 @@
                          "Noto Emoji"
                          "Segoe UI Emoji"
                          "Symbola")
-        when (find-font (font-spec :name font))
-        return (set-fontset-font
-                t
-                'unicode
-                (font-spec :family font
-                           :size
-                           (cond ((eq system-type 'darwin) 12)
-                                 ((eq system-type 'gnu/linux) 12)
-                                 ((eq system-type 'windows-nt) 12)))
-                nil 'prepend))
+           when (find-font (font-spec :name font))
+             return (set-fontset-font
+                     t
+                     'unicode
+                     (font-spec :family font
+                                :size
+                                (cond ((eq system-type 'darwin) 12)
+                                      ((eq system-type 'gnu/linux) 12)
+                                      ((eq system-type 'windows-nt) 12)))
+                     nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
-                      (font-spec :family "TsangerJinKai02")))
+                      (font-spec :family "LXGW WenKai Screen")))
   ;; Setting fall-back fonts
   ;; https://idiocy.org/emacs-fonts-and-fontsets.html
   (dolist (font '("Jigmo" "Jigmo2" "Jigmo3"))
