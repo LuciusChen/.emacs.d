@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: svg-babel-header
+# key: <svg
+# --
+:results file raw :file assets/$0.svg
