@@ -57,7 +57,9 @@
 
 ;; install packages
 (defvar *use-package-list*
-  '((org
+  '(
+    ;; https://github.com/tecosaur/org-latex-preview-todos
+    (org
      :fork (:host nil
             :repo "https://git.tecosaur.net/tec/org-mode.git"
             :branch "dev"
@@ -211,7 +213,6 @@
 ;; (require 'init-rime)
 
 (require 'init-org)
-;; (require 'init-latex)
 (require 'init-local)
 (provide 'init)
 ;; Local Variables:

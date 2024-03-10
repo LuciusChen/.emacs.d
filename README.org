@@ -40,10 +40,8 @@ pnpm run build -- ttf::IosevkaLucius
 #+end_src
 
 和 Iosevka 等高的中文字体目前有：霞鹜文楷、仓耳今楷。
-*** [[http://tsanger.cn/product?keyword=%E4%BB%8A%E6%A5%B7][仓耳今楷]]
-目前选用的是 02W04，这个系列的字体前面的序号越大越圆润，从接近宋体到接近楷体；W 开头的序号代表字重，04 的字重是和 Iosevka 的 normal 相近。相对于「霞鹜文楷」，「仓耳今楷」的笔画更加紧凑，显得更加正式。
-
-「仓耳今楷」不属于大字符集字体，因此需要设置对应的 fall-back 字体，我选择的是「[[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]]」字体。
+*** [[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]
+「霞鹜文楷」不属于大字符集字体，因此需要设置对应的 fall-back 字体，我选择的是「[[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]]」字体。
 
 |------------------------+------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+---------------+--------|
 |                        | CJK        | CJK-A        | CJK-B         | CJK-C         |         CJK-D | CJK-E         | CJK-F         | CJK-G         | CJK-H         | 合计   |
@@ -68,7 +66,7 @@ pnpm run build -- ttf::IosevkaLucius
 *** 特殊字体
 需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。（由于 Symbola 和 nerd-icons 所需字体有一些重复，所以需要先安装 Symbola 再安装 nerd-icons 所需字体。）
 ** Themes
-[[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]
+[[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]，颜色方案参考了 [[tailwind-colors]]。
 
 透明以及毛玻璃效果可以参考下面两个 patch
 - [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]]
@@ -101,11 +99,27 @@ img.org-latex.org-latex-inline.medium-zoom-image {
     margin: 0.25em;
 }
 #+end_src
-** Version Control
-#+begin_src shell
-brew install git-delta
+
+但是上述这种对于一些 MathJax 支持的公式也会以图片的形式导出，因此算不上最好的方式。完美的方式通过 org-babel 导出 svg，其他的继续用 MathJax 渲染。
+
+#+header: :headers '("\\usepackage[ruled, linesnumbered]{algorithm2e}")
+#+begin_src latex :results file raw :file assets/lamport-clocks-algorithm.svg
+\begin{algorithm}[H]
+\renewcommand{\thealgocf}{}
+\SetKwProg{FnOn}{on}{ do}{end}
+\caption{Lamport clocks algorithm}
+\FnOn{\textsf{\upshape initialisation}}
+{$t := 0$ \tcp*{each node has its own local variable t}}
+\FnOn{\textsf{\upshape any event occurring at the local node}}
+{$t := t + 1$}
+\FnOn{\textsf{\upshape request to send message $m$}}
+{$t := t + 1$\;
+\textsf{\upshape send $(t, m)$ via the underlying network link}}
+\FnOn{\textsf{\upshape receiving $(t', m)$ via the underlying network link}}
+{$t := \max(t, t') + 1$\;
+\textsf{\upshape deliver $m$ to the application}}
+\end{algorithm}
 #+end_src
-[[https://github.com/dandavison/magit-delta][dandavison/magit-delta]] 可以增强 magit 的 diff 功能，具体到 word 级别。
 ** Program
 #+begin_src shell
 # java
@@ -155,7 +169,6 @@ npm install -g typescript-language-server
 #+ATTR_ORG: :width 800
 [[file:assets/SCR-20240122-ppqy.png]]
 *** Building TDLib
-
 ~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。
 
 #+begin_src shell
@@ -176,7 +189,6 @@ ls -l /usr/local
 
 如果报错 ~"user-error: TDLib is not installed into "/usr/local". Set ‘telega-server-libs-prefix’ to the TDLib installion path"~​，则可以通过 ~M-: (setq telega-server-libs-prefix “/path/to/tdlib/install/path”) RET~ 然后 ~M-x telega-server-build RET~ 重新构建。
 *** Animated Stickers
-
 #+begin_src shell
 git clone https://github.com/zevlg/tgs2png.git
 git submodule init
@@ -199,8 +211,6 @@ copy tgs2png somewhere into $PATH
 [[file:assets/telega-bridge-bot.png]]
 *** telega-mnz
 高亮消息中的代码块
-*** Adjust the ascent to avoid gaps between slices.
-
 *** Frequent Shortcuts
 | =C-u C-c C-k= | 取消回复和附带的文件，不保留所输入文字（用得最多）        |
 | =C-c C-k=     | 取消回复和附带的文件，但保留所输入文字（不用 只用上面↑） |

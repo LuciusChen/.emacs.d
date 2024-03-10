@@ -17,6 +17,14 @@
   (:advice pp-display-expression :after lucius/make-read-only)
   (:hooks emacs-lisp-mode-hook lucius/maybe-set-bundled-elisp-readonly))
 
+;; xml format
+;; M-: (execute-kbd-macro (kbd "M-% > < RET > C-q C-j < RET ! C-M-\\"))
+(defun +xml-format ()
+  "XML formating"
+  (interactive)
+  (save-excursion
+    (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
+
 (setup web-mode
   (:option web-mode-markup-indent-offset 2
            web-mode-code-indent-offset 2)
