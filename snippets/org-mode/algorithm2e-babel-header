@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: algorithm2e-babel-header
+# key: <algo2e
+# --
+#+header: :headers '("\\\\usepackage[ruled, linesnumbered]{algorithm2e}")
