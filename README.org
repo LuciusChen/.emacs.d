@@ -7,10 +7,10 @@ Iosevka 设计之初就是和大部分 CJK 字体等高，1:2 的比例，可以
 可以根据 [[https://typeof.net/Iosevka/customizer][Iosevka Customizer]] 进行自定义，将 [[https://typeof.net/Iosevka/customizer][Iosevka Customizer]] 中的自定义配置粘贴在 =private-build-plans.toml= 中即可。
 
 #+begin_src shell
-$ brew install ttfautohint
-$ cd Iosevka
-$ pnpm install
-$ touch private-build-plans.toml
+brew install ttfautohint
+cd Iosevka
+pnpm install
+touch private-build-plans.toml
 #+end_src
 
 #+begin_src toml
@@ -66,7 +66,7 @@ pnpm run build -- ttf::IosevkaLucius
 *** 特殊字体
 需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。（由于 Symbola 和 nerd-icons 所需字体有一些重复，所以需要先安装 Symbola 再安装 nerd-icons 所需字体。）
 ** Themes
-[[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]，颜色方案参考了 [[tailwind-colors]]。
+[[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]，颜色方案参考了 [[https://uicolors.app/browse/tailwind-colors][tailwind-colors]]。
 
 透明以及毛玻璃效果可以参考下面两个 patch
 - [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]]
@@ -100,24 +100,21 @@ img.org-latex.org-latex-inline.medium-zoom-image {
 }
 #+end_src
 
-但是上述这种对于一些 MathJax 支持的公式也会以图片的形式导出，因此算不上最好的方式。完美的方式通过 org-babel 导出 svg，其他的继续用 MathJax 渲染。
+但是上述这种对于一些 MathJax 支持的公式也会以图片的形式导出，算不上最好的方式。完美的方式通过 org-babel 导出 svg，其他的继续用 MathJax 渲染。
 
 #+header: :headers '("\\usepackage[ruled, linesnumbered]{algorithm2e}")
 #+begin_src latex :results file raw :file assets/lamport-clocks-algorithm.svg
 \begin{algorithm}[H]
-\renewcommand{\thealgocf}{}
-\SetKwProg{FnOn}{on}{ do}{end}
-\caption{Lamport clocks algorithm}
-\FnOn{\textsf{\upshape initialisation}}
-{$t := 0$ \tcp*{each node has its own local variable t}}
-\FnOn{\textsf{\upshape any event occurring at the local node}}
-{$t := t + 1$}
-\FnOn{\textsf{\upshape request to send message $m$}}
-{$t := t + 1$\;
-\textsf{\upshape send $(t, m)$ via the underlying network link}}
-\FnOn{\textsf{\upshape receiving $(t', m)$ via the underlying network link}}
-{$t := \max(t, t') + 1$\;
-\textsf{\upshape deliver $m$ to the application}}
+  \renewcommand{\thealgocf}{} \SetKwProg{FnOn}{on}{ do}{end}
+  \caption{Lamport clocks algorithm}
+  \FnOn{\textsf{\upshape initialisation}} {$t := 0$ \tcp*{each node
+      has its own local variable t}} \FnOn{\textsf{\upshape any event
+      occurring at the local node}} {$t := t + 1$}
+  \FnOn{\textsf{\upshape request to send message $m$}} {$t := t + 1$\;
+    \textsf{\upshape send $(t, m)$ via the underlying network link}}
+  \FnOn{\textsf{\upshape receiving $(t', m)$ via the underlying
+      network link}} {$t := \max(t, t') + 1$\; \textsf{\upshape
+      deliver $m$ to the application}}
 \end{algorithm}
 #+end_src
 ** Program

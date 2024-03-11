@@ -70,15 +70,6 @@
     (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
-(setup ox-latex
-  (:load-after org)
-  (:option
-   org-latex-listings 'minted
-   org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f -output-directory=%o %f")
-   org-preview-latex-default-process 'dvisvgm)
-  (:when-loaded
-    (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
-
 (setup ob-core
   (:after org)
   (:when-loaded
@@ -88,10 +79,7 @@
     (:option      org-plantuml-jar-path
                   (expand-file-name "~/Library/CloudStorage/Dropbox/org/plantuml/plantuml.jar")
                   ;; 这里应该就是 .zshrc 里面配置的 python3
-                  org-babel-python-command "python3"
-                  ;; org-babel-latex-preamble (lambda (_)
-                  ;;                            "\\documentclass{standalone}")
-                  )
+                  org-babel-python-command "python3")
     (org-babel-do-load-languages
      'org-babel-load-languages '((plantuml . t)
                                  (python . t)
@@ -134,6 +122,18 @@
               org-clock-in-hook lucius/clock-in-with-auto-next
               org-after-todo-state-change-hook lucius/done-with-auto-clock-out))
     (:after org (org-clock-persistence-insinuate))))
+
+(setup ox-latex
+  (:load-after org)
+  (:option
+   org-latex-listings 'minted
+   org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f -output-directory=%o %f")
+   org-preview-latex-default-process 'dvisvgm)
+  (:when-loaded
+    (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
+
+(setup auctex
+  (require 'latex))
 
 (setup org-latex-preview
   (:option org-latex-preview-process-default 'dvisvgm

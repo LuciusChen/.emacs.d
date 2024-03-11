@@ -153,5 +153,12 @@ e.g. if there's a file foo.tar.gz.gpg, it attempts to remove the foo.tar.gz file
 
 ;; also, if want to insert last message after C-x C-e, prefix it with C-u.
 (keymap-global-set "C-h E" 'z/copy-last-message)
+
+(setup rainbow-mode
+  ;; add support for ARGB color format e.g "0xFFFF0000"
+  (:when-loaded
+    (add-to-list 'rainbow-hexadecimal-colors-font-lock-keywords
+                 '("0[xX][0-9a-fA-F]\\{2\\}\\([0-9A-Fa-f]\\{6\\}\\)\\b"
+                   (0 (rainbow-colorize-hexadecimal-without-sharp))))))
 (provide 'init-local)
 ;;; init-local.el ends here
