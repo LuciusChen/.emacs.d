@@ -101,7 +101,6 @@
     elfeed
     popper
     embark
-    ;; xenops
     bibtex
     auctex
     dimmer
