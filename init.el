@@ -90,7 +90,6 @@
     cape
     deft
     ;; rime
-    affe
     ebib
     citar
     setup
@@ -141,6 +140,7 @@
     org-roam-ui
     org-remark
     forge
+    ob-restclient
     magit-todos
     prettier-js
     consult-dir

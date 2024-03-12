@@ -84,6 +84,7 @@
      'org-babel-load-languages '((plantuml . t)
                                  (python . t)
                                  (shell . t)
+                                 (restclient . t)
                                  (latex . t)))))
 
 (setup org-capture

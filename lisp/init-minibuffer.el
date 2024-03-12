@@ -11,7 +11,7 @@
            doom-modeline-hud-min-height 1)
   (:when-loaded
     (doom-modeline-def-segment lucius/buffer-info
-        "Customize doom-modeline to remove modification indication"
+      "Customize doom-modeline to remove modification indication"
       (let ((buffer-name (doom-modeline--buffer-name)))
         (when (derived-mode-p 'telega-chat-mode 'org-agenda-mode)
           (setq buffer-name
@@ -45,6 +45,7 @@
   (:global "M-g l" consult-line
            "M-g i" consult-imenu
            "M-g r" consult-recent-file
+           "M-g f" consult-ripgrep
            [remap switch-to-buffer] consult-buffer
            [remap switch-to-buffer-other-window] 'consult-buffer-other-window
            [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame
@@ -76,16 +77,6 @@
                                embark-isearch-highlight-indicator)
            embark-cycle-key "."
            embark-help-key "?"))
-
-(setup affe
-  ;; brew install ripgrep
-  (when (executable-find "rg")
-    (:autoload lucius/affe-grep-at-point)
-    (:global "C-c f"  lucius/affe-grep-at-point)
-    (:when-loaded
-      (:also-load lib-consult)
-      (lucius/no-consult-preview lucius/affe-grep-at-point)
-      (lucius/no-consult-preview affe-grep))))
 
 (setup embark-consult
   (:hooks embark-collect-mode-hook consult-preview-at-point-mode))
