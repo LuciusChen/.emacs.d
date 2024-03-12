@@ -25,6 +25,9 @@
   (save-excursion
     (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
 
+;; lua
+(add-to-list 'auto-mode-alist '("\\.lua\\'" . lua-ts-mode))
+
 (setup web-mode
   (:option web-mode-markup-indent-offset 2
            web-mode-code-indent-offset 2)

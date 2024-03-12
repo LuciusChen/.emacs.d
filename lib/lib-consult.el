@@ -43,11 +43,6 @@
  consult-git-grep consult-grep
  consult-bookmark consult-recent-file consult-xref
  consult--source-recent-file consult--source-project-recent-file consult--source-bookmark)
-
-(defun lucius/affe-grep-at-point (&optional dir initial)
-  (interactive (list prefix-arg (when-let ((s (symbol-at-point)))
-                                  (symbol-name s))))
-  (affe-grep dir initial))
 ;;;; provide
 (provide 'lib-consult)
 ;;; lib-consult.el ends here.
