@@ -134,7 +134,7 @@
     (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
 
 (setup auctex
-  (require 'latex))
+  (:defer (require 'latex)))
 
 (setup org-latex-preview
   (:option org-latex-preview-process-default 'dvisvgm
