@@ -128,7 +128,6 @@
     orderless
     kind-icon
     git-modes
-    ibuffer-vc
     git-blamed
     nerd-icons
     org-modern
@@ -162,7 +161,6 @@
     command-log-mode
     browse-kill-ring
     flymake-flycheck
-    nerd-icons-ibuffer
     rainbow-delimiters
     default-text-scale
     language-detection
