@@ -74,8 +74,8 @@
      ;; telega-url-shorten
      (list `(too-long-link
              :regexp "^\\(https?://\\)\\(.\\{55\\}\\).*?$"
-             :symbol ""
-             :replace "\\1\\2..."))
+             :symbol ,(nerd-icons-faicon "nf-fa-link")
+             :replace " \\1\\2..."))
      ;; telega-root
      telega-root-default-view-function 'telega-view-folders
      telega-root-keep-cursor 'track
