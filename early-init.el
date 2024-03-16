@@ -1,8 +1,8 @@
-;;; early-init.el --- Emacs 27+ pre-initialisation config
+;;; early-init.el --- Emacs 29+ pre-initialisation config -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 
-;; Emacs 27+ loads this file before (normally) calling
+;; Emacs 29+ loads this file before (normally) calling
 ;; `package-initialize'.  We use this file to suppress that automatic
 ;; behaviour so that startup is consistent across Emacs versions.
 
@@ -12,7 +12,8 @@
 ;; in the early init file.
 
 ;; Adjust garbage collection thresholds during startup, and thereafter
-(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.5)
 
 (add-hook 'emacs-startup-hook
           (lambda ()
