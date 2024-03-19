@@ -92,6 +92,7 @@
     ;; rime
     ebib
     citar
+    wgrep
     setup
     eglot
     corfu

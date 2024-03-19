@@ -81,6 +81,9 @@
 (setup embark-consult
   (:hooks embark-collect-mode-hook consult-preview-at-point-mode))
 
+(setup wgrep
+  (:after consult))
+
 (setup marginalia
   (:option marginalia-annotators '(marginalia-annotators-heavy
                                    marginalia-annotators-light
