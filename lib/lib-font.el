@@ -5,8 +5,8 @@
   ;; https://typeof.net/Iosevka/customizer
   ;; https://github.com/be5invis/Iosevka/blob/v21.0.0/doc/PACKAGE-LIST.md
   ;; Setting the default
-  ;; (set-face-attribute 'default nil :font "IBM Plex Mono 14" :weight 'normal)
-  (set-face-attribute 'default nil :font "Iosevka Lucius 14" :weight 'normal)
+  (set-face-attribute 'default nil :font "IBM Plex Mono 14" :weight 'normal)
+  ;; (set-face-attribute 'default nil :font "Iosevka Lucius 14" :weight 'normal)
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
   ;; "Emacs 28 now has 'emoji . before, emoji is part of 'symbol"
@@ -42,9 +42,9 @@
   ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
   ;; IBM Plex Mono 没有这几个字符，自己编辑字体后添加，可以省去下面的设置。
-  ;; (set-fontset-font nil ?❤ "Arial Unicode MS")
-  ;; (set-fontset-font nil ?☑ "Arial Unicode MS")
-  ;; (set-fontset-font nil ?☐ "Arial Unicode MS")
+  (set-fontset-font nil ?❤ "Iosevka Lucius")
+  (set-fontset-font nil ?☑ "Iosevka Lucius")
+  (set-fontset-font nil ?☐ "Iosevka Lucius")
   (set-fontset-font t 'javanese "Noto Sans Javanese"))
 (provide 'lib-font)
 ;;; lib-font.el ends here

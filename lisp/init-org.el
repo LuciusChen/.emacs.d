@@ -66,7 +66,8 @@
     (:with-mode org-mode
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
-      (:hook (lambda () (setq truncate-lines nil))))
+      (:hook (lambda () (setq truncate-lines nil)))
+      (:hook org-buffer-face-mode-variable))
     (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
@@ -137,45 +138,46 @@
   (:defer (require 'latex)))
 
 (setup org-latex-preview
-  (:option org-latex-preview-process-default 'dvisvgm
-           org-latex-preview-numbered t
-           org-latex-preview-live t
-           ;; org-startup-with-latex-preview t
-           org-latex-preview-preamble
-           "\\documentclass{article}
+  (:load-after org)
+  (:when-loaded
+    ;; Increase preview width
+    (:option org-latex-preview-process-default 'dvisvgm
+             org-latex-preview-numbered t
+             org-latex-preview-live t
+             ;; org-startup-with-latex-preview t
+             org-latex-preview-preamble
+             "\\documentclass{article}
             [DEFAULT-PACKAGES]
             [PACKAGES]
             \\usepackage{xcolor}
             \\usephysicsmodule{ab,ab.braket,diagmat,xmat}%
             \\DeclareUnicodeCharacter{2212}{-}"
-           org-latex-packages-alist '(;; hook right arrow with text above and below
-                                      ;; https://tex.stackexchange.com/questions/186896/xhookrightarrow-and-xmapsto
-                                      ("" "svg" t)
-                                      ("" "svg-extract" t)
+             org-latex-packages-alist '(;; hook right arrow with text above and below
+                                        ;; https://tex.stackexchange.com/questions/186896/xhookrightarrow-and-xmapsto
+                                        ("" "svg" t)
+                                        ("" "svg-extract" t)
 
-                                      ("" "mathtools" t)
-                                      ("" "amsmath" t)
-                                      ("" "amssymb" t)
-                                      ;; for mapsfrom
-                                      ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
-                                      ("" "stmaryrd" t)
-                                      ("" "mathrsfs" t)
-                                      ("" "tikz" t)
-                                      ("" "tikz-cd" t)
-                                      ;; ("" "quiver" t)
-                                      ;; see https://castel.dev/post/lecture-notes-2/
-                                      ("" "import" t)
-                                      ("" "xifthen" t)
-                                      ("" "pdfpages" t)
-                                      ("" "transparent" t)
-                                      ;; algorithm
-                                      ;; https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused
-                                      ("ruled,linesnumbered" "algorithm2e" t)
-                                      ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
-                                      ;; ("" "algpseudocode" t)
-                                      ))
-  (:when-loaded
-    ;; Increase preview width
+                                        ("" "mathtools" t)
+                                        ("" "amsmath" t)
+                                        ("" "amssymb" t)
+                                        ;; for mapsfrom
+                                        ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
+                                        ("" "stmaryrd" t)
+                                        ("" "mathrsfs" t)
+                                        ("" "tikz" t)
+                                        ("" "tikz-cd" t)
+                                        ;; ("" "quiver" t)
+                                        ;; see https://castel.dev/post/lecture-notes-2/
+                                        ("" "import" t)
+                                        ("" "xifthen" t)
+                                        ("" "pdfpages" t)
+                                        ("" "transparent" t)
+                                        ;; algorithm
+                                        ;; https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused
+                                        ("ruled,linesnumbered" "algorithm2e" t)
+                                        ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
+                                        ;; ("" "algpseudocode" t)
+                                        ))
     (plist-put org-latex-preview-appearance-options
                :page-width 0.8)
     ;; Turn on auto-mode, it's built into Org and much faster/more featured than
@@ -421,89 +423,93 @@
       [("q" "Quit"           transient-quit-one)])))
 
 (setup bibtex
-  (:option bibtex-file-path "~/Library/CloudStorage/Dropbox/org/bib/"
-           bibtex-files '("bibtex.bib")
-           bibtex-notes-path "~/Library/CloudStorage/Dropbox/org/main/"
-           bibtex-align-at-equal-sign t
-           bibtex-autokey-titleword-separator "-"
-           bibtex-autokey-year-title-separator "-"
-           bibtex-autokey-name-year-separator "-"
-           bibtex-dialect 'biblatex))
+  (:load-after org)
+  (:when-loaded (:option bibtex-file-path "~/Library/CloudStorage/Dropbox/org/bib/"
+                         bibtex-files '("bibtex.bib")
+                         bibtex-notes-path "~/Library/CloudStorage/Dropbox/org/main/"
+                         bibtex-align-at-equal-sign t
+                         bibtex-autokey-titleword-separator "-"
+                         bibtex-autokey-year-title-separator "-"
+                         bibtex-autokey-name-year-separator "-"
+                         bibtex-dialect 'biblatex)))
 
 (setup ebib
-  (:require bibtex)
-  (:also-load lib-org)
-  (:option ebib-default-directory bibtex-file-path
-           ebib-bib-search-dirs `(,bibtex-file-path)
-           ebib-file-search-dirs `(,(concat bibtex-file-path "files/"))
-           ebib-notes-directory bibtex-notes-path
-           ebib-reading-list-file "~/Library/CloudStorage/Dropbox/org/agenda/inbox.org"
-           ebib-bibtex-dialect bibtex-dialect
-           ebib-file-associations '(("pdf" . "open"))
-           ebib-index-default-sort '("timestamp" . descend)
-           ebib-reading-list-project-marker "PROJECT"
-           ;; 笔记模板
-           ebib-notes-template ":PROPERTIES:\n:ID: %i\n:ROAM_REFS: @%k\n:END:\n#+title: %t\n#+description: %d\n#+date: %s\n%%?\n"
-           ebib-notes-template-specifiers '((?k . ebib-create-key)
-                                            (?i . ebib-create-id)
-                                            (?t . ebib-create-org-title)
-                                            (?d . ebib-create-org-description)
-                                            (?l . ebib-create-org-link)
-                                            (?s . ebib-create-org-time-stamp))
-           ;; 读书列表模板
-           ebib-reading-list-template "* %M %T\n:PROPERTIES:\n%K\n:END:\n%F\n%S\n"
-           ebib-reading-list-template-specifiers '((?M . ebib-reading-list-project-marker)
-                                                   (?T . ebib-create-org-title)
-                                                   (?K . ebib-reading-list-create-org-identifier)
-                                                   (?F . ebib-create-org-file-link)
-                                                   (?S . ebib-create-org-stamp-inactive))
-           ebib-preload-bib-files bibtex-files
-           ebib-use-timestamp t))
+  (:load-after bibtex)
+  (:when-loaded
+    (:also-load lib-org)
+    (:option ebib-default-directory bibtex-file-path
+             ebib-bib-search-dirs `(,bibtex-file-path)
+             ebib-file-search-dirs `(,(concat bibtex-file-path "files/"))
+             ebib-notes-directory bibtex-notes-path
+             ebib-reading-list-file "~/Library/CloudStorage/Dropbox/org/agenda/inbox.org"
+             ebib-bibtex-dialect bibtex-dialect
+             ebib-file-associations '(("pdf" . "open"))
+             ebib-index-default-sort '("timestamp" . descend)
+             ebib-reading-list-project-marker "PROJECT"
+             ;; 笔记模板
+             ebib-notes-template ":PROPERTIES:\n:ID: %i\n:ROAM_REFS: @%k\n:END:\n#+title: %t\n#+description: %d\n#+date: %s\n%%?\n"
+             ebib-notes-template-specifiers '((?k . ebib-create-key)
+                                              (?i . ebib-create-id)
+                                              (?t . ebib-create-org-title)
+                                              (?d . ebib-create-org-description)
+                                              (?l . ebib-create-org-link)
+                                              (?s . ebib-create-org-time-stamp))
+             ;; 读书列表模板
+             ebib-reading-list-template "* %M %T\n:PROPERTIES:\n%K\n:END:\n%F\n%S\n"
+             ebib-reading-list-template-specifiers '((?M . ebib-reading-list-project-marker)
+                                                     (?T . ebib-create-org-title)
+                                                     (?K . ebib-reading-list-create-org-identifier)
+                                                     (?F . ebib-create-org-file-link)
+                                                     (?S . ebib-create-org-stamp-inactive))
+             ebib-preload-bib-files bibtex-files
+             ebib-use-timestamp t)))
 
 (setup citar
-  (:option org-cite-global-bibliography '("~/Library/CloudStorage/Dropbox/org/bib/bibtex.bib")
-           citar-notes-paths (list "~/Library/CloudStorage/Dropbox/org/main")
-           citar-library-paths (list "~/Library/CloudStorage/Dropbox/org/bib/files")
-           org-cite-insert-processor 'citar
-           org-cite-follow-processor 'citar
-           org-cite-activate-processor 'citar
-           citar-bibliography org-cite-global-bibliography)
+  (:load-after org)
+  (:when-loaded
+    (:option org-cite-global-bibliography '("~/Library/CloudStorage/Dropbox/org/bib/bibtex.bib")
+             citar-notes-paths (list "~/Library/CloudStorage/Dropbox/org/main")
+             citar-library-paths (list "~/Library/CloudStorage/Dropbox/org/bib/files")
+             org-cite-insert-processor 'citar
+             org-cite-follow-processor 'citar
+             org-cite-activate-processor 'citar
+             citar-bibliography org-cite-global-bibliography)
 
-  (defvar citar-indicator-files
-    (citar-indicator-create
-     :symbol (nerd-icons-faicon
-              "nf-fa-file_o"
-              :face 'nerd-icons-green
-              :v-adjust -0.1)
-     :function #'citar-has-files
-     :padding "  " ; need this because the default padding is too low for these icons
-     :tag "has:files"))
-  (defvar citar-indicator-links
-    (citar-indicator-create
-     :symbol (nerd-icons-faicon
-              "nf-fa-link"
-              :face 'nerd-icons-orange
-              :v-adjust 0.01)
-     :function #'citar-has-links
-     :padding "  "
-     :tag "has:links"))
-  (defvar citar-indicator-notes
-    (citar-indicator-create
-     :symbol (nerd-icons-codicon
-              "nf-cod-note"
-              :face 'nerd-icons-blue
-              :v-adjust -0.3)
-     :function #'citar-has-notes
-     :padding "    "
-     :tag "has:notes"))
-  (defvar citar-indicator-cited
-    (citar-indicator-create
-     :symbol (nerd-icons-faicon
-              "nf-fa-circle_o"
-              :face 'nerd-icon-green)
-     :function #'citar-is-cited
-     :padding "  "
-     :tag "is:cited")))
+    (defvar citar-indicator-files
+      (citar-indicator-create
+       :symbol (nerd-icons-faicon
+                "nf-fa-file_o"
+                :face 'nerd-icons-green
+                :v-adjust -0.1)
+       :function #'citar-has-files
+       :padding "  " ; need this because the default padding is too low for these icons
+       :tag "has:files"))
+    (defvar citar-indicator-links
+      (citar-indicator-create
+       :symbol (nerd-icons-faicon
+                "nf-fa-link"
+                :face 'nerd-icons-orange
+                :v-adjust 0.01)
+       :function #'citar-has-links
+       :padding "  "
+       :tag "has:links"))
+    (defvar citar-indicator-notes
+      (citar-indicator-create
+       :symbol (nerd-icons-codicon
+                "nf-cod-note"
+                :face 'nerd-icons-blue
+                :v-adjust -0.3)
+       :function #'citar-has-notes
+       :padding "    "
+       :tag "has:notes"))
+    (defvar citar-indicator-cited
+      (citar-indicator-create
+       :symbol (nerd-icons-faicon
+                "nf-fa-circle_o"
+                :face 'nerd-icon-green)
+       :function #'citar-is-cited
+       :padding "  "
+       :tag "is:cited"))))
 
 (setup org-modern
   (:load-after org)
