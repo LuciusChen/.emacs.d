@@ -27,7 +27,7 @@
          buffer-name)))
 
     (doom-modeline-def-modeline 'disbale-modification-indication
-        '(bar workspace-name window-number modals lucius/buffer-info selection-info)
+      '(bar workspace-name window-number modals lucius/buffer-info selection-info)
       '(misc-info minor-modes buffer-encoding major-mode time))
 
     (:hooks doom-modeline-mode-hook
@@ -36,9 +36,6 @@
 
     (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disbale-modification-indication))
     (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disbale-modification-indication))))
-
-(setup projectile
-  (:option consult-project-root-function 'projectile-project-root))
 
 (setup vertico
   (:option vertico-cycle t)
