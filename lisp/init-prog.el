@@ -20,6 +20,9 @@
                                (eglot-ensure))))
 (setup gfm-mode (:file-match "\\.md\\'"))
 
+(setup projectile
+  (:option consult-project-root-function 'projectile-project-root))
+
 (setup apheleia
   (:global "C-c C-x C-f" apheleia-format-buffer)
   (:with-mode prog-mode
