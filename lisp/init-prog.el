@@ -20,6 +20,13 @@
                                (eglot-ensure))))
 (setup gfm-mode (:file-match "\\.md\\'"))
 
+(setup apheleia
+  (:global "C-c C-x C-f" apheleia-format-buffer)
+  (:with-mode prog-mode
+    (:hook apheleia-global-mode))
+  (:when-loaded
+    (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
+
 (setup lisp-mode
   (:also-load lib-lisp)
   (:require macrostep)
@@ -40,11 +47,6 @@
   (interactive)
   (save-excursion
     (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
-
-(setup sly-el-indent
-  (:hooks emacs-lisp-mode-hook sly-el-indent-setup)
-  (:when-loaded
-    (:hooks emacs-lisp-mode-hook sly-lisp-indent-compatibility-mode)))
 
 ;; js
 ;;; Basic js-mode setup

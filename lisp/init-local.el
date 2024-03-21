@@ -1,12 +1,5 @@
 ;;; init-local.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary:
-(setup apheleia
-  (:global "C-c C-x C-f" apheleis-format-buffer)
-  (:with-mode prog-mode
-    (:hook apheleia-global-mode))
-  (:when-loaded
-    (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
-
 (setup blamer
   (:option blamer-author-formatter "  ✎ %s "
            blamer-idle-time 0.3
