@@ -28,5 +28,15 @@
 (setup git-commit
   (:with-mode git-commit-mode
     (:hook goto-address-mode)))
+
+(setup diff-hl
+  (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
+          magit-pre-refresh-hook diff-hl-magit-post-refresh
+          prog-mode-hook diff-hl-mode
+          conf-mode-hook diff-hl-mode
+          dired-mode-hook diff-hl-dired-mode)
+  (:when-loaded
+    (:bind-into diff-hl-mode-map
+      "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk)))
 (provide 'init-git)
 ;;; init-git.el ends here

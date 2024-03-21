@@ -197,7 +197,7 @@
 (require 'init-gui-frames)
 (require 'init-layout)
 
-(require 'init-edit-util)
+(require 'init-enhance-editing)
 (require 'init-dired)
 (require 'init-flymake)
 (require 'init-git)

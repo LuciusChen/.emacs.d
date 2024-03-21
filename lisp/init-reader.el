@@ -78,6 +78,7 @@
                                    "--ytdl-raw-options-append=proxy=http://127.0.0.1:7890"))))
 
 (setup elfeed-tube-mpv
+  (:load-after elfeed)
   (:bind-into elfeed-show-mode-map
     "C-c C-f"  elfeed-tube-mpv-follow-mode
     "C-c C-w"  elfeed-tube-mpv-where))
