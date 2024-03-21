@@ -112,7 +112,6 @@
     scratch
     diff-hl
     company
-    rainbow-mode
     flymake
     web-mode
     js2-mode
@@ -140,6 +139,7 @@
     org-roam-ui
     org-remark
     forge
+    rainbow-mode
     ob-restclient
     magit-todos
     prettier-js

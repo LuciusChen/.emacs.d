@@ -53,6 +53,7 @@
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
      telega-symbol-premium (nerd-icons-octicon "nf-oct-star_fill" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
+     telega-symbol-saved-messages-tag-end (nerd-icons-faicon "nf-fa-tag")
      telega-symbol-checkbox-on (nerd-icons-octicon "nf-oct-checkbox")
      telega-symbol-checkbox-off (nerd-icons-sucicon "nf-seti-checkbox_unchecked")
      telega-symbol-button-close (nerd-icons-faicon "nf-fa-close")

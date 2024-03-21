@@ -1,40 +1,11 @@
 ;;; init-core.el --- Measure startup and require times -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(setq-default
- initial-scratch-message
- (propertize
-  (concat ";; Happy hacking, " user-login-name " - Emacs ❤ you") 'face 'italic)
- ;; 书签保存
- bookmark-default-file (locate-user-emacs-file ".bookmarks.el")
- ;; buffers-menu-max-size 30
- case-fold-search t
- ;; column-number-mode t
- ediff-split-window-function 'split-window-horizontally
- ediff-window-setup-function 'ediff-setup-windows-plain
- indent-tabs-mode nil
- create-lockfiles nil
- auto-save-default nil
- make-backup-files nil
- mouse-yank-at-point t
- save-interprogram-paste-before-kill t
- scroll-preserve-screen-position 'always
- set-mark-command-repeat-pop t
- tooltip-delay 2.5
- truncate-partial-width-windows nil
- history-length 1000
- ;; tab 键来补全
- tab-always-indent 'complete
- ;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。
- completion-category-defaults nil
- completion-category-overrides nil
- ;; 将阈值设置为 4 表示只有当需要补全的字符数大于4时才会执行循环补全
- completion-cycle-threshold 4
- global-auto-revert-non-file-buffers t
- auto-revert-verbose nil)
-
-;; 启动时间、加载包数量以及 gc 次数
-(add-hook 'emacs-startup-hook
+(setup startup
+  (:option initial-scratch-message
+           (propertize
+            (concat ";; Happy hacking, " user-login-name " - Emacs ❤ you") 'face 'italic))
+  (:hooks emacs-startup-hook
           (lambda ()
             (with-current-buffer "*scratch*"
               (goto-char (point-max))
@@ -57,13 +28,100 @@
                        (format "%d packages"
                                (length (hash-table-keys
                                         straight--profile-cache)))
-                       "\n\n")))))
+                       "\n\n"))))
+          after-init-hook delete-selection-mode
+          after-init-hook savehist-mode
+          after-init-hook electric-pair-mode))
 
-(add-hook 'after-init-hook 'delete-selection-mode)
-(add-hook 'after-init-hook 'global-auto-revert-mode)
-(add-hook 'after-init-hook 'savehist-mode)
-(add-hook 'after-init-hook 'transient-mark-mode)
-(add-hook 'after-init-hook 'electric-pair-mode)
+(setup emacs
+  (:defer
+      (:option case-fold-search t
+               create-lockfiles nil
+               scroll-preserve-screen-position 'always
+               truncate-partial-width-windows nil
+               history-length 1000
+               ;; 改善 CJK 换行
+               word-wrap-by-category t
+               read-process-output-max (* 1024 1024))
+      ;; Better fringe symbol
+      (define-fringe-bitmap 'right-curly-arrow
+        [#b00000000
+         #b00000110
+         #b00001100
+         #b00011000
+         #b00110000
+         #b00011000
+         #b00001100
+         #b00000110])
+
+    (define-fringe-bitmap 'left-curly-arrow
+      [#b00000000
+       #b01100000
+       #b00110000
+       #b00011000
+       #b00001100
+       #b00011000
+       #b00110000
+       #b01100000])))
+
+(setup bookmark
+  (:defer
+      (:option bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
+
+(setup simple
+  (:defer
+      (:global "C-." set-mark-command
+               "C-x C-." pop-global-mark
+               ;; 从光标位置删除到行首第一个非空格字符。
+               "C-M-<backspace>" (lambda ()
+                                   (interactive)
+                                   (let ((prev-pos (point)))
+                                     (back-to-indentation)
+                                     (kill-region (point) prev-pos))))
+      (:option  indent-tabs-mode nil
+                save-interprogram-paste-before-kill t
+                set-mark-command-repeat-pop t)
+    (:hooks after-init-hook transient-mark-mode)))
+
+(setup files
+  (:defer
+      (:option  auto-save-default nil
+                make-backup-files nil)))
+
+(setup ediff-wind
+  (:defer
+      (:option  ediff-split-window-function 'split-window-horizontally
+                ediff-window-setup-function 'ediff-setup-windows-plain)))
+
+(setup mouse
+  (:defer (:option  mouse-yank-at-point t)))
+
+(setup emacs
+  (:defer (:option  case-fold-search t
+                    create-lockfiles nil
+                    scroll-preserve-screen-position 'always
+                    truncate-partial-width-windows nil
+                    history-length 1000)))
+
+(setup tooltip
+  (:defer (:option  tooltip-delay 2.5)))
+
+(setup indent
+  (:defer (:option  tab-always-indent 'complete)))
+
+(setup minibuffer
+  (:defer
+      ;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。
+      (:option  completion-category-defaults nil
+                completion-category-overrides nil
+                ;; 将阈值设置为 4 表示只有当需要补全的字符数大于4时才会执行循环补全
+                completion-cycle-threshold 4)))
+
+(setup autorevert
+  (:defer
+      (:option  global-auto-revert-non-file-buffers t
+                auto-revert-verbose nil)
+      (:hooks after-init-hook global-auto-revert-mode)))
 
 (setup recentf
   (:hooks after-init-hook recentf-mode)
@@ -83,59 +141,5 @@
     ;; HACK: Text properties inflate the size of recentf's files, and there is
     ;; no purpose in persisting them (Must be first in the list!)
     (add-to-list 'recentf-filename-handlers #'substring-no-properties)))
-
-;; Better fringe symbol
-(define-fringe-bitmap 'right-curly-arrow
-  [#b00000000
-   #b00000110
-   #b00001100
-   #b00011000
-   #b00110000
-   #b00011000
-   #b00001100
-   #b00000110])
-
-(define-fringe-bitmap 'left-curly-arrow
-  [#b00000000
-   #b01100000
-   #b00110000
-   #b00011000
-   #b00001100
-   #b00011000
-   #b00110000
-   #b01100000])
-
-;; https://emacs-china.org/t/topic/25114/5
-;; (pixel-scroll-precision-mode 1)
-;; (setq pixel-scroll-precision-interpolate-page t)
-;; (defun +pixel-scroll-interpolate-down (&optional lines)
-;;   (interactive)
-;;   (if lines
-;;       (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
-;;     (pixel-scroll-interpolate-down)))
-
-;; (defun +pixel-scroll-interpolate-up (&optional lines)
-;;   (interactive)
-;;   (if lines
-;;       (pixel-scroll-precision-interpolate (* lines (pixel-line-height))))
-;;   (pixel-scroll-interpolate-up))
-
-;; (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
-;; (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
-
-;; 改善 CJK 换行
-(setq word-wrap-by-category t)
-;; For Emacs >= 27
-(setq read-process-output-max (* 1024 1024))
-
-(global-set-key (kbd "C-.") 'set-mark-command)
-(global-set-key (kbd "C-x C-.") 'pop-global-mark)
-;; 从光标位置删除到行首第一个非空格字符。
-(global-set-key (kbd "C-M-<backspace>") (lambda ()
-                                          (interactive)
-                                          (let ((prev-pos (point)))
-                                            (back-to-indentation)
-                                            (kill-region (point) prev-pos))))
-(global-set-key (kbd "C-h K") 'find-function-on-key)
 (provide 'init-core)
 ;;; init-core.el ends here
