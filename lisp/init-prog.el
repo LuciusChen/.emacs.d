@@ -2,8 +2,24 @@
 ;;; Commentary:
 ;;; Code:
 
-;; lisp
+;; language
+(setup web-mode
+  (:option web-mode-markup-indent-offset 2
+           web-mode-code-indent-offset 2))
+
+(define-derived-mode vue-mode web-mode "Vue")
+(define-derived-mode my-html-mode web-mode "Web")
+(define-derived-mode my-jsp-mode web-mode "Web")
 (setup emacs-lisp-mode (:file-match "\\.emacs.d\\'"))
+(setup lua-ts-mode (:file-match "\\.lua\\'"))
+(setup my-html-mode (:file-match "\\.html\\'"))
+(setup my-jsp-mode (:file-match "\\.jsp\\'"))
+(setup vue-mode (:file-match "\\.vue\\'")
+       (:hooks vue-mode-hook (lambda ()
+                               (setq-local tab-width 2)
+                               (eglot-ensure))))
+(setup gfm-mode (:file-match "\\.md\\'"))
+
 (setup lisp-mode
   (:also-load lib-lisp)
   (:require macrostep)
@@ -24,26 +40,6 @@
   (interactive)
   (save-excursion
     (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
-
-;; lua
-(add-to-list 'auto-mode-alist '("\\.lua\\'" . lua-ts-mode))
-
-(setup web-mode
-  (:option web-mode-markup-indent-offset 2
-           web-mode-code-indent-offset 2)
-  ;; vue
-  (define-derived-mode vue-mode web-mode "Vue")
-  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
-  (add-hook 'vue-mode-hook (lambda ()
-                             (setq-local tab-width 2)
-                             (eglot-ensure)))
-  ;; html
-  (define-derived-mode my-html-mode web-mode "Web")
-  (add-to-list 'auto-mode-alist '("\\.html\\'" . my-html-mode))
-
-  ;; jsp
-  (define-derived-mode my-jsp-mode web-mode "Web")
-  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . my-jsp-mode)))
 
 (setup sly-el-indent
   (:hooks emacs-lisp-mode-hook sly-el-indent-setup)
@@ -88,15 +84,5 @@
   (:autoload global-treesit-auto-mode)
   (:option treesit-auto-install 'prompt)
   (:when-loaded (global-treesit-auto-mode)))
-
-(setup diff-hl
-  (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
-          magit-pre-refresh-hook diff-hl-magit-post-refresh
-          prog-mode-hook diff-hl-mode
-          conf-mode-hook diff-hl-mode
-          dired-mode-hook diff-hl-dired-mode)
-  (:when-loaded
-    (:bind-into diff-hl-mode-map
-      "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk)))
 (provide 'init-prog)
 ;;; init-prog.el ends here

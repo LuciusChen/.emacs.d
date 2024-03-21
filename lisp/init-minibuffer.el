@@ -1,6 +1,9 @@
 ;;; init-minibuffer.el --- Config for minibuffer completion       -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
+(setup mode-line-bell
+  (:hooks after-init-hook mode-line-bell-mode))
+
 (setup doom-modeline
   (doom-modeline-mode)
   (:option doom-modeline-height 18

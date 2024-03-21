@@ -109,6 +109,16 @@
 (setup indent
   (:defer (:option  tab-always-indent 'complete)))
 
+(setup window
+  (:require lib-window)
+  (global-set-key (kbd "C-x |") 'split-window-horizontally-instead)
+  (global-set-key (kbd "C-x _") 'split-window-vertically-instead))
+
+(setup line-number
+  (when (fboundp 'display-line-numbers-mode)
+    (setq-default display-line-numbers-width 3)
+    (add-hook 'prog-mode-hook 'display-line-numbers-mode)))
+
 (setup minibuffer
   (:defer
       ;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。
@@ -121,7 +131,9 @@
   (:defer
       (:option  global-auto-revert-non-file-buffers t
                 auto-revert-verbose nil)
-      (:hooks after-init-hook global-auto-revert-mode)))
+      (:hooks after-init-hook global-auto-revert-mode)
+    ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
+    (:when-loaded (diminish 'auto-revert-mode))))
 
 (setup recentf
   (:hooks after-init-hook recentf-mode)
