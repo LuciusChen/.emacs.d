@@ -26,7 +26,7 @@
                    'unicode
                    (font-spec :family font
                               :size
-                              (cond ((eq system-type 'darwin) 12)
+                              (cond ((eq system-type 'darwin) 11.5)
                                     ((eq system-type 'gnu/linux) 12)
                                     ((eq system-type 'windows-nt) 12)))
                    nil 'prepend))

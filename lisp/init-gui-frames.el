@@ -7,34 +7,29 @@
       (add-to-list 'default-frame-alist no-border)
       (add-to-list 'initial-frame-alist no-border))))
 
+;; Non-zero values for `line-spacing' can mess up ansi-term and co,
+;; so we zero it explicitly in those cases.
+(setup term (:with-mode term-mode (:hook (lambda () (setq line-spacing 0)))))
 
-
-(setup appearance
-  (:require lib-appearance)
-  ;; Stop C-z from minimizing windows under OS X
-  (global-set-key (kbd "C-z") '+maybe-suspend-frame)
-
-  ;; 调整背景透明度（假透明）
-  (global-set-key (kbd "M-C-8") (lambda () (interactive) (+adjust-opacity nil -2)))
-  (global-set-key (kbd "M-C-7") (lambda () (interactive) (+adjust-opacity nil 2)))
-  ;; Non-zero values for `line-spacing' can mess up ansi-term and co,
-  ;; so we zero it explicitly in those cases.
-  (add-hook 'term-mode-hook (lambda () (setq line-spacing 0)))
-
-  ;; Change global font size easily
-  (add-hook 'after-init-hook 'default-text-scale-mode))
+;; Change global font size easily
+(setup default-text-scale (:hook-into after-init))
 
 (setup custom
-  (:require lib-appearance)
-  ;; Don't prompt to confirm theme safety. This avoids problems with
-  ;; first-time startup on Emacs > 26.3.
-  (:option custom-safe-themes t
-           ;; If you don't customize it, this is the theme you get.
-           custom-enabled-themes '(modus-operandi-tinted)
-           light-theme 'modus-operandi-tinted
-           dark-theme 'modus-vivendi-tinted)
-  (:hooks after-init-hook reapply-themes
-          window-setup-hook set-dividers-and-fringe-color))
+  (:when-loaded
+    (:require lib-appearance)
+    (:global "M-C-8" (lambda () (interactive) (+adjust-opacity nil -2))
+             "M-C-7" (lambda () (interactive) (+adjust-opacity nil 2))
+             ;; Stop C-z from minimizing windows under OS X
+             "C-z" +maybe-suspend-frame)
+    ;; Don't prompt to confirm theme safety. This avoids problems with
+    ;; first-time startup on Emacs > 26.3.
+    (:option custom-safe-themes t
+             ;; If you don't customize it, this is the theme you get.
+             custom-enabled-themes '(modus-operandi-tinted)
+             light-theme 'modus-operandi-tinted
+             dark-theme 'modus-vivendi-tinted)
+    (:hooks after-init-hook reapply-themes
+            window-setup-hook set-dividers-and-fringe-color)))
 
 (when window-system
   (setup font
@@ -54,14 +49,15 @@
 
 (setup nerd-icons
   (:defer
-   ;; fix orig. nerd dashboard oct icon missing
-   (:when-loaded (let ((icons nerd-icons-mode-icon-alist))
-                   (setq nerd-icons-mode-icon-alist
-                         (cons '(benchmark-init/tree-mode nerd-icons-codicon
-                                                          "nf-cod-dashboard"
-                                                          :face
-                                                          nerd-icons-blue)
-                               (delq (assq 'benchmark-init/tree-mode icons)
-                                     icons)))))))
+   (:require nerd-icons))
+  ;; fix orig. nerd dashboard oct icon missing
+  (:when-loaded (let ((icons nerd-icons-mode-icon-alist))
+                  (setq nerd-icons-mode-icon-alist
+                        (cons '(benchmark-init/tree-mode nerd-icons-codicon
+                                                         "nf-cod-dashboard"
+                                                         :face
+                                                         nerd-icons-blue)
+                              (delq (assq 'benchmark-init/tree-mode icons)
+                                    icons))))))
 (provide 'init-gui-frames)
 ;;; init-gui-frames.el ends here

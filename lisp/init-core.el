@@ -50,7 +50,8 @@
             ;; Window size and features
             window-resize-pixelwise t
             frame-resize-pixelwise t
-            indicate-buffer-boundaries 'left)
+            indicate-buffer-boundaries 'left
+            display-line-numbers-width 2)
    ;; Better fringe symbol
    (define-fringe-bitmap 'right-curly-arrow
      [#b00000000
@@ -71,7 +72,9 @@
       #b00011000
       #b00110000
       #b01100000])
-   (:with-mode prog-mode (:hook display-fill-column-indicator-mode))))
+   (:with-mode prog-mode
+     (:hook display-fill-column-indicator-mode)
+     (:hook display-line-numbers-mode))))
 
 (setup tool-bar (:when-loaded (tool-bar-mode -1)))
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
@@ -127,11 +130,6 @@
   (global-set-key (kbd "C-x |") 'split-window-horizontally-instead)
   (global-set-key (kbd "C-x _") 'split-window-vertically-instead))
 
-(setup line-number
-  (when (fboundp 'display-line-numbers-mode)
-    (setq-default display-line-numbers-width 3)
-    (add-hook 'prog-mode-hook 'display-line-numbers-mode)))
-
 (setup minibuffer
   (:defer
    ;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。
@@ -141,15 +139,16 @@
              completion-cycle-threshold 4)))
 
 (setup autorevert
-  (:defer
-   (:option  global-auto-revert-non-file-buffers t
-             auto-revert-verbose nil)
-   (:hooks after-init-hook global-auto-revert-mode)
-   ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
-   (:when-loaded (diminish 'auto-revert-mode))))
+  (:defer (:require autorevert))
+  (:when-loaded
+    (:option  global-auto-revert-non-file-buffers t
+              auto-revert-verbose nil)
+    (global-auto-revert-mode)
+    ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
+    (diminish 'auto-revert-mode)))
 
 (setup recentf
-  (:hooks after-init-hook recentf-mode)
+  (:hook-into after-init)
   (:when-loaded
     (:option recentf-auto-cleanup 'never
              recentf-max-saved-items 100
