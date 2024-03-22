@@ -1,4 +1,4 @@
-;;; init-enhance-editing.el --- Insert description here -*- lexical-binding: t -*-
+;;; init-editing.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 (setup meow
@@ -151,5 +151,5 @@
            "C-:" avy-goto-char-in-line)
   (:defer (:require ace-pinyin)
           (ace-pinyin-global-mode +1)))
-(provide 'init-enhance-editing)
+(provide 'init-editing)
 ;;; init-enhance-editing.el ends here

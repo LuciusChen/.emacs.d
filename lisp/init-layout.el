@@ -40,12 +40,13 @@
   (advice-add #'keyboard-quit :before #'+popper-close-window-hack))
 
 (setup tab-bar
-  (:require lib-layout)
-  (:global "s-{" tab-bar-switch-to-prev-tab
-           "s-}" tab-bar-switch-to-next-tab
-           "s-t" tab-bar-new-tab
-           "s-w" tab-bar-close-tab)
+  (:defer (:require tab-bar))
   (:when-loaded
+    (:global "s-{" tab-bar-switch-to-prev-tab
+             "s-}" tab-bar-switch-to-next-tab
+             "s-t" tab-bar-new-tab
+             "s-w" tab-bar-close-tab)
+    (:require lib-layout)
     (:option tab-bar-separator ""
              tab-bar-close-button-show nil
              tab-bar-tab-hints t
