@@ -4,7 +4,8 @@
 (setup startup
   (:option initial-scratch-message
            (propertize
-            (concat ";; Happy hacking, " user-login-name " - Emacs ❤ you") 'face 'italic))
+            (concat ";; Happy hacking, " user-login-name " - Emacs ❤ you") 'face 'italic)
+           inhibit-startup-screen t)
   (:hooks emacs-startup-hook
           (lambda ()
             (with-current-buffer "*scratch*"
@@ -35,63 +36,75 @@
 
 (setup emacs
   (:defer
-      (:option case-fold-search t
-               create-lockfiles nil
-               scroll-preserve-screen-position 'always
-               truncate-partial-width-windows nil
-               history-length 1000
-               ;; 改善 CJK 换行
-               word-wrap-by-category t
-               read-process-output-max (* 1024 1024))
-      ;; Better fringe symbol
-      (define-fringe-bitmap 'right-curly-arrow
-        [#b00000000
-         #b00000110
-         #b00001100
-         #b00011000
-         #b00110000
-         #b00011000
-         #b00001100
-         #b00000110])
+   (:option case-fold-search t
+            create-lockfiles nil
+            scroll-preserve-screen-position 'always
+            truncate-partial-width-windows nil
+            history-length 1000
+            ;; 改善 CJK 换行
+            word-wrap-by-category t
+            read-process-output-max (* 1024 1024)
+            ;; Suppress GUI features
+            use-file-dialog nil
+            use-dialog-box nil
+            ;; Window size and features
+            window-resize-pixelwise t
+            frame-resize-pixelwise t
+            indicate-buffer-boundaries 'left)
+   ;; Better fringe symbol
+   (define-fringe-bitmap 'right-curly-arrow
+     [#b00000000
+      #b00000110
+      #b00001100
+      #b00011000
+      #b00110000
+      #b00011000
+      #b00001100
+      #b00000110])
 
-    (define-fringe-bitmap 'left-curly-arrow
-      [#b00000000
-       #b01100000
-       #b00110000
-       #b00011000
-       #b00001100
-       #b00011000
-       #b00110000
-       #b01100000])))
+   (define-fringe-bitmap 'left-curly-arrow
+     [#b00000000
+      #b01100000
+      #b00110000
+      #b00011000
+      #b00001100
+      #b00011000
+      #b00110000
+      #b01100000])
+   (:with-mode prog-mode (:hook display-fill-column-indicator-mode))))
+
+(setup tool-bar (:when-loaded (tool-bar-mode -1)))
+(setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
+(setup menu-bar (:when-loaded (menu-bar-mode -1)))
 
 (setup bookmark
   (:defer
-      (:option bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
+   (:option bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
 
 (setup simple
   (:defer
-      (:global "C-." set-mark-command
-               "C-x C-." pop-global-mark
-               ;; 从光标位置删除到行首第一个非空格字符。
-               "C-M-<backspace>" (lambda ()
-                                   (interactive)
-                                   (let ((prev-pos (point)))
-                                     (back-to-indentation)
-                                     (kill-region (point) prev-pos))))
-      (:option  indent-tabs-mode nil
-                save-interprogram-paste-before-kill t
-                set-mark-command-repeat-pop t)
-    (:hooks after-init-hook transient-mark-mode)))
+   (:global "C-." set-mark-command
+            "C-x C-." pop-global-mark
+            ;; 从光标位置删除到行首第一个非空格字符。
+            "C-M-<backspace>" (lambda ()
+                                (interactive)
+                                (let ((prev-pos (point)))
+                                  (back-to-indentation)
+                                  (kill-region (point) prev-pos))))
+   (:option  indent-tabs-mode nil
+             save-interprogram-paste-before-kill t
+             set-mark-command-repeat-pop t)
+   (:hooks after-init-hook transient-mark-mode)))
 
 (setup files
   (:defer
-      (:option  auto-save-default nil
-                make-backup-files nil)))
+   (:option  auto-save-default nil
+             make-backup-files nil)))
 
 (setup ediff-wind
   (:defer
-      (:option  ediff-split-window-function 'split-window-horizontally
-                ediff-window-setup-function 'ediff-setup-windows-plain)))
+   (:option  ediff-split-window-function 'split-window-horizontally
+             ediff-window-setup-function 'ediff-setup-windows-plain)))
 
 (setup mouse
   (:defer (:option  mouse-yank-at-point t)))
@@ -121,19 +134,19 @@
 
 (setup minibuffer
   (:defer
-      ;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。
-      (:option  completion-category-defaults nil
-                completion-category-overrides nil
-                ;; 将阈值设置为 4 表示只有当需要补全的字符数大于4时才会执行循环补全
-                completion-cycle-threshold 4)))
+   ;; 用于对补全候选项进行分类的变量。通过将它们设置为nil，我们禁用了Emacs自动分类补全候选项的功能，从而获得更简洁的补全列表。
+   (:option  completion-category-defaults nil
+             completion-category-overrides nil
+             ;; 将阈值设置为 4 表示只有当需要补全的字符数大于4时才会执行循环补全
+             completion-cycle-threshold 4)))
 
 (setup autorevert
   (:defer
-      (:option  global-auto-revert-non-file-buffers t
-                auto-revert-verbose nil)
-      (:hooks after-init-hook global-auto-revert-mode)
-    ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
-    (:when-loaded (diminish 'auto-revert-mode))))
+   (:option  global-auto-revert-non-file-buffers t
+             auto-revert-verbose nil)
+   (:hooks after-init-hook global-auto-revert-mode)
+   ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
+   (:when-loaded (diminish 'auto-revert-mode))))
 
 (setup recentf
   (:hooks after-init-hook recentf-mode)

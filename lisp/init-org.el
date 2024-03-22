@@ -118,11 +118,11 @@
      '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
     (:when-loaded
       (:also-load lib-org-clock)
-      (:hooks org-clock-in-hook lucius/show-org-clock-in-header-line
-              org-clock-out-hook lucius/hide-org-clock-from-header-line
-              org-clock-cancel-hook lucius/hide-org-clock-from-header-line
-              org-clock-in-hook lucius/clock-in-with-auto-next
-              org-after-todo-state-change-hook lucius/done-with-auto-clock-out))
+      (:hooks org-clock-in-hook +show-org-clock-in-header-line
+              org-clock-out-hook +hide-org-clock-from-header-line
+              org-clock-cancel-hook +hide-org-clock-from-header-line
+              org-clock-in-hook +clock-in-with-auto-next
+              org-after-todo-state-change-hook +done-with-auto-clock-out))
     (:after org (org-clock-persistence-insinuate))))
 
 (setup ox-latex
@@ -325,7 +325,7 @@
              "C-c n I"     org-roam-node-insert-immediate
              "C-x <up>"    org-move-subtree-up
              "C-x <down>"  org-move-subtree-down
-             "C-c r r"     lucius/org-roam-rg-search)
+             "C-c r r"     +org-roam-rg-search)
   (:when-loaded
     (:require emacsql-sqlite-builtin)
     (:option
@@ -384,7 +384,7 @@
     (:advice
      ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
      org-roam-node-read--to-candidate
-     :override lucius/org-roam-node-read--to-candidate)
+     :override +org-roam-node-read--to-candidate)
     (org-roam-db-autosync-enable)
     (:after embark
       (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
@@ -566,7 +566,7 @@
            "\\|^#\s[-]*$" ;; org-mode metadata
            "\\|^:PROPERTIES:\n\\(.+\n\\)+:END:\n"
            "\\)"))
-  (:advice deft-parse-title :override #'lucius/deft-parse-title)
+  (:advice deft-parse-title :override #'+deft-parse-title)
   (:global [f7] deft)
   (:when-loaded (:also-load lib-deft)))
 

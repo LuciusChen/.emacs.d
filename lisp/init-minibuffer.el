@@ -13,7 +13,7 @@
            doom-modeline-hud t
            doom-modeline-hud-min-height 1)
   (:when-loaded
-    (doom-modeline-def-segment lucius/buffer-info
+    (doom-modeline-def-segment +buffer-info
       "Customize doom-modeline to remove modification indication"
       (let ((buffer-name (doom-modeline--buffer-name)))
         (when (derived-mode-p 'telega-chat-mode 'org-agenda-mode)
@@ -27,7 +27,7 @@
          buffer-name)))
 
     (doom-modeline-def-modeline 'disbale-modification-indication
-      '(bar workspace-name window-number modals lucius/buffer-info selection-info)
+      '(bar workspace-name window-number modals +buffer-info selection-info)
       '(misc-info minor-modes buffer-encoding major-mode time))
 
     (:hooks doom-modeline-mode-hook

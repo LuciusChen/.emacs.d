@@ -20,7 +20,7 @@ Otherwise, calculate the age of the current entry."
       (time-subtract (current-time)
                      (org-time-string-to-time stamp)))))
 
-(defun lucius/org-agenda-refile-anywhere (&optional goto rfloc no-update)
+(defun +org-agenda-refile-anywhere (&optional goto rfloc no-update)
   "A version of `org-agenda-refile' which allows refiling to any subtree."
   (interactive "P")
   (let ((org-refile-target-verify-function))

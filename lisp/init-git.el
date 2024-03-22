@@ -10,7 +10,7 @@
     (:load-after vc)
     (:bind-into magit-status-mode-map "C-M-<up>" magit-section-up)
     (:bind-into vc-prefix-map
-      "l" lucius/magit-or-vc-log-file
+      "l" +magit-or-vc-log-file
       ;; Convenient binding for vc-git-grep
       "f" vc-git-grep)
     ;; (define-key magit-status-mode-map (kbd "C-M-<up>") 'magit-section-up)
@@ -30,12 +30,13 @@
     (:hook goto-address-mode)))
 
 (setup diff-hl
-  (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
-          magit-pre-refresh-hook diff-hl-magit-post-refresh
-          prog-mode-hook diff-hl-mode
-          conf-mode-hook diff-hl-mode
-          dired-mode-hook diff-hl-dired-mode)
+  (:defer (diff-hl-mode))
   (:when-loaded
+    (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
+            magit-pre-refresh-hook diff-hl-magit-post-refresh
+            prog-mode-hook diff-hl-mode
+            conf-mode-hook diff-hl-mode
+            dired-mode-hook diff-hl-dired-mode)
     (:bind-into diff-hl-mode-map
       "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk)))
 (provide 'init-git)

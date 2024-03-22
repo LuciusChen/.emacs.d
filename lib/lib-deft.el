@@ -1,6 +1,6 @@
 ;; lib-deft.el --- Initialize org	-*- lexical-binding: t; -*-
 ;; deft parse title
-(defun lucius/deft-parse-title (file contents)
+(defun +deft-parse-title (file contents)
   "Parse the given FILE and CONTENTS and determine the title.
 If `deft-use-filename-as-title' is nil, the title is taken to
 be the first non-empty line of the FILE.  Else the base name of the FILE is

@@ -26,8 +26,8 @@
              ("\\*Telegram Message Info\\*$")
              ("\\*Telegram Sticker Set\\*$")
              ("\\*Telegram Notification Messages\\*$")))
-  (popper-mode +1)
-  (popper-echo-mode +1)
+  (:defer (popper-mode +1)
+          (popper-echo-mode +1))
   ;; HACK: close popper window with `C-g'
   (defun +popper-close-window-hack (&rest _)
     "Close popper window via `C-g'."
@@ -54,18 +54,18 @@
              tab-bar-tab-name-truncated-max 20
              tab-bar-auto-width nil
              ;; Add spaces for tab-name
-             tab-bar-tab-name-function 'lucius/tab-bar-tab-name-function
-             tab-bar-tab-name-format-function 'lucius/tab-bar-tab-name-format-function
+             tab-bar-tab-name-function '+tab-bar-tab-name-function
+             tab-bar-tab-name-format-function '+tab-bar-tab-name-format-function
              tab-bar-format '(tab-bar-format-menu-bar
                               tab-bar-format-tabs
                               tab-bar-format-add-tab
                               tab-bar-format-align-right
-                              lucius/tab-bar-telega-icon))
-    (:hooks telega-connection-state-hook lucius/tab-bar-telega-icon-update
-            telega-kill-hook lucius/tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateUnreadChatCount :after #'lucius/tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadMentionCount :after #'lucius/tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'lucius/tab-bar-telega-icon-update)
-    (advice-add 'telega-msg-observable-p :after  #'lucius/tab-bar-telega-icon-update)))
+                              +tab-bar-telega-icon))
+    (:hooks telega-connection-state-hook +tab-bar-telega-icon-update
+            telega-kill-hook +tab-bar-telega-icon-update)
+    (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
+    (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
+    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
+    (advice-add 'telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)))
 (provide 'init-layout)
 ;;; init-layout.el ends here

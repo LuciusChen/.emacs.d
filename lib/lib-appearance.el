@@ -23,7 +23,7 @@
 (defvar light-theme nil "The light theme.")
 (defvar dark-theme nil "The dark theme.")
 
-(defun lucius/adjust-opacity (frame incr)
+(defun +adjust-opacity (frame incr)
   "Adjust the background opacity of FRAME by increment INCR."
   (unless (display-graphic-p frame)
     (error "Cannot adjust opacity of this frame"))
@@ -44,7 +44,7 @@
   (reapply-themes)
   (set-dividers-and-fringe-color)
   (when window-system
-    (lucius/adjust-opacity (selected-frame) +40)))
+    (+adjust-opacity (selected-frame) +40)))
 
 (defun dark ()
   "Activate a dark color theme."
@@ -54,9 +54,9 @@
   (reapply-themes)
   (set-dividers-and-fringe-color)
   (when window-system
-    (lucius/adjust-opacity (selected-frame) -40)))
+    (+adjust-opacity (selected-frame) -40)))
 
-(defun lucius/maybe-suspend-frame ()
+(defun +maybe-suspend-frame ()
   (interactive)
   (unless (and *IS-MAC* window-system)
     (suspend-frame)))

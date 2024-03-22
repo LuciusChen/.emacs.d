@@ -171,7 +171,6 @@
     whitespace-cleanup-mode
     password-store-otp
     password-store
-    (blamer :host github :repo "LuciusChen/blamer.el")
     (emt :host github :repo "roife/emt")
     ;; (dape :host github :repo "svaante/dape")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
