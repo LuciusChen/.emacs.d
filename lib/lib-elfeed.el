@@ -1,7 +1,7 @@
 ;;; lib-elfeed.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(cl-defun lucius/org-roam-capture-ref (&key title url)
+(cl-defun +org-roam-capture-ref (&key title url)
   "Capture the TITLE and URL with multiple `org-roam' templates."
   (let ((templates
          '(("d" "default" plain
@@ -14,12 +14,12 @@
      :props '(:immediate-finish nil)
      :templates templates)))
 
-(cl-defun lucius/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+(cl-defun +menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
   "Create an `org-roam-node' from elfeed ENTRY."
   (interactive)
   (let ((url (elfeed-entry-link entry))
         (title (elfeed-entry-title entry)))
-    (lucius/org-roam-capture-ref :url url :title title)))
+    (+org-roam-capture-ref :url url :title title)))
 
 (defun eli/elfeed-overview ()
   "Get an overview of all feeds."
@@ -66,7 +66,7 @@
       (setf elfeed-search-entries
             entries))))
 
-(defun lucius/xwidget-webkit-browse-entry-link-at-point ()
+(defun +xwidget-webkit-browse-entry-link-at-point ()
   (interactive)
   (let ((entry-link
          (if (eq major-mode 'elfeed-search-mode)
@@ -76,7 +76,7 @@
 
 ;; Full-text RSS https://morss.it/
 ;; https://rsshub.sheerwill.live
-(defvar lucius/elfeed-feeds
+(defvar +elfeed-feeds
   '(
     ("https://morss.it/https://www.joshwcomeau.com/rss.xml" front-end)
     ("https://leancrew.com/all-this/feed/" blog)
@@ -158,7 +158,7 @@
         ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
         (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
 
-(defun lucius/elfeed-search-print-entry--better-default (entry)
+(defun +elfeed-search-print-entry--better-default (entry)
   "Print ENTRY to the buffer."
   (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
          (date-width (car (cdr elfeed-search-date-format)))
@@ -194,7 +194,7 @@
               (propertize feed-title 'face 'elfeed-search-feed-face) " "))
     (when tags (insert "(" tags-str ")"))))
 
-(defun lucius/elfeed-switch-to-log-buffer ()
+(defun +elfeed-switch-to-log-buffer ()
   "As name suggested."
   (interactive)
   (switch-to-buffer (elfeed-log-buffer)))

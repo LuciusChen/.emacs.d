@@ -1,6 +1,6 @@
 ;;; lib-telega.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary
-(defun lucius/telega-webpage-open-url-in-xwidget ()
+(defun +telega-webpage-open-url-in-xwidget ()
   (interactive)
   (let ((entry-link
          (if (eq major-mode 'telega-chat-mode)
@@ -37,14 +37,14 @@
           backend)))
 
 ;; 补全
-(defun lucius/telega-completion-setup ()
+(defun +telega-completion-setup ()
   (make-variable-buffer-local 'completion-at-point-functions)
   (setq completion-at-point-functions
         (append (mapcar #'cape-company-to-capf telega-company-backends)
                 completion-at-point-functions))
   (corfu-mode 1))
 
-(defun lucius/telega-save-file-to-clipboard (msg)
+(defun +telega-save-file-to-clipboard (msg)
   "Save file at point to clipboard.
 NOTE: macOS only."
   (interactive (list (telega-msg-for-interactive)))
@@ -60,7 +60,7 @@ NOTE: macOS only."
             (shell-command (format "osascript -e 'set the clipboard to POSIX file \"%s\"'" fpath))
             (message (format "File saved to clipboard: %s" fpath))))))))
 
-(defun lucius/telega-msg-save-to-cloud-copyleft (msg)
+(defun +telega-msg-save-to-cloud-copyleft (msg)
   "Save messages's MSG media content to a file.
      If MSG is an animation message, then possibly add animation to
      the saved animations list."

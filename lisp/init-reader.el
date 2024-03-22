@@ -3,17 +3,17 @@
 (setup nov
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   (:when-loaded
-    (:hooks nov-mode-hook lucius/nov-annotate-font-lock)
-    (defface lucius/nov-annotate-face
+    (:hooks nov-mode-hook +nov-annotate-font-lock)
+    (defface +nov-annotate-face
         '((t (:foreground "#86C166")))
       "Face for # in nov-annotate-face."
       :group 'nov-annotate-face)
 
-    (defun lucius/nov-annotate-font-lock ()
-      "Set up font-lock for # in lucius/nov-annotate-face."
+    (defun +nov-annotate-font-lock ()
+      "Set up font-lock for # in +nov-annotate-face."
       (font-lock-add-keywords
        nil
-       '(("『\\(\\(?:.\\|\n\\)*?\\)』" . 'lucius/nov-annotate-face)))
+       '(("『\\(\\(?:.\\|\n\\)*?\\)』" . '+nov-annotate-face)))
       (font-lock-flush))))
 
 (setup org-remark
@@ -57,10 +57,10 @@
   (:global "C-x w" elfeed)
   (:when-loaded
     (:also-load lib-elfeed)
-    (:option elfeed-feeds lucius/elfeed-feeds
-             elfeed-search-print-entry-function #'lucius/elfeed-search-print-entry--better-default)
+    (:option elfeed-feeds +elfeed-feeds
+             elfeed-search-print-entry-function #'+elfeed-search-print-entry--better-default)
     (:bind-into elfeed-show-mode-map
-      "N" lucius/menu-dwim--org-capture-elfeed-show
+      "N" +menu-dwim--org-capture-elfeed-show
       "o" open-link-with-mpv)
     (:bind-into elfeed-search-mode-map "L" eli/elfeed-overview)))
 

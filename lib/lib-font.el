@@ -1,11 +1,12 @@
 ;;; lib-font.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(defun lucius/setup-fonts ()
+(defun +setup-fonts ()
   ;; https://typeof.net/Iosevka/customizer
   ;; https://github.com/be5invis/Iosevka/blob/v21.0.0/doc/PACKAGE-LIST.md
   ;; Setting the default
-  (set-face-attribute 'default nil :font "IBM Plex Mono 14" :weight 'normal)
+  ;; (set-face-attribute 'default nil :font "IBM Plex Mono 14" :weight 'normal)
+  (set-face-attribute 'default nil :font "Berkeley Mono 14" :weight 'normal)
   ;; (set-face-attribute 'default nil :font "Iosevka Lucius 14" :weight 'normal)
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
@@ -20,15 +21,15 @@
                          "Segoe UI Emoji"
                          "Symbola")
            when (find-font (font-spec :name font))
-             return (set-fontset-font
-                     t
-                     'unicode
-                     (font-spec :family font
-                                :size
-                                (cond ((eq system-type 'darwin) 12)
-                                      ((eq system-type 'gnu/linux) 12)
-                                      ((eq system-type 'windows-nt) 12)))
-                     nil 'prepend))
+           return (set-fontset-font
+                   t
+                   'unicode
+                   (font-spec :family font
+                              :size
+                              (cond ((eq system-type 'darwin) 12)
+                                    ((eq system-type 'gnu/linux) 12)
+                                    ((eq system-type 'windows-nt) 12)))
+                   nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
@@ -45,6 +46,7 @@
   (set-fontset-font nil ?❤ "Iosevka Lucius")
   (set-fontset-font nil ?☑ "Iosevka Lucius")
   (set-fontset-font nil ?☐ "Iosevka Lucius")
+  (set-fontset-font nil ?⦚ "Iosevka Lucius")
   (set-fontset-font t 'javanese "Noto Sans Javanese"))
 (provide 'lib-font)
 ;;; lib-font.el ends here

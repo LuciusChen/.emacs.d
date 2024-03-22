@@ -3,28 +3,28 @@
 ;;; Code:
 (setup webpaste
   (:defer
-      (require 'webpaste)
-      (:option webpaste-provider-priority '("paste.mozilla.org" "dpaste.org"))))
+   (require 'webpaste)
+   (:option webpaste-provider-priority '("paste.mozilla.org" "dpaste.org"))))
 
 (setup password-store
   (:defer
-      (defun lucius/password-store-insert (entry &optional password)
-        "Insert a new ENTRY containing PASSWORD or the current region if selected."
-        (interactive
-         (list (password-store--completing-read)
-               (if (use-region-p)
-                   (buffer-substring-no-properties (region-beginning) (region-end))
-                 (read-passwd "Password: " t))))
-        (let* ((password (or password (read-passwd "Password: " t)))
-               (command (format "echo %s | %s insert -m -f %s"
-                                (shell-quote-argument password)
-                                password-store-executable
-                                (shell-quote-argument entry)))
-               (ret (process-file-shell-command command)))
-          (if (zerop ret)
-              (message "Successfully inserted entry for %s" entry)
-            (message "Cannot insert entry for %s" entry))))
-      (:advice password-store-insert :override #'lucius/password-store-insert)))
+   (defun +password-store-insert (entry &optional password)
+     "Insert a new ENTRY containing PASSWORD or the current region if selected."
+     (interactive
+      (list (password-store--completing-read)
+            (if (use-region-p)
+                (buffer-substring-no-properties (region-beginning) (region-end))
+              (read-passwd "Password: " t))))
+     (let* ((password (or password (read-passwd "Password: " t)))
+            (command (format "echo %s | %s insert -m -f %s"
+                             (shell-quote-argument password)
+                             password-store-executable
+                             (shell-quote-argument entry)))
+            (ret (process-file-shell-command command)))
+       (if (zerop ret)
+           (message "Successfully inserted entry for %s" entry)
+         (message "Cannot insert entry for %s" entry))))
+   (:advice password-store-insert :override #'+password-store-insert)))
 
 (setup rainbow-mode
   ;; add support for ARGB color format e.g "0xFFFF0000"

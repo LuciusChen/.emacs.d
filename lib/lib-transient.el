@@ -1,6 +1,6 @@
 ;; lib-transient.el --- Initialize org	-*- lexical-binding: t; -*-
 ;; 打开当前日期对应的 daily log 文件
-(defun lucius/delete-archived-daily-log-files ()
+(defun +delete-archived-daily-log-files ()
   "Delete Daily log files that have no titles in them."
   (interactive)
   (let ((dir "~/Library/CloudStorage/Dropbox/org/daily/")
@@ -45,7 +45,7 @@
                  (find-file file-path)
                (message "Journal file not found for yesterday"))))
           ((member "delete" args)
-           (lucius/delete-archived-daily-log-files)))))
+           (+delete-archived-daily-log-files)))))
 ;;;; provide
 (provide 'lib-transient)
 ;;; lib-transient.el ends here.

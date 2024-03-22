@@ -34,11 +34,11 @@
         (insert (propertize pre-insert-string 'face 'shadow))))
     (add-hook 'pre-command-hook 'mcfly-back-to-present nil t)))
 
-(defmacro lucius/no-consult-preview (&rest cmds)
+(defmacro +no-consult-preview (&rest cmds)
   `(with-eval-after-load 'consult
      (consult-customize ,@cmds :preview-key "M-P")))
 
-(lucius/no-consult-preview
+(+no-consult-preview
  consult-ripgrep
  consult-git-grep consult-grep
  consult-bookmark consult-recent-file consult-xref

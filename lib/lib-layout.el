@@ -1,12 +1,6 @@
 ;;; lib-layout.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-;; (defface lucius/nerd-icons-purple
-;;     '((((background dark)) :foreground "#B2A3F9" :background "#172021")
-;;       (((background light)) :foreground "#8940AE" :background "#f6fff9"))
-;;   "Face for purple icons."
-;;   :group 'nerd-icons-faces)
-
 (defun tab-bar-format-menu-bar ()
   "Produce the Menu button for the tab bar that shows the menu bar."
   `((menu-bar menu-item
@@ -15,7 +9,7 @@
                                           :face '(:inherit nerd-icons-purple)))
               tab-bar-menu-bar :help "Menu Bar")))
 
-(defun lucius/tab-bar-tab-name-function ()
+(defun +tab-bar-tab-name-function ()
   (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
          (count (length (window-list-1 nil 'nomini)))
          (truncated-tab-name (if (< (length raw-tab-name)
@@ -28,7 +22,7 @@
         (concat truncated-tab-name "(" (number-to-string count) ")")
       truncated-tab-name)))
 
-(defun lucius/tab-bar-tab-name-format-function (tab i)
+(defun +tab-bar-tab-name-format-function (tab i)
   (let ((face (funcall tab-bar-tab-face-function tab)))
     (concat
      ;; change tab-bar's height
@@ -37,10 +31,10 @@
      (propertize (concat " " (alist-get 'name tab) " ") 'face face)
      (propertize " " 'display '(raise -0.25)))))
 ;; telega notification
-(defvar lucius/tab-bar-telega-indicator-cache nil)
+(defvar +tab-bar-telega-indicator-cache nil)
 
-(defun lucius/tab-bar-telega-icon-update (&rest rest)
-  (setq lucius/tab-bar-telega-indicator-cache
+(defun +tab-bar-telega-icon-update (&rest rest)
+  (setq +tab-bar-telega-indicator-cache
         (when (and (fboundp 'telega-server-live-p)
                    (telega-server-live-p)
                    (buffer-live-p telega-server--buffer))
@@ -71,8 +65,8 @@
                                     'face 'telega-unmuted-count))
                       "] "))))))
 
-(defun lucius/tab-bar-telega-icon ()
-  (or lucius/tab-bar-telega-indicator-cache
-      (lucius/tab-bar-telega-icon-update)))
+(defun +tab-bar-telega-icon ()
+  (or +tab-bar-telega-indicator-cache
+      (+tab-bar-telega-icon-update)))
 (provide 'lib-layout)
 ;;; lib-layout.el ends here

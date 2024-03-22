@@ -101,7 +101,7 @@ See also `org-save-all-org-buffers'"
   (let ((org-time-stamp-custom-formats org-time-stamp-custom-formats))
     (format "%s" (with-temp-buffer (org-time-stamp-inactive nil)))))
 
-(defun lucius/org-latex-preview-reload ()
+(defun +org-latex-preview-reload ()
   (interactive)
   (call-interactively 'org-latex-preview-clear-cache)
   (org-latex-preview 'buffer))

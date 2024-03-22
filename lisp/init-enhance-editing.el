@@ -71,12 +71,12 @@
                                                 'telega-chat-mode)))
                    'other)))
 
-  (defun lucius/meow-focus-change-function ()
+  (defun +meow-focus-change-function ()
     (if (frame-focus-state)
         (sis-set-english)
       (meow-insert-exit)))
 
-  (add-function :after after-focus-change-function 'lucius/meow-focus-change-function))
+  (add-function :after after-focus-change-function '+meow-focus-change-function))
 
 (setup emt
   (:hooks after-init-hook emt-mode)
@@ -89,11 +89,11 @@
   (emt-ensure))
 
 ;; 编程模式下显示竖线作为参考，控制行宽。
-(setup column-indicator
-  (when (boundp 'display-fill-column-indicator)
-    (setq-default indicate-buffer-boundaries 'left)
-    (setq-default display-fill-column-indicator-character ?\u254e)
-    (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)))
+;; (setup column-indicator
+;;   (when (boundp 'display-fill-column-indicator)
+;;     (setq-default indicate-buffer-boundaries 'left)
+;;     (setq-default display-fill-column-indicator-character ?\u2502)
+;;     (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)))
 
 ;; 剪贴板查找
 (setup browse-kill-ring
@@ -120,10 +120,12 @@
   (:hooks prog-mode-hook rainbow-delimiters-mode))
 
 (setup yasnippet
-  (:option yas-keymap-disable-hook
-           (lambda () (and (frame-live-p corfu--frame)
-                           (frame-visible-p corfu--frame))))
-  (:when-loaded (:hooks after-init-hook yas-global-mode)))
+  (:defer
+   (:when-loaded
+     (:option yas-keymap-disable-hook
+              (lambda () (and (frame-live-p corfu--frame)
+                              (frame-visible-p corfu--frame))))
+     (:hooks after-init-hook yas-global-mode))))
 
 ;; 手动开启 hs-minor-mode
 (setup hideshow
@@ -145,11 +147,9 @@
            vundo-roll-back-on-quit t))
 
 (setup avy
-  (:require ace-pinyin)
-  (:global "C-;" avy-goto-char-timer
+  (:global "C-;" avy-goto-char
            "C-:" avy-goto-char-in-line)
-  ;; uncomment if you want to use `ace-jump-mode'
-  ;; (:option ace-pinyin-use-avy nil)
-  (ace-pinyin-global-mode +1))
+  (:defer (:require ace-pinyin)
+          (ace-pinyin-global-mode +1)))
 (provide 'init-enhance-editing)
 ;;; init-enhance-editing.el ends here

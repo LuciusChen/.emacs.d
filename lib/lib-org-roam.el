@@ -23,7 +23,7 @@
     (apply #'org-roam-node-insert args)))
 
 ;; https://github.com/org-roam/org-roam/issues/2066
-(defun lucius/org-roam-node-read--to-candidate (node template)
+(defun +org-roam-node-read--to-candidate (node template)
   "Return a minibuffer completion candidate given NODE.
 TEMPLATE is the processed template used to format the entry."
   (let ((candidate-main (org-roam-node--format-entry
@@ -51,7 +51,7 @@ TEMPLATE is the processed template used to format the entry."
 
 ;; ripgrep search
 ;; brew install ripgrep
-(defun lucius/org-roam-rg-search ()
+(defun +org-roam-rg-search ()
   "Search org-roam directory using consult-ripgrep. With live-preview."
   (interactive)
   (let ((consult-ripgrep-command "rg --null --ignore-case --type org --line-buffered --color=always --max-columns=500 --no-heading --line-number . -e ARG OPTS"))
@@ -137,7 +137,7 @@ TEMPLATE is the processed template used to format the entry."
         ;; (org-transclusion-mode -1)
         (message "Done!")))))
 
-(defun lucius/org-refile-anywhere (&optional goto default-buffer rfloc msg)
+(defun +org-refile-anywhere (&optional goto default-buffer rfloc msg)
   "A version of `org-refile' which allows refiling to any subtree."
   (interactive "P")
   (let ((org-refile-target-verify-function))
