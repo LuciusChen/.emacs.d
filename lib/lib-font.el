@@ -7,6 +7,7 @@
   ;; Setting the default
   ;; (set-face-attribute 'default nil :font "IBM Plex Mono 14" :weight 'normal)
   (set-face-attribute 'default nil :font "Berkeley Mono 14" :weight 'normal)
+  ;; (set-face-attribute 'default nil :font "Fira Code 14" :weight 'normal)
   ;; (set-face-attribute 'default nil :font "Iosevka Lucius 14" :weight 'normal)
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola

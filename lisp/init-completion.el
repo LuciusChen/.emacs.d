@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (setup orderless
-  (:defer (require 'orderless))
+  (:defer (:require orderless))
   (:when-loaded
     (:also-load lib-orderless)
     (:option completion-styles '(orderless flex)
@@ -33,13 +33,13 @@
                  '(orderless+basic
                    orderless+basic-try
                    orderless+basic-all
-                   "Unholy mix of Orderless and Basic."))
-    ))
+                   "Unholy mix of Orderless and Basic."))))
 
 (setup corfu
-  (:defer (global-corfu-mode)
-          (:require nerd-icons))
+  (:defer (:require corfu))
   (:when-loaded
+    (:require nerd-icons)
+    (global-corfu-mode)
     (:option corfu-cycle t
              global-corfu-modes '(prog-mode telega-chat-mode)
              ;; Using VS Code icons as an alternative
@@ -91,26 +91,26 @@
       (setq-default corfu-quit-no-match 'separator))))
 
 (setup kind-icon
-  (:after corfu
-    (add-to-list 'corfu-margin-formatters
-                 #'kind-icon-margin-formatter))
+  (:load-after corfu)
   (:when-loaded
+    (add-to-list 'corfu-margin-formatters
+                 #'kind-icon-margin-formatter)
     (advice-add 'reapply-themes :after 'kind-icon-reset-cache)))
 
 (setup cape
+  (:load-after corfu)
   (:when-loaded
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 (setup eglot
-  (:defer (require 'eglot))
+  (:defer (:require eglot))
   (:when-loaded
     (:also-load lib-eglot)
     (:with-mode (python-mode java-ts-mode typescript-mode)
       (:hook eglot-ensure))
     ;; 关闭 eldoc_mode
-
     (:hooks eglot-managed-mode-hook (lambda () (when (eglot-managed-p)
                                                  (eldoc-mode -1))))
     (:option eglot-events-buffer-size 0

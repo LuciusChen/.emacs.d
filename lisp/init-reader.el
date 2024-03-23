@@ -1,11 +1,13 @@
 ;;; init-reader.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary
+(setup gfm-mode (:file-match "\\.md\\'"))
+
 (setup nov
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (:file-match "\\.epub\\'")
   (:when-loaded
     (:hooks nov-mode-hook +nov-annotate-font-lock)
     (defface +nov-annotate-face
-        '((t (:foreground "#86C166")))
+      '((t (:foreground "#86C166")))
       "Face for # in nov-annotate-face."
       :group 'nov-annotate-face)
 
@@ -17,14 +19,16 @@
       (font-lock-flush))))
 
 (setup org-remark
-  (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
-  (:global "C-c i m" org-remark-mark)
-  (:bind-into org-remark-mode-map
-    "C-c i o" org-remark-open
-    "C-c i ]" org-remark-view-next
-    "C-c i [" org-remark-view-prev
-    "C-c i r" org-remark-remove
-    "C-c i d" org-remark-delete))
+  (:load-after org)
+  (:when-loaded
+    (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
+    (:global "C-c i m" org-remark-mark)
+    (:bind-into org-remark-mode-map
+      "C-c i o" org-remark-open
+      "C-c i ]" org-remark-view-next
+      "C-c i [" org-remark-view-prev
+      "C-c i r" org-remark-remove
+      "C-c i d" org-remark-delete)))
 
 (setup org-remark-nov
   (:after nov (org-remark-nov-mode +1)))

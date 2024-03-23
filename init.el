@@ -191,7 +191,7 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
 (require 'init-setup)
-(require 'init-core)
+(require 'init-builtin)
 (require 'init-gui-frames)
 (require 'init-layout)
 
