@@ -6,7 +6,7 @@
 (setup magit
   (:load-after vc)
   (:when-loaded
-    (:also-load lib-vc)
+    (:also-load lib-magit)
     (:bind-into magit-status-mode-map "C-M-<up>" magit-section-up)
     (:bind-into vc-prefix-map
       "l" +magit-or-vc-log-Convenient
