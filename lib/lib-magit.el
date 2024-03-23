@@ -31,5 +31,34 @@
 
 (defun magit-restore-screen (&rest args)
   (jump-to-register :magit-fullscreen))
+
+(defun kill-all-blob-next-after-quit (orig-fun &rest args)
+  "Kill next last viewed buffer"
+  (let ((prev-buffer (current-buffer)))
+    (apply orig-fun args)
+    (kill-buffer prev-buffer)
+    (unless magit-buffer-file-name
+      (user-error "magit timemachine: You have reached the end of time"))))
+
+(defun kill-all-blob-previous-after-quit (orig-fun &rest args)
+  "Kill previous last viewed buffer"
+  (let ((prev-buffer (current-buffer)))
+    (apply orig-fun args)
+    (unless (equal magit-buffer-file-name (buffer-file-name prev-buffer))
+      (kill-buffer prev-buffer))))
+
+(defun +magit-blob-save()
+  (interactive)
+  (let ((file magit-buffer-file-name)
+        (blob-buf (current-buffer)))
+    (when file
+      (with-current-buffer (find-file file)
+        (widen)
+        (replace-buffer-contents  blob-buf))
+      (message "save blob to file %s" file))
+    (dolist (buf (buffer-list))         ;关闭此文件所有版本的blob buffer
+      (with-current-buffer buf
+        (when (equal magit-buffer-file-name file)
+          (kill-this-buffer))))))
 (provide 'lib-magit)
 ;;; lib-magit.el ends here

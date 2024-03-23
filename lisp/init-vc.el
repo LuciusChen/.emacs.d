@@ -2,11 +2,7 @@
 ;;; Commentary:
 (setup git-timemachine
   (:global "C-x v t" git-timemachine-toggle)
-  ;; (:advice (meow-motion-mode 1) :after #'git-timemachine-toggle)
-  ;; (:advice (lambda()(meow-normal-mode 1)) :after #'git-timemachine-quit)
   (add-hook 'git-timemachine-mode-hook (lambda()(message "test")(meow--switch-state 'motion)))
-  ;; (advice-add #'meow--enable :before (lambda (&rest _) (meow--switch-state 'motion)))
-  ;; (:advice my-custom-timemachine-hook :after #'switch-to-buffer)
   )
 
 (setup magit
@@ -14,19 +10,22 @@
   (:when-loaded
     (:also-load lib-magit)
     (:bind-into magit-status-mode-map "C-M-<up>" magit-section-up)
-    (:bind-into vc-prefix-map
-      "l" +magit-or-vc-log-Convenient
-      ;; file binding for vc-git-grep
-      "f" vc-git-grep)
-    ;; (define-key magit-status-mode-map (kbd "C-M-<up>") 'magit-section-up)
+    (:bind-into vc-prefix-map "l" +magit-or-vc-log-file
+                ;; file binding for vc-git-grep
+                "f" vc-git-grep)
+    ;; 将当前 view 的 buffer 写入文件，实现恢复以前版本的作用
+    (:bind-into magit-blob-mode-map "C-c C-c" +magit-blob-save)
     ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
     ;; quickly open magit on any one of your projects.
     (:global [(meta f12)] magit-status
              "C-x g" magit-status
              "C-x M-g" magit-dispatch)
+    (:option magit-diff-refine-hunk t)
     (:advice magit-status :around #'magit-fullscreen)
     (:advice magit-mode-quit-window :after #'magit-restore-screen)
-    (setq-default magit-diff-refine-hunk t)
+    ;; kill 因为 blob-next 和 blob-previous 产生的 buffer
+    (:advice magit-blob-next :around #'kill-all-blob-next-after-quit)
+    (:advice magit-blob-previous :around #'kill-all-blob-previous-after-quit)
     (when *IS-MAC*
       (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))))
 
