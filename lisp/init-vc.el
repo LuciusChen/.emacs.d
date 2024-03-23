@@ -1,10 +1,5 @@
 ;;; init-vc.el --- Git SCM support -*- lexical-binding: t -*-
 ;;; Commentary:
-(setup git-timemachine
-  (:global "C-x v t" git-timemachine-toggle)
-  (add-hook 'git-timemachine-mode-hook (lambda()(message "test")(meow--switch-state 'motion)))
-  )
-
 (setup magit
   (:load-after vc)
   (:when-loaded
