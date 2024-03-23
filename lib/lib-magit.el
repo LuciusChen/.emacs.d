@@ -1,4 +1,4 @@
-;;; lib-vc.el --- vc setup -*- lexical-binding: t -*-
+;;; lib-magit.el --- vc setup -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 (defun +magit-or-vc-log-file (&optional prompt)
@@ -31,5 +31,5 @@
 
 (defun magit-restore-screen (&rest args)
   (jump-to-register :magit-fullscreen))
-(provide 'lib-vc)
-;;; lib-vc.el ends here
+(provide 'lib-magit)
+;;; lib-magit.el ends here
