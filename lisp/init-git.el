@@ -4,14 +4,13 @@
   (:global "C-x v t" git-timemachine-toggle))
 
 (setup magit
+  (:load-after vc)
   (:when-loaded
     (:also-load lib-vc)
-    (:also-load forge)
-    (:load-after vc)
     (:bind-into magit-status-mode-map "C-M-<up>" magit-section-up)
     (:bind-into vc-prefix-map
-      "l" +magit-or-vc-log-file
-      ;; Convenient binding for vc-git-grep
+      "l" +magit-or-vc-log-Convenient
+      ;; file binding for vc-git-grep
       "f" vc-git-grep)
     ;; (define-key magit-status-mode-map (kbd "C-M-<up>") 'magit-section-up)
     ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
@@ -25,9 +24,14 @@
     (when *IS-MAC*
       (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))))
 
-(setup git-commit
-  (:with-mode git-commit-mode
-    (:hook goto-address-mode)))
+(setup forge
+  (:load-after magit)
+  ;; Make it easier to see that a topic was closed.
+  (:face forge-topic-closed ((t (:strike-through t)))))
+
+;; (setup git-commit
+;;   (:with-mode git-commit-mode
+;;     (:hook goto-address-mode)))
 
 (setup diff-hl
   (:defer (diff-hl-mode))

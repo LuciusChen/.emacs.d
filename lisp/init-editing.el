@@ -146,10 +146,26 @@
   (:option vundo--window-max-height 5
            vundo-roll-back-on-quit t))
 
+(setup imenu
+  (:when-loaded
+    (:with-mode emacs-lisp-mode
+      (:hook (lambda ()
+               (setf (map-elt imenu-generic-expression "Setup")
+                     (list (rx line-start (0+ blank)
+                               "(setup" (1+ blank)
+                               (or (group-n 1 (1+ (or (syntax word)
+                                                      (syntax symbol))))
+                                   ;; Add here items that can define a feature:
+                                   (seq "(:" (or "straight" "require" "package")
+                                        (1+ blank)
+                                        (group-n 1 (1+ (or (syntax word)
+                                                           (syntax symbol)))))))
+                           1)))))))
+
 (setup avy
   (:global "C-;" avy-goto-char
            "C-:" avy-goto-char-in-line)
   (:defer (:require ace-pinyin)
           (ace-pinyin-global-mode +1)))
 (provide 'init-editing)
-;;; init-enhance-editing.el ends here
+;;; init-editing.el ends here

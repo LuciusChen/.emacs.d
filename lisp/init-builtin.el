@@ -1,4 +1,4 @@
-;;; init-core.el --- Measure startup and require times -*- lexical-binding: t -*-
+;;; init-builtin.el --- Measure startup and require times -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 (setup startup
@@ -165,5 +165,5 @@
     ;; HACK: Text properties inflate the size of recentf's files, and there is
     ;; no purpose in persisting them (Must be first in the list!)
     (add-to-list 'recentf-filename-handlers #'substring-no-properties)))
-(provide 'init-core)
-;;; init-core.el ends here
+(provide 'init-builtin)
+;;; init-builtin.el ends here

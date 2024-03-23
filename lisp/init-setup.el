@@ -54,19 +54,12 @@ See `advice-add' for more details."
       body))
   :documentation "Load the current feature after FEATURES.")
 
-(with-eval-after-load 'imenu
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (setf (map-elt imenu-generic-expression "Setup")
-                    (list (rx line-start (0+ blank)
-                              "(setup" (1+ blank)
-                              (or (group-n 1 (1+ (or (syntax word)
-                                                     (syntax symbol))))
-                                  ;; Add here items that can define a feature:
-                                  (seq "(:" (or "straight" "require" "package")
-                                       (1+ blank)
-                                       (group-n 1 (1+ (or (syntax word)
-                                                          (syntax symbol)))))))
-                          1)))))
+(setup-define :face
+  (lambda (face spec) `(custom-set-faces (quote (,face ,spec))))
+  :documentation "Customize FACE to SPEC."
+  :signature '(face spec ...)
+  :debug '(setup)
+  :repeatable t
+  :after-loaded t)
 (provide 'init-setup)
 ;;; init-setup.el ends here

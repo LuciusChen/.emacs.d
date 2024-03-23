@@ -16,7 +16,6 @@
 (setup my-jsp-mode (:file-match "\\.jsp\\'"))
 (setup java-ts-mode (:file-match "\\.java\\'"))
 (setup yaml-ts-mode (:file-match "\\.yaml\\'"))
-(setup gfm-mode (:file-match "\\.md\\'"))
 (setup vue-mode (:file-match "\\.vue\\'")
        (:hooks vue-mode-hook (lambda ()
                                (setq-local tab-width 2)
