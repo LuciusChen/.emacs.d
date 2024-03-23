@@ -157,7 +157,6 @@
     embark-consult
     elfeed-tube-mpv
     typescript-mode
-    git-timemachine
     nerd-icons-dired
     command-log-mode
     browse-kill-ring
