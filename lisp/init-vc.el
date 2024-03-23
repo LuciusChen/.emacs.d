@@ -1,7 +1,13 @@
-;;; init-git.el --- Git SCM support -*- lexical-binding: t -*-
+;;; init-vc.el --- Git SCM support -*- lexical-binding: t -*-
 ;;; Commentary:
 (setup git-timemachine
-  (:global "C-x v t" git-timemachine-toggle))
+  (:global "C-x v t" git-timemachine-toggle)
+  ;; (:advice (meow-motion-mode 1) :after #'git-timemachine-toggle)
+  ;; (:advice (lambda()(meow-normal-mode 1)) :after #'git-timemachine-quit)
+  (add-hook 'git-timemachine-mode-hook (lambda()(message "test")(meow--switch-state 'motion)))
+  ;; (advice-add #'meow--enable :before (lambda (&rest _) (meow--switch-state 'motion)))
+  ;; (:advice my-custom-timemachine-hook :after #'switch-to-buffer)
+  )
 
 (setup magit
   (:load-after vc)
@@ -43,5 +49,5 @@
             dired-mode-hook diff-hl-dired-mode)
     (:bind-into diff-hl-mode-map
       "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk)))
-(provide 'init-git)
-;;; init-git.el ends here
+(provide 'init-vc)
+;;; init-vc.el ends here
