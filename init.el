@@ -198,7 +198,7 @@
 (require 'init-editing)
 (require 'init-dired)
 (require 'init-flymake)
-(require 'init-git)
+(require 'init-vc)
 (require 'init-minibuffer)
 (require 'init-completion)
 (require 'init-prog)

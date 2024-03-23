@@ -88,8 +88,8 @@
    '("<escape>" . ignore))
   (dolist
       (state
-        '((telega-root-mode . motion)
-          (telega-chat-mode . normal)))
+       '((telega-root-mode . motion)
+         (telega-chat-mode . normal)))
     (add-to-list 'meow-mode-state-list state)))
 
 ;; meow insert mode switch
