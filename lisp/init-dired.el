@@ -16,5 +16,15 @@
   (:with-mode dired-mode (:hook diff-hl-dired-mode
                                 dired-hide-details-mode
                                 nerd-icons-dired-mode)))
+
+(setup dired-preview
+  (:option dired-preview-delay 0.7
+           dired-preview-max-size (expt 2 20)
+           dired-preview-ignored-extensions-regexp
+           (concat "\\."
+                   "\\(mkv\\|webm\\|mp4\\|mp3\\|ogg\\|m4a"
+                   "\\|gz\\|zst\\|tar\\|xz\\|rar\\|zip"
+                   "\\|iso\\|epub\\|pdf\\)"))
+  (:defer (dired-preview-global-mode 1)))
 (provide 'init-dired)
 ;;; init-dired.el ends here
