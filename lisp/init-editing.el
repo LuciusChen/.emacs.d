@@ -78,22 +78,16 @@
 
   (add-function :after after-focus-change-function '+meow-focus-change-function))
 
-(setup emt
-  (:hooks after-init-hook emt-mode)
-  (:global "M-f" emt-forward-word
-           "M-b" emt-backward-word)
-  (:option emt-lib-path
-           (expand-file-name
-            "straight/repos/emt/module/.build/release/libEMT.dylib"
-            user-emacs-directory))
-  (emt-ensure))
-
-;; 编程模式下显示竖线作为参考，控制行宽。
-;; (setup column-indicator
-;;   (when (boundp 'display-fill-column-indicator)
-;;     (setq-default indicate-buffer-boundaries 'left)
-;;     (setq-default display-fill-column-indicator-character ?\u2502)
-;;     (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)))
+(when *IS-MAC*
+  (setup emt
+    (:hooks after-init-hook emt-mode)
+    (:global "M-f" emt-forward-word
+             "M-b" emt-backward-word)
+    (:option emt-lib-path
+             (expand-file-name
+              "straight/repos/emt/module/.build/release/libEMT.dylib"
+              user-emacs-directory))
+    (emt-ensure)))
 
 ;; 剪贴板查找
 (setup browse-kill-ring
