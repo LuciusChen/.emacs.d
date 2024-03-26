@@ -48,8 +48,10 @@
   (:when-loaded
     (:global "M-g l" consult-line
              "M-g i" consult-imenu
-             "M-g r" consult-recent-file
-             "M-g f" consult-ripgrep
+             "M-g f" consult-recent-file
+             "M-g r" consult-ripgrep
+             ;; brew install fd
+             "M-g d" consult-fd
              [remap switch-to-buffer] consult-buffer
              [remap switch-to-buffer-other-window] 'consult-buffer-other-window
              [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame
