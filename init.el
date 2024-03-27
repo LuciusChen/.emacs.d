@@ -197,12 +197,12 @@
 
 (require 'init-editing)
 (require 'init-dired)
-(require 'init-flymake)
 (require 'init-vc)
 (require 'init-minibuffer)
 (require 'init-completion)
 (require 'init-prog)
 
+(require 'init-transient)
 (require 'init-telega)
 (require 'init-reader)
 ;; (require 'init-beancount)

@@ -94,9 +94,9 @@
     (:option org-capture-bookmark nil
              org-capture-templates
              `(("i" "inbox" entry  (file "agenda/inbox.org")
-                    ,(concat "* TODO %?\n%U"))
+                ,(concat "* TODO %?\n%U"))
                ("n" "note" entry (file "agenda/note.org")
-                    "* %? :NOTE:\n%U\n%a\n" :clock-resume t)))))
+                "* %? :NOTE:\n%U\n%a\n" :clock-resume t)))))
 
 (setup org-clock
   (:global "C-c o j" org-clock-goto
@@ -227,79 +227,79 @@
      org-agenda-window-setup 'current-window
      org-agenda-custom-commands
      `(("N" "Notes" tags "NOTE"
-            ((org-agenda-overriding-header "Notes")
-             (org-tags-match-list-sublevels t)))
+        ((org-agenda-overriding-header "Notes")
+         (org-tags-match-list-sublevels t)))
        ("g" "GTD"
-            ((agenda "" nil)
-             (tags-todo "-inbox"
-                        ((org-agenda-overriding-header "Next Actions")
-                         (org-agenda-tags-todo-honor-ignore-options t)
-                         (org-agenda-todo-ignore-scheduled 'future)
-                         (org-agenda-skip-function
-                          (lambda ()
-                            (or (org-agenda-skip-subtree-if 'todo '("HOLD" "WAITING"))
-                                (org-agenda-skip-entry-if 'nottodo '("NEXT")))))
-                         (org-tags-match-list-sublevels t)
-                         (org-agenda-sorting-strategy
-                          '(todo-state-down effort-up category-keep))))
-             (tags-todo "-reading/PROJECT"
-                        ((org-agenda-overriding-header "Project")
-                         (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
-                         (org-tags-match-list-sublevels t)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))
-             (tags-todo "+reading/PROJECT"
-                        ((org-agenda-overriding-header "Reading")
-                         (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
-                         (org-tags-match-list-sublevels t)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))
-             (tags-todo "/WAITING"
-                        ((org-agenda-overriding-header "Waiting")
-                         (org-agenda-tags-todo-honor-ignore-options t)
-                         (org-agenda-todo-ignore-scheduled 'future)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))
-             (tags-todo "/DELEGATED"
-                        ((org-agenda-overriding-header "Delegated")
-                         (org-agenda-tags-todo-honor-ignore-options t)
-                         (org-agenda-todo-ignore-scheduled 'future)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))
-             (tags-todo "-inbox"
-                        ((org-agenda-overriding-header "On Hold")
-                         (org-agenda-skip-function
-                          (lambda ()
-                            (or (org-agenda-skip-subtree-if 'todo '("WAITING"))
-                                (org-agenda-skip-entry-if 'nottodo '("HOLD")))))
-                         (org-tags-match-list-sublevels nil)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))
-             ))
+        ((agenda "" nil)
+         (tags-todo "-inbox"
+                    ((org-agenda-overriding-header "Next Actions")
+                     (org-agenda-tags-todo-honor-ignore-options t)
+                     (org-agenda-todo-ignore-scheduled 'future)
+                     (org-agenda-skip-function
+                      (lambda ()
+                        (or (org-agenda-skip-subtree-if 'todo '("HOLD" "WAITING"))
+                            (org-agenda-skip-entry-if 'nottodo '("NEXT")))))
+                     (org-tags-match-list-sublevels t)
+                     (org-agenda-sorting-strategy
+                      '(todo-state-down effort-up category-keep))))
+         (tags-todo "-reading/PROJECT"
+                    ((org-agenda-overriding-header "Project")
+                     (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                     (org-tags-match-list-sublevels t)
+                     (org-agenda-sorting-strategy
+                      '(category-keep))))
+         (tags-todo "+reading/PROJECT"
+                    ((org-agenda-overriding-header "Reading")
+                     (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                     (org-tags-match-list-sublevels t)
+                     (org-agenda-sorting-strategy
+                      '(category-keep))))
+         (tags-todo "/WAITING"
+                    ((org-agenda-overriding-header "Waiting")
+                     (org-agenda-tags-todo-honor-ignore-options t)
+                     (org-agenda-todo-ignore-scheduled 'future)
+                     (org-agenda-sorting-strategy
+                      '(category-keep))))
+         (tags-todo "/DELEGATED"
+                    ((org-agenda-overriding-header "Delegated")
+                     (org-agenda-tags-todo-honor-ignore-options t)
+                     (org-agenda-todo-ignore-scheduled 'future)
+                     (org-agenda-sorting-strategy
+                      '(category-keep))))
+         (tags-todo "-inbox"
+                    ((org-agenda-overriding-header "On Hold")
+                     (org-agenda-skip-function
+                      (lambda ()
+                        (or (org-agenda-skip-subtree-if 'todo '("WAITING"))
+                            (org-agenda-skip-entry-if 'nottodo '("HOLD")))))
+                     (org-tags-match-list-sublevels nil)
+                     (org-agenda-sorting-strategy
+                      '(category-keep))))
+         ))
        ("v" "Orphaned Tasks"
-            ((agenda "" nil)
-             (tags "inbox"
-                   ((org-agenda-overriding-header "Inbox")
-                    (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
-                    (org-tags-match-list-sublevels nil)))
-             (tags-todo "+book&-reading/PROJECT"
-                        ((org-agenda-overriding-header "Book Plan")
-                         (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
-                         (org-tags-match-list-sublevels t)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))
-             (tags-todo "-inbox/-NEXT"
-                        ((org-agenda-overriding-header "Orphaned Tasks")
-                         (org-agenda-tags-todo-honor-ignore-options t)
-                         (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
-                         (org-agenda-todo-ignore-scheduled 'future)
-                         (org-agenda-skip-function
-                          (lambda ()
-                            (or (org-agenda-skip-subtree-if 'todo '("PROJECT" "HOLD" "WAITING" "DELEGATED"))
-                                (org-agenda-skip-subtree-if 'nottododo '("TODO")))))
-                         (org-tags-match-list-sublevels t)
-                         (org-agenda-sorting-strategy
-                          '(category-keep))))))))
+        ((agenda "" nil)
+         (tags "inbox"
+               ((org-agenda-overriding-header "Inbox")
+                (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                (org-tags-match-list-sublevels nil)))
+         (tags-todo "+book&-reading/PROJECT"
+                    ((org-agenda-overriding-header "Book Plan")
+                     (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                     (org-tags-match-list-sublevels t)
+                     (org-agenda-sorting-strategy
+                      '(category-keep))))
+         (tags-todo "-inbox/-NEXT"
+                    ((org-agenda-overriding-header "Orphaned Tasks")
+                     (org-agenda-tags-todo-honor-ignore-options t)
+                     (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
+                     (org-agenda-todo-ignore-scheduled 'future)
+                     (org-agenda-skip-function
+                      (lambda ()
+                        (or (org-agenda-skip-subtree-if 'todo '("PROJECT" "HOLD" "WAITING" "DELEGATED"))
+                            (org-agenda-skip-subtree-if 'nottododo '("TODO")))))
+                     (org-tags-match-list-sublevels t)
+                     (org-agenda-sorting-strategy
+                      '(category-keep))))))))
 
     (:also-load lib-org-agenda)
     (setq-default org-agenda-clockreport-parameter-plist
@@ -388,39 +388,6 @@
     (org-roam-db-autosync-enable)
     (:after embark
       (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
-
-(setup transient
-  (:defer (require 'transient))
-  (:global "C-c e a" agenda-transient
-           "C-c e j" journal-transient)
-  (:when-loaded
-    (:also-load lib-transient)
-    (:option transient-semantic-coloring t)
-    (transient-define-prefix  agenda-transient ()
-      "Agenda menu"
-      :info-manual "Agenda menu"
-      ["Arguments"
-       ("-i" "Inbox"       "inbox.org")
-       ("-a" "AREA"        "AREA.org")
-       ("-r" "RESOURCE"    "RESOURCE.org")
-       ("-p" "PROJECT"    "PROJECT.org")
-       ("-g" "Agenda"      "agenda.org")
-       ("-n" "Note"        "note.org")]
-      ["Commands"
-       ("RET" "agenda files switcher"     agenda-files-switcher)]
-      [("q" "Quit"           transient-quit-one)])
-
-    (transient-define-prefix journal-transient ()
-      "Journal menu"
-      :info-manual "Journal menu"
-      ["Arguments"
-       ("-j" "Journal"            "journal.org")
-       ("-t" "Today"              "today")
-       ("-y" "Yesterday"          "yesterday")
-       ("-d" "Clear archive log"  "delete")]
-      ["Commands"
-       ("RET" "Journal files switch"   journal-options)]
-      [("q" "Quit"           transient-quit-one)])))
 
 (setup bibtex
   (:load-after org)
@@ -537,7 +504,7 @@
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
     ;; https://emacs.stackexchange.com/questions/45291/change-color-of-org-mode-checkboxes
     (defface org-checkbox-todo-text
-        '((t (:foreground unspecified :inherit org-todo)))
+      '((t (:foreground unspecified :inherit org-todo)))
       "Face for the text part of an unchecked org-mode checkbox.")
 
     (font-lock-add-keywords
@@ -546,7 +513,7 @@
      'append)
 
     (defface org-checkbox-done-text
-        '((t (:foreground unspecified :inherit org-done :strike-through t)))
+      '((t (:foreground unspecified :inherit org-done :strike-through t)))
       "Face for the text part of a checked org-mode checkbox.")
 
     (font-lock-add-keywords

@@ -112,6 +112,6 @@ See also `org-save-all-org-buffers'"
   (set-face-attribute 'width-font-face nil :font "Iosevka Lucius 14")
   (setq buffer-face-mode-face 'width-font-face)
   (buffer-face-mode))
-;;;; provide
 (provide 'lib-org)
+;;;; provide
 ;;; lib-org.el ends here.

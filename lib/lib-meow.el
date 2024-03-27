@@ -36,8 +36,10 @@
    '("2" . meow-expand-2)
    '("1" . meow-expand-1)
    '("-" . negative-argument)
-   '(";" . sis-meow-reverse)
-   '("," . meow-inner-of-thing)
+   (if *IS-MAC*
+       '(";" . sis-meow-reverse)
+     '(";" . meow-reverse))
+   '("," . Meow-inner-of-thing)
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
