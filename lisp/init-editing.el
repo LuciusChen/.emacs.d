@@ -46,7 +46,7 @@
            sis-inline-tighten-head-rule nil
            sis-default-cursor-color "#cf7fa7"
            sis-other-cursor-color "orange")
-  (:hooks meow-leaving-insert-mode-hook sis-set-english)
+  (:hooks meow-insert-exit-hook sis-set-english)
   (if *IS-MAC*
       (sis-ism-lazyman-config
        "com.apple.keylayout.ABC"
@@ -60,7 +60,7 @@
   (sis-global-context-mode t)
   ;; enable the /inline english/ mode for all buffers
   ;; (sis-global-inline-mode t)
-  (add-to-list 'sis-context-hooks 'meow-entering-insert-mode-hook)
+  (add-to-list 'sis-context-hooks 'meow-insert-enter-hook)
   ;; org title 处切换 Rime，telega 聊天时切换 Rime。
   ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。
   (add-to-list 'sis-context-detectors
