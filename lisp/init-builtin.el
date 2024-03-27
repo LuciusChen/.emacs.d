@@ -51,7 +51,8 @@
             window-resize-pixelwise t
             frame-resize-pixelwise t
             indicate-buffer-boundaries 'left
-            display-line-numbers-width 2)
+            display-line-numbers-width 2
+            display-fill-column-indicator-character ?\u254e)
    ;; Better fringe symbol
    (define-fringe-bitmap 'right-curly-arrow
      [#b00000000
