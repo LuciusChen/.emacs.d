@@ -192,7 +192,7 @@
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
 (require 'init-setup)
 (require 'init-builtin)
-(require 'init-gui-frames)
+(require 'init-ui)
 
 (require 'init-editing)
 (require 'init-dired)
