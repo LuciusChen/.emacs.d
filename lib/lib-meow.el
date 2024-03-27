@@ -94,12 +94,6 @@
          (telega-chat-mode . normal)))
     (add-to-list 'meow-mode-state-list state)))
 
-;; meow insert mode switch
-(defvar meow-leaving-insert-mode-hook nil
-  "Hook to run when leaving meow insert mode.")
-(defvar meow-entering-insert-mode-hook nil
-  "Hook to run when entering meow insert mode.")
-
 ;; MacOS 上防止进入 insert mode 覆盖要切换的中文状态
 ;; (defun sis--respect-focus-in-handler ())
 ;; sis-global-respect-mode 使得 meow-reverse 无效

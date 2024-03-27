@@ -18,7 +18,7 @@
                                 nerd-icons-dired-mode)))
 
 (setup dired-preview
-  (:option dired-preview-delay 0.7
+  (:option dired-preview-delay 0.3
            dired-preview-max-size (expt 2 20)
            dired-preview-ignored-extensions-regexp
            (concat "\\."
