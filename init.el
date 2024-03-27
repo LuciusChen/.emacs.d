@@ -193,7 +193,6 @@
 (require 'init-setup)
 (require 'init-builtin)
 (require 'init-gui-frames)
-(require 'init-layout)
 
 (require 'init-editing)
 (require 'init-dired)
