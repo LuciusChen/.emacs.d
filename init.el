@@ -98,6 +98,7 @@
     corfu
     vundo
     gptel
+    forge
     elfeed
     popper
     embark
@@ -135,10 +136,9 @@
     projectile
     marginalia
     git-commit
+    org-remark
     elfeed-tube
     org-roam-ui
-    org-remark
-    forge
     rainbow-mode
     ob-restclient
     magit-todos
