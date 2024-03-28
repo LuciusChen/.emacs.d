@@ -29,10 +29,6 @@
   ;; Make it easier to see that a topic was closed.
   (:face forge-topic-closed ((t (:strike-through t)))))
 
-;; (setup git-commit
-;;   (:with-mode git-commit-mode
-;;     (:hook goto-address-mode)))
-
 (setup diff-hl
   (:defer (diff-hl-mode))
   (:when-loaded
