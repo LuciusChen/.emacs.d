@@ -1,6 +1,6 @@
 * .emacs.d
 ** 字体
-字体这块折腾的真的比较多了，目前使用 [[https://github.com/IBM/plex][IBM Plex Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了），从 Iosevka 中复制了 "❤ ☑ ☐" 等一些字符到其中。
+字体这块折腾的真的比较多了，目前使用 [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了），[[https://orgmode.org/][Org mode]] 单独使用 iosevka。
 *** [[https://github.com/be5invis/Iosevka][Iosevka]]
 Iosevka 设计之初就是和大部分 CJK 字体等高，1:2 的比例，可以很好的解决中英文字体不对齐的问题。
 
@@ -103,6 +103,11 @@ img.org-latex.org-latex-inline.medium-zoom-image {
 #+end_src
 
 但是上述这种对于一些 MathJax 支持的公式也会以图片的形式导出，算不上最好的方式。完美的方式通过 org-babel 导出 svg，其他的继续用 MathJax 渲染。
+
+2024-03-08: [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本中 =org-latex-compile= 改为异步生成 PDF，所以在 Inkscape 转换 PDF 为 SVG 时，PDF 还未生成，导致报错。相关参考如下。
+
+- [[https://github.com/tecosaur/org-latex-preview-todos/issues/28][tecosaur/org-latex-preview-todos#28 Convention for Org mode functions to supp...]]
+- [[https://list.orgmode.org/87frysk0tp.fsf@gmail.com/T/#ma03ea00706247732a7c772dcdcdf27cfa8d76024][{Pre-PATCH} Overhaul of the LaTeX preview system]]
 
 #+header: :headers '("\\usepackage[ruled, linesnumbered]{algorithm2e}")
 #+begin_src latex :results file raw :file assets/lamport-clocks-algorithm.svg
