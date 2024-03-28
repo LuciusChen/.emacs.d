@@ -65,6 +65,8 @@
            "M-~"   popper-cycle
            "C-M-`" popper-toggle-type)
   (:option popper-window-height 15
+           popper-echo-dispatch-keys '("M-1" "M-2" "M-3" "M-4" "M-5"
+                                       "M-6" "M-7" "M-8" "M-9" "M-0")
            popper-reference-buffers
            '(("\\*Messages\\*"
               "Output\\*$"
@@ -72,7 +74,7 @@
               help-mode
               compilation-mode)
              ("\\*Org Select\\*$")
-             ("\\*Agenda Commands\\*$")
+             ;; ("\\*Agenda Commands\\*$")
              ("\\*chatgpt\\*$")
              ("\\*xref\\*$")
              ("\\*Help\\*$")
@@ -82,7 +84,8 @@
              ("\\*Telegram Sticker Set\\*$")
              ("\\*Telegram Notification Messages\\*$")))
   (:defer (popper-mode +1)
-          (popper-echo-mode +1))
+          ;; (popper-echo-mode +1)
+          (popper-tab-line-mode +1))
   ;; HACK: close popper window with `C-g'
   (defun +popper-close-window-hack (&rest _)
     "Close popper window via `C-g'."
