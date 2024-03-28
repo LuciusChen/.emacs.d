@@ -6,7 +6,8 @@
   (:when-loaded
     (:also-load lib-transient)
     (:global    "C-c e a" agenda-transient
-                "C-c e j" journal-transient)
+                "C-c e j" journal-transient
+                "C-c e g" gptel-menu)
     (:with-map transient-base-map
       (:bind "<escape>" transient-quit-one))
     (:option transient-semantic-coloring t)

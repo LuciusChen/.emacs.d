@@ -5,7 +5,7 @@
   (:hook-into after-init))
 
 (setup doom-modeline
-  (:hook-into after-init)
+  (:defer (:require doom-modeline))
   (:when-loaded
     (doom-modeline-mode)
     (:option doom-modeline-height 18
@@ -94,6 +94,8 @@
                                      nil))
     (marginalia-mode)))
 
-(setup nerd-icons-completion (:defer (nerd-icons-completion-mode)))
+(setup nerd-icons-completion
+  (:after vertico
+    (nerd-icons-completion-mode)))
 (provide 'init-minibuffer)
 ;;; init-minibuffer.el ends here
