@@ -1,4 +1,4 @@
-;;; init-editing.el --- Insert description here -*- lexical-binding: t -*-
+;;; init-editing.el --- enhance editing -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 (setup meow
