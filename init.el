@@ -202,8 +202,9 @@
 (require 'init-prog)
 
 (require 'init-transient)
-(require 'init-telega)
 (require 'init-reader)
+(require 'init-telega)
+(require 'init-util)
 ;; (require 'init-beancount)
 ;; (require 'init-rime)
 
