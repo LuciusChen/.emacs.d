@@ -195,7 +195,6 @@
 (require 'init-ui)
 
 (require 'init-editing)
-(require 'init-dired)
 (require 'init-vc)
 (require 'init-minibuffer)
 (require 'init-completion)

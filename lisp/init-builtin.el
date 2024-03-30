@@ -81,6 +81,23 @@
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
 (setup menu-bar (:when-loaded (menu-bar-mode -1)))
 
+(setup dired
+  (:defer (:require dired))
+  (:when-loaded
+    (:bind-into ctl-x-map "\C-j" 'dired-jump)
+    (:bind-into ctl-x-4-map "\C-j" 'dired-jump-other-window)
+    (:option dired-recursive-deletes 'top
+             dired-dwim-target t
+             dired-recursive-copies 'always
+             dired-kill-when-opening-new-dired-buffer t)
+    ;; Prefer g-prefixed coreutils version of standard utilities when available
+    (let ((gls (executable-find "gls")))
+      (when gls (setq insert-directory-program gls)))
+    (diredfl-global-mode)
+    (:with-mode dired-mode (:hook diff-hl-dired-mode
+                                  dired-hide-details-mode
+                                  nerd-icons-dired-mode))))
+
 (setup bookmark
   (:defer
    (:option bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
