@@ -1,8 +1,7 @@
 ;;; init-local.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary:
 (setup mastodon
-  (:defer (:require mastodon)
-          (:global "C-c t" (identity telega-prefix-map)))
+  (:defer (:require mastodon))
   (:when-loaded
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
