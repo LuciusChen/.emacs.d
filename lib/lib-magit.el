@@ -60,5 +60,25 @@
       (with-current-buffer buf
         (when (equal magit-buffer-file-name file)
           (kill-this-buffer))))))
+
+(defun modi/magit-log--abbreviate-author (&rest args)
+  "The first arg is AUTHOR, abbreviate it.
+First Last  -> F Last
+First.Last  -> F Last
+Last, First -> F Last
+First       -> First (no change).
+
+It is assumed that the author has only one or two names."
+  ;; ARGS               -> '((REV AUTHOR DATE))
+  ;; (car ARGS)         -> '(REV AUTHOR DATE)
+  ;; (nth 1 (car ARGS)) -> AUTHOR
+  (let* ((author (nth 1 (car args)))
+         (author-abbr (if (string-match-p "," author)
+                          ;; Last, First -> F Last
+                          (replace-regexp-in-string "\\(.*?\\), *\\(.\\).*" "\\2 \\1" author)
+                        ;; First Last -> F Last
+                        (replace-regexp-in-string "\\(.\\).*?[. ]+\\(.*\\)" "\\1 \\2" author))))
+    (setf (nth 1 (car args)) author-abbr))
+  (car args))
 (provide 'lib-magit)
 ;;; lib-magit.el ends here

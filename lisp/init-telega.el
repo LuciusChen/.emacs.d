@@ -13,7 +13,7 @@
   ;; 改成 (identity xxx-prefix-map) 即可
   (:global "C-c t" (identity telega-prefix-map))
   ;; remove chat folder icons
-  (setq telega-chat-folder-format nil)
+  (:option telega-chat-folder-format nil)
   (:when-loaded
     (:bind-into telega-prefix-map
       "p" telega-chatbuf-filter-search
@@ -34,8 +34,8 @@
     (:option
      telega-notifications-mode 1
      telega-notifications-msg-temex '(and (not outgoing)
-                                      (not (chat (or (type channel))))
-                                      (contains "dape\\|jdtls\\|eglot\\|meow\\|[eE]macs\\|telega\\|[тТ]елег[^р]"))
+                                          (not (chat (or (type channel))))
+                                          (contains "dape\\|jdtls\\|eglot\\|meow\\|[eE]macs\\|telega\\|[тТ]елег[^р]"))
      ;; telega-msg-heading-with-date-and-status t
      ;; telega-debug t
      ;; telega-server-verbosity 4
@@ -131,10 +131,10 @@
       (setq telega-user-show-avatars nil)
       (setq telega-chat-show-avatars nil)
       (setq telega-proxies (list '(:server "127.0.0.1"
-                                   :port 7890
-                                   :enable t
-                                   :type (:@type "proxyTypeSocks5"
-                                          :username "" :password "")))))
+                                           :port 7890
+                                           :enable t
+                                           :type (:@type "proxyTypeSocks5"
+                                                         :username "" :password "")))))
     ;; Opening files using external programs
     (if *IS-MAC*
         (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
