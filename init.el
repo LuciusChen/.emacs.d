@@ -122,6 +122,7 @@
     git-link
     webpaste
     apheleia
+    mastodon
     pdf-tools
     ox-pandoc
     macrostep
@@ -171,6 +172,7 @@
     password-store-otp
     password-store
     (emt :host github :repo "roife/emt")
+    (mastodon-alt :host github :repo "rougier/mastodon-alt")
     (dired-preview :host github :repo "karthink/dired-preview")
     ;; (dape :host github :repo "svaante/dape")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
