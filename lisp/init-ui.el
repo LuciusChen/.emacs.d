@@ -104,7 +104,7 @@
              "s-}" tab-bar-switch-to-next-tab
              "s-t" tab-bar-new-tab
              "s-w" tab-bar-close-tab)
-    (:require lib-layout)
+    (:require lib-tabbar)
     (:option tab-bar-separator ""
              tab-bar-close-button-show nil
              tab-bar-tab-hints t
