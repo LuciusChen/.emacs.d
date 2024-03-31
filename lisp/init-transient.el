@@ -8,7 +8,8 @@
     (:global    "C-c e a" agenda-transient
                 "C-c e j" journal-transient
                 "C-c e g" gptel-menu
-                "C-c e p" prog-commands)
+                "C-c e p" prog-commands
+                "C-c e m" magit-commands)
     (:with-map transient-base-map
       (:bind "<escape>" transient-quit-one))
     (:option transient-semantic-coloring t)
@@ -57,6 +58,18 @@
         ("N" "jump-to-prev-diagnostic" flymake-goto-prev-error)
         ("l" "list-diagnostics" consult-flymake)]
        ["Navigate"
-        ("m" "consult-mark" consult-mark)]])))
+        ("m" "consult-mark" consult-mark)]])
+
+    (transient-define-prefix magit-commands ()
+      "Magit commands"
+      :info-manual "Magit commands"
+      [["Magit naviagte"
+        ("n" "Untracked section" magit-jump-to-untracked)
+        ("u" "Unstaged section" magit-jump-to-unstaged)
+        ("s" "Staged section" magit-jump-to-staged)
+        ("p" "Unpushed section" magit-jump-to-unpushed-to-pushremote)
+        ("M-p" "previous sibling section" magit-section-backward-sibling)
+        ("M-n" "next sibling section" magit-section-forward-sibling)
+        ]])))
 (provide 'init-transient)
 ;;; init-transient.el ends here
