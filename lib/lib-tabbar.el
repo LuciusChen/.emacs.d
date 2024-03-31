@@ -1,4 +1,4 @@
-;;; lib-layout.el --- Insert description here -*- lexical-binding: t -*-
+;;; lib-tabbar.el --- tabbar -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 (defun tab-bar-format-menu-bar ()
@@ -68,5 +68,5 @@
 (defun +tab-bar-telega-icon ()
   (or +tab-bar-telega-indicator-cache
       (+tab-bar-telega-icon-update)))
-(provide 'lib-layout)
-;;; lib-layout.el ends here
+(provide 'lib-tabbar)
+;;; lib-tabbar.el ends here
