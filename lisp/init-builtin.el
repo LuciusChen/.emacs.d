@@ -145,8 +145,10 @@
 
 (setup window
   (:require lib-window)
-  (global-set-key (kbd "C-x |") 'split-window-horizontally-instead)
-  (global-set-key (kbd "C-x _") 'split-window-vertically-instead))
+  (:global "C-x |" split-window-horizontally-instead
+           "C-x _" split-window-vertically-instead
+           "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))
+           "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
 
 (setup minibuffer
   (:defer
