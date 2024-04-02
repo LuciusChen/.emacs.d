@@ -41,6 +41,7 @@
             scroll-preserve-screen-position 'always
             truncate-partial-width-windows nil
             history-length 1000
+            use-short-answers t
             ;; 改善 CJK 换行
             word-wrap-by-category t
             read-process-output-max (* 1024 1024)
