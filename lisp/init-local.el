@@ -5,20 +5,7 @@
   (:when-loaded
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
-             mastodon-tl--show-avatars t
-             mastodon-tl--symbols
-             '((reply     . ("💬" . "R"))
-               (boost     . ("🚀" . "B"))
-               (favourite . ("⭐" . "F"))
-               (bookmark  . ("🔖" . "K"))
-               (media     . ("📹" . "[media]"))
-               (verified  . ("" . "V"))
-               (locked    . ("🔒" . "[locked]"))
-               (private   . ("🔒" . "[followers]"))
-               (direct    . ("✉" . "[direct]"))
-               (edited    . ("✍" . "[edited]"))
-               (replied   . ("⬇" . "↓"))
-               (reply-bar . ("┃" . "|"))))))
+             mastodon-tl--show-avatars t)))
 
 (setup mastodon-alt
   (:load-after mastodon)

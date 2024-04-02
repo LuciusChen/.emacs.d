@@ -43,6 +43,10 @@
  consult-git-grep consult-grep
  consult-bookmark consult-recent-file consult-xref
  consult--source-recent-file consult--source-project-recent-file consult--source-bookmark)
+
+(defun consult-ripgrep-always-prompt-dir ()
+  (interactive)
+  (consult-ripgrep t))
 ;;;; provide
 (provide 'lib-consult)
 ;;; lib-consult.el ends here.
