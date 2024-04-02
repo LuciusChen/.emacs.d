@@ -50,6 +50,7 @@
              "M-g i" consult-imenu
              "M-g f" consult-recent-file
              "M-g r" consult-ripgrep
+             "M-g p" consult-ripgrep-always-prompt-dir
              ;; brew install fd
              "M-g d" consult-fd
              [remap switch-to-buffer] consult-buffer
