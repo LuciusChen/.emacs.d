@@ -172,7 +172,7 @@
     password-store-otp
     password-store
     (emt :host github :repo "roife/emt")
-    (mastodon-alt :host github :repo "rougier/mastodon-alt")
+    (mastodon-alt :host github :repo "LuciusChen/mastodon-alt")
     ;; (dape :host github :repo "svaante/dape")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
@@ -205,11 +205,11 @@
 (require 'init-reader)
 (require 'init-telega)
 (require 'init-util)
-;; (require 'init-beancount)
-;; (require 'init-rime)
 
 (require 'init-org)
 (require 'init-local)
+;; (require 'init-beancount)
+;; (require 'init-rime)
 (provide 'init)
 ;; Local Variables:
 ;; coding: utf-8
