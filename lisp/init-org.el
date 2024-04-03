@@ -17,6 +17,8 @@
      ;; remove org-src content indent
      org-edit-src-content-indentation 0
      org-src-preserve-indentation nil
+     ;; https://git.tecosaur.net/tec/org-mode.git version only
+     org-fontify-semantic-seperator nil
      org-goto-interface 'outline-path-completion
      ;; Various preferences
      org-log-done t
