@@ -29,6 +29,7 @@
              light-theme 'modus-operandi-tinted
              dark-theme 'modus-vivendi-tinted)
     (:hooks after-init-hook reapply-themes
+            window-setup-hook reapply-themes
             window-setup-hook set-dividers-and-fringe-color)))
 
 (when window-system
