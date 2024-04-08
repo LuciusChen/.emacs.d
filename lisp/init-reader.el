@@ -66,7 +66,7 @@
     (:bind-into elfeed-show-mode-map
       "N" +menu-dwim--org-capture-elfeed-show
       "o" open-link-with-mpv)
-    (:bind-into elfeed-search-mode-map "L" eli/elfeed-overview)))
+    (:bind-into elfeed-search-mode-map "L" +elfeed-overview)))
 
 (setup elfeed-tube
   (:after elfeed

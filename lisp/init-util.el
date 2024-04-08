@@ -36,6 +36,7 @@
 (setup vterm
   (:defer (:require vterm))
   (:when-loaded
+    (:also-load lib-font)
     (:bind-into vterm-mode-map
       "C-y" vterm-yank
       "M-y" vterm-yank-pop
@@ -46,7 +47,11 @@
       "Send `C-k' to libvterm, and put content in kill-ring."
       (interactive)
       (kill-ring-save (point) (vterm-end-of-line))
-      (vterm-send-key "k" nil nil t))))
+      (vterm-send-key "k" nil nil t)))
+
+  (:with-mode vterm-mode
+    (:hook +buffer-face-mode-variable))
+  )
 
 (setup vterm-toggle
   (:after vterm
