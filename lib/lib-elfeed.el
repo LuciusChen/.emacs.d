@@ -21,25 +21,25 @@
         (title (elfeed-entry-title entry)))
     (+org-roam-capture-ref :url url :title title)))
 
-(defun eli/elfeed-overview ()
+(defun +elfeed-overview ()
   "Get an overview of all feeds."
   (interactive)
   (with-current-buffer (elfeed-search-buffer)
     (elfeed-save-excursion
-        (let* ((inhibit-read-only t)
-               (standard-output (current-buffer)))
-          (erase-buffer)
-          (eli/elfeed-overview--update-list)
-          (dolist (entry elfeed-search-entries)
-            (funcall elfeed-search-print-entry-function entry)
-            (insert "\n"))
-          (setf elfeed-search-last-update (float-time))))
+      (let* ((inhibit-read-only t)
+             (standard-output (current-buffer)))
+        (erase-buffer)
+        (+elfeed-overview--update-list)
+        (dolist (entry elfeed-search-entries)
+          (funcall elfeed-search-print-entry-function entry)
+          (insert "\n"))
+        (setf elfeed-search-last-update (float-time))))
     (when (zerop (buffer-size))
       ;; If nothing changed, force a header line update
       (force-mode-line-update))
     (run-hooks 'elfeed-search-update-hook)))
 
-(defun eli/elfeed-overview--update-list ()
+(defun +elfeed-overview--update-list ()
   "Update `elfeed-search-filter' list."
   (let* ((head (list nil))
          (tail head)
@@ -51,11 +51,11 @@
                                       feed))))
              (func (byte-compile (elfeed-search-compile-filter filter))))
         (with-elfeed-db-visit (entry feed)
-            (when (funcall func entry feed count)
-              (setf (cdr tail) (list entry)
-                    tail (cdr tail)
-                    count (1+ count))
-              (elfeed-db-return)))))
+          (when (funcall func entry feed count)
+            (setf (cdr tail) (list entry)
+                  tail (cdr tail)
+                  count (1+ count))
+            (elfeed-db-return)))))
     (let ((entries (cdr head))
           (elfeed-search-sort-function
            (lambda (a b)
@@ -75,7 +75,6 @@
     (xwidget-webkit-browse-url entry-link)))
 
 ;; Full-text RSS https://morss.it/
-;; https://rsshub.sheerwill.live
 (defvar +elfeed-feeds
   '(
     ("https://morss.it/https://www.joshwcomeau.com/rss.xml" front-end)
@@ -84,21 +83,19 @@
     ("https://samwho.dev/rss.xml" program)
     ("https://morss.it/https://matt-rickard.com/" program)
     ("https://guangzhengli.com/index.xml" program)
-    ("https://rsshub.sheerwill.live/meituan/tech/home" meituan)
-    ("https://rsshub.sheerwill.live/scmp/3" NEWS)
-    ("https://rsshub.sheerwill.live.app/utgd/timeline" UNTAG)
+    ;; ("https://rsshub.sheerwill.live/meituan/tech/home" meituan)
     ;; Emacs
     ("https://andreyorst.gitlab.io/feed.xml" emacs)
     ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
     ("https://morss.it/susam.net/" emacs)
     ("https://karthinks.com/index.xml" emacs)
     ;; Forum
-    ("https://rsshub.sheerwill.live/chiphell/forum/319" forum)
+    ("https://lucius.zeabur.app/chiphell/forum/319" forum)
     ;; Economics
-    ("https://rsshub.sheerwill.live/economist/latest" economics)
+    ("https://lucius.zeabur.app/economist/latest" economics)
     ;; Novel
-    ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/194_194173/" novel) ;; 玄鉴仙族
-    ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/192_192713/" novel) ;; 我本无意成仙
+    ("https://lucius.zeabur.app/biquge/http://www.biqu5200.net/194_194173/" novel) ;; 玄鉴仙族
+    ("https://lucius.zeabur.app/biquge/http://www.biqu5200.net/192_192713/" novel) ;; 我本无意成仙
     ;; Github
     ("https://github.com/zevlg/telega.el/commits.atom" github)
     ("https://github.com/tdlib/td/commits.atom" github)
@@ -106,42 +103,42 @@
     ("https://github.com/protesilaos/modus-themes/commits.atom" github)
     ;; Instagram
     ;; backup https://openrss.org/www.instagram.com/user
-    ("https://rsshub.app/picnob/user/zhonglin_"               instagram)
-    ("https://rsshub.app/picnob/user/sakaitakahiro_"          instagram)
-    ("https://rsshub.app/picnob/user/misselvani"              instagram)
-    ("https://rsshub.app/picnob/user/miantanzhou"             instagram)
-    ("https://rsshub.app/picnob/user/satosi_photo"            instagram)
-    ("https://rsshub.app/picnob/user/yiiooi"                  instagram)
-    ("https://rsshub.app/picnob/user/ramaworks"               instagram)
-    ("https://rsshub.app/picnob/user/tanaka_tatsuya"          instagram)
-    ("https://rsshub.app/picnob/user/roywanglightart"         instagram)
-    ("https://rsshub.app/picnob/user/dailypurrr"              instagram)
-    ("https://rsshub.app/picnob/user/yongsundrawing"          instagram)
-    ("https://rsshub.app/picnob/user/octo8"                   instagram)
-    ("https://rsshub.app/picnob/user/iilucius.image"          instagram)
-    ("https://rsshub.app/picnob/user/nah_ill_"                instagram)
-    ("https://rsshub.app/picnob/user/itseriksen"              instagram)
-    ("https://rsshub.app/picnob/user/aron_ch"                 instagram)
-    ("https://rsshub.app/picnob/user/mark.smith.photography"  instagram)
-    ("https://rsshub.app/picnob/user/der_greif"               instagram)
+    ("https://lucius.zeabur.app/instagram/user/zhonglin_"               instagram)
+    ("https://lucius.zeabur.app/instagram/user/sakaitakahiro_"          instagram)
+    ("https://lucius.zeabur.app/instagram/user/misselvani"              instagram)
+    ("https://lucius.zeabur.app/instagram/user/miantanzhou"             instagram)
+    ("https://lucius.zeabur.app/instagram/user/satosi_photo"            instagram)
+    ("https://lucius.zeabur.app/instagram/user/yiiooi"                  instagram)
+    ("https://lucius.zeabur.app/instagram/user/ramaworks"               instagram)
+    ("https://lucius.zeabur.app/instagram/user/tanaka_tatsuya"          instagram)
+    ("https://lucius.zeabur.app/instagram/user/roywanglightart"         instagram)
+    ("https://lucius.zeabur.app/instagram/user/dailypurrr"              instagram)
+    ("https://lucius.zeabur.app/instagram/user/yongsundrawing"          instagram)
+    ("https://lucius.zeabur.app/instagram/user/octo8"                   instagram)
+    ("https://lucius.zeabur.app/instagram/user/iilucius.image"          instagram)
+    ("https://lucius.zeabur.app/instagram/user/nah_ill_"                instagram)
+    ("https://lucius.zeabur.app/instagram/user/itseriksen"              instagram)
+    ("https://lucius.zeabur.app/instagram/user/aron_ch"                 instagram)
+    ("https://lucius.zeabur.app/instagram/user/mark.smith.photography"  instagram)
+    ("https://lucius.zeabur.app/instagram/user/der_greif"               instagram)
     ;; YouTube
-    ("https://rsshub.sheerwill.live/youtube/user/@lijxse"              youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@TimelabPro"          youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@xiao_lin_shuo"       youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@MacroRoom"           youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@BrandonLiUnscripted" youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@cherry_official"     youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@mediastorm6801"      youtube)
+    ("https://lucius.zeabur.app/youtube/user/@lijxse"              youtube)
+    ("https://lucius.zeabur.app/youtube/user/@TimelabPro"          youtube)
+    ("https://lucius.zeabur.app/youtube/user/@xiao_lin_shuo"       youtube)
+    ("https://lucius.zeabur.app/youtube/user/@MacroRoom"           youtube)
+    ("https://lucius.zeabur.app/youtube/user/@BrandonLiUnscripted" youtube)
+    ("https://lucius.zeabur.app/youtube/user/@cherry_official"     youtube)
+    ("https://lucius.zeabur.app/youtube/user/@mediastorm6801"      youtube)
     ;; Bilibili
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/72270557"   bilibili) ;; 芳斯塔芙
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18706318"   bilibili) ;; 龙女之声
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/7487399"    bilibili) ;; 努力的Lorre
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/470156882"  bilibili) ;; 小艾大叔
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/38053181"   bilibili) ;; oooooohmygosh
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/6330633"    bilibili) ;; 小胡仙儿
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18202105"   bilibili) ;; 绵羊料理
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/125526"     bilibili) ;; -LKs-
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/20375812"   bilibili) ;; 博士萌
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/72270557"   bilibili) ;; 芳斯塔芙
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/18706318"   bilibili) ;; 龙女之声
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/7487399"    bilibili) ;; 努力的Lorre
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/470156882"  bilibili) ;; 小艾大叔
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/38053181"   bilibili) ;; oooooohmygosh
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/6330633"    bilibili) ;; 小胡仙儿
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/18202105"   bilibili) ;; 绵羊料理
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/125526"     bilibili) ;; -LKs-
+    ("https://lucius.zeabur.app/bilibili/user/dynamic/20375812"   bilibili) ;; 博士萌
     ))
 
 (defun nerd-icon-for-tags (tags)

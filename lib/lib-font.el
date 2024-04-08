@@ -74,5 +74,12 @@
                                              'compose-gstring-for-graphic)))))
 ;; Don't scale font on trackpad pinch!
 (global-unset-key (kbd "<pinch>"))
+
+(defun +buffer-face-mode-variable ()
+  (interactive)
+  (make-face 'width-font-face)
+  (set-face-attribute 'width-font-face nil :font "Iosevka Lucius 14")
+  (setq buffer-face-mode-face 'width-font-face)
+  (buffer-face-mode))
 (provide 'lib-font)
 ;;; lib-font.el ends here

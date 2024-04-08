@@ -105,13 +105,6 @@ See also `org-save-all-org-buffers'"
   (interactive)
   (call-interactively 'org-latex-preview-clear-cache)
   (org-latex-preview 'buffer))
-
-(defun org-buffer-face-mode-variable ()
-  (interactive)
-  (make-face 'width-font-face)
-  (set-face-attribute 'width-font-face nil :font "Iosevka Lucius 14")
-  (setq buffer-face-mode-face 'width-font-face)
-  (buffer-face-mode))
 (provide 'lib-org)
 ;;;; provide
 ;;; lib-org.el ends here.

@@ -11,6 +11,7 @@
    "C-c b"     org-cite-insert)
   (:when-loaded
     (:also-load lib-org)
+    (:also-load lib-font)
     (:option
      org-directory "~/Library/CloudStorage/Dropbox/org/"
      org-image-actual-width nil
@@ -69,7 +70,7 @@
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
       (:hook (lambda () (setq truncate-lines nil)))
-      (:hook org-buffer-face-mode-variable))
+      (:hook +buffer-face-mode-variable))
     (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
