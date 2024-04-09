@@ -68,6 +68,7 @@
                  (when (and meow-insert-mode
                             (or (derived-mode-p 'org-mode
                                                 'gfm-mode
+                                                'text-mode ;; for mastodon-toot
                                                 'telega-chat-mode)))
                    'other)))
 
