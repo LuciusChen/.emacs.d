@@ -1,6 +1,12 @@
 ;;; init-util.el --- util -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+(setup dired-hacks
+  (:load-after dired)
+  (:when-loaded
+    (:option dired-subtree-line-prefix "  │ ")
+    (:bind-into dired-mode-map "TAB" dired-subtree-toggle)))
+
 (setup webpaste
   (:defer (:require webpaste)
           (:option webpaste-provider-priority '("paste.mozilla.org" "dpaste.org"))))
