@@ -4,7 +4,7 @@
 (setup dired-hacks
   (:load-after dired)
   (:when-loaded
-    (:option dired-subtree-line-prefix "  │ ")
+    (:option dired-subtree-line-prefix "  │  ")
     (:bind-into dired-mode-map "TAB" dired-subtree-toggle)))
 
 (setup webpaste
@@ -56,8 +56,10 @@
       (vterm-send-key "k" nil nil t)))
 
   (:with-mode vterm-mode
-    (:hook +buffer-face-mode-variable))
-  )
+    (:hook (lambda ()(make-face 'width-font-face)
+             (set-face-attribute 'width-font-face nil :font "IosevkaTerm Nerd Font Mono 14")
+             (setq buffer-face-mode-face 'width-font-face)
+             (buffer-face-mode)))))
 
 (setup vterm-toggle
   (:after vterm
@@ -83,6 +85,15 @@
           (compilation-shell-minor-mode 1)
           (vterm-send-M-w)
           (vterm-send-string compile-command t))))))
+
+(defun +browse-straight-repos ()
+  "Browse files from the repositories cloned by `straight', using `fd'."
+  (interactive)
+  (let* ((repopath "~/.emacs.d/straight/repos/")
+         (fd-cmd (concat "fd --no-ignore-vcs . --base-directory " repopath))
+         (files (split-string (shell-command-to-string fd-cmd) "\n"))
+         (file (completing-read "Find file in straight repos: " files nil t)))
+    (find-file (file-name-concat repopath file))))
 
 ;; http://yitang.uk/2024/01/06/gpg-in-emacs-functions-to-decrypt-and-delete-all/
 ;; (defun +gpg--decrypt-recursively (root-dir)

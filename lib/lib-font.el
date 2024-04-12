@@ -42,9 +42,9 @@
   ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
   ;; IBM Plex Mono 没有这几个字符，自己编辑字体后添加，可以省去下面的设置。
-  (set-fontset-font nil ?❤ "Iosevka Lucius")
-  ;; (set-fontset-font nil ?☑ "Iosevka Lucius")
-  ;; (set-fontset-font nil ?☐ "Iosevka Lucius")
+  (set-fontset-font nil ?❤ "Iosevka")
+  ;; (set-fontset-font nil ?☑ "Iosevka")
+  ;; (set-fontset-font nil ?☐ "Iosevka")
   (set-fontset-font t 'javanese "Noto Sans Javanese"))
 
 (defconst jetbrains-ligature-mode--ligatures
@@ -74,12 +74,5 @@
                                              'compose-gstring-for-graphic)))))
 ;; Don't scale font on trackpad pinch!
 (global-unset-key (kbd "<pinch>"))
-
-(defun +buffer-face-mode-variable ()
-  (interactive)
-  (make-face 'width-font-face)
-  (set-face-attribute 'width-font-face nil :font "Iosevka Lucius 14")
-  (setq buffer-face-mode-face 'width-font-face)
-  (buffer-face-mode))
 (provide 'lib-font)
 ;;; lib-font.el ends here

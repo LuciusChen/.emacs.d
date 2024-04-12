@@ -70,7 +70,10 @@
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
       (:hook (lambda () (setq truncate-lines nil)))
-      (:hook +buffer-face-mode-variable))
+      (:hook (lambda ()(make-face 'width-font-face)
+               (set-face-attribute 'width-font-face nil :font "Iosevka 14")
+               (setq buffer-face-mode-face 'width-font-face)
+               (buffer-face-mode))))
     (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
@@ -143,11 +146,10 @@
 (setup org-latex-preview
   (:load-after org)
   (:when-loaded
-    ;; Increase preview width
     (:option org-latex-preview-process-default 'dvisvgm
              org-latex-preview-numbered t
              org-latex-preview-live t
-             ;; org-startup-with-latex-preview t
+             org-startup-with-latex-preview t
              org-latex-preview-preamble
              "\\documentclass{article}
             [DEFAULT-PACKAGES]
@@ -181,30 +183,14 @@
                                         ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
                                         ;; ("" "algpseudocode" t)
                                         ))
-    (plist-put org-latex-preview-appearance-options
-               :page-width 0.8)
+    ;; Increase preview width
+    (plist-put org-latex-preview-appearance-options :page-width 0.8)
     ;; Turn on auto-mode, it's built into Org and much faster/more featured than
     ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
     (:hooks org-mode-hook org-latex-preview-auto-mode
             ;; Block C-n and C-p from opening up previews when using auto-mode
             org-latex-preview-auto-ignored-commands next-line
-            org-latex-preview-auto-ignored-commands previous-line
-            ;; code for centering LaTeX previews -- a terrible idea
-            org-latex-preview-overlay-open-functions
-            (lambda (ov) (overlay-put ov 'before-string nil))
-            org-latex-preview-overlay-close-functions
-            (lambda (ov) (overlay-put ov 'before-string (overlay-get ov 'justify)))
-            org-latex-preview-overlay-update-functions
-            (lambda (ov) (save-excursion
-                           (goto-char (overlay-start ov))
-                           (when-let* ((elem (org-element-context))
-                                       ((or (eq (org-element-type elem) 'latex-environment)
-                                            (string-match-p "^\\\\\\[" (org-element-property :value elem))))
-                                       (img (overlay-get ov 'display))
-                                       (prop `(space :align-to (- center (0.55 . ,img))))
-                                       (justify (propertize " " 'display prop 'face 'default)))
-                             (overlay-put ov 'justify justify)
-                             (overlay-put ov 'before-string (overlay-get ov 'justify))))))))
+            org-latex-preview-auto-ignored-commands previous-line)))
 
 (setup org-agenda
   (:global "C-c a" org-agenda)
