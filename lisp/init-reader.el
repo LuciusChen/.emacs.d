@@ -65,7 +65,7 @@
              elfeed-search-print-entry-function #'+elfeed-search-print-entry--better-default)
     (:bind-into elfeed-show-mode-map
       "N" +menu-dwim--org-capture-elfeed-show
-      "o" open-link-with-mpv)
+      "o" +open-link-with-mpv)
     (:bind-into elfeed-search-mode-map "L" +elfeed-overview)))
 
 (setup elfeed-tube
