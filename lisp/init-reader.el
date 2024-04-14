@@ -78,8 +78,9 @@
       [remap save-buffer] elfeed-tube-save))
   (:when-loaded
     (elfeed-tube-setup)
-    (:option mpv-default-options '("--http-proxy=http://127.0.0.1:7890"
-                                   "--ytdl-raw-options-append=proxy=http://127.0.0.1:7890"))))
+    ;; (:option mpv-default-options '("--http-proxy=http://127.0.0.1:7890"
+    ;;                                "--ytdl-raw-options-append=proxy=http://127.0.0.1:7890"))
+    ))
 
 (setup elfeed-tube-mpv
   (:load-after elfeed)
