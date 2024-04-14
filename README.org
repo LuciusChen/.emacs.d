@@ -1,45 +1,6 @@
 * .emacs.d
 ** 字体
-字体这块折腾的真的比较多了，目前使用 [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了），[[https://orgmode.org/][Org mode]] 单独使用 iosevka。
-*** [[https://github.com/be5invis/Iosevka][Iosevka]]
-Iosevka 设计之初就是和大部分 CJK 字体等高，1:2 的比例，可以很好的解决中英文字体不对齐的问题。
-
-可以根据 [[https://typeof.net/Iosevka/customizer][Iosevka Customizer]] 进行自定义，将 [[https://typeof.net/Iosevka/customizer][Iosevka Customizer]] 中的自定义配置粘贴在 =private-build-plans.toml= 中即可。
-
-#+begin_src shell
-brew install ttfautohint
-cd Iosevka
-pnpm install
-touch private-build-plans.toml
-#+end_src
-
-#+begin_src toml
-[buildPlans.IosevkaLucius]
-family = "Iosevka Lucius"
-spacing = "normal"
-serifs = "sans"
-noCvSs = true
-exportGlyphNames = false
-
-  [buildPlans.IosevkaLucius.variants]
-  inherits = "ss08"
-
-    [buildPlans.IosevkaLucius.variants.design]
-    capital-n = "standard-serifless"
-    dollar = "interrupted"
-    question = "corner-flat-hooked"
-
-    [buildPlans.IosevkaLucius.variants.oblique]
-    capital-n = "standard-serifless"
-    dollar = "interrupted"
-    question = "corner-flat-hooked"
-#+end_src
-
-#+begin_src shell
-pnpm run build -- ttf::IosevkaLucius
-#+end_src
-
-和 Iosevka 等高的中文字体目前有：霞鹜文楷、仓耳今楷。
+字体这块折腾的真的比较多了，目前使用 [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了）。不在自行编译 [[https://github.com/be5invis/Iosevka][Iosevka]] 直接下载可用版本，用于 org-mode。同时安装 IosevkaTerm Nerd Font，用于 vterm-mode。（2024-04-14）
 *** [[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]
 「霞鹜文楷」不属于大字符集字体，因此需要设置对应的 fall-back 字体，我选择的是「[[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]]」字体。
 

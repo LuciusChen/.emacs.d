@@ -11,6 +11,7 @@
                                            (keypad . "K")
                                            (insert . "I")
                                            (beacon . "B"))
+            meow-cursor-type-insert '(hbar . 2)
             wrap-keymap (let ((map (make-keymap)))
                           (suppress-keymap map)
                           (dolist (k '("(" "[" "{" "<"))
@@ -115,12 +116,13 @@
   (:hooks prog-mode-hook rainbow-delimiters-mode))
 
 (setup yasnippet
-  (:defer
-   (:when-loaded
-     (:option yas-keymap-disable-hook
-              (lambda () (and (frame-live-p corfu--frame)
-                              (frame-visible-p corfu--frame))))
-     (:hooks after-init-hook yas-global-mode))))
+  (:defer (:require yasnippet))
+  (:when-loaded
+    (yas-global-mode)
+    ;; (:hooks after-init-hook yas-global-mode)
+    (:option yas-keymap-disable-hook
+             (lambda () (and (frame-live-p corfu--frame)
+                             (frame-visible-p corfu--frame))))))
 
 ;; 手动开启 hs-minor-mode
 (setup hideshow
