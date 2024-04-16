@@ -4,12 +4,12 @@
   (:load-after vc)
   (:when-loaded
     (:also-load lib-magit)
-    (:bind-into magit-status-mode-map "C-M-<up>" magit-section-up)
-    (:bind-into vc-prefix-map "l" +magit-or-vc-log-file
+    (:bind-into magit-status "C-M-<up>" magit-section-up)
+    (:bind-into vc-prefix "l" +magit-or-vc-log-file
                 ;; file binding for vc-git-grep
                 "f" vc-git-grep)
     ;; 将当前 view 的 buffer 写入文件，实现恢复以前版本的作用
-    (:bind-into magit-blob-mode-map "C-c C-c" +magit-blob-save)
+    (:bind-into magit-blob "C-c C-c" +magit-blob-save)
     ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
     ;; quickly open magit on any one of your projects.
     (:global [(meta f12)] magit-status
@@ -55,7 +55,7 @@
             prog-mode-hook diff-hl-mode
             conf-mode-hook diff-hl-mode
             dired-mode-hook diff-hl-dired-mode)
-    (:bind-into diff-hl-mode-map
+    (:bind-into diff-hl
       "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk)))
 (provide 'init-vc)
 ;;; init-vc.el ends here

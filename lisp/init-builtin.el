@@ -85,8 +85,8 @@
 (setup dired
   (:defer (:require dired))
   (:when-loaded
-    (:bind-into ctl-x-map "\C-j" 'dired-jump)
-    (:bind-into ctl-x-4-map "\C-j" 'dired-jump-other-window)
+    (:with-map ctl-x-map (:bind "\C-j" 'dired-jump))
+    (:with-map ctl-x-4-map (:bind "\C-j" 'dired-jump-other-window))
     (:option dired-recursive-deletes 'top
              dired-dwim-target t
              dired-recursive-copies 'always

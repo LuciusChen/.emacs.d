@@ -15,13 +15,15 @@
   ;; remove chat folder icons
   (:option telega-chat-folder-format nil)
   (:when-loaded
-    (:bind-into telega-prefix-map
-      "p" telega-chatbuf-filter-search
-      "h" telega-notifications-history
-      "x" telega-chatbuf-thread-cancel)
-    (:bind-into telega-msg-button-map
-      "C" +telega-save-file-to-clipboard
-      "s" +telega-msg-save-to-cloud-copyleft)
+    (:with-map telega-prefix-map
+      (:bind
+       "p" telega-chatbuf-filter-search
+       "h" telega-notifications-history
+       "x" telega-chatbuf-thread-cancel))
+    (:with-map telega-msg-button-map
+      (:bind
+       "C" +telega-save-file-to-clipboard
+       "s" +telega-msg-save-to-cloud-copyleft))
     (:also-load telega-url-shorten
                 telega-bridge-bot
                 telega-mnz

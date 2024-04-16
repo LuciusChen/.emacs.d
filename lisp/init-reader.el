@@ -23,7 +23,7 @@
   (:when-loaded
     (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
     (:global "C-c i m" org-remark-mark)
-    (:bind-into org-remark-mode-map
+    (:bind-into org-remark
       "C-c i o" org-remark-open
       "C-c i ]" org-remark-view-next
       "C-c i [" org-remark-view-prev
@@ -63,17 +63,17 @@
     (:also-load lib-elfeed)
     (:option elfeed-feeds +elfeed-feeds
              elfeed-search-print-entry-function #'+elfeed-search-print-entry--better-default)
-    (:bind-into elfeed-show-mode-map
+    (:bind-into elfeed-show
       "N" +menu-dwim--org-capture-elfeed-show
       "o" +open-link-with-mpv)
-    (:bind-into elfeed-search-mode-map "L" +elfeed-overview)))
+    (:bind-into elfeed-search "L" +elfeed-overview)))
 
 (setup elfeed-tube
   (:after elfeed
-    (:bind-into elfeed-show-mode-map
+    (:bind-into elfeed-show
       "F" elfeed-tube-fetch
       [remap save-buffer] elfeed-tube-save)
-    (:bind-into     elfeed-search-mode-map
+    (:bind-into     elfeed-search
       "F" elfeed-tube-fetch
       [remap save-buffer] elfeed-tube-save))
   (:when-loaded
@@ -84,7 +84,7 @@
 
 (setup elfeed-tube-mpv
   (:load-after elfeed)
-  (:bind-into elfeed-show-mode-map
+  (:bind-into elfeed-show
     "C-c C-f"  elfeed-tube-mpv-follow-mode
     "C-c C-w"  elfeed-tube-mpv-where))
 (provide 'init-reader)

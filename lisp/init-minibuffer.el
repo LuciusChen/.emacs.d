@@ -15,21 +15,21 @@
              doom-modeline-hud t
              doom-modeline-hud-min-height 1)
     (doom-modeline-def-segment +buffer-info
-                               "Customize doom-modeline to remove modification indication"
-                               (let ((buffer-name (doom-modeline--buffer-name)))
-                                 (when (derived-mode-p 'telega-chat-mode 'org-agenda-mode)
-                                   (setq buffer-name
-                                         (propertize buffer-name 'face
-                                                     `(:inherit doom-modeline))))
-                                 (concat
-                                  (doom-modeline-spc)
-                                  (doom-modeline--buffer-mode-icon)
-                                  (doom-modeline--buffer-state-icon)
-                                  buffer-name)))
+      "Customize doom-modeline to remove modification indication"
+      (let ((buffer-name (doom-modeline--buffer-name)))
+        (when (derived-mode-p 'telega-chat-mode 'org-agenda-mode)
+          (setq buffer-name
+                (propertize buffer-name 'face
+                            `(:inherit doom-modeline))))
+        (concat
+         (doom-modeline-spc)
+         (doom-modeline--buffer-mode-icon)
+         (doom-modeline--buffer-state-icon)
+         buffer-name)))
 
     (doom-modeline-def-modeline 'disbale-modification-indication
-                                '(bar workspace-name window-number modals +buffer-info selection-info)
-                                '(misc-info minor-modes buffer-encoding major-mode time))
+      '(bar workspace-name window-number modals +buffer-info selection-info)
+      '(misc-info minor-modes buffer-encoding major-mode time))
 
     (:hooks doom-modeline-mode-hook
             (lambda ()
@@ -63,9 +63,10 @@
 (setup consult-dir
   (:after vertico
     (:global "C-x C-d" consult-dir)
-    (:bind-into vertico-map
-      "C-x C-d" consult-dir
-      "C-x C-j" consult-dir-jump-file)))
+    (:with-map vertico-map
+      (:bind
+       "C-x C-d" consult-dir
+       "C-x C-j" consult-dir-jump-file))))
 
 (setup isearch
   (:option isearch-lazy-count t
