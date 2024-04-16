@@ -129,6 +129,7 @@
     ("https://rsshub.sheerwill.live/youtube/user/@BrandonLiUnscripted" youtube)
     ("https://rsshub.sheerwill.live/youtube/user/@cherry_official"     youtube)
     ("https://rsshub.sheerwill.live/youtube/user/@mediastorm6801"      youtube)
+    ("https://rsshub.sheerwill.live/youtube/user/@Vox"                 youtube)
     ;; Bilibili
     ("https://rsshub.sheerwill.live/bilibili/user/dynamic/72270557"   bilibili) ;; 芳斯塔芙
     ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18706318"   bilibili) ;; 龙女之声
