@@ -5,7 +5,7 @@
   (:load-after dired)
   (:when-loaded
     (:option dired-subtree-line-prefix "  │  ")
-    (:bind-into dired-mode-map "TAB" dired-subtree-toggle)))
+    (:bind-into dired "TAB" dired-subtree-toggle)))
 
 (setup webpaste
   (:defer (:require webpaste)
@@ -43,7 +43,7 @@
   (:defer (:require vterm))
   (:when-loaded
     (:also-load lib-font)
-    (:bind-into vterm-mode-map
+    (:bind-into vterm
       "C-y" vterm-yank
       "M-y" vterm-yank-pop
       "C-k" vterm-send-C-k-and-kill)
@@ -65,7 +65,7 @@
   (:after vterm
     (:global [f8] vterm-toggle
              [f9] vterm-compile)
-    (:bind-into vterm-mode-map
+    (:bind-into vterm
       [f8] vterm-toggle
       [(control return)] vterm-toggle-insert-cd))
   (:when-loaded

@@ -93,11 +93,12 @@
 
 ;; 剪贴板查找
 (setup browse-kill-ring
-  (:bind-into browse-kill-ring-mode-map
-    "M-Y" browse-kill-ring
-    "C-g" browse-kill-ring-quit
-    "M-n" browse-kill-ring-forward
-    "M-p" browse-kill-ring-previous)
+  (:with-map browse-kill-ring-mode-map
+    (:bind
+     "M-Y" browse-kill-ring
+     "C-g" browse-kill-ring-quit
+     "M-n" browse-kill-ring-forward
+     "M-p" browse-kill-ring-previous))
   (:option browse-kill-ring-separator "\f"))
 
 ;; Shift lines up and down with M-up and M-down. When paredit is enabled,
@@ -128,7 +129,7 @@
 (setup hideshow
   (:also-load lib-hs)
   (:autoload hs-global-cycle)
-  (:bind-into hs-minor-mode-map "C-<tab>" hs-cycle
+  (:bind-into hs-minor "C-<tab>" hs-cycle
               "C-S-<tab>" hs-global-cycle))
 
 (setup whitespace-cleanup-mode

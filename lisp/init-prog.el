@@ -42,12 +42,13 @@
   (:also-load lib-lisp)
   (:require macrostep)
   (global-set-key [remap eval-expression] 'pp-eval-expression)
-  (:bind-into emacs-lisp-mode-map
-    "C-x C-e" +eval-last-sexp-or-region
-    "C-c C-e" pp-eval-expression
-    "C-c C-l" +load-this-file
-    "C-c x"   macrostep-expand
-    "C-c X"   macrostep-collapse)
+  (:with-map emacs-lisp-mode-map
+    (:bind
+     "C-x C-e" +eval-last-sexp-or-region
+     "C-c C-e" pp-eval-expression
+     "C-c C-l" +load-this-file
+     "C-c x"   macrostep-expand
+     "C-c X"   macrostep-collapse))
   (:advice pp-display-expression :after +make-read-only)
   (:hooks emacs-lisp-mode-hook +maybe-set-bundled-elisp-readonly))
 
@@ -91,7 +92,7 @@
   (:when-loaded (global-treesit-auto-mode)))
 
 (setup flycheck
-  (:bind-into flymake-mode-map
+  (:bind-into flymake
     "C-c ! n" flymake-goto-next-error
     "C-c ! p" flymake-goto-prev-error
     "C-c ! c" flymake-start))

@@ -26,7 +26,7 @@
    ;; support shift-l, shift-r, control-l, control-r
    rime-inline-ascii-trigger 'shift-r
    rime-user-data-dir "~/.emacs.d/Rime")
-  (:bind-into rime-mode-map
+  (:bind-into rime
     "C-i" rime-force-enable
     ;; 方案切换选择
     "C-`" rime-send-keybinding)
