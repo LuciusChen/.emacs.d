@@ -63,7 +63,6 @@
                                                (nth 2 (org-heading-components))
                                                org-done-keywords))))
     (:also-load lib-org-archive-hierachical)
-    (:also-load lib-org)
     (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     ;; only hook in org-mode
     (:with-mode org-mode
@@ -107,6 +106,7 @@
                 "* %? :NOTE:\n%U\n%a\n" :clock-resume t)))))
 
 (setup org-clock
+  (:after org)
   (:global "C-c o j" org-clock-goto
            "C-c o l" org-clock-in-last
            "C-c o i" org-clock-in
@@ -124,14 +124,7 @@
      ;; Show clock sums as hours and minutes, not "n days" etc.
      org-time-clocksum-format
      '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
-    (:when-loaded
-      (:also-load lib-org-clock)
-      (:hooks org-clock-in-hook +show-org-clock-in-header-line
-              org-clock-out-hook +hide-org-clock-from-header-line
-              org-clock-cancel-hook +hide-org-clock-from-header-line
-              org-clock-in-hook +clock-in-with-auto-next
-              org-after-todo-state-change-hook +done-with-auto-clock-out))
-    (:after org (org-clock-persistence-insinuate))))
+    (org-clock-persistence-insinuate)))
 
 (setup ox-latex
   (:load-after org)
