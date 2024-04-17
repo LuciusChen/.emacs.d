@@ -36,8 +36,8 @@
   (setup font
     (:require lib-font)
     ;; 偶发切换窗口时，字体设置失效。 modify 2023-08-22
-    (add-hook 'window-setup-hook #'+setup-fonts)
-    (add-hook 'server-after-make-frame-hook #'+setup-fonts)))
+    (:hooks window-setup-hook +setup-fonts
+            server-after-make-frame-hook +setup-fonts)))
 
 (setup dimmer
   (:defer (dimmer-mode t))

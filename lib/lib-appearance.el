@@ -35,6 +35,14 @@
     (when (and (<= frame-alpha-lower-limit newalpha) (>= 100 newalpha))
       (modify-frame-parameters frame (list (cons 'alpha-background newalpha))))))
 
+(defun +set-opacity (value)
+  "Set the background opacity of all frames to VALUE."
+  (dolist (frame (frame-list))
+    (unless (display-graphic-p frame)
+      (error "Cannot adjust opacity of this frame"))
+    (when (and (<= frame-alpha-lower-limit value) (>= 100 value))
+      (modify-frame-parameters frame (list (cons 'alpha value))))))
+
 (defun light ()
   "Activate a light color theme."
   (interactive)
@@ -43,8 +51,7 @@
   (setq custom-enabled-themes (list light-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (when window-system
-    (+adjust-opacity (selected-frame) +40)))
+  (when window-system (+set-opacity 100)))
 
 (defun dark ()
   "Activate a dark color theme."
@@ -53,8 +60,7 @@
   (setq custom-enabled-themes (list dark-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (when window-system
-    (+adjust-opacity (selected-frame) -40)))
+  (when window-system (+set-opacity 90)))
 
 (defun +maybe-suspend-frame ()
   (interactive)
