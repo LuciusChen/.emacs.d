@@ -17,10 +17,8 @@
 (setup custom
   (:when-loaded
     (:require lib-appearance)
-    (:global "M-C-8" (lambda () (interactive) (+adjust-opacity nil -2))
-             "M-C-7" (lambda () (interactive) (+adjust-opacity nil 2))
-             ;; Stop C-z from minimizing windows under OS X
-             "C-z" +maybe-suspend-frame)
+    ;; Stop C-z from minimizing windows under OS X
+    (:global "C-z" +maybe-suspend-frame)
     ;; Don't prompt to confirm theme safety. This avoids problems with
     ;; first-time startup on Emacs > 26.3.
     (:option custom-safe-themes t
@@ -48,18 +46,7 @@
     (add-to-list 'dimmer-exclusion-predicates '+display-non-graphic-p)
     (:advice frame-set-background-mode :after (lambda (&rest args) (dimmer-process-all)))))
 
-(setup nerd-icons
-  (:defer
-   (:require nerd-icons))
-  ;; fix orig. nerd dashboard oct icon missing
-  (:when-loaded (let ((icons nerd-icons-mode-icon-alist))
-                  (setq nerd-icons-mode-icon-alist
-                        (cons '(benchmark-init/tree-mode nerd-icons-codicon
-                                                         "nf-cod-dashboard"
-                                                         :face
-                                                         nerd-icons-blue)
-                              (delq (assq 'benchmark-init/tree-mode icons)
-                                    icons))))))
+(setup nerd-icons (:defer (:require nerd-icons)))
 
 (setup popper
   (:global "C-~"   popper-toggle
