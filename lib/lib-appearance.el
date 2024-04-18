@@ -23,13 +23,25 @@
 (defvar light-theme nil "The light theme.")
 (defvar dark-theme nil "The dark theme.")
 
+(defun +adjust-opacity (frame incr)
+  "Adjust the background opacity of FRAME by increment INCR."
+  (unless (display-graphic-p frame)
+    (error "Cannot adjust opacity of this frame"))
+  (let* ((oldalpha (or (frame-parameter frame 'alpha-background) 100))
+         ;; The 'alpha frame param became a pair at some point in
+         ;; emacs 24.x, e.g. (100 100)
+         (oldalpha (if (listp oldalpha) (car oldalpha) oldalpha))
+         (newalpha (+ incr oldalpha)))
+    (when (and (<= frame-alpha-lower-limit newalpha) (>= 100 newalpha))
+      (modify-frame-parameters frame (list (cons 'alpha-background newalpha))))))
+
 (defun set-opacity (value)
   "Set the background opacity of all frames to VALUE."
   (dolist (frame (frame-list))
     (unless (display-graphic-p frame)
       (error "Cannot adjust opacity of this frame"))
     (when (and (<= frame-alpha-lower-limit value) (>= 100 value))
-      (modify-frame-parameters frame (list (cons 'alpha value))))))
+      (modify-frame-parameters frame (list (cons 'alpha-background value))))))
 
 (defun light ()
   "Activate a light color theme."
@@ -48,7 +60,7 @@
   (setq custom-enabled-themes (list dark-theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (when window-system (set-opacity 90)))
+  (when window-system (set-opacity 60)))
 
 (defun +maybe-suspend-frame ()
   (interactive)

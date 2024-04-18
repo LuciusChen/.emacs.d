@@ -17,8 +17,10 @@
 (setup custom
   (:when-loaded
     (:require lib-appearance)
-    ;; Stop C-z from minimizing windows under OS X
-    (:global "C-z" +maybe-suspend-frame)
+    (:global "M-C-8" (lambda () (interactive) (+adjust-opacity nil -2))
+             "M-C-7" (lambda () (interactive) (+adjust-opacity nil 2))
+             ;; Stop C-z from minimizing windows under OS X
+             "C-z" +maybe-suspend-frame)
     ;; Don't prompt to confirm theme safety. This avoids problems with
     ;; first-time startup on Emacs > 26.3.
     (:option custom-safe-themes t

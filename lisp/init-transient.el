@@ -7,25 +7,13 @@
     (:also-load lib-transient)
     (:global    "C-c e a" agenda-transient
                 "C-c e j" journal-transient
+                "C-c e e" emacs-access-transient
                 "C-c e g" gptel-menu
                 "C-c e p" prog-commands
                 "C-c e m" magit-commands)
     (:with-map transient-base-map
       (:bind "<escape>" transient-quit-one))
     (:option transient-semantic-coloring t)
-    (transient-define-prefix  agenda-transient ()
-      "Agenda menu"
-      :info-manual "Agenda menu"
-      ["Arguments"
-       ("-i" "Inbox"       "inbox.org")
-       ("-a" "AREA"        "AREA.org")
-       ("-r" "RESOURCE"    "RESOURCE.org")
-       ("-p" "PROJECT"    "PROJECT.org")
-       ("-g" "Agenda"      "agenda.org")
-       ("-n" "Note"        "note.org")]
-      ["Commands"
-       ("RET" "agenda files switcher"     agenda-files-switcher)]
-      [("q" "Quit"           transient-quit-one)])
 
     (transient-define-prefix journal-transient ()
       "Journal menu"
@@ -37,6 +25,20 @@
        ("-d" "Clear archive log"  "delete")]
       ["Commands"
        ("RET" "Journal files switch"   journal-options)]
+      [("q" "Quit"           transient-quit-one)])
+
+    (transient-define-prefix  emacs-access-transient ()
+      "Emacs quick access"
+      :info-manual "Emacs quick access"
+      [["Emacs"
+        ("-r" "repos" "~/.emacs.d/straight/repos/")
+        ("-c" "settings" "~/.emacs.d/lisp/")]
+       ["Files"
+        ("-t" "telega" "~/.telega/")
+        ("-a" "agenda" "~/Library/CloudStorage/Dropbox/org/agenda/")
+        ("-b" "books" "~/Library/CloudStorage/Dropbox/org/bib/files")]]
+      ["Commands"
+       ("RET" "Emacs quick access"     browse-path)]
       [("q" "Quit"           transient-quit-one)])
 
     (transient-define-prefix prog-commands ()
