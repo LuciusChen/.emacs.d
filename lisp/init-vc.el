@@ -9,7 +9,10 @@
                 ;; file binding for vc-git-grep
                 "f" vc-git-grep)
     ;; 将当前 view 的 buffer 写入文件，实现恢复以前版本的作用
-    (:with-map magit-blob-mode-map (:bind "C-c C-c" +magit-blob-save))
+    (:with-map magit-blob-mode-map
+      (:bind "C-c C-c" +magit-blob-save
+             "C-n"     magit-blob-next
+             "C-p"     magit-blob-previous))
     ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
     ;; quickly open magit on any one of your projects.
     (:global [(meta f12)] magit-status

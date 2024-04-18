@@ -86,15 +86,6 @@
           (vterm-send-M-w)
           (vterm-send-string compile-command t))))))
 
-(defun +browse-straight-repos ()
-  "Browse files from the repositories cloned by `straight', using `fd'."
-  (interactive)
-  (let* ((repopath "~/.emacs.d/straight/repos/")
-         (fd-cmd (concat "fd --no-ignore-vcs . --base-directory " repopath))
-         (files (split-string (shell-command-to-string fd-cmd) "\n"))
-         (file (completing-read "Find file in straight repos: " files nil t)))
-    (find-file (file-name-concat repopath file))))
-
 ;; http://yitang.uk/2024/01/06/gpg-in-emacs-functions-to-decrypt-and-delete-all/
 ;; (defun +gpg--decrypt-recursively (root-dir)
 ;;   "Decrypt all '.gpg' files under ROOT-DIR.

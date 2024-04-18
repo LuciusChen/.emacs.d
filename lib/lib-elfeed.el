@@ -26,14 +26,14 @@
   (interactive)
   (with-current-buffer (elfeed-search-buffer)
     (elfeed-save-excursion
-     (let* ((inhibit-read-only t)
-            (standard-output (current-buffer)))
-       (erase-buffer)
-       (+elfeed-overview--update-list)
-       (dolist (entry elfeed-search-entries)
-         (funcall elfeed-search-print-entry-function entry)
-         (insert "\n"))
-       (setf elfeed-search-last-update (float-time))))
+      (let* ((inhibit-read-only t)
+             (standard-output (current-buffer)))
+        (erase-buffer)
+        (+elfeed-overview--update-list)
+        (dolist (entry elfeed-search-entries)
+          (funcall elfeed-search-print-entry-function entry)
+          (insert "\n"))
+        (setf elfeed-search-last-update (float-time))))
     (when (zerop (buffer-size))
       ;; If nothing changed, force a header line update
       (force-mode-line-update))
@@ -51,11 +51,11 @@
                                       feed))))
              (func (byte-compile (elfeed-search-compile-filter filter))))
         (with-elfeed-db-visit (entry feed)
-                              (when (funcall func entry feed count)
-                                (setf (cdr tail) (list entry)
-                                      tail (cdr tail)
-                                      count (1+ count))
-                                (elfeed-db-return)))))
+          (when (funcall func entry feed count)
+            (setf (cdr tail) (list entry)
+                  tail (cdr tail)
+                  count (1+ count))
+            (elfeed-db-return)))))
     (let ((entries (cdr head))
           (elfeed-search-sort-function
            (lambda (a b)
@@ -207,5 +207,40 @@
           (message "%s" (propertize "Starting mpv, please wait!" 'face 'elfeed-log-info-level-face))
           (mpv-play-url url))
       (message "%s" (propertize "Not a video link!" 'face 'elfeed-log-warn-level-face)))))
+
+(defun +elfeed-tube-download (entries)
+  (interactive
+   (list
+    (cond
+     ((eq major-mode 'elfeed-search-mode)
+      (when (y-or-n-p "Download entry at point or selected entries?")
+        (ensure-list (elfeed-search-selected))))
+     ((eq major-mode 'elfeed-show-mode)
+      (when (y-or-n-p "Download entry at point or selected entries?")
+        (ensure-list elfeed-show-entry)))
+     (t (user-error "elfeed-tube-download only works in Elfeed.")))))
+  (when entries
+    (if-let* (((seq-every-p #'elfeed-tube--youtube-p entries))
+              (default-directory "~/Downloads/"))
+        (seq-doseq (entry entries)
+          (let* ((title (elfeed-entry-title entry))
+                 (link  (elfeed-entry-link entry))
+                 (proc (start-process
+                        (format "yt-dlp download: %s" title)
+                        (get-buffer-create (format "*elfeed-tube-yt-dlp*: %s" title))
+                        "yt-dlp" "-w" "-c" "-o" "%(title)s.%(ext)s" "-f"
+                        "bestvideo[height<=?720]+bestaudio/best" "--add-metadata" link)))
+            (set-process-sentinel
+             proc
+             (lambda (process s)
+               (unless (process-live-p process)
+                 (if (eq (process-exit-status process) 0)
+                     (progn
+                       (message "Finished download: %s" title)
+                       (kill-buffer (process-buffer process)))
+                   (message "Download: [%s] failed (%d) with error: %s"
+                            title (process-exit-status process) s)))))
+            (message "Started download: %s" title)))
+      (message "Not youtube url(s), cancelling download."))))
 (provide 'lib-elfeed)
 ;;; lib-elfeed.el ends here

@@ -20,8 +20,8 @@
       (message "Deleted archived daily log file: %s" (string-join (nreverse deleted-files) ", ")))))
 
 (defun agenda-files-switcher (&optional args)
-      (interactive (list (transient-args 'agenda-transient)))
-      (find-file  (concat "~/Library/CloudStorage/Dropbox/org/agenda/" (car args))))
+  (interactive (list (transient-args 'agenda-transient)))
+  (find-file  (concat "~/Library/CloudStorage/Dropbox/org/agenda/" (car args))))
 
 (defun journal-options (&optional args)
   (interactive (list (transient-args 'journal-transient)))
@@ -46,6 +46,15 @@
                (message "Journal file not found for yesterday"))))
           ((member "delete" args)
            (+delete-archived-daily-log-files)))))
+
+(defun browse-path (&optional args)
+  "Browse files from the repositories cloned by `straight', using `fd'."
+  (interactive (list (transient-args 'emacs-access-transient)))
+  (let* ((repopath (expand-file-name (car args)))
+         (fd-cmd (concat "fd --no-ignore-vcs . --base-directory " repopath))
+         (files (split-string (shell-command-to-string fd-cmd) "\n"))
+         (file (completing-read "Find file in straight repos: " files nil t)))
+    (find-file (file-name-concat repopath file))))
 ;;;; provide
 (provide 'lib-transient)
 ;;; lib-transient.el ends here.
