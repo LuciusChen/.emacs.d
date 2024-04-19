@@ -62,6 +62,12 @@
   (set-dividers-and-fringe-color)
   (when window-system (set-opacity 60)))
 
+(defun opacity-dark-theme (&rest frame)
+  (if (display-graphic-p)
+      (if (eq (frame-parameter nil 'background-mode) 'dark)
+          (set-opacity 60))
+    (message "Non-graphical interface")))
+
 (defun +maybe-suspend-frame ()
   (interactive)
   (unless (and *IS-MAC* window-system)

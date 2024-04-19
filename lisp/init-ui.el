@@ -25,11 +25,13 @@
     ;; first-time startup on Emacs > 26.3.
     (:option custom-safe-themes t
              ;; If you don't customize it, this is the theme you get.
-             custom-enabled-themes '(modus-operandi-tinted)
+             custom-enabled-themes '(modus-vivendi-tinted)
              light-theme 'modus-operandi-tinted
              dark-theme 'modus-vivendi-tinted)
     (:hooks after-init-hook reapply-themes
             window-setup-hook reapply-themes
+            window-setup-hook opacity-dark-theme
+            after-make-frame-functions opacity-dark-theme
             window-setup-hook set-dividers-and-fringe-color)))
 
 (when window-system
