@@ -43,8 +43,8 @@
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
   ;; IBM Plex Mono 没有这几个字符，自己编辑字体后添加，可以省去下面的设置。
   (set-fontset-font nil ?❤ "Iosevka")
-  ;; (set-fontset-font nil ?☑ "Iosevka")
-  ;; (set-fontset-font nil ?☐ "Iosevka")
+  (set-fontset-font nil ?  "Symbols Nerd Font Mono")
+
   (set-fontset-font t 'javanese "Noto Sans Javanese"))
 
 (defconst jetbrains-ligature-mode--ligatures

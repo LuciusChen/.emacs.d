@@ -2,35 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 (setup startup
-  (:option initial-scratch-message
-           (propertize
-            (concat ";; Happy hacking, " user-login-name " - Emacs ❤ you") 'face 'italic)
-           inhibit-startup-screen t)
-  (:hooks emacs-startup-hook
-          (lambda ()
-            (with-current-buffer "*scratch*"
-              (goto-char (point-max))
-              (insert
-               (concat "\n;;     \\\"\\/\\/\\/\"/"
-                       "\n;;      )======("
-                       "\n;;    .'  LOOT  '."
-                       "\n;;   /   __||___  \\"
-                       "\n;;  /   (__||__    \\"
-                       "\n;; |    ___||__)    | (\\\\)"
-                       "\n;; \"       ||       \" ( -.-)"
-                       "\n;;   \"____________\"  o_(\")(\")"
-                       "\n;; Emacs startup time: "
-                       (format "%.2f seconds with %d garbage collections"
-                               (float-time
-                                (time-subtract after-init-time
-                                               before-init-time))
-                               gcs-done)
-                       "\n;; Loaded "
-                       (format "%d packages"
-                               (length (hash-table-keys
-                                        straight--profile-cache)))
-                       "\n\n"))))
-          after-init-hook delete-selection-mode
+  (:option inhibit-startup-screen t)
+  (:hooks after-init-hook delete-selection-mode
           after-init-hook savehist-mode
           after-init-hook electric-pair-mode))
 

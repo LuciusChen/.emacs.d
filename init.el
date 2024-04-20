@@ -173,6 +173,7 @@
     password-store
     (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))
     (emt :host github :repo "roife/emt")
+    (dashboard :host github :repo "LuciusChen/dashboard")
     (mastodon-alt :host github :repo "LuciusChen/mastodon-alt")
     ;; (dape :host github :repo "svaante/dape")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
