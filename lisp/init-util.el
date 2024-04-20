@@ -86,6 +86,18 @@
           (vterm-send-M-w)
           (vterm-send-string compile-command t))))))
 
+(setup mastodon
+  (:defer (:require mastodon))
+  (:when-loaded
+    (:option mastodon-instance-url "https://mastodon.social"
+             mastodon-active-user "Lucius_Chen"
+             mastodon-tl--show-avatars t)))
+
+(setup mastodon-alt
+  (:load-after mastodon)
+  (:when-loaded
+    (mastodon-alt-tl-activate)))
+
 ;; http://yitang.uk/2024/01/06/gpg-in-emacs-functions-to-decrypt-and-delete-all/
 ;; (defun +gpg--decrypt-recursively (root-dir)
 ;;   "Decrypt all '.gpg' files under ROOT-DIR.
