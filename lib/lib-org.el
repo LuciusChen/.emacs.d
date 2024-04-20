@@ -67,16 +67,6 @@ See also `org-save-all-org-buffers'"
                            t)))
   (message "Saving org-agenda-files buffers... done"))
 
-;; 获取当前主题的背景色
-;; (defun get-theme-background-color ()
-;;   (cdr (assoc 'background-color (frame-parameters))))
-
-;; (defun set-org-block-end-line-color ()
-;;   "Set org-src-block face background color to current theme's background color."
-;;   (interactive)
-;;   (let ((background-color (get-theme-background-color))) ; 获取当前主题的背景色
-;;     (set-face-attribute 'org-block-end-line nil :background background-color))) ; 设置 org-src-block face 的背景色属性
-
 (defun ebib-create-key (key _db)
   "Return the KEY in DB for the Org mode note."
   (format "%s" key))
