@@ -1,4 +1,5 @@
 * .emacs.d
+[[file:assets/screenshot_1.png]]
 ** 字体
 字体这块折腾的真的比较多了，目前使用 [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了）。不在自行编译 [[https://github.com/be5invis/Iosevka][Iosevka]] 直接下载可用版本，用于 org-mode。同时安装 IosevkaTerm Nerd Font，用于 vterm-mode。（2024-04-14）
 *** [[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]
