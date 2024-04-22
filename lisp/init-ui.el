@@ -17,9 +17,9 @@
 (setup dashboard
   (:after nerd-icons)
   (:option dashboard-latitude 32.088258
-           dashboard-longitude 118.822916 ;; latitude and longitude must be set to show weather information
+           dashboard-longitude 118.822916
            dashboard-path-max-length 75
-           dashboard-use-fahrenheit nil ;; show in celcius or fahrenheit.
+           dashboard-use-fahrenheit nil
            dashboard-min-left-padding 10
            dashboard-image-file "~/.emacs.d/assets/bitmap.png"
            dashboard-image-width 400
