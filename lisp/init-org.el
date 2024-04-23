@@ -3,7 +3,8 @@
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
   (:global
-   "C-C L"     org-store-link
+   "C-c L"     org-store-link
+   "C-c C-o"   org-open-at-point
    "C-M-<up>"  org-up-element
    ;; 一般这个函数都是在 org 启动后调用，如果 org 没有启动则会报错。
    ;; Wrong type argument: commandp, dired-copy-images-links
