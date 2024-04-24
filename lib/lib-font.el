@@ -42,7 +42,9 @@
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
   ;; Set font for specific characters
   (set-fontset-font nil ?❤ "Iosevka")
-  (set-fontset-font nil ?  "Symbols Nerd Font Mono")
+  (set-fontset-font nil ? "Symbols Nerd Font Mono")
+  (set-fontset-font nil ? "Symbols Nerd Font Mono")
+  (set-fontset-font nil ? "Symbols Nerd Font Mono")
 
   (set-fontset-font t 'javanese "Noto Sans Javanese"))
 
