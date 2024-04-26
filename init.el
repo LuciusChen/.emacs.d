@@ -142,7 +142,6 @@
     org-roam-ui
     rainbow-mode
     ob-restclient
-    magit-todos
     prettier-js
     consult-dir
     vterm
@@ -151,7 +150,6 @@
     org-cliplink
     doom-modeline
     markdown-mode
-    disable-mouse
     consult-eglot
     mode-line-bell
     benchmark-init
@@ -165,7 +163,6 @@
     rainbow-delimiters
     default-text-scale
     language-detection
-    list-unicode-display
     nerd-icons-completion
     emacsql-sqlite-builtin
     whitespace-cleanup-mode
