@@ -1,5 +1,10 @@
 * .emacs.d
 [[file:assets/screenshot_1.png]]
+
+| Language   | Files | Lines | Code | Comments | Blanks |
+|------------+-------+-------+------+----------+--------|
+| Emacs Lisp |    43 |  3948 | 3127 |      550 |    271 |
+| Total      |    43 |  3948 | 3127 |      550 |    271 |
 ** 字体
 字体这块折腾的真的比较多了，目前使用 [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了）。不在自行编译 [[https://github.com/be5invis/Iosevka][Iosevka]] 直接下载可用版本，用于 org-mode。同时安装 IosevkaTerm Nerd Font，用于 vterm-mode。（2024-04-14）
 *** [[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]
@@ -44,6 +49,7 @@ machine api.github.com login LuciusChen^forge password ****
 
 Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获取。
 ** Reader
+[[file:assets/org.png]]
 用过一段时间的 [[https://read.readwise.io][Readwise Reader]]，选择其的原因在于可以配合沉浸式翻译，达到快速阅读英文书籍及文章的目的。但是目前在 Emacs 当中也可以通过 gpt 的应用达到相同的目的。
 
 通过 [[https://github.com/Elilif/emacs-immersive-translate][Elilif/emacs-immersive-translate]] 进行翻译。其中 [[https://platform.openai.com/][OpenAI]] 需要绑定支付方式后才可以使用，可以使用我的 [[https://bewildcard.com/i/YAOHUA][WildCard]] 邀请链接注册充值，享受88折优惠。
