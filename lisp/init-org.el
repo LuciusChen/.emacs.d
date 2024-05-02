@@ -473,7 +473,8 @@
              (push '("[X]" . "☑" ) prettify-symbols-alist)
              (push '("[-]" . "❍" ) prettify-symbols-alist)
              (prettify-symbols-mode))))
-  (:option org-modern-star ["❑" "❍" "❑" "❍" "❑" "❍"]
+  (:option org-modern-star 'replace
+           org-modern-replace-stars "❑❍❑❍❑❍"
            org-hide-emphasis-markers t
            org-tags-column 0
            org-modern-block-fringe 2
