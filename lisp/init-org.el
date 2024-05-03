@@ -136,9 +136,6 @@
   (:when-loaded
     (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
 
-(setup auctex
-  (:defer (require 'latex)))
-
 (setup org-latex-preview
   (:load-after org)
   (:when-loaded
