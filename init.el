@@ -103,7 +103,6 @@
     popper
     embark
     bibtex
-    auctex
     dimmer
     vertico
     diredfl
