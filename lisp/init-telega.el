@@ -43,7 +43,6 @@
      ;; telega-server-verbosity 4
      ;; adjust the size for sticker
      telega-open-file-function 'org-open-file
-     telega-chat-fill-column 90
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
      telega-avatar-workaround-gaps-for '(return t)
@@ -53,14 +52,9 @@
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
-     telega-symbol-premium (nerd-icons-octicon "nf-oct-star_fill" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
-     telega-symbol-saved-messages-tag-end (nerd-icons-faicon "nf-fa-tag")
-     telega-symbol-checkbox-on (nerd-icons-octicon "nf-oct-checkbox")
-     telega-symbol-checkbox-off (nerd-icons-sucicon "nf-seti-checkbox_unchecked")
      telega-symbol-button-close (nerd-icons-faicon "nf-fa-close")
-     telega-symbol-radiobox-on (nerd-icons-faicon "nf-fa-circle")
-     telega-symbol-radiobox-off (nerd-icons-octicon "nf-oct-circle")
+     telega-symbol-saved-messages-tag-end (nerd-icons-faicon "nf-fa-tag")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
      telega-symbol-flames (nerd-icons-mdicon "nf-md-delete_clock")
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
@@ -84,10 +78,8 @@
      telega-root-keep-cursor 'track
      telega-root-show-avatars nil
      telega-root-buffer-name "*Telega Root*"
-     telega-root-fill-column 70 ; fill-column
      telega-filters-custom nil
      telega-filter-custom-show-folders nil
-     telega-symbol-folder "  "
      ;;telega-bridge-bot
      telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
      telega-bridge-bot-bridge-info-plist
