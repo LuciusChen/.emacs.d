@@ -5,7 +5,7 @@
   (:load-after dired)
   (:when-loaded
     (:option dired-subtree-line-prefix "  │  ")
-    (:bind-into dired "TAB" dired-subtree-toggle)))
+    (:with-map dired-mode-map (:bind "TAB" dired-subtree-toggle))))
 
 (setup webpaste
   (:defer (:require webpaste)
@@ -43,10 +43,10 @@
   (:defer (:require vterm))
   (:when-loaded
     (:also-load lib-font)
-    (:bind-into vterm
-      "C-y" vterm-yank
-      "M-y" vterm-yank-pop
-      "C-k" vterm-send-C-k-and-kill)
+    (:with-map vterm-mode-map
+      (:bind "C-y" vterm-yank
+             "M-y" vterm-yank-pop
+             "C-k" vterm-send-C-k-and-kill))
     (:option vterm-shell "zsh"
              vterm-always-compile-module t)
     (defun vterm-send-C-k-and-kill ()
@@ -65,9 +65,9 @@
   (:after vterm
     (:global [f8] vterm-toggle
              [f9] vterm-compile)
-    (:bind-into vterm
-      [f8] vterm-toggle
-      [(control return)] vterm-toggle-insert-cd))
+    (:with-map vterm-mode-map
+      (:bind [f8] vterm-toggle
+             [(control return)] vterm-toggle-insert-cd)))
   (:when-loaded
     (:option vterm-toggle-cd-auto-create-buffer nil)
     (defvar vterm-compile-buffer nil)

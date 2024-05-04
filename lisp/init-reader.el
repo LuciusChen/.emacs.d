@@ -23,12 +23,12 @@
   (:when-loaded
     (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
     (:global "C-c i m" org-remark-mark)
-    (:bind-into org-remark
-      "C-c i o" org-remark-open
-      "C-c i ]" org-remark-view-next
-      "C-c i [" org-remark-view-prev
-      "C-c i r" org-remark-remove
-      "C-c i d" org-remark-delete)))
+    (:with-map org-remark-mode-map
+      (:bind "C-c i o" org-remark-open
+             "C-c i ]" org-remark-view-next
+             "C-c i [" org-remark-view-prev
+             "C-c i r" org-remark-remove
+             "C-c i d" org-remark-delete))))
 
 (setup org-remark-nov
   (:after nov (org-remark-nov-mode +1)))
@@ -63,19 +63,19 @@
     (:also-load lib-elfeed)
     (:option elfeed-feeds +elfeed-feeds
              elfeed-search-print-entry-function #'+elfeed-search-print-entry--better-default)
-    (:bind-into elfeed-show
-      "N" +menu-dwim--org-capture-elfeed-show
-      "o" +open-link-with-mpv)
-    (:bind-into elfeed-search "L" +elfeed-overview)))
+    (:with-map elfeed-show-mode-map
+      (:bind "N" +menu-dwim--org-capture-elfeed-show
+             "o" +open-link-with-mpv))
+    (:with-map elfeed-search-mode-map (:bind "L" +elfeed-overview))))
 
 (setup elfeed-tube
   (:after elfeed
-    (:bind-into elfeed-show
-      "F" elfeed-tube-fetch
-      [remap save-buffer] elfeed-tube-save)
-    (:bind-into     elfeed-search
-      "F" elfeed-tube-fetch
-      [remap save-buffer] elfeed-tube-save))
+    (:with-map elfeed-show-mode-map
+      (:bind "F" elfeed-tube-fetch
+             [remap save-buffer] elfeed-tube-save))
+    (:with-map elfeed-search-mode-map
+      (:bind "F" elfeed-tube-fetch
+             [remap save-buffer] elfeed-tube-save)))
   (:when-loaded
     (elfeed-tube-setup)
     ;; (:option mpv-default-options '("--http-proxy=http://127.0.0.1:7890"
@@ -84,8 +84,8 @@
 
 (setup elfeed-tube-mpv
   (:load-after elfeed)
-  (:bind-into elfeed-show
-    "C-c C-f"  elfeed-tube-mpv-follow-mode
-    "C-c C-w"  elfeed-tube-mpv-where))
+  (:with-map elfeed-show-mode-map
+    (:bind "C-c C-f"  elfeed-tube-mpv-follow-mode
+           "C-c C-w"  elfeed-tube-mpv-where)))
 (provide 'init-reader)
 ;;; init-reader.el ends here
