@@ -26,10 +26,10 @@
    ;; support shift-l, shift-r, control-l, control-r
    rime-inline-ascii-trigger 'shift-r
    rime-user-data-dir "~/.emacs.d/Rime")
-  (:bind-into rime
-    "C-i" rime-force-enable
-    ;; 方案切换选择
-    "C-`" rime-send-keybinding)
+  (:with-map rime-mode-map
+    (:bind "C-i" rime-force-enable
+           ;; 方案切换选择
+           "C-`" rime-send-keybinding))
   (:hooks
    meow-insert-enter-hook
    (lambda() (when (derived-mode-p 'org-mode 'telega-chat-mode)

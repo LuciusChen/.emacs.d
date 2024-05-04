@@ -129,8 +129,9 @@
 (setup hideshow
   (:also-load lib-hs)
   (:autoload hs-global-cycle)
-  (:bind-into hs-minor "C-<tab>" hs-cycle
-              "C-S-<tab>" hs-global-cycle))
+  (:with-map hs-minor-mode-map
+    (:bind "C-<tab>" hs-cycle
+           "C-S-<tab>" hs-global-cycle)))
 
 (setup whitespace-cleanup-mode
   (:global [remap just-one-space] cycle-spacing)

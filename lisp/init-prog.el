@@ -92,10 +92,10 @@
   (:when-loaded (global-treesit-auto-mode)))
 
 (setup flycheck
-  (:bind-into flymake
-    "C-c ! n" flymake-goto-next-error
-    "C-c ! p" flymake-goto-prev-error
-    "C-c ! c" flymake-start))
+  (:with-map flymake-mode-map
+    (:bind "C-c ! n" flymake-goto-next-error
+           "C-c ! p" flymake-goto-prev-error
+           "C-c ! c" flymake-start)))
 
 ;; Use flycheck checkers with flymake, to extend its coverage
 (setup flymake-flycheck

@@ -4,10 +4,12 @@
   (:load-after vc)
   (:when-loaded
     (:also-load lib-magit)
-    (:bind-into magit-status "C-M-<up>" magit-section-up)
-    (:bind-into vc-prefix "l" +magit-or-vc-log-file
-                ;; file binding for vc-git-grep
-                "f" vc-git-grep)
+    (:with-map magit-status-mode-map
+      (:bind "C-M-<up>" magit-section-up))
+    (:with-map vc-prefix-map
+      (:bind "l" +magit-or-vc-log-file
+             ;; file binding for vc-git-grep
+             "f" vc-git-grep))
     ;; 将当前 view 的 buffer 写入文件，实现恢复以前版本的作用
     (:with-map magit-blob-mode-map
       (:bind "C-c C-c" +magit-blob-save
@@ -58,7 +60,7 @@
             prog-mode-hook diff-hl-mode
             conf-mode-hook diff-hl-mode
             dired-mode-hook diff-hl-dired-mode)
-    (:bind-into diff-hl
-      "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk)))
+    (:with-map diff-hl-mode-map
+      (:bind "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))))
 (provide 'init-vc)
 ;;; init-vc.el ends here
