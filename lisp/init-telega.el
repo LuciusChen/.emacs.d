@@ -78,6 +78,7 @@
      telega-root-keep-cursor 'track
      telega-root-show-avatars nil
      telega-root-buffer-name "*Telega Root*"
+     telega-chat-folders-insexp (lambda () nil)
      telega-filters-custom nil
      telega-filter-custom-show-folders nil
      ;;telega-bridge-bot
