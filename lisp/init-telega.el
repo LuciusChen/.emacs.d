@@ -43,6 +43,7 @@
      ;; telega-server-verbosity 4
      ;; adjust the size for sticker
      telega-open-file-function 'org-open-file
+     telega-chat-fill-column 90
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
      telega-avatar-workaround-gaps-for '(return t)
@@ -80,6 +81,7 @@
      telega-root-buffer-name "*Telega Root*"
      telega-chat-folders-insexp (lambda () nil)
      telega-filters-custom nil
+     telega-root-fill-column 70 ; fill-column
      telega-filter-custom-show-folders nil
      ;;telega-bridge-bot
      telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
