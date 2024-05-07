@@ -40,9 +40,9 @@
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
 (setup sis
-  ;; brew tap daipeihust/tap
-  ;; brew install im-select
-  (:option sis-external-ism "im-select"
+  ;; brew tap laishulu/macism
+  ;; brew install macism
+  (:option sis-external-ism "macism"
            sis-english-source "com.apple.keylayout.ABC"
            sis-inline-tighten-head-rule nil
            sis-default-cursor-color "#cf7fa7"
