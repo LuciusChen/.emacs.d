@@ -131,15 +131,16 @@
     ("https://rsshub.sheerwill.live/youtube/user/@mediastorm6801"      youtube)
     ("https://rsshub.sheerwill.live/youtube/user/@Vox"                 youtube)
     ;; Bilibili
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/72270557"   bilibili) ;; 芳斯塔芙
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18706318"   bilibili) ;; 龙女之声
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/7487399"    bilibili) ;; 努力的Lorre
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/470156882"  bilibili) ;; 小艾大叔
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/38053181"   bilibili) ;; oooooohmygosh
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/6330633"    bilibili) ;; 小胡仙儿
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18202105"   bilibili) ;; 绵羊料理
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/125526"     bilibili) ;; -LKs-
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/20375812"   bilibili) ;; 博士萌
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/72270557"     bilibili) ;; 芳斯塔芙
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18706318"     bilibili) ;; 龙女之声
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/1498726302"   bilibili) ;; 何限梁
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/7487399"      bilibili) ;; 努力的Lorre
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/470156882"    bilibili) ;; 小艾大叔
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/38053181"     bilibili) ;; oooooohmygosh
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/6330633"      bilibili) ;; 小胡仙儿
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18202105"     bilibili) ;; 绵羊料理
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/125526"       bilibili) ;; -LKs-
+    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/20375812"     bilibili) ;; 博士萌
     ))
 
 (defun nerd-icon-for-tags (tags)
