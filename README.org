@@ -36,7 +36,7 @@
 [[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]，颜色方案参考了 [[https://uicolors.app/browse/tailwind-colors][tailwind-colors]]。
 
 透明以及毛玻璃效果可以参考下面两个 patch
-- [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]]
+- [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]] （master 的 ef6ffbdc79645e719d3b5ef23c9200405c58c61e 之后 patch 不能正确 apply，参考我修改过的 [[https://github.com/LuciusChen/.emacs.d/blob/bbcb432caee0c66a42100acf6e5322c4bf128ba8/patches/ns-alpha-background.patch][ns-alpha-background.patch]]。）
 - [[https://github.com/jaaasonSun/homebrew-emacs-plus/blob/master/patches/emacs-29/blur.patch]]
 
 例如添加透明 patch，需要在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@30.rb= 中添加 =local_patch "ns-alpha-background", sha: "eae9abd14c2d00315806116e0eaba09510e98738b420d6e40a9d7d97d9437b81"= 并把 ns-alpha-background.patch 文件放在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-30=  下。
