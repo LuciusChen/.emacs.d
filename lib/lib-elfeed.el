@@ -94,8 +94,8 @@
     ;; Economics
     ("https://rsshub.sheerwill.live/economist/latest" economics)
     ;; Novel
-    ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/194_194173/" novel) ;; 玄鉴仙族
-    ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/192_192713/" novel) ;; 我本无意成仙
+    ;; ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/194_194173/" novel) ;; 玄鉴仙族
+    ;; ("https://rsshub.sheerwill.live/biquge/http://www.biqu5200.net/192_192713/" novel) ;; 我本无意成仙
     ;; Github
     ("https://github.com/zevlg/telega.el/commits.atom" github)
     ("https://github.com/tdlib/td/commits.atom" github)
