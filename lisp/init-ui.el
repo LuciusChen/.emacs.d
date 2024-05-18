@@ -16,8 +16,8 @@
 
 (setup dashboard
   (:after nerd-icons)
-  (:option dashboard-latitude 32.088258
-           dashboard-longitude 118.822916
+  (:option dashboard-latitude 32.09703
+           dashboard-longitude 118.77969
            dashboard-path-max-length 75
            dashboard-use-fahrenheit nil
            dashboard-min-left-padding 10

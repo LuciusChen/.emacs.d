@@ -330,32 +330,37 @@
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>\n${fetch-weather-data}")))
+                 ("%<%a, %d %b %Y>")))
+       ("w" "Weather" entry "${fetch-weather-data}"
+        :if-new (file+head+olp
+                 "%<%Y-%m-%d>.org"
+                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
+                 ("%<%a, %d %b %Y>")))
        ("e" "Diet" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>\n${fetch-weather-data}" "Food Journal :food:")))
+                 ("%<%a, %d %b %Y>" "Food Journal :food:")))
        ("r" "Read" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>\n${fetch-weather-data}" "What I read? :read:")))
+                 ("%<%a, %d %b %Y>" "What I read? :read:")))
        ("t" "Tasks" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>\n${fetch-weather-data}" "Tasks :task:")))
+                 ("%<%a, %d %b %Y>" "Tasks :task:")))
        ("f" "Fleeting Notes" entry "*** %?"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>\n${fetch-weather-data}" "Notes :note:")))
+                 ("%<%a, %d %b %Y>" "Notes :note:")))
        ("o" "Online" entry "** %<%H:%M> %? :online:"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>\n${fetch-weather-data}"))))
+                 ("%<%a, %d %b %Y>"))))
      org-src-fontify-natively t
      ;; Hierachy for title nodes
      org-roam-node-display-template

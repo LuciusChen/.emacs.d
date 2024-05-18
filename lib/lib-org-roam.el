@@ -150,7 +150,7 @@ TEMPLATE is the processed template used to format the entry."
   "Fetch weather data from API and return weather string."
   (let ((url-request-method "GET")
         (url-request-extra-headers '(("Content-Type" . "application/json")))
-        (url (format "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=Asia%%2FSingapore" latitude longitude)))
+        (url (format "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=Asia%%2FSingapore&forecast_days=1" latitude longitude)))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (re-search-forward "^$")
@@ -165,7 +165,7 @@ TEMPLATE is the processed template used to format the entry."
              (uv (aref (cdr (assoc 'uv_index_max daily)) 0))
              (weather-description (weather-code-to-string weather-code))
              (weather-string (format "** Weather: %s\n*** Temperature: %.1f°C-%.1f°C\n*** Daytime: %s-%s\n*** UV: %.2f"
-                                     weather-description temp-max temp-min sunrise sunset uv)))
+                                     weather-description temp-min temp-max sunrise sunset uv)))
         weather-string))))
 
 (defun weather-code-to-string (code)
