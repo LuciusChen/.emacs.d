@@ -162,11 +162,22 @@ TEMPLATE is the processed template used to format the entry."
              (temp-min (aref (cdr (assoc 'temperature_2m_min daily)) 0))
              (sunrise (aref (cdr (assoc 'sunrise daily)) 0))
              (sunset (aref (cdr (assoc 'sunset daily)) 0))
-             (uv (aref (cdr (assoc 'uv_index_max daily)) 0))
+             (uv (uv-to-sunscreen-advice (aref (cdr (assoc 'uv_index_max daily)) 0)))
              (weather-description (weather-code-to-string weather-code))
-             (weather-string (format "** Weather: %s\n*** Temperature: %.1f°C-%.1f°C\n*** Daytime: %s-%s\n*** UV: %.2f"
+             (weather-string (format "** Weather: %s\n*** Temperature: %.1f°C-%.1f°C\n*** Daytime: %s-%s\n*** UV: %s"
                                      weather-description temp-min temp-max sunrise sunset uv)))
         weather-string))))
+
+(defun uv-to-sunscreen-advice (uv-index)
+  "Return sunscreen advice based on the given UV index."
+  (let ((uv-str (number-to-string uv-index)))
+    (cond
+     ((<= uv-index 2) (concat uv-str " 通常不需要特别防护，但可以考虑使用SPF 15的防晒霜。"))
+     ((<= uv-index 5) (concat uv-str " 建议使用SPF 15-30的防晒霜，尤其是在户外活动时。"))
+     ((<= uv-index 7) (concat uv-str " 建议使用SPF 30-50的防晒霜，并采取其他防护措施，如戴帽子和太阳镜。"))
+     ((<= uv-index 10) (concat uv-str " 建议使用SPF 50+的防晒霜，并尽量避免在阳光最强的时段外出，同时采取其他防护措施。"))
+     ((>= uv-index 11) (concat uv-str " 强烈建议使用SPF 50+的防晒霜，并采取一切可能的防护措施，如穿长袖衣物、戴帽子和太阳镜，尽量避免暴露在阳光下。"))
+     (t "输入的UV指数无效。"))))
 
 (defun weather-code-to-string (code)
   "Convert weather CODE to a human-readable string."
