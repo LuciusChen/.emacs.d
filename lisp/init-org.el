@@ -71,11 +71,11 @@
       (:hook org-indent-mode)
       (:hook (lambda () (setq truncate-lines nil)))
       (:hook (lambda ()(make-face 'width-font-face)
-               (set-face-attribute 'width-font-face nil :font "PragmataPro Mono 14")
+               (set-face-attribute 'width-font-face nil :font "PragmataPro 14")
                (setq buffer-face-mode-face 'width-font-face)
                (buffer-face-mode)
                ;; org-table 字体好像并没有跟随 org-mode，所以单独设置。
-               (set-face-attribute 'org-table nil :family "PragmataPro Mono"))))
+               (set-face-attribute 'org-table nil :family "PragmataPro"))))
     (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
