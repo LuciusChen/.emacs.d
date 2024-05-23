@@ -57,7 +57,7 @@
 
   (:with-mode vterm-mode
     (:hook (lambda ()(make-face 'width-font-face)
-             (set-face-attribute 'width-font-face nil :font "IosevkaTerm Nerd Font Mono 14")
+             (set-face-attribute 'width-font-face nil :font "PragmataPro Mono Liga 14")
              (setq buffer-face-mode-face 'width-font-face)
              (buffer-face-mode)))))
 
