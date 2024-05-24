@@ -356,7 +356,7 @@
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
                  ("%<%a, %d %b %Y>" "Notes :note:")))
-       ("o" "Online" entry "** %<%H:%M> %? :online:"
+       ("p" "Prod" entry "** %<%H:%M> %? :prod:"
         :if-new (file+head+olp
                  "%<%Y-%m-%d>.org"
                  "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"

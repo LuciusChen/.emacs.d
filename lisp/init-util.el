@@ -53,13 +53,7 @@
       "Send `C-k' to libvterm, and put content in kill-ring."
       (interactive)
       (kill-ring-save (point) (vterm-end-of-line))
-      (vterm-send-key "k" nil nil t)))
-
-  (:with-mode vterm-mode
-    (:hook (lambda ()(make-face 'width-font-face)
-             (set-face-attribute 'width-font-face nil :font "PragmataPro Mono Liga 14")
-             (setq buffer-face-mode-face 'width-font-face)
-             (buffer-face-mode)))))
+      (vterm-send-key "k" nil nil t))))
 
 (setup vterm-toggle
   (:after vterm
