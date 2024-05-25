@@ -190,7 +190,7 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
-(require 'auto-space)
+(when *IS-MAC* (require 'auto-space))
 (require 'init-setup)
 (require 'init-builtin)
 (require 'init-ui)

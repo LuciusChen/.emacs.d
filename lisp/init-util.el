@@ -110,6 +110,6 @@
 ;;   (dolist (file (directory-files-recursively root-dir "\\.gpg\\'"))
 ;;     (delete-file (file-name-sans-extension file))))
 
-(setup auto-space (:hook-into after-init))
+(when *IS-MAC* (setup auto-space (:hook-into after-init)))
 (provide 'init-util)
 ;;; init-util.el ends here
