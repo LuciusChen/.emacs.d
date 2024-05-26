@@ -6,9 +6,7 @@
 | Emacs Lisp |    43 |  3948 | 3127 |      550 |    271 |
 | Total      |    43 |  3948 | 3127 |      550 |    271 |
 ** 字体
-字体这块折腾的真的比较多了，目前使用 [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]] （2023-11-28）字体（因为 Telega 有了个 workaround gaps 可以让头像再也不裂了）。不在自行编译 [[https://github.com/be5invis/Iosevka][Iosevka]] 直接下载可用版本，用于 org-mode。同时安装 IosevkaTerm Nerd Font，用于 vterm-mode。（2024-04-14）
-*** [[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]
-「霞鹜文楷」不属于大字符集字体，因此需要设置对应的 fall-back 字体，我选择的是「[[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]]」字体，全覆盖 CJK 字符集。
+主要使用 [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]]，vterm-mode、prog-mode 和 org-mode 下使用 [[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro]]；中文字体使用[[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]，选择 [[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]] 全覆盖 CJK 字符集作为 fallback 字体。
 
 |------------------------+------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+---------------+--------|
 |                        | CJK        | CJK-A        | CJK-B         | CJK-C         |         CJK-D | CJK-E         | CJK-F         | CJK-G         | CJK-H         | 合计   |
@@ -29,7 +27,6 @@
 | 花园明朝               | 20,971     | 6,582        | 42,711        | 4,149         |           222 | 5,762         | 7,473         |               |               | 87,870 |
 | Jigmo                  | 20,992     | 6,592        | 42,720        | 4,154         |           222 | 5,762         | 7,473         | 4,939         | 4,192         | 97,046 |
 |------------------------+------------+--------------+---------------+---------------+---------------+---------------+---------------+---------------+---------------+--------|
-
 *** 特殊字体
 需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。（由于 Symbola 和 nerd-icons 所需字体有一些重复，所以需要先安装 Symbola 再安装 nerd-icons 所需字体。）
 ** 包管理工具
