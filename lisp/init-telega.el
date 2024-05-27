@@ -54,7 +54,7 @@
      ;; remove iterm from `telega-symbols-emojify`
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
-     telega-symbol-button-close (nerd-icons-faicon "nf-fa-close")
+     telega-symbol-button-close (nerd-icons-faicon "nf-fa-window_close_o")
      telega-symbol-saved-messages-tag-end (nerd-icons-faicon "nf-fa-tag")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
      telega-symbol-flames (nerd-icons-mdicon "nf-md-delete_clock")
