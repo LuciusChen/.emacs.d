@@ -24,7 +24,7 @@
            dashboard-image-file "~/.emacs.d/assets/bitmap.png"
            dashboard-image-width 400
            dashboard-image-height 169
-           dashboard-title "Happy hacking, lucius - Emacs ❤ you")
+           dashboard-title "Happy hacking, lucius - Emacs ♥ you")
   (dashboard-create-hook))
 
 (setup custom
