@@ -92,24 +92,6 @@
   (:when-loaded
     (mastodon-alt-tl-activate)))
 
-;; http://yitang.uk/2024/01/06/gpg-in-emacs-functions-to-decrypt-and-delete-all/
-;; (defun +gpg--decrypt-recursively (root-dir)
-;;   "Decrypt all '.gpg' files under ROOT-DIR.
-;; Decrypted files have the same filename but without the '.gpg' extension.
-;; It stops if the decryption fails."
-;;   (interactive "DDirectory: ")
-;;   (dolist (file (directory-files-recursively root-dir "\\.gpg\\'"))
-;;     (message "Decrypting file: %s" file) ;; Add this line to print out which files are being processed.
-;;     (let ((default-directory (file-name-directory file)))
-;;       (epa-decrypt-file file (file-name-base file)))))
-
-;; (defun +gpg--delete-decrypted-files (root-dir)
-;;   "It deletes the decrypted files under the root-dir directory.
-;; e.g. if there's a file foo.tar.gz.gpg, it attempts to remove the foo.tar.gz file."
-;;   (interactive "DDirectory: ")
-;;   (dolist (file (directory-files-recursively root-dir "\\.gpg\\'"))
-;;     (delete-file (file-name-sans-extension file))))
-
 (when *IS-MAC* (setup auto-space (:hook-into after-init)))
 (provide 'init-util)
 ;;; init-util.el ends here
