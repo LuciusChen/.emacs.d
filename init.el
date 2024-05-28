@@ -170,7 +170,6 @@
     (emt :host github :repo "roife/emt")
     (dashboard :host github :repo "LuciusChen/dashboard")
     (gptel :host github :repo "LuciusChen/gptel")
-    (mastodon-alt :host github :repo "LuciusChen/mastodon-alt")
     ;; (dape :host github :repo "svaante/dape")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
