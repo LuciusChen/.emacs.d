@@ -134,7 +134,9 @@
                                                          :username "" :password "")))))
     ;; Opening files using external programs
     (if *IS-MAC*
-        (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
+        ;; 防止 cursor animation
+        (:with-mode telega-image-mode (:hook forward-char))
+      (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
       (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open))))
 (provide 'init-telega)
 ;;; init-telega.el ends here
