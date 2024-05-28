@@ -2,8 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 (defun +setup-fonts ()
-  ;; https://typeof.net/Iosevka/customizer
-  ;; https://github.com/be5invis/Iosevka/blob/v21.0.0/doc/PACKAGE-LIST.md
   ;; Setting the default
   (set-face-attribute 'default nil :font "JetBrains Mono 14" :weight 'normal)
   ;; 特殊字符需要安装 Symbola 字体
