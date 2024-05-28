@@ -26,7 +26,12 @@
             frame-resize-pixelwise t
             indicate-buffer-boundaries 'left
             display-line-numbers-width 2
-            display-fill-column-indicator-character ?\u254e)
+            display-fill-column-indicator-character ?\u254e
+            case-fold-search t
+            create-lockfiles nil
+            scroll-preserve-screen-position 'always
+            truncate-partial-width-windows nil
+            history-length 1000)
    ;; Better fringe symbol
    (define-fringe-bitmap 'right-curly-arrow
      [#b00000000
@@ -103,13 +108,6 @@
 
 (setup mouse
   (:defer (:option  mouse-yank-at-point t)))
-
-(setup emacs
-  (:defer (:option  case-fold-search t
-                    create-lockfiles nil
-                    scroll-preserve-screen-position 'always
-                    truncate-partial-width-windows nil
-                    history-length 1000)))
 
 (setup tooltip
   (:defer (:option  tooltip-delay 2.5)))
