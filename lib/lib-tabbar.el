@@ -58,7 +58,7 @@
                         (propertize (concat " @​​​" (number-to-string mentioned-count))
                                     'face 'telega-mention-count))
                       (when (> reaction-count 0)
-                        (propertize (concat " ❤​​​" (number-to-string reaction-count))
+                        (propertize (concat " ♥​​​" (number-to-string reaction-count))
                                     'face 'telega-mention-count))
                       (when (> keyword-count 0)
                         (propertize (concat " #​​​" (number-to-string keyword-count))

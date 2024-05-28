@@ -85,12 +85,37 @@
   (:when-loaded
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
-             mastodon-tl--show-avatars t)))
-
-(setup mastodon-alt
-  (:load-after mastodon)
-  (:when-loaded
-    (mastodon-alt-tl-activate)))
+             mastodon-tl--show-avatars t)
+    (defun +mastodon-media--process-full-sized-image-response (status-plist url)
+      ;; FIXME: refactor this with but not into
+      ;; `mastodon-media--process-image-response'.
+      "Callback function processing the `url-retrieve' response for URL.
+URL is a full-sized image URL attached to a timeline image.
+STATUS-PLIST is a plist of status events as per `url-retrieve'."
+      (if-let (error-response (plist-get status-plist :error))
+          (message "error in loading image: %S" error-response)
+        (when mastodon-media--enable-image-caching
+          (unless (url-is-cached url) ;; cache if not already cached
+            (url-store-in-cache)))
+        ;; thanks to rahguzar for this idea:
+        ;; https://codeberg.org/martianh/mastodon.el/issues/540
+        (let* ((handle (mm-dissect-buffer t))
+               (image (mm-get-image handle))
+               (str (image-property image :data)))
+          ;; (setf (image-property image :max-width)
+          ;; (window-pixel-width))
+          (with-current-buffer (get-buffer-create "*masto-image*")
+            (let ((inhibit-read-only t))
+              (erase-buffer)
+              (insert-image image str)
+              (special-mode) ; prevent image-mode loop bug
+              (goto-char (point-min))
+              (image-mode)
+              (switch-to-buffer-other-window (current-buffer))
+              (image-transform-fit-both))))))
+    ;; 防止 cursor animation 遮挡图片
+    (if *IS-MAC* (:with-mode image-mode (:hook forward-char)))
+    (:advice mastodon-media--process-full-sized-image-response :override +mastodon-media--process-full-sized-image-response)))
 
 (when *IS-MAC* (setup auto-space (:hook-into after-init)))
 (provide 'init-util)
