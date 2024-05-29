@@ -87,7 +87,13 @@ add a space between Chinese and English characters."
   :lighter " Auto-Space"
   :global t
   (if auto-space-mode
-      (add-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)
-    (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)))
+      (progn
+        (advice-add 'yank :around #'auto-space-yank-advice)
+        (advice-add 'yank-pop :around #'auto-space-yank-advice)
+        (add-hook 'post-self-insert-hook 'add-space-between-chinese-and-english))
+    (progn
+      (advice-remove 'yank :around #'auto-space-yank-advice)
+      (advice-remove 'yank-pop :around #'auto-space-yank-advice)
+      (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english))))
 (provide 'auto-space)
 ;;; auto-space.el ends here
