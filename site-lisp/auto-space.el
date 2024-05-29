@@ -30,8 +30,7 @@
                 (and (>= char #x2b820) (<= char #x2ceaf)))))
 
 (defun is-halfwidth-character (char)
-  "Determine if a character is a halfwidth character,
-including English letters, numbers, and punctuation."
+  "Determine if a character is a halfwidth character, including English letters, numbers, and punctuation."
   (and char (or (and (>= char ?a) (<= char ?z))
                 (and (>= char ?A) (<= char ?Z))
                 (and (>= char ?0) (<= char ?9)))))
@@ -42,9 +41,14 @@ including English letters, numbers, and punctuation."
       (and (is-halfwidth-character char1) (is-chinese-character char2))))
 
 (defun delayed-add-space-between-chinese-and-english ()
-  "Delay execution to automatically
-add a space between Chinese and English characters."
+  "Delay execution to automatically add a space between Chinese and English characters."
   (run-with-idle-timer 0 nil 'add-space-between-chinese-and-english))
+
+(defun insert-space-if-needed (char1 char2 buffer-content)
+  "Insert a space between CHAR1 and CHAR2 in BUFFER-CONTENT if needed."
+  (if (and (should-insert-space char1 char2) (not (eq char2 ?\s)))
+      (concat buffer-content " ")
+    buffer-content))
 
 (defun process-pasted-text (text prev-char next-char)
   "Process pasted TEXT to add spaces between Chinese and English characters, considering PREV-CHAR and NEXT-CHAR."
@@ -56,7 +60,7 @@ add a space between Chinese and English characters."
             (next-char-internal (char-after (1+ (point)))))
         (when (and current-char next-char-internal
                    (should-insert-space current-char next-char-internal)
-                   (not (eq current-char ?\s))) ; Check that the current character is not a space
+                   (not (eq current-char ?\s)))
           (forward-char)
           (insert " ")))
       (forward-char))
@@ -64,11 +68,10 @@ add a space between Chinese and English characters."
       (if prev-char
           (setq buffer-content (substring buffer-content 1)))
       ;; Add space between the last char of pasted text and next-char
-      (if (and next-char
-               (or (and (is-chinese-character (aref buffer-content (1- (length buffer-content)))) (is-halfwidth-character next-char))
-                   (and (is-halfwidth-character (aref buffer-content (1- (length buffer-content)))) (is-chinese-character next-char)))
-               (not (eq next-char ?\s)))
-          (setq buffer-content (concat buffer-content " ")))
+      (setq buffer-content (insert-space-if-needed
+                            (aref buffer-content (1- (length buffer-content)))
+                            next-char
+                            buffer-content))
       buffer-content)))
 
 (defun auto-space-yank-advice (orig-fun &rest args)
@@ -84,8 +87,7 @@ add a space between Chinese and English characters."
 
 ;;;###autoload
 (define-minor-mode auto-space-mode
-  "Mode to automatically
-add a space between Chinese and English characters."
+  "Mode to automatically add a space between Chinese and English characters."
   :lighter " Auto-Space"
   :global t
   (if auto-space-mode
