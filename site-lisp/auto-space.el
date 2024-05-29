@@ -2,13 +2,21 @@
 (defun add-space-between-chinese-and-english ()
   "Automatically add a space between Chinese and English characters."
   (let ((current-char (char-before))
-        (prev-char (char-before (1- (point)))))
+        (prev-char (char-before (1- (point))))
+        (next-char (char-after)))
     (when (and current-char prev-char
                (or (and (is-chinese-character prev-char) (is-halfwidth-character current-char))
                    (and (is-halfwidth-character prev-char) (is-chinese-character current-char)))
-               (not (eq prev-char ?\s))) ; Check that the previous character is not a space
+               (not (eq prev-char ?\s))) ; Check if the previous character is a space
       (save-excursion
         (goto-char (1- (point)))
+        (insert " ")))
+    (when (and current-char next-char
+               (or (and (is-chinese-character current-char) (is-halfwidth-character next-char))
+                   (and (is-halfwidth-character current-char) (is-chinese-character next-char)))
+               (not (eq current-char ?\s))) ; Check if the current character is a space
+      (save-excursion
+        (goto-char (point))
         (insert " ")))))
 
 (defun is-chinese-character (char)
