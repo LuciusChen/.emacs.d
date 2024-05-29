@@ -5,15 +5,16 @@
         (prev-char (char-before (1- (point))))
         (next-char (char-after)))
     (when (and current-char prev-char
-               (or (and (is-chinese-character prev-char) (is-halfwidth-character current-char))
-                   (and (is-halfwidth-character prev-char) (is-chinese-character current-char)))
+               (or (and (is-chinese-character prev-char)
+                        (is-halfwidth-character current-char))
+                   (and (is-halfwidth-character prev-char)
+                        (is-chinese-character current-char)))
                (not (eq prev-char ?\s))) ; Check if the previous character is a space
       (save-excursion
         (goto-char (1- (point)))
         (insert " ")))
     (when (and current-char next-char
-               (or (and (is-chinese-character current-char) (is-halfwidth-character next-char))
-                   (and (is-halfwidth-character current-char) (is-chinese-character next-char)))
+               (should-insert-space current-char next-char)
                (not (eq current-char ?\s))) ; Check if the current character is a space
       (save-excursion
         (goto-char (point))
@@ -35,6 +36,11 @@ including English letters, numbers, and punctuation."
                 (and (>= char ?A) (<= char ?Z))
                 (and (>= char ?0) (<= char ?9)))))
 
+(defun should-insert-space (char1 char2)
+  "Determine if a space should be inserted between CHAR1 and CHAR2."
+  (or (and (is-chinese-character char1) (is-halfwidth-character char2))
+      (and (is-halfwidth-character char1) (is-chinese-character char2))))
+
 (defun delayed-add-space-between-chinese-and-english ()
   "Delay execution to automatically
 add a space between Chinese and English characters."
@@ -49,8 +55,7 @@ add a space between Chinese and English characters."
       (let ((current-char (char-after))
             (next-char-internal (char-after (1+ (point)))))
         (when (and current-char next-char-internal
-                   (or (and (is-chinese-character current-char) (is-halfwidth-character next-char-internal))
-                       (and (is-halfwidth-character current-char) (is-chinese-character next-char-internal)))
+                   (should-insert-space current-char next-char-internal)
                    (not (eq current-char ?\s))) ; Check that the current character is not a space
           (forward-char)
           (insert " ")))
@@ -76,9 +81,6 @@ add a space between Chinese and English characters."
       (let ((pasted-text (buffer-substring-no-properties beg end)))
         (delete-region beg end)
         (insert (process-pasted-text pasted-text prev-char next-char))))))
-
-(advice-add 'yank :around #'auto-space-yank-advice)
-(advice-add 'yank-pop :around #'auto-space-yank-advice)
 
 ;;;###autoload
 (define-minor-mode auto-space-mode
