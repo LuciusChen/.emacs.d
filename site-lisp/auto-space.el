@@ -58,9 +58,10 @@
             (next-char-internal (char-after (1+ (point)))))
         (when (and current-char next-char-internal
                    (should-insert-space current-char next-char-internal)
-                   (not (eq current-char ?\s)))
-          (forward-char)
-          (insert " ")))
+                   (not (eq (char-after) ?\s)))
+          (save-excursion
+            (goto-char (1+ (point)))
+            (insert " "))))
       (forward-char))
     (let ((buffer-content (buffer-string)))
       (if prev-char
