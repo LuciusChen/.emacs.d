@@ -11,7 +11,6 @@
                                            (keypad . "K")
                                            (insert . "I")
                                            (beacon . "B"))
-            meow-cursor-type-insert '(hbar . 2)
             wrap-keymap (let ((map (make-keymap)))
                           (suppress-keymap map)
                           (dolist (k '("(" "[" "{" "<"))
