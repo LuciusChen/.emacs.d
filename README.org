@@ -100,7 +100,8 @@ img.org-latex.org-latex-inline.medium-zoom-image {
 
 #+RESULTS:
 [[file:assets/lamport-clocks-algorithm.svg]]
-
+*** 输入法自动切换
+使用的是 [[https://github.com/laishulu/emacs-smart-input-source][laishulu/emacs-smart-input-source]] + [[https://github.com/laishulu/macism][laishulu/macism]]，但是会有一些问题，切换时会反复横跳，以及切换到英文输入法。需要将其中的 =select()= 方法的部分修改一下，我 fork 的版本在这 [[https://github.com/LuciusChen/macism][LuciusChen/macism]]，可以自行编译替换。
 ** Program
 #+begin_src shell
 # java
