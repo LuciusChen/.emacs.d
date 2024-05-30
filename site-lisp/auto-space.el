@@ -30,10 +30,8 @@
                 (and (>= char #x2b820) (<= char #x2ceaf)))))
 
 (defun is-halfwidth-character (char)
-  "Determine if a character is a halfwidth character, including English letters, numbers, and punctuation."
-  (and char (or (and (>= char ?a) (<= char ?z))
-                (and (>= char ?A) (<= char ?Z))
-                (and (>= char ?0) (<= char ?9)))))
+  "Determine if a character is a halfwidth character using char-width."
+  (and char (not (eq char ?\s)) (= (char-width char) 1)))
 
 (defun should-insert-space (char1 char2)
   "Determine if a space should be inserted between CHAR1 and CHAR2."
@@ -96,8 +94,8 @@
         (advice-add 'yank-pop :around #'auto-space-yank-advice)
         (add-hook 'post-self-insert-hook 'add-space-between-chinese-and-english))
     (progn
-      (advice-remove 'yank :around #'auto-space-yank-advice)
-      (advice-remove 'yank-pop :around #'auto-space-yank-advice)
+      (advice-remove 'yank #'auto-space-yank-advice)
+      (advice-remove 'yank-pop #'auto-space-yank-advice)
       (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english))))
 (provide 'auto-space)
 ;;; auto-space.el ends here
