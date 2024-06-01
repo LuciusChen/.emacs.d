@@ -68,8 +68,8 @@
                  (when (and meow-insert-mode
                             (or (derived-mode-p 'org-mode
                                                 'gfm-mode
-                                                'text-mode ;; for mastodon-toot
-                                                'telega-chat-mode)))
+                                                'telega-chat-mode)
+                                (string-match-p "*new toot*" (buffer-name))))
                    'other)))
 
   (defun +meow-focus-change-function ()

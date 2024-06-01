@@ -31,7 +31,7 @@
 
 (defun is-halfwidth-character (char)
   "Determine if a character is a halfwidth character using char-width."
-  (and char (not (member char '(?\s ?~ ?“ ?”))) (= (char-width char) 1)))
+  (and char (not (member char '(?\s ?~ ?“ ?” ?# ?( ?) ?[ ?] ?{ ?}))) (= (char-width char) 1)))
 
 (defun should-insert-space (char1 char2)
   "Determine if a space should be inserted between CHAR1 and CHAR2."
