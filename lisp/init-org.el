@@ -12,7 +12,6 @@
    "C-c b"     org-cite-insert)
   (:when-loaded
     (:also-load lib-org)
-    (:also-load lib-font)
     (:option
      org-directory "~/Library/CloudStorage/Dropbox/org/"
      org-image-actual-width nil
