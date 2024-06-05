@@ -113,8 +113,6 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
               (image-mode)
               (switch-to-buffer-other-window (current-buffer))
               (image-transform-fit-both))))))
-    ;; 防止 cursor animation 遮挡图片
-    (if *IS-MAC* (:with-mode image-mode (:hook forward-char)))
     (:advice mastodon-media--process-full-sized-image-response :override +mastodon-media--process-full-sized-image-response)))
 
 (when *IS-MAC* (setup auto-space (:hook-into after-init)))
