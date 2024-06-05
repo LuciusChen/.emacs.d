@@ -111,6 +111,7 @@
     scratch
     diff-hl
     company
+    goggles
     flymake
     web-mode
     js2-mode
@@ -157,7 +158,6 @@
     nerd-icons-dired
     command-log-mode
     browse-kill-ring
-    flymake-flycheck
     rainbow-delimiters
     default-text-scale
     language-detection
@@ -189,7 +189,7 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
-(when *IS-MAC* (require 'auto-space))
+
 (require 'init-setup)
 (require 'init-builtin)
 (require 'init-ui)

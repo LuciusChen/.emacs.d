@@ -165,5 +165,12 @@
            "C-:" avy-goto-char-in-line)
   (:defer (:require ace-pinyin)
           (ace-pinyin-global-mode +1)))
+
+(setup goggles
+  (:hook-into prog-mode)
+  (:hook-into text-mode)
+  (:option goggles-pulse t))
+
+(when *IS-MAC* (require 'auto-space))
 (provide 'init-editing)
 ;;; init-editing.el ends here

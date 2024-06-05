@@ -18,6 +18,10 @@
        '(("『\\(\\(?:.\\|\n\\)*?\\)』" . '+nov-annotate-face)))
       (font-lock-flush))))
 
+(setup pdf-view
+  (:defer (:require pdf-tools))
+  (:file-match "\\.PDF\\'"))
+
 (setup org-remark
   (:load-after org)
   (:when-loaded

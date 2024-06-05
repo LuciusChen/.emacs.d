@@ -110,14 +110,9 @@
     (:also-load lib-eglot)
     (:with-mode (python-mode java-ts-mode typescript-mode)
       (:hook eglot-ensure))
-    ;; 关闭 eldoc_mode
-    (:hooks eglot-managed-mode-hook (lambda () (when (eglot-managed-p)
-                                                 (eldoc-mode -1))))
     (:option eglot-events-buffer-size 0
              ;; 取消 eglot log
              eglot-events-buffer-config '(:size 0 :format full))
-    ;; 关闭 flymake
-    (add-to-list 'eglot-stay-out-of 'flymake)
     ;; Java $brew install jdtls
     ;; Python $pip3 install pyright
     (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
