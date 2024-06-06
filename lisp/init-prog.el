@@ -43,21 +43,20 @@
     (:option mmm-parse-when-idle t
              mmm-global-classes nil
              mmm-classes-alist nil
-             mmm-mode-ext-classes-alist nil)
+             mmm-mode-ext-classes-alist nil
+             mmm-submode-decoration-level 0)
     (:hook-into nxml-mode)
     (mmm-add-classes
-     '((web-sql-select :submode sql-mode
-                       :front "<select[^>]*>[ \t]*\n" :back "[ \t]*</select>")
-       (web-sql-insert :submode sql-mode
-                       :front "<insert[^>]*>[ \t]*\n" :back "[ \t]*</insert>")
-       (web-sql-update :submode sql-mode
-                       :front "<update[^>]*>[ \t]*\n" :back "[ \t]*</update>")
-       (web-sql-delete :submode sql-mode
-                       :front "<delete[^>]*>[ \t]*\n" :back "[ \t]*</delete>")))
-    (mmm-add-mode-ext-class 'nxml-mode nil 'web-sql-select)
-    (mmm-add-mode-ext-class 'nxml-mode nil 'web-sql-insert)
-    (mmm-add-mode-ext-class 'nxml-mode nil 'web-sql-update)
-    (mmm-add-mode-ext-class 'nxml-mode nil 'web-sql-delete)))
+     '((nxml-sql-select :submode sql-mode
+                        :front "<select[^>]*>[ \t]*\n" :back "[ \t]*</select>")
+       (nxml-sql-insert :submode sql-mode
+                        :front "<insert[^>]*>[ \t]*\n" :back "[ \t]*</insert>")
+       (nxml-sql-update :submode sql-mode
+                        :front "<update[^>]*>[ \t]*\n" :back "[ \t]*</update>")
+       (nxml-sql-delete :submode sql-mode
+                        :front "<delete[^>]*>[ \t]*\n" :back "[ \t]*</delete>")))
+    (dolist (class '(nxml-sql-select nxml-sql-insert nxml-sql-update nxml-sql-delete))
+      (mmm-add-mode-ext-class 'nxml-mode nil class))))
 
 (setup lisp-mode
   (:also-load lib-lisp)
