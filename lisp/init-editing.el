@@ -81,7 +81,7 @@
 
 (when *IS-MAC*
   (setup emt
-    (:hooks after-init-hook emt-mode)
+    (:hook-into after-init)
     (:global "M-f" emt-forward-word
              "M-b" emt-backward-word)
     (:option emt-lib-path
