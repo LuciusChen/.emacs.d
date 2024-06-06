@@ -34,7 +34,7 @@
   (and char (or (and (>= char ?a) (<= char ?z))
                 (and (>= char ?A) (<= char ?Z))
                 (and (>= char ?0) (<= char ?9))
-                (and char (member char '(?%))))))
+                (and char (member char '(?% ?> ?<))))))
 
 (defun should-insert-space (char1 char2)
   "Determine if a space should be inserted between CHAR1 and CHAR2."
