@@ -21,13 +21,6 @@
        (:hooks vue-mode-hook (lambda ()
                                (setq-local tab-width 2)
                                (eglot-ensure))))
-;; xml format
-;; M-: (execute-kbd-macro (kbd "M-% > < RET > C-q C-j < RET ! C-M-\\"))
-(defun +xml-format ()
-  "XML formating"
-  (interactive)
-  (save-excursion
-    (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
 
 (setup projectile
   (:option consult-project-root-function 'projectile-project-root))
@@ -45,7 +38,7 @@
     (highlight-matching-tag 1)))
 
 (setup mmm-mode
-  (:defer (:require mmm-mode))
+  (:with-mode prog-mode (:hook (lambda()(:require mmm-mode))))
   (:when-loaded
     (:option mmm-parse-when-idle t
              mmm-global-classes nil
@@ -84,11 +77,10 @@
 ;;; Basic js-mode setup
 (setup js-mode (:file-match "\\.\\(js\\|es6\\)\\(\\.erb\\)?\\'"))
 
-(setup sql
-  ;; or the product can be set from a comment on the first line
-  ;; -- -*- mode: sql; sql-product: mysql; -*-
-  ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
-  (:when-loaded (sql-set-product 'mysql)))
+;; or the product can be set from a comment on the first line
+;; -- -*- mode: sql; sql-product: mysql; -*-
+;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
+(setup sql (:when-loaded (sql-set-product 'mysql)))
 
 (setup js
   (:also-load lib-js)
@@ -118,5 +110,13 @@
   (:autoload global-treesit-auto-mode)
   (:option treesit-auto-install 'prompt)
   (:when-loaded (global-treesit-auto-mode)))
+
+;; xml format
+;; M-: (execute-kbd-macro (kbd "M-% > < RET > C-q C-j < RET ! C-M-\\"))
+(defun +xml-format ()
+  "XML formating"
+  (interactive)
+  (save-excursion
+    (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
 (provide 'init-prog)
 ;;; init-prog.el ends here
