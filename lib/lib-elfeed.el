@@ -83,7 +83,6 @@
     ("https://samwho.dev/rss.xml" program)
     ("https://morss.it/https://matt-rickard.com/" program)
     ("https://guangzhengli.com/index.xml" program)
-    ;; ("https://rsshub.sheerwill.live/meituan/tech/home" meituan)
     ;; Emacs
     ("https://andreyorst.gitlab.io/feed.xml" emacs)
     ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
@@ -92,7 +91,7 @@
     ;; Forum
 
     ;; Economics
-    ("https://rsshub.sheerwill.live/economist/latest" economics)
+    ("https://rsshub.sheerwill.xyz/economist/latest" economics)
     ;; Novel
 
     ;; Github
@@ -139,25 +138,25 @@
     ;; ("https://rsshub.app/picnob/user/mark.smith.photography"  instagram)
     ;; ("https://rsshub.app/picnob/user/der_greif"               instagram)
     ;; YouTube
-    ("https://rsshub.sheerwill.live/youtube/user/@lijxse"              youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@TimelabPro"          youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@xiao_lin_shuo"       youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@MacroRoom"           youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@BrandonLiUnscripted" youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@cherry_official"     youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@mediastorm6801"      youtube)
-    ("https://rsshub.sheerwill.live/youtube/user/@Vox"                 youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@lijxse"              youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@TimelabPro"          youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@xiao_lin_shuo"       youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@MacroRoom"           youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@BrandonLiUnscripted" youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@cherry_official"     youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@mediastorm6801"      youtube)
+    ("https://rsshub.sheerwill.xyz/youtube/user/@Vox"                 youtube)
     ;; Bilibili
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/72270557"     bilibili) ;; 芳斯塔芙
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18706318"     bilibili) ;; 龙女之声
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/1498726302"   bilibili) ;; 何限梁
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/7487399"      bilibili) ;; 努力的Lorre
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/470156882"    bilibili) ;; 小艾大叔
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/38053181"     bilibili) ;; oooooohmygosh
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/6330633"      bilibili) ;; 小胡仙儿
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/18202105"     bilibili) ;; 绵羊料理
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/125526"       bilibili) ;; -LKs-
-    ("https://rsshub.sheerwill.live/bilibili/user/dynamic/20375812"     bilibili) ;; 博士萌
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/72270557"     bilibili) ;; 芳斯塔芙
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/18706318"     bilibili) ;; 龙女之声
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/1498726302"   bilibili) ;; 何限梁
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/7487399"      bilibili) ;; 努力的Lorre
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/470156882"    bilibili) ;; 小艾大叔
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/38053181"     bilibili) ;; oooooohmygosh
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/6330633"      bilibili) ;; 小胡仙儿
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/18202105"     bilibili) ;; 绵羊料理
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/125526"       bilibili) ;; -LKs-
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/20375812"     bilibili) ;; 博士萌
     ))
 
 (defun nerd-icon-for-tags (tags)

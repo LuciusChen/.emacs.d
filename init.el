@@ -92,6 +92,7 @@
     corfu
     vundo
     forge
+    verb
     elfeed
     popper
     embark
@@ -135,7 +136,6 @@
     elfeed-tube
     org-roam-ui
     rainbow-mode
-    ob-restclient
     prettier-js
     consult-dir
     vterm
