@@ -83,7 +83,8 @@
   (:when-loaded
     (:also-load ob-plantuml
                 ob-python
-                ob-latex)
+                ob-latex
+                ob-verb)
     (:option      org-plantuml-jar-path
                   (expand-file-name "~/Library/CloudStorage/Dropbox/org/plantuml/plantuml.jar")
                   ;; 这里应该就是 .zshrc 里面配置的 python3
@@ -92,7 +93,7 @@
      'org-babel-load-languages '((plantuml . t)
                                  (python . t)
                                  (shell . t)
-                                 (restclient . t)
+                                 (verb . t)
                                  (latex . t)))))
 
 (setup org-capture

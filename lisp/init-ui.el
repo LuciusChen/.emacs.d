@@ -59,7 +59,8 @@
       (setq buffer-face-mode-face 'width-font-face)
       (buffer-face-mode))
     (:with-mode prog-mode (:hook buffer-font))
-    (:with-mode vterm-mode (:hook buffer-font))))
+    (:with-mode vterm-mode (:hook buffer-font))
+    (:with-mode nxml-mode (:hook buffer-font))))
 
 (setup dimmer
   (:defer (dimmer-mode t))
