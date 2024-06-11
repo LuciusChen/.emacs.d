@@ -126,5 +126,11 @@
                     (java-ts-mode . jdtls-command-contact)))
       (push item eglot-server-programs))
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
+
+;; https://github.com/blahgeek/emacs-lsp-booster
+;; Download the executable file from the address above and place it in your exec-path.
+(setup eglot-booster
+  (:load-after eglot)
+  (:when-loaded (eglot-booster-mode)))
 (provide 'init-completion)
 ;;; init-completion.el ends here
