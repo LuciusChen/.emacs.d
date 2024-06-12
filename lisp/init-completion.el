@@ -132,5 +132,20 @@
 (setup eglot-booster
   (:load-after eglot)
   (:when-loaded (eglot-booster-mode)))
+
+(setup xref
+  (defun lucius/xref-show-xrefs (fetcher display-action)
+    "Display some Xref values produced by FETCHER using DISPLAY-ACTION.
+After jumping to the first xref, close the xref window."
+    (let ((buf (xref--show-xref-buffer fetcher
+                                       `((window . ,(selected-window))
+                                         (display-action . ,display-action)
+                                         (auto-jump . t)))))
+      (when xref-auto-jump-to-first-xref
+        (let ((window (get-buffer-window buf)))
+          (when window
+            (quit-window nil window))))))
+  (:option xref-auto-jump-to-first-xref t
+           xref-show-xrefs-function #'lucius/xref-show-xrefs))
 (provide 'init-completion)
 ;;; init-completion.el ends here

@@ -87,9 +87,7 @@
               help-mode
               compilation-mode)
              ("\\*Org Select\\*$")
-             ;; ("\\*Agenda Commands\\*$")
              ("\\*chatgpt\\*$")
-             ("\\*xref\\*$")
              ("\\*Help\\*$")
              ("\\*Telega User\\*$")
              ("\\*Telegram Chat Info\\*$")
