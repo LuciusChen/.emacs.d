@@ -96,8 +96,9 @@
 
     ;; Github
     ("https://github.com/tdlib/td/commits.atom" github)
-    ("https://github.com/zevlg/telega.el/commits.atom" github)
     ("https://github.com/karthink/gptel/commits.atom" github)
+    ("https://github.com/zevlg/telega.el/commits.atom" github)
+    ("https://github.com/SilasMarvin/lsp-ai/commits.atom" github)
     ("https://github.com/reorx/hugo-PaperModX/commits.atom" github)
     ("https://github.com/protesilaos/modus-themes/commits.atom" github)
     ;; Instagram

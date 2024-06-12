@@ -20,10 +20,26 @@
       (message "Deleted archived daily log file: %s" (string-join (nreverse deleted-files) ", ")))))
 
 (defun agenda-files-switcher (&optional args)
+  "Open an agenda file based on ARGS.
+
+ARGS should be a list where the first element is the name of the agenda file
+to open.  The files are located in the '~/Library/CloudStorage/Dropbox/org/agenda/' directory."
   (interactive (list (transient-args 'agenda-transient)))
   (find-file  (concat "~/Library/CloudStorage/Dropbox/org/agenda/" (car args))))
 
 (defun journal-options (&optional args)
+  "Perform various journal-related actions based on ARGS.
+
+This function allows you to open specific journal files or perform
+other journal-related actions. ARGS should be a list of arguments
+that can include:
+
+- \"journal.org\": Open the main journal file.
+- \"today\": Open today's journal file.
+- \"yesterday\": Open yesterday's journal file.
+- \"delete\": Delete archived daily log files.
+
+The files are located in the directory specified by `file-path-prefix`."
   (interactive (list (transient-args 'journal-transient)))
   (let ((file-path-prefix "~/Library/CloudStorage/Dropbox/org/daily/"))
     (cond ((member "journal.org" args)
@@ -48,13 +64,32 @@
            (+delete-archived-daily-log-files)))))
 
 (defun browse-path (&optional args)
-  "Browse files from the repositories cloned by `straight', using `fd'."
+  "Browse files from the repositories cloned by `straight', using `fd'.
+
+ARGS should be a list where the first element is the path to the repositories."
   (interactive (list (transient-args 'emacs-access-transient)))
   (let* ((repopath (expand-file-name (car args)))
          (fd-cmd (concat "fd --no-ignore-vcs . --base-directory " repopath))
          (files (split-string (shell-command-to-string fd-cmd) "\n"))
          (file (completing-read "Find file in straight repos: " files nil t)))
     (find-file (file-name-concat repopath file))))
+
+(defun lucius/java-to-xml-mapper ()
+  "Jump from a Java mapper file to the corresponding XML mapper file.
+If the cursor is on a method name in the Java file, jump to the corresponding
+method definition in the XML file."
+  (interactive)
+  (let* ((java-file (buffer-file-name))
+         (xml-file (concat (file-name-sans-extension java-file) ".xml"))
+         (method-name (thing-at-point 'symbol t)))
+    (if (file-exists-p xml-file)
+        (progn
+          (find-file xml-file)
+          (goto-char (point-min))
+          (if (re-search-forward (concat "id=\"\\(" method-name "\\)\"") nil t)
+              (message "Jumped to method: %s" method-name)
+            (message "Method '%s' not found in XML file." method-name)))
+      (message "No corresponding XML file found."))))
 ;;;; provide
 (provide 'lib-transient)
 ;;; lib-transient.el ends here.
