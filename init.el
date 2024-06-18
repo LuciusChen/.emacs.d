@@ -138,6 +138,7 @@
     rainbow-mode
     prettier-js
     consult-dir
+    swift-mode
     vterm
     vterm-toggle
     treesit-auto

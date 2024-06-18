@@ -80,6 +80,8 @@
           (vterm-send-M-w)
           (vterm-send-string compile-command t))))))
 
+(setup verb (:option verb-babel-timeout 60.0))
+
 (setup mastodon
   (:defer (:require mastodon))
   (:when-loaded
