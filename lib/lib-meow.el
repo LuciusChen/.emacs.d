@@ -36,6 +36,7 @@
    '("2" . meow-expand-2)
    '("1" . meow-expand-1)
    '("-" . negative-argument)
+   '("/" . find-file)
    (if *IS-MAC*
        '(";" . sis-meow-reverse)
      '(";" . meow-reverse))
