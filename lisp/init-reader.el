@@ -18,6 +18,8 @@
        '(("『\\(\\(?:.\\|\n\\)*?\\)』" . '+nov-annotate-face)))
       (font-lock-flush))))
 
+;; pdf-view-themed-minor
+;; Synchronize color filter with the present Emacs theme.
 (setup pdf-view
   (:defer (:require pdf-tools))
   (:file-match "\\.PDF\\'"))
