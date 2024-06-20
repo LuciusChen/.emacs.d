@@ -30,7 +30,23 @@
   (:with-mode prog-mode
     (:hook apheleia-global-mode))
   (:when-loaded
-    (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))))
+    (defmacro set-apheleia-formatters (&rest mode-format-pairs)
+      `(progn
+         ,@(mapcar (lambda (pair)
+                     `(setf (alist-get ',(car pair) apheleia-mode-alist) ',(cdr pair)))
+                   mode-format-pairs)))
+    ;; brew install isort black google-java-format prettier
+    ;; (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))
+    ;; (setf (alist-get 'java-ts-mode apheleia-mode-alist) 'google-java-format)
+    (setf (alist-get 'google-java-format apheleia-formatters)
+          '("google-java-format"
+            "--aosp"
+            file))
+    (set-apheleia-formatters
+     (python-ts-mode . (isort black))
+     (css-mode . prettier)
+     (typescript-ts-mode . prettier)
+     (js-ts-mode . prettier))))
 
 (setup highlight-matching-tag
   (require 'highlight-matching-tag)
