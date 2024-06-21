@@ -41,7 +41,7 @@
     (setf (alist-get 'google-java-format apheleia-formatters)
           '("google-java-format"
             "--aosp"
-            file))
+            filepath))
     (set-apheleia-formatters
      (python-ts-mode . (isort black))
      (css-mode . prettier)
