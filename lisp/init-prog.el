@@ -10,11 +10,16 @@
 
 (define-derived-mode vue-mode web-mode "Vue")
 (define-derived-mode my-html-mode web-mode "Web")
-(define-derived-mode my-jsp-mode web-mode "Web")
+(define-derived-mode jsp-mode web-mode "Web")
+(define-derived-mode wxss-mode css-mode "CSS")
+(define-derived-mode wxml-mode html-mode "HTML")
+
 (setup emacs-lisp-mode (:file-match "\\.emacs.d\\'"))
 (setup lua-ts-mode (:file-match "\\.lua\\'"))
 (setup my-html-mode (:file-match "\\.html\\'"))
-(setup my-jsp-mode (:file-match "\\.jsp\\'"))
+(setup jsp-mode (:file-match "\\.jsp\\'"))
+(setup wxss-mode (:file-match "\\.wxss\\'"))
+(setup wxml-mode (:file-match "\\.wxml\\'"))
 (setup java-ts-mode (:file-match "\\.java\\'"))
 (setup yaml-ts-mode (:file-match "\\.yaml\\'"))
 (setup vue-mode (:file-match "\\.vue\\'")
@@ -44,6 +49,8 @@
             filepath))
     (set-apheleia-formatters
      (python-ts-mode . (isort black))
+     (html-mode . prettier-html)
+     (sql-mode . pgformatter)
      (css-mode . prettier)
      (typescript-ts-mode . prettier)
      (js-ts-mode . prettier))))
