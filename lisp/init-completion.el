@@ -115,6 +115,7 @@
              eglot-events-buffer-config '(:size 0 :format full))
     ;; Java $brew install jdtls
     ;; Python $pip3 install pyright
+    ;; HTML $brew install vscode-langservers-extracted
     (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
                     ;; curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
                     ;; nvm install node
