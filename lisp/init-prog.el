@@ -19,7 +19,8 @@
 (setup my-html-mode (:file-match "\\.html\\'"))
 (setup jsp-mode (:file-match "\\.jsp\\'"))
 (setup wxss-mode (:file-match "\\.wxss\\'"))
-(setup wxml-mode (:file-match "\\.wxml\\'"))
+;; (setup wxml-mode (:file-match "\\.wxml\\'"))
+(setup my-html-mode (:file-match "\\.wxml\\'"))
 (setup java-ts-mode (:file-match "\\.java\\'"))
 (setup yaml-ts-mode (:file-match "\\.yaml\\'"))
 (setup vue-mode (:file-match "\\.vue\\'")
@@ -49,7 +50,7 @@
             filepath))
     (set-apheleia-formatters
      (python-ts-mode . (isort black))
-     (html-mode . prettier-html)
+     (my-html-mode . prettier-html)
      (sql-mode . pgformatter)
      (css-mode . prettier)
      (typescript-ts-mode . prettier)
