@@ -178,9 +178,14 @@
                                         ))
     ;; Increase preview width
     (plist-put org-latex-preview-appearance-options :page-width 0.8)
+    ;; disable org-latex-preview-auto-mode in gptel buffer
+    (defun my-org-latex-preview-auto-mode-setup ()
+      (if (string-match-p "ChatGPT" (buffer-name))
+          (org-latex-preview-auto-mode -1)
+        (org-latex-preview-auto-mode 1)))
     ;; Turn on auto-mode, it's built into Org and much faster/more featured than
     ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
-    (:hooks org-mode-hook org-latex-preview-auto-mode
+    (:hooks org-mode-hook my-org-latex-preview-auto-mode-setup
             ;; Block C-n and C-p from opening up previews when using auto-mode
             org-latex-preview-auto-ignored-commands next-line
             org-latex-preview-auto-ignored-commands previous-line)))
