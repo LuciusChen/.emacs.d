@@ -28,9 +28,6 @@
                                (setq-local tab-width 2)
                                (eglot-ensure))))
 
-(setup projectile
-  (:option consult-project-root-function 'projectile-project-root))
-
 (setup apheleia
   (:global "C-c C-x C-f" apheleia-format-buffer)
   (:with-mode prog-mode (:hook apheleia-global-mode))

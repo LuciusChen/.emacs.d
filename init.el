@@ -129,7 +129,6 @@
     nerd-icons
     org-modern
     ace-pinyin
-    projectile
     marginalia
     git-commit
     org-remark
