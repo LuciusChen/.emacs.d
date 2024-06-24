@@ -12,8 +12,6 @@
   ;; :bind-into 里面用 :ensure 规定了 func`，直接传的话就会给你加 #'。
   ;; 改成 (identity xxx-prefix-map) 即可
   (:global "C-c t" (identity telega-prefix-map))
-  ;; remove chat folder icons
-  (:option telega-chat-folder-format nil)
   (:when-loaded
     (:with-map telega-prefix-map
       (:bind
@@ -79,6 +77,7 @@
      telega-root-keep-cursor 'track
      telega-root-show-avatars nil
      telega-root-buffer-name "*Telega Root*"
+     ;; remove chat folder icons
      telega-chat-folders-insexp (lambda () nil)
      telega-filters-custom nil
      telega-root-fill-column 70 ; fill-column
