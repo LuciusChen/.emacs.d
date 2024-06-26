@@ -108,7 +108,7 @@
   (:defer (:require eglot))
   (:when-loaded
     (:also-load lib-eglot)
-    (:with-mode (python-mode java-ts-mode typescript-mode)
+    (:with-mode (python-mode java-ts-mode js-mode typescript-mode)
       (:hook eglot-ensure))
     (:option eglot-events-buffer-size 0
              ;; 取消 eglot log
@@ -126,6 +126,7 @@
                     ;; npm install -g @volar/vue-language-server
                     (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
                     ;; npm install -g typescript-language-server
+                    (js-mode . ("typescript-language-server" "--stdio"))
                     (typescript-mode . ("typescript-language-server" "--stdio"))
                     (java-ts-mode . jdtls-command-contact)))
       (push item eglot-server-programs))
