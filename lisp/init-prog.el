@@ -102,6 +102,20 @@
 ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
 (setup sql (:when-loaded (sql-set-product 'mysql)))
 
+(setup flymake
+  (:defer (:require flymake))
+  (:when-loaded
+    (:option flymake-no-changes-timeout nil
+             flymake-fringe-indicator-position 'right-fringe)
+    (:with-mode prog-mode (:hook flymake-mode))))
+
+(setup sideline-flymake
+  (:load-after flymake)
+  (:when-loaded
+    (:option sideline-flymake-display-mode 'point
+             sideline-backends-right '(sideline-flymake))
+    (:with-mode flymake-mode (:hook sideline-mode))))
+
 (setup js
   (:also-load lib-js)
   (:when-loaded
@@ -112,15 +126,13 @@
 ;; js2-mode
 (setup js2-mode
   (:when-loaded
-    (:hooks js-mode-hook +enable-js2-checks-if-flycheck-inactive
-            js2-mode-hook +enable-js2-checks-if-flycheck-inactive)
+    (:hooks js-mode-hook +enable-js2-checks-if-flymake-inactive
+            js2-mode-hook +enable-js2-checks-if-flymake-inactive)
     ;; Change some defaults: customize them to override
     (setq-default js2-bounce-indent-p nil)
     ;; Disable js2 mode's syntax error highlighting by default...
     (setq-default js2-mode-show-parse-errors nil
                   js2-mode-show-strict-warnings nil)
-    ;; ... but enable it if flycheck can't handle javascript
-    (autoload 'flycheck-get-checker-for-buffer "flycheck")
     (js2-imenu-extras-setup)
     (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))
     (+major-mode-lighter 'js2-mode "JS2")

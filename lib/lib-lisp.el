@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (defun +headerise-elisp ()
-  "Add minimal header and footer to an elisp buffer in order to placate flycheck."
+  "Add a minimal header and footer to an elisp buffer."
   (interactive)
   (let ((fname (if (buffer-file-name)
                    (file-name-nondirectory (buffer-file-name))

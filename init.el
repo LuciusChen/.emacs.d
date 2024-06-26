@@ -109,6 +109,7 @@
     company
     goggles
     flymake
+    sideline-flymake
     web-mode
     js2-mode
     move-dup
