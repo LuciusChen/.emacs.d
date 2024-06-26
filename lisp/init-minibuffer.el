@@ -52,6 +52,7 @@
              "M-g r" consult-ripgrep
              "M-g p" consult-project-buffer
              "M-g x" consult-recent-xref
+             "M-g m" consult-flymake
              ;; brew install fd
              "M-g d" consult-fd
              [remap switch-to-buffer] consult-buffer
