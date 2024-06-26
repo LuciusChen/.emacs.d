@@ -64,7 +64,6 @@
                                                org-done-keywords))))
     (:also-load lib-org-archive-hierachical)
     (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
-    ;; only hook in org-mode
     (:with-mode org-mode
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
