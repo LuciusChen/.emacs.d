@@ -38,7 +38,7 @@
          ,@(mapcar (lambda (pair)
                      `(setf (alist-get ',(car pair) apheleia-mode-alist) ',(cdr pair)))
                    mode-format-pairs)))
-    ;; brew install isort black google-java-format prettier
+    ;; brew install isort black google-java-format prettier stylua
     ;; (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))
     ;; (setf (alist-get 'java-ts-mode apheleia-mode-alist) 'google-java-format)
     (setf (alist-get 'google-java-format apheleia-formatters)
@@ -50,6 +50,7 @@
      (my-html-mode . prettier-html)
      (sql-mode . pgformatter)
      (css-mode . prettier)
+     (lua-ts-mode . stylua)
      (typescript-ts-mode . prettier)
      (js-ts-mode . prettier))))
 
