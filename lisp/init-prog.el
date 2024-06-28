@@ -114,9 +114,7 @@
   (:when-loaded
     (:option sideline-flymake-display-mode 'point
              sideline-backends-right '(sideline-flymake))
-    (:with-mode flymake-mode (:hook sideline-mode))
-    ;; 解决 revert-buffer 时 sideline 不会清除的问题
-    (:hooks before-revert-hook #'sideline--disable)))
+    (:with-mode flymake-mode (:hook sideline-mode))))
 
 (setup js
   (:also-load lib-js)
