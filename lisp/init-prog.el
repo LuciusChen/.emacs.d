@@ -45,12 +45,16 @@
           '("google-java-format"
             "--aosp"
             filepath))
+    (setf (alist-get 'stylua apheleia-formatters)
+          '("stylua"
+            "--indent-type"
+            "Spaces"
+            filepath))
     (set-apheleia-formatters
      (python-ts-mode . (isort black))
      (my-html-mode . prettier-html)
      (sql-mode . pgformatter)
      (css-mode . prettier)
-     (lua-ts-mode . stylua)
      (typescript-ts-mode . prettier)
      (js-ts-mode . prettier))))
 
