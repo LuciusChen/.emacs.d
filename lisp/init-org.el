@@ -529,10 +529,6 @@
   (:global [f7] deft)
   (:when-loaded (:also-load lib-deft)))
 
-(setup anki-editor
-  (:when-loaded
-    (:also-load anki-editor-ui)))
-
 (setup ox-hugo
   (:after ox (require 'ox-hugo)))
 (provide 'init-org)
