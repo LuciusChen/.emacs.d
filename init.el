@@ -170,8 +170,6 @@
     ;; (dape :host github :repo "svaante/dape")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     (yasnippet :host github :repo "joaotavora/yasnippet")
-    (anki-editor :host github :repo "LuciusChen/anki-editor")
-    (eglot-hierarchy :host github :repo "dolmens/eglot-hierarchy")
     (meow :host github :repo "meow-edit/meow")
     (telega :host github :repo "LuciusChen/telega.el")
     (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
