@@ -20,6 +20,7 @@
 (defconst *spell-check-support-enabled* nil )
 (defconst *IS-MAC* (eq system-type 'darwin))
 (defconst *IS-LINUX* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst *org-path* "~/Library/CloudStorage/Dropbox/org")
 
 (when *IS-MAC*
   ;; modify meta from ⌥ to ⌘
@@ -163,6 +164,7 @@
     password-store-otp
     password-store
     (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))
+    (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))
     (emt :host github :repo "roife/emt")
     (dashboard :host github :repo "LuciusChen/dashboard")
     (eglot-booster :host github :repo "jdtsmith/eglot-booster")
