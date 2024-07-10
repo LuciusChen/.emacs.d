@@ -5,7 +5,7 @@
   "Capture the TITLE and URL with multiple `org-roam' templates."
   (let ((templates
          '(("d" "default" plain
-            (file "~/Library/CloudStorage/Dropbox/org/templates/default.org")
+            (file (concat *org-path* "/templates/default.org"))
             :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
             :unnarrowed t))))
     (org-roam-capture-

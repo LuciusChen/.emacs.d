@@ -35,8 +35,8 @@
         ("-c" "settings" "~/.emacs.d/lisp/")]
        ["Files"
         ("-t" "telega" "~/.telega/")
-        ("-a" "agenda" "~/Library/CloudStorage/Dropbox/org/agenda/")
-        ("-b" "books" "~/Library/CloudStorage/Dropbox/org/bib/files")]]
+        ("-a" "agenda" "agenda")
+        ("-b" "books" "books")]]
       ["Commands"
        ("RET" "Emacs quick access"     browse-path)]
       [("q" "Quit"           transient-quit-one)])

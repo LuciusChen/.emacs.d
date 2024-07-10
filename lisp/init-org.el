@@ -13,7 +13,7 @@
   (:when-loaded
     (:also-load lib-org)
     (:option
-     org-directory "~/Library/CloudStorage/Dropbox/org/"
+     org-directory *org-path*
      org-image-actual-width nil
      ;; remove org-src content indent
      org-edit-src-content-indentation 0
@@ -85,7 +85,7 @@
                 ob-latex
                 ob-verb)
     (:option      org-plantuml-jar-path
-                  (expand-file-name "~/Library/CloudStorage/Dropbox/org/plantuml/plantuml.jar")
+                  (expand-file-name (concat *org-path* "/plantuml/plantuml.jar"))
                   ;; 这里应该就是 .zshrc 里面配置的 python3
                   org-babel-python-command "python3")
     (org-babel-do-load-languages
@@ -198,7 +198,7 @@
      org-agenda-time-leading-zero t
      ;; 过滤掉 dynamic
      org-agenda-hide-tags-regexp (regexp-opt '("dynamic"))
-     org-agenda-files (file-expand-wildcards "~/Library/CloudStorage/Dropbox/org/agenda/*.org")
+     org-agenda-files (file-expand-wildcards (concat *org-path* "/agenda/*.org"))
      org-agenda-compact-blocks t
      org-agenda-sticky t
      org-agenda-start-on-weekday nil
@@ -315,16 +315,16 @@
   (:when-loaded
     (:require emacsql-sqlite-builtin)
     (:option
-     org-roam-directory (file-truename "~/Library/CloudStorage/Dropbox/org/")
+     org-roam-directory (file-truename *org-path*)
      org-roam-database-connector 'sqlite-builtin
-     org-roam-db-location "~/Library/CloudStorage/Dropbox/org/org.db"
+     org-roam-db-location (concat *org-path* "/org.db")
      org-roam-db-gc-threshold most-positive-fixnum
      org-roam-completion-everywhere t
      org-roam-capture-templates
      '(
        ;; #+OPTIONS: toc:nil 为了导出 .md 的格式更加符合使用
        ("d" "default" plain
-        (file "~/Library/CloudStorage/Dropbox/org/templates/default.org")
+        (file (concat *org-path* "/templates/default.org"))
         :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
         :unnarrowed t))
      org-roam-dailies-capture-templates
@@ -382,9 +382,9 @@
 
 (setup bibtex
   (:load-after org)
-  (:when-loaded (:option bibtex-file-path "~/Library/CloudStorage/Dropbox/org/bib/"
+  (:when-loaded (:option bibtex-file-path (concat *org-path* "/bib/")
                          bibtex-files '("bibtex.bib")
-                         bibtex-notes-path "~/Library/CloudStorage/Dropbox/org/main/"
+                         bibtex-notes-path (concat *org-path* "/main/")
                          bibtex-align-at-equal-sign t
                          bibtex-autokey-titleword-separator "-"
                          bibtex-autokey-year-title-separator "-"
@@ -399,7 +399,7 @@
              ebib-bib-search-dirs `(,bibtex-file-path)
              ebib-file-search-dirs `(,(concat bibtex-file-path "files/"))
              ebib-notes-directory bibtex-notes-path
-             ebib-reading-list-file "~/Library/CloudStorage/Dropbox/org/agenda/inbox.org"
+             ebib-reading-list-file (concat *org-path* "/agenda/inbox.org")
              ebib-bibtex-dialect bibtex-dialect
              ebib-file-associations '(("pdf" . "open"))
              ebib-index-default-sort '("timestamp" . descend)
@@ -459,11 +459,10 @@
      :function #'citar-is-cited
      :padding "  "
      :tag "is:cited"))
-
   (:when-loaded
-    (:option org-cite-global-bibliography '("~/Library/CloudStorage/Dropbox/org/bib/bibtex.bib")
-             citar-notes-paths (list "~/Library/CloudStorage/Dropbox/org/main")
-             citar-library-paths (list "~/Library/CloudStorage/Dropbox/org/bib/files")
+    (:option org-cite-global-bibliography (list (concat *org-path* "/bib/bibtex.bib"))
+             citar-notes-paths (list (concat *org-path* "/main"))
+             citar-library-paths (list (concat *org-path* "/bib/files"))
              org-cite-insert-processor 'citar
              org-cite-follow-processor 'citar
              org-cite-activate-processor 'citar
@@ -516,7 +515,7 @@
 (setup deft
   (:option
    deft-extensions '("md" "tex" "org" "conf")
-   deft-directory "~/Library/CloudStorage/Dropbox/org/notes"
+   deft-directory (concat *org-path* "/notes")
    deft-recursive t
    deft-strip-summary-regexp
    (concat "\\("

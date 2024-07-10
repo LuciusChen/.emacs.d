@@ -1,9 +1,10 @@
 ;; lib-transient.el --- Initialize org	-*- lexical-binding: t; -*-
+;;; Commentary:
 ;; 打开当前日期对应的 daily log 文件
 (defun +delete-archived-daily-log-files ()
   "Delete Daily log files that have no titles in them."
   (interactive)
-  (let ((dir "~/Library/CloudStorage/Dropbox/org/daily/")
+  (let ((dir (concat *org-path* "/daily/"))
         (deleted-files '()))
     (dolist (file (directory-files dir nil "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org$"))
       (let* ((fullpath (concat (file-name-as-directory dir) file))
@@ -23,9 +24,9 @@
   "Open an agenda file based on ARGS.
 
 ARGS should be a list where the first element is the name of the agenda file
-to open.  The files are located in the '~/Library/CloudStorage/Dropbox/org/agenda/' directory."
+to open.  The files are located in the '/agenda/' directory."
   (interactive (list (transient-args 'agenda-transient)))
-  (find-file  (concat "~/Library/CloudStorage/Dropbox/org/agenda/" (car args))))
+  (find-file  (concat *org-path* "/agenda/" (car args))))
 
 (defun journal-options (&optional args)
   "Perform various journal-related actions based on ARGS.
@@ -41,7 +42,7 @@ that can include:
 
 The files are located in the directory specified by `file-path-prefix`."
   (interactive (list (transient-args 'journal-transient)))
-  (let ((file-path-prefix "~/Library/CloudStorage/Dropbox/org/daily/"))
+  (let ((file-path-prefix (concat *org-path* "/daily/")))
     (cond ((member "journal.org" args)
            (find-file (concat file-path-prefix (car args))))
           ((member "today" args)
@@ -65,13 +66,16 @@ The files are located in the directory specified by `file-path-prefix`."
 
 (defun browse-path (&optional args)
   "Browse files from the repositories cloned by `straight', using `fd'.
-
 ARGS should be a list where the first element is the path to the repositories."
   (interactive (list (transient-args 'emacs-access-transient)))
-  (let* ((repopath (expand-file-name (car args)))
+  (let* ((key (car args))
+         (repopath (cond
+                    ((string-equal key "agenda") (concat *org-path* "/agenda/"))
+                    ((string-equal key "books") (concat *org-path* "/bib/files"))
+                    (t (expand-file-name key))))
          (fd-cmd (concat "fd --no-ignore-vcs . --base-directory " repopath))
          (files (split-string (shell-command-to-string fd-cmd) "\n"))
-         (file (completing-read "Find file in straight repos: " files nil t)))
+         (file (completing-read "Find file: " files nil t)))
     (find-file (file-name-concat repopath file))))
 
 (defun lucius/java-to-xml-mapper ()

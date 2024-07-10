@@ -118,5 +118,9 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
     (:advice mastodon-media--process-full-sized-image-response :override +mastodon-media--process-full-sized-image-response)))
 
 (when *IS-MAC* (setup auto-space (:hook-into after-init)))
+
+(setup ready-player
+  (:defer (:require ready-player))
+  (:when-loaded (ready-player-add-to-auto-mode-alist)))
 (provide 'init-util)
 ;;; init-util.el ends here
