@@ -1,5 +1,6 @@
 ;;; lib-org-roam.el --- org-roam config -*- lexical-binding: t -*-
 ;;; Commentary:
+;;; Code:
 ;; 在记录的时候创建新的 node 时不退出当前状态，保存新建的 node。
 (defun org-roam-node-insert-immediate (arg &rest args)
   "Insert a new Org-roam note and immediately finish capturing.
