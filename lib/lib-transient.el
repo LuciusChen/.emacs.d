@@ -1,5 +1,6 @@
 ;; lib-transient.el --- Initialize org	-*- lexical-binding: t; -*-
 ;;; Commentary:
+;;; Code:
 ;; 打开当前日期对应的 daily log 文件
 (defun +delete-archived-daily-log-files ()
   "Delete Daily log files that have no titles in them."
