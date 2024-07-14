@@ -324,7 +324,13 @@
      '(
        ;; #+OPTIONS: toc:nil 为了导出 .md 的格式更加符合使用
        ("d" "default" plain
-        (file (concat *org-path* "/templates/default.org"))
+        "# ------------------------------------------------------------------------------
+#+title: ${title}
+#+AUTHOR: Lucius Chen
+#+EMAIL: chenyh572@gmail.com
+#+STARTUP: content showstars indent inlineimages hideblocks
+#+OPTIONS: toc:nil
+# ------------------------------------------------------------------------------"
         :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
         :unnarrowed t))
      org-roam-dailies-capture-templates
