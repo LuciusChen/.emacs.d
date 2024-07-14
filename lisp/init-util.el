@@ -122,5 +122,15 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 (setup ready-player
   (:defer (:require ready-player))
   (:when-loaded (ready-player-add-to-auto-mode-alist)))
+
+(setup mu4e
+  (:option
+   mu4e-mu-binary (executable-find "mu")
+   mu4e-maildir "~/.maildir"
+   mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
+   mu4e-update-interval 300
+   mu4e-attachment-dir "~/Desktop"
+   mu4e-change-filenames-when-moving t
+   mu4e-user-mail-address-list '("chenyh572@gmail.com")))
 (provide 'init-util)
 ;;; init-util.el ends here

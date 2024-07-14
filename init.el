@@ -163,6 +163,7 @@
     whitespace-cleanup-mode
     password-store-otp
     password-store
+    (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))
     (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))
     (emt :host github :repo "roife/emt")
