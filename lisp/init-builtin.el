@@ -2,7 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 (setup startup
-  (:option inhibit-startup-screen t)
+  (:option inhibit-startup-screen t
+           user-mail-address "chenyh572@gmail.com")
   (:hooks after-init-hook delete-selection-mode
           after-init-hook savehist-mode
           after-init-hook electric-pair-mode))
