@@ -22,6 +22,7 @@
 ;; (setup wxml-mode (:file-match "\\.wxml\\'"))
 (setup my-html-mode (:file-match "\\.wxml\\'"))
 (setup java-ts-mode (:file-match "\\.java\\'"))
+(setup python-ts-mode (:file-match "\\.py\\'"))
 (setup yaml-ts-mode (:file-match "\\.yaml\\'"))
 (setup vue-mode (:file-match "\\.vue\\'")
        (:hooks vue-mode-hook (lambda ()
@@ -147,6 +148,18 @@
   (:autoload global-treesit-auto-mode)
   (:option treesit-auto-install 'prompt)
   (:when-loaded (global-treesit-auto-mode)))
+
+(setup indent-bars
+  (:with-mode (java-ts-mode python-ts-mode)
+    (:require indent-bars)
+    (:hook indent-bars-mode))
+  (:option indent-bars-treesit-support t
+           indent-bars-no-descend-string t
+           indent-bars-treesit-ignore-blank-lines-types '("module")
+           indent-bars-prefer-character t
+           indent-bars-no-stipple-char ?\u254e
+           indent-bars-treesit-scope '((python function_definition class_definition for_statement
+                                               if_statement with_statement while_statement))))
 
 ;; xml format
 ;; M-: (execute-kbd-macro (kbd "M-% > < RET > C-q C-j < RET ! C-M-\\"))

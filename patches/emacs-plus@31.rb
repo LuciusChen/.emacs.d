@@ -1,8 +1,8 @@
 require_relative "../Library/EmacsBase"
 
-class EmacsPlusAT30 < EmacsBase
-  init 30
-  version "30.0.50"
+class EmacsPlusAT31 < EmacsBase
+  init 31
+  version "31.0.50"
 
   on_macos do
     env :std
@@ -80,8 +80,8 @@ class EmacsPlusAT30 < EmacsBase
   # URL
   #
 
-  if ENV['HOMEBREW_EMACS_PLUS_30_REVISION']
-    url "https://github.com/emacs-mirror/emacs.git", :revision => ENV['HOMEBREW_EMACS_PLUS_30_REVISION']
+  if ENV['HOMEBREW_EMACS_PLUS_31_REVISION']
+    url "https://github.com/emacs-mirror/emacs.git", :revision => ENV['HOMEBREW_EMACS_PLUS_31_REVISION']
   else
     url "https://github.com/emacs-mirror/emacs.git", :branch => "master"
   end
@@ -96,13 +96,12 @@ class EmacsPlusAT30 < EmacsBase
   # Patches
   #
 
-  opoo "The option --with-no-frame-refocus is not required anymore in emacs-plus@30." if build.with? "no-frame-refocus"
+  opoo "The option --with-no-frame-refocus is not required anymore in emacs-plus@31." if build.with? "no-frame-refocus"
   local_patch "fix-window-role", sha: "1f8423ea7e6e66c9ac6dd8e37b119972daa1264de00172a24a79a710efcb8130"
   local_patch "system-appearance", sha: "9eb3ce80640025bff96ebaeb5893430116368d6349f4eb0cb4ef8b3d58477db6"
   local_patch "poll", sha: "31b76d6a2830fa3b6d453e3bbf5ec7259b5babf1d977b2bf88a6624fa78cb3e6" if build.with? "poll"
   local_patch "round-undecorated-frame", sha: "7451f80f559840e54e6a052e55d1100778abc55f98f1d0c038a24e25773f2874"
   local_patch "ns-alpha-background", sha: "eae9abd14c2d00315806116e0eaba09510e98738b420d6e40a9d7d97d9437b81"
-  # local_patch "0001-Cursor-animation", sha: "d6898b69c5248da9ee400e4526892aed4e1ad489c992ae5dcf724d3b1275b5d2"
 
   #
   # Initialize
@@ -135,12 +134,21 @@ class EmacsPlusAT30 < EmacsBase
     args << "--without-compress-install" if build.without? "compress-install"
 
     ENV.append "CFLAGS", "-g -Og" if build.with? "debug"
-    ENV.append "CFLAGS", "-DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT"
+    ENV.append "CFLAGS", "-O2 -DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT"
 
     # Necessary for libgccjit library discovery
-    ENV.append "CPATH", "-I#{Formula["libgccjit"].opt_include}" if build.with? "native-comp"
-    ENV.append "LIBRARY_PATH", "-L#{Formula["libgccjit"].opt_lib}" if build.with? "native-comp"
-    ENV.append "LDFLAGS", "-L#{Formula["libgccjit"].opt_lib}" if build.with? "native-comp"
+    if build.with? "native-comp"
+      gcc_ver = Formula["gcc"].any_installed_version
+      gcc_ver_major = gcc_ver.major
+      gcc_lib="#{HOMEBREW_PREFIX}/lib/gcc/#{gcc_ver_major}"
+
+      ENV.append "CFLAGS", "-I#{Formula["gcc"].include}"
+      ENV.append "CFLAGS", "-I#{Formula["libgccjit"].include}"
+
+      ENV.append "LDFLAGS", "-L#{gcc_lib}"
+      ENV.append "LDFLAGS", "-I#{Formula["gcc"].include}"
+      ENV.append "LDFLAGS", "-I#{Formula["libgccjit"].include}"
+    end
 
     args <<
       if build.with? "dbus"

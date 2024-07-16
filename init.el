@@ -163,6 +163,7 @@
     whitespace-cleanup-mode
     password-store-otp
     password-store
+    (indent-bars :host github :repo "jdtsmith/indent-bars")
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))
     (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))
