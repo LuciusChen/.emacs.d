@@ -121,16 +121,74 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 
 (setup ready-player
   (:defer (:require ready-player))
-  (:when-loaded (ready-player-add-to-auto-mode-alist)))
+  (:when-loaded
+    (ready-player-add-to-auto-mode-alist)
+    (add-to-list 'ready-player-supported-media "m4r")))
+
+;; brew install mu isync msmtp
+;;
+;; file --> .mbsyncrc ↓
+;;
+;; IMAPAccount gmail
+;; Host imap.gmail.com
+;; User xxxx@gmail.com
+;; PassCmd "security find-generic-password -s mu4e-gmail -a xxxx@gmail.com -w"
+;; Port 993
+;; SSLType IMAPS
+;; SSLVersions TLSv1.2
+;; AuthMechs PLAIN
+;; SystemCertificates no
+;; CertificateFile ~/.maildir/certificates/root-certificates.pem
+
+;; IMAPStore gmail-remote
+;; Account gmail
+
+;; MaildirStore gmail-local
+;; SubFolders Verbatim
+;; Path ~/.maildir/gmail/
+;; Inbox ~/.maildir/gmail/INBOX
+
+;; Channel gmail
+;; Far :gmail-remote:
+;; Near :gmail-local:
+;; Patterns *
+;; Create Near
+;; Sync All
+;; Expunge Both
+;; SyncState *
 
 (setup mu4e
-  (:option
-   mu4e-mu-binary (executable-find "mu")
-   mu4e-maildir "~/.maildir"
-   mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
-   mu4e-update-interval 300
-   mu4e-attachment-dir "~/Desktop"
-   mu4e-change-filenames-when-moving t
-   mu4e-user-mail-address-list '("chenyh572@gmail.com")))
+  (:defer (:require mu4e))
+  (:when-loaded
+    (:global "C-c v" mu4e-view-actions)
+    (:option mu4e-mu-binary (executable-find "mu")
+             mu4e-maildir "~/.maildir"
+             mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
+             mu4e-update-interval 300
+             mu4e-attachment-dir "~/Desktop"
+             mu4e-change-filenames-when-moving t
+             mu4e-user-mail-address-list '("chenyh572@gmail.com")
+             mu4e-headers-unread-mark    '("u" . "📩 ")
+             mu4e-headers-draft-mark     '("D" . "🚧 ")
+             mu4e-headers-flagged-mark   '("F" . "🚩 ")
+             mu4e-headers-new-mark       '("N" . "✨ ")
+             mu4e-headers-passed-mark    '("P" . "↪ ")
+             mu4e-headers-replied-mark   '("R" . "↩ ")
+             mu4e-headers-seen-mark      '("S" . " ")
+             mu4e-headers-trashed-mark   '("T" . "🗑️")
+             mu4e-headers-attach-mark    '("a" . "📎 ")
+             mu4e-headers-encrypted-mark '("x" . "🔑 ")
+             mu4e-headers-signed-mark    '("s" . "🖊 "))))
+
+(setup consult-mu
+  (:load-after mu4e)
+  (:when-loaded
+    (:global "M-g m" consult-mu)
+    (:option consult-mu-maxnum 200
+             consult-mu-preview-key 'any
+             consult-mu-mark-previewed-as-read nil
+             consult-mu-mark-viewed-as-read nil
+             consult-mu-action #'consult-mu--view-action
+             consult-mu-headers-template (lambda () (concat "%f" (number-to-string (floor (* (frame-width) 0.15))) "%s" (number-to-string (floor (* (frame-width) 0.5))) "%d13" "%g" "%x")))))
 (provide 'init-util)
 ;;; init-util.el ends here
