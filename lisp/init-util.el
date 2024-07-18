@@ -165,7 +165,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 ;; SyncState *
 ;;
 ;; mbsync -aV                                                                             <----
-;; mu init -m ~/.maildir --my-address chenyaohua@njcjh.cn --my-address chenyh572@gmail.com    |
+;; mu init -m ~/.maildir --my-address chenyaohua@njcjh.cn --my-address xxxx@gmail.com    |
 ;; mu index                                                                                   |
 ;;                                                                                            |
 ;; remarks -->                                                                                |
@@ -185,9 +185,9 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 ;; host smtp.gmail.com
 ;; port 465
 ;; protocol smtp
-;; from chenyh572@gmail.com
-;; user chenyh572@gmail.com
-;; passwordeval security find-generic-password -s mu4e-gmail -a chenyh572@gmail.com -w
+;; from xxxx@gmail.com
+;; user xxxx@gmail.com
+;; passwordeval security find-generic-password -s mu4e-gmail -a xxxx@gmail.com -w
 ;; tls on
 ;; tls_starttls off
 ;;
