@@ -115,7 +115,8 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
               (image-mode)
               (switch-to-buffer-other-window (current-buffer))
               (image-transform-fit-both))))))
-    (:advice mastodon-media--process-full-sized-image-response :override +mastodon-media--process-full-sized-image-response)))
+    (:advice mastodon-media--process-full-sized-image-response
+             :override +mastodon-media--process-full-sized-image-response)))
 
 (when *IS-MAC* (setup auto-space (:hook-into after-init)))
 
@@ -126,6 +127,9 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
     (add-to-list 'ready-player-supported-media "m4r")))
 
 ;; brew install mu isync msmtp
+;;
+;; === receve mail settings ===
+;;
 ;; security add-generic-password -s mu4e-gmail -a xxxx@gmail.com -w
 ;;
 ;; from keychain Access - System Roots export root-certificates.pem
@@ -165,11 +169,34 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 ;; mu index                                                                                   |
 ;;                                                                                            |
 ;; remarks -->                                                                                |
-;;  qq 需要先开启 imap                                                                        |
+;; qq 需要先开启 imap                                                                         |
 ;; 删除数据重新部署需要删除 Dashboard 中 database-path 位置的数据库。 -------------------------
 
+;; === send mail settings ===
+;;
+;; file --> .msmtprc ↓
+;;
+;; defaults
+;; logfile ~/.maildir/msmtp.log
+;; tls_trust_file ~/.maildir/certificates/root-certificates.pem
+
+;; account gmail
+;; auth on
+;; host smtp.gmail.com
+;; port 465
+;; protocol smtp
+;; from chenyh572@gmail.com
+;; user chenyh572@gmail.com
+;; passwordeval security find-generic-password -s mu4e-gmail -a chenyh572@gmail.com -w
+;; tls on
+;; tls_starttls off
+;;
+;; remarks -->
+;; mkdir -p ~/Mail/queued-mail && touch ~/Mail/queued-mail/index
+
 (setup mu4e
-  (:defer (:require mu4e))
+  (:defer (:require mu4e)
+          (:require smtpmail))
   (:when-loaded
     (:global "C-c v" mu4e-view-actions)
     (:option mu4e-mu-binary (executable-find "mu")
@@ -179,6 +206,22 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
              mu4e-attachment-dir "~/Desktop"
              mu4e-change-filenames-when-moving t
              mu4e-user-mail-address-list '("chenyh572@gmail.com" "chenyaohua@njcjh.cn")
+             ;; header view formatting
+             mu4e-headers-thread-single-orphan-prefix '("─>" . "─▶")
+             mu4e-headers-thread-orphan-prefix '("┬>" . "┬▶ ")
+             mu4e-headers-thread-connection-prefix '("│ " . "│ ")
+             mu4e-headers-thread-first-child-prefix '("├>" . "├▶")
+             mu4e-headers-thread-child-prefix '("├>" . "├▶")
+             mu4e-headers-thread-last-child-prefix '("└>" . "╰▶")
+             ;; don't keep message compose buffers around after sending:
+             message-kill-buffer-on-exit t
+             ;; send function:
+             send-mail-function 'message-send-mail-with-sendmail
+             message-send-mail-function 'message-send-mail-with-sendmail
+             ;; send program:
+             ;; this is exeranal. remember we installed it before.
+             sendmail-program (executable-find "msmtp")
+             message-sendmail-envelope-from 'header
              mu4e-headers-unread-mark    '("u" . "📩 ")
              mu4e-headers-draft-mark     '("D" . "🚧 ")
              mu4e-headers-flagged-mark   '("F" . "🚩 ")
@@ -189,7 +232,89 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
              mu4e-headers-trashed-mark   '("T" . "🗑️")
              mu4e-headers-attach-mark    '("a" . "📎 ")
              mu4e-headers-encrypted-mark '("x" . "🔑 ")
-             mu4e-headers-signed-mark    '("s" . "🖊 "))))
+             mu4e-headers-signed-mark    '("s" . "🖊 ")
+             mu4e-contexts
+             `(,(make-mu4e-context
+                 :name "gmail"
+                 :enter-func
+                 (lambda () (mu4e-message "Enter chenyh572@gmail.com context"))
+                 :leave-func
+                 (lambda () (mu4e-message "Leave chenyh572@gmail.com context"))
+                 :match-func
+                 (lambda (msg)
+                   (when msg
+                     (mu4e-message-contact-field-matches msg
+                                                         :to "chenyh572@gmail.com")))
+                 :vars '((user-mail-address . "chenyh572@gmail.com")
+                         (user-full-name . "Lucius Chan")
+                         (mu4e-drafts-folder . "/gmail/Drafts")
+                         (mu4e-refile-folder . "/gmail/Archive")
+                         (mu4e-sent-folder . "/gmail/Sent")
+                         (mu4e-trash-folder . "/gmail/Trash")))
+               ,(make-mu4e-context
+                 :name "qq"
+                 :enter-func
+                 (lambda () (mu4e-message "Enter chenyaohua@njcjh.cn context"))
+                 :leave-func
+                 (lambda () (mu4e-message "Leave chenyaohua@njcjh.cn context"))
+                 :match-func
+                 (lambda (msg)
+                   (when msg
+                     (mu4e-message-contact-field-matches msg
+                                                         :to "chenyaohua@njcjh.cn")))
+                 :vars '((user-mail-address . "chenyaohua@njcjh.cn" )
+                         (user-full-name . "Lucius Chen")
+                         (mu4e-drafts-folder . "/qq/Drafts")
+                         (mu4e-refile-folder . "/qq/Archive")
+                         (mu4e-sent-folder . "/qq/Sent Messages")
+                         (mu4e-trash-folder . "/qq/Deleted Messages"))))
+             ;; start with the first (default) context;
+             mu4e-context-policy 'pick-first
+             ;; ask for context if no context matches;
+             mu4e-compose-context-policy 'ask)
+
+    (add-to-list 'display-buffer-alist
+                 '("\\*mu4e-update\\*"
+                   (display-buffer-below-selected)
+                   (window-height . 0.1)))
+    ;;; MU4E HEADERS
+    (customize-set-variable 'mu4e-headers-fields
+                            '((:flags . 6)
+                              (:date . 25)
+                              (:from . 40)
+                              (:subject . nil)))
+    (customize-set-variable 'mu4e-headers-date-format "%Y-%m-%d %H:%M")
+    ;; chose from account before sending
+    ;; this is a custom function that works for me.
+    ;; well I stole it somewhere long ago.
+    ;; I suggest using it to make matters easy
+    ;; of course adjust the email adresses and account descriptions
+    (defun timu/set-msmtp-account ()
+      (if (message-mail-p)
+          (save-excursion
+            (let*
+                ((from (save-restriction
+                         (message-narrow-to-headers)
+                         (message-fetch-field "from")))
+                 (account
+                  (cond
+                   ((string-match "chenyaohua@njcjh.cn" from) "qq")
+                   ((string-match "chenyh572@gmail.com" from) "gmail"))))
+              (setq message-sendmail-extra-arguments (list '"-a" account))))))
+
+    (add-hook 'message-send-mail-hook 'timu/set-msmtp-account)
+
+    ;; mu4e cc & bcc
+    ;; this is custom as well
+    (add-hook 'mu4e-compose-mode-hook
+              (defun timu/add-cc-and-bcc ()
+                "My Function to automatically add Cc & Bcc: headers.
+    This is in the mu4e compose mode."
+                (save-excursion (message-add-header "Cc:\n"))
+                (save-excursion (message-add-header "Bcc:\n"))))
+
+    ;; mu4e address completion
+    (add-hook 'mu4e-compose-mode-hook 'company-mode)))
 
 (setup consult-mu
   (:load-after mu4e)
@@ -200,6 +325,13 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
              consult-mu-mark-previewed-as-read nil
              consult-mu-mark-viewed-as-read nil
              consult-mu-action #'consult-mu--view-action
-             consult-mu-headers-template (lambda () (concat "%f" (number-to-string (floor (* (frame-width) 0.15))) "%s" (number-to-string (floor (* (frame-width) 0.5))) "%d13" "%g" "%x")))))
+             consult-mu-headers-template (lambda ()
+                                           (concat "%f"
+                                                   (number-to-string
+                                                    (floor (* (frame-width) 0.15)))
+                                                   "%s"
+                                                   (number-to-string
+                                                    (floor (* (frame-width) 0.5)))
+                                                   "%d13" "%g" "%x")))))
 (provide 'init-util)
 ;;; init-util.el ends here
