@@ -195,10 +195,9 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 ;; mkdir -p ~/Mail/queued-mail && touch ~/Mail/queued-mail/index
 
 (setup mu4e
-  (:defer (:require mu4e)
-          (:require smtpmail))
+  (:defer (:require mu4e))
   (:when-loaded
-    (:global "C-c v" mu4e-view-actions)
+    (:require smtpmail)
     (:option mu4e-mu-binary (executable-find "mu")
              mu4e-maildir "~/.maildir"
              mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
