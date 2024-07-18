@@ -126,6 +126,9 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
     (add-to-list 'ready-player-supported-media "m4r")))
 
 ;; brew install mu isync msmtp
+;; security add-generic-password -s mu4e-gmail -a xxxx@gmail.com -w
+;;
+;; from keychain Access - System Roots export root-certificates.pem
 ;;
 ;; file --> .mbsyncrc ↓
 ;;
@@ -156,6 +159,14 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 ;; Sync All
 ;; Expunge Both
 ;; SyncState *
+;;
+;; mbsync -aV                                                                             <----
+;; mu init -m ~/.maildir --my-address chenyaohua@njcjh.cn --my-address chenyh572@gmail.com    |
+;; mu index                                                                                   |
+;;                                                                                            |
+;; remarks -->                                                                                |
+;;  qq 需要先开启 imap                                                                        |
+;; 删除数据重新部署需要删除 Dashboard 中 database-path 位置的数据库。 -------------------------
 
 (setup mu4e
   (:defer (:require mu4e))
@@ -167,7 +178,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
              mu4e-update-interval 300
              mu4e-attachment-dir "~/Desktop"
              mu4e-change-filenames-when-moving t
-             mu4e-user-mail-address-list '("chenyh572@gmail.com")
+             mu4e-user-mail-address-list '("chenyh572@gmail.com" "chenyaohua@njcjh.cn")
              mu4e-headers-unread-mark    '("u" . "📩 ")
              mu4e-headers-draft-mark     '("D" . "🚧 ")
              mu4e-headers-flagged-mark   '("F" . "🚩 ")
