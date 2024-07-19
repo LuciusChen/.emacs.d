@@ -127,6 +127,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
     (add-to-list 'ready-player-supported-media "m4r")))
 
 ;; brew install mu isync msmtp
+;; mkdir -p ~/.maildir/qq ~/.maildir/gmail
 ;;
 ;; === receve mail settings ===
 ;;
@@ -165,7 +166,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 ;; SyncState *
 ;;
 ;; mbsync -aV                                                                             <----
-;; mu init -m ~/.maildir --my-address chenyaohua@njcjh.cn --my-address xxxx@gmail.com    |
+;; mu init -m ~/.maildir --my-address chenyaohua@njcjh.cn --my-address xxxx@gmail.com         |
 ;; mu index                                                                                   |
 ;;                                                                                            |
 ;; remarks -->                                                                                |
@@ -197,13 +198,20 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
 (setup mu4e
   (:defer (:require mu4e))
   (:when-loaded
+    ;; for sending mails
     (:require smtpmail)
     (:option mu4e-mu-binary (executable-find "mu")
              mu4e-maildir "~/.maildir"
+             ;; this command is called to sync imap servers:
              mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
+             ;; how often to call it in seconds:
              mu4e-update-interval 300
+             ;; save attachment to desktop by default
+             ;; or another choice of yours:
              mu4e-attachment-dir "~/Desktop"
+             ;; rename files when moving - needed for mbsync:
              mu4e-change-filenames-when-moving t
+             ;; list of your email adresses:
              mu4e-user-mail-address-list '("chenyh572@gmail.com" "chenyaohua@njcjh.cn")
              ;; header view formatting
              mu4e-headers-thread-single-orphan-prefix '("─>" . "─▶")
@@ -220,6 +228,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
              ;; send program:
              ;; this is exeranal. remember we installed it before.
              sendmail-program (executable-find "msmtp")
+             ;; select the right sender email from the context.
              message-sendmail-envelope-from 'header
              mu4e-headers-unread-mark    '("u" . "📩 ")
              mu4e-headers-draft-mark     '("D" . "🚧 ")
@@ -288,7 +297,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
     ;; well I stole it somewhere long ago.
     ;; I suggest using it to make matters easy
     ;; of course adjust the email adresses and account descriptions
-    (defun timu/set-msmtp-account ()
+    (defun +set-msmtp-account ()
       (if (message-mail-p)
           (save-excursion
             (let*
@@ -301,7 +310,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
                    ((string-match "chenyh572@gmail.com" from) "gmail"))))
               (setq message-sendmail-extra-arguments (list '"-a" account))))))
 
-    (add-hook 'message-send-mail-hook 'timu/set-msmtp-account)
+    (add-hook 'message-send-mail-hook '+set-msmtp-account)
 
     ;; mu4e cc & bcc
     ;; this is custom as well
