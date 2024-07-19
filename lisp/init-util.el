@@ -230,6 +230,7 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
              sendmail-program (executable-find "msmtp")
              ;; select the right sender email from the context.
              message-sendmail-envelope-from 'header
+             mu4e-use-fancy-chars t
              mu4e-headers-unread-mark    '("u" . "📩 ")
              mu4e-headers-draft-mark     '("D" . "🚧 ")
              mu4e-headers-flagged-mark   '("F" . "🚩 ")
@@ -237,10 +238,13 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
              mu4e-headers-passed-mark    '("P" . "↪ ")
              mu4e-headers-replied-mark   '("R" . "↩ ")
              mu4e-headers-seen-mark      '("S" . " ")
-             mu4e-headers-trashed-mark   '("T" . "🗑️")
+             mu4e-headers-trashed-mark   '("T" . "🗑️ ")
              mu4e-headers-attach-mark    '("a" . "📎 ")
              mu4e-headers-encrypted-mark '("x" . "🔑 ")
              mu4e-headers-signed-mark    '("s" . "🖊 ")
+             mu4e-headers-list-mark      '("l" . "🔈 ")
+             mu4e-headers-personal-mark  '("p" . "👨 ")
+             mu4e-headers-calendar-mark  '("c" . "📅 ")
              mu4e-contexts
              `(,(make-mu4e-context
                  :name "gmail"
@@ -285,13 +289,6 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
                  '("\\*mu4e-update\\*"
                    (display-buffer-below-selected)
                    (window-height . 0.1)))
-    ;;; MU4E HEADERS
-    (customize-set-variable 'mu4e-headers-fields
-                            '((:flags . 6)
-                              (:date . 25)
-                              (:from . 40)
-                              (:subject . nil)))
-    (customize-set-variable 'mu4e-headers-date-format "%Y-%m-%d %H:%M")
     ;; chose from account before sending
     ;; this is a custom function that works for me.
     ;; well I stole it somewhere long ago.
