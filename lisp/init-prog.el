@@ -161,6 +161,14 @@
            indent-bars-treesit-scope '((python function_definition class_definition for_statement
                                                if_statement with_statement while_statement))))
 
+(setup separedit
+  (:defer (:require separedit))
+  (:when-loaded
+    (:with-map prog-mode-map (:bind "C-c '" separedit))
+    (:with-map minibuffer-mode-map (:bind "C-c '" separedit))
+    (:with-map help-mode-map (:bind "C-c '" separedit))
+    (:option separedit-default-mode 'org-mode)))
+
 ;; xml format
 ;; M-: (execute-kbd-macro (kbd "M-% > < RET > C-q C-j < RET ! C-M-\\"))
 (defun +xml-format ()

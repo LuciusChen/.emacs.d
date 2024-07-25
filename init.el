@@ -101,6 +101,7 @@
     dimmer
     vertico
     diredfl
+    separedit
     cdlatex
     consult
     mmm-mode
@@ -201,10 +202,13 @@
 
 (require 'init-transient)
 (require 'init-reader)
-(require 'init-telega)
 (require 'init-util)
 
 (require 'init-org)
+
+(require 'init-telega)
+(require 'init-mu4e)
+
 (require 'init-local)
 ;; (require 'init-beancount)
 ;; (require 'init-rime)
