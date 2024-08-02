@@ -69,7 +69,5 @@ If DEST, a buffer, is provided, insert the markup there."
           (goto-char next))))
     (pop-to-buffer buff)
     (goto-char (point-min))))
-;; (require 'gptel-commit)
-(setup gptel-commit (:after magit))
 (provide 'init-local)
 ;;; init-local.el ends here

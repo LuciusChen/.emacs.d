@@ -47,6 +47,8 @@
       (:option magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
       (advice-add 'magit-log-format-margin :filter-args #'modi/magit-log--abbreviate-author))))
 
+(setup gptel-commit (:load-after magit))
+
 (setup forge
   (:load-after magit)
   ;; Make it easier to see that a topic was closed.

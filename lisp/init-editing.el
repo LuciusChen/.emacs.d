@@ -79,11 +79,12 @@
     (:hook-into after-init)
     (:global "M-f" emt-forward-word
              "M-b" emt-backward-word)
-    (:option emt-lib-path
-             (expand-file-name
-              "straight/repos/emt/module/.build/release/libEMT.dylib"
-              user-emacs-directory))
-    (emt-ensure)))
+    ;; (:option emt-lib-path
+    ;;          (expand-file-name
+    ;;           "straight/repos/emt/module/.build/release/libEMT.dylib"
+    ;;           user-emacs-directory))
+    ;; (emt-ensure)
+    ))
 
 ;; 剪贴板查找
 (setup browse-kill-ring
