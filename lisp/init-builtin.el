@@ -158,5 +158,9 @@
     ;; HACK: Text properties inflate the size of recentf's files, and there is
     ;; no purpose in persisting them (Must be first in the list!)
     (add-to-list 'recentf-filename-handlers #'substring-no-properties)))
+
+(setup python
+  (:option python-indent-guess-indent-offset t
+           python-indent-guess-indent-offset-verbose nil))
 (provide 'init-builtin)
 ;;; init-builtin.el ends here
