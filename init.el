@@ -181,8 +181,7 @@
     (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))
     (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))))
 
-(dolist (e *use-package-list*)
-  (straight-use-package e))
+(dolist (e *use-package-list*) (straight-use-package e))
 (setq vc-follow-symlinks t)
 
 ;; load module settings
