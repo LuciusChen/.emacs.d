@@ -61,6 +61,15 @@
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
 (setup menu-bar (:when-loaded (menu-bar-mode -1)))
 
+;; secret with password-store
+(setup auth-source-pass
+  (:option auth-source-pass-extra-query-keywords t
+           auth-source-save-behavior nil
+           epg-pinentry-mode 'loopback)
+  (:when-loaded
+    (auth-source-pass-enable)
+    (setenv "GPG_AGENT_INFO" nil)))
+
 (setup dired
   (:defer (:require dired))
   (:when-loaded
