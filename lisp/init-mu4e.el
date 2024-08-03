@@ -41,13 +41,14 @@
 ;; Expunge Both
 ;; SyncState *
 ;;
-;; mbsync -aV                                                                  <──────────────┐
-;; mu init -m ~/.maildir --my-address xxxx@163.com --my-address xxxx@gmail.com                │
-;; mu index                                                                                   │
-;;                                                                                            │
-;; remarks -->                                                                                │
-;; qq 需要先开启 imap                                                                         │
-;; 删除数据重新部署需要删除 Dashboard 中 database-path 位置的数据库。 ────────────────────────┘
+;; mbsync -aV                                                            <──────────────┐
+;; mu init -m ~/.maildir --my-address xxxx@163.com --my-address xxxx@gmail.com          │
+;; mu index                                                                             │
+;;                                                                                      │
+;; remarks -->                                                                          │
+;; qq 需要先开启 imap                                                                   │
+;; 删除数据重新部署需要删除 Dashboard 中 database-path 位置的数据库。                   │
+;; cd .cache && rm -rf mu ──────────────────────────────────────────────────────────────┘
 
 ;; === send mail settings ===
 ;;

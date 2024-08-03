@@ -62,6 +62,8 @@
 (setup menu-bar (:when-loaded (menu-bar-mode -1)))
 
 ;; secret with password-store
+;; This is where =epg-pinentry-mode= directly handles GPG password input,
+;; without needing an external pinentry.
 (setup auth-source-pass
   (:option auth-source-pass-extra-query-keywords t
            auth-source-save-behavior nil
