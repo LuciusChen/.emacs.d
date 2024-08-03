@@ -41,13 +41,13 @@
 ;; Expunge Both
 ;; SyncState *
 ;;
-;; mbsync -aV                                                                  <--------------
-;; mu init -m ~/.maildir --my-address chenyaohua@njcjh.cn --my-address xxxx@gmail.com         |
-;; mu index                                                                                   |
-;;                                                                                            |
-;; remarks -->                                                                                |
-;; qq 需要先开启 imap                                                                         |
-;; 删除数据重新部署需要删除 Dashboard 中 database-path 位置的数据库。 ------------------------
+;; mbsync -aV                                                                  <──────────────┐
+;; mu init -m ~/.maildir --my-address xxxx@163.com --my-address xxxx@gmail.com                │
+;; mu index                                                                                   │
+;;                                                                                            │
+;; remarks -->                                                                                │
+;; qq 需要先开启 imap                                                                         │
+;; 删除数据重新部署需要删除 Dashboard 中 database-path 位置的数据库。 ────────────────────────┘
 
 ;; === send mail settings ===
 ;;
@@ -88,7 +88,7 @@
              ;; rename files when moving - needed for mbsync:
              mu4e-change-filenames-when-moving t
              ;; list of your email adresses:
-             mu4e-user-mail-address-list '("chenyh572@gmail.com" "chenyaohua@njcjh.cn")
+             mu4e-user-mail-address-list '("chenyh572@gmail.com" "chenyaohua@njcjh.cn", "chenyh1013@163.com")
              ;; header view formatting
              mu4e-headers-thread-single-orphan-prefix '("─>" . "─▶")
              mu4e-headers-thread-orphan-prefix '("┬>" . "┬▶ ")
@@ -155,7 +155,24 @@
                          (mu4e-drafts-folder . "/qq/Drafts")
                          (mu4e-refile-folder . "/qq/Archive")
                          (mu4e-sent-folder . "/qq/Sent Messages")
-                         (mu4e-trash-folder . "/qq/Deleted Messages"))))
+                         (mu4e-trash-folder . "/qq/Deleted Messages")))
+               ,(make-mu4e-context
+                 :name "163"
+                 :enter-func
+                 (lambda () (mu4e-message "Enter chenyh1013@163.com context"))
+                 :leave-func
+                 (lambda () (mu4e-message "Leave chenyh1013@163.com context"))
+                 :match-func
+                 (lambda (msg)
+                   (when msg
+                     (mu4e-message-contact-field-matches msg
+                                                         :to "chenyh1013@163.com")))
+                 :vars '((user-mail-address . "chenyh1013@163.com" )
+                         (user-full-name . "Lucius Chen")
+                         (mu4e-drafts-folder . "/163/Drafts")
+                         (mu4e-refile-folder . "/163/Archive")
+                         (mu4e-sent-folder . "/163/Sent Messages")
+                         (mu4e-trash-folder . "/163/Deleted Messages"))))
              ;; start with the first (default) context;
              mu4e-context-policy 'pick-first
              ;; ask for context if no context matches;
@@ -180,7 +197,8 @@
                  (account
                   (cond
                    ((string-match "chenyaohua@njcjh.cn" from) "qq")
-                   ((string-match "chenyh572@gmail.com" from) "gmail"))))
+                   ((string-match "chenyh572@gmail.com" from) "gmail")
+                   ((string-match "chenyh1013@163.com" from) "163"))))
               (setq message-sendmail-extra-arguments (list '"-a" account))))))
 
     (add-hook 'message-send-mail-hook '+set-msmtp-account)
