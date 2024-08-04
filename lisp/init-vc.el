@@ -45,9 +45,20 @@
       ;; Also reduce the author column width to 11 as the author name is being
       ;; abbreviated below.
       (:option magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
-      (advice-add 'magit-log-format-margin :filter-args #'modi/magit-log--abbreviate-author))))
+      (advice-add 'magit-log-format-margin :filter-args #'modi/magit-log--abbreviate-author))
+    (:with-mode magit-status-mode
+      (:require gptel)
+      (defconst gptel-commit-prompt
+        (with-temp-buffer
+          (insert-file-contents (concat user-emacs-directory "/prompt/git-commit.txt"))
+          (buffer-string)))
 
-(setup gptel-commit (:load-after magit))
+      (defun gptel-commit ()
+        "Generate commit message with gptel and insert it into the buffer."
+        (interactive)
+        (let* ((lines (magit-git-lines "diff" "--cached"))
+               (changes (string-join lines "\n")))
+          (gptel-request changes :system gptel-commit-prompt))))))
 
 (setup forge
   (:load-after magit)
