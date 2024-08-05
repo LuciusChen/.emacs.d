@@ -1,9 +1,37 @@
 ;;; init-builtin.el --- Measure startup and require times -*- lexical-binding: t -*-
 ;;; Commentary:
+;;
+;; This file contains the configuration for various Emacs built-in packages.
+;; These settings enhance the behavior of Emacs by enabling useful modes,
+;; setting options for better usability, and optimizing performance.
+;;
+;; The main configurations include:
+;; - Initial startup settings
+;; - Emacs core options
+;; - Disabling unnecessary GUI elements
+;; - Setting up =auth-source-pass= for password management
+;; - Dired settings and enhancements
+;; - Bookmark management
+;; - Simple editing options
+;; - File handling preferences
+;; - Ediff window setup
+;; - Mouse behavior adjustments
+;; - Tooltip delay settings
+;; - Indentation preferences
+;; - Window management shortcuts
+;; - Minibuffer completion settings
+;; - Auto-revert mode for keeping buffers up-to-date
+;; - Recent files management
+;; - Python mode configuration
+;;
+;; The =auth-source-pass= setup eliminates the need for a =.authinfo= file
+;; by directly reading credentials from =.password-store= entries.
+;;
 ;;; Code:
+
 (setup startup
   (:option inhibit-startup-screen t
-           user-mail-address "chenyh572@gmail.com")
+           user-mail-address "chenyh572@gmail.com")  ; mu4e
   (:hooks after-init-hook delete-selection-mode
           after-init-hook savehist-mode
           after-init-hook electric-pair-mode))
@@ -61,16 +89,15 @@
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
 (setup menu-bar (:when-loaded (menu-bar-mode -1)))
 
-;; secret with password-store
 ;; This is where =epg-pinentry-mode= directly handles GPG password input,
 ;; without needing an external pinentry.
 (setup auth-source-pass
-  (:option auth-source-pass-extra-query-keywords t
-           auth-source-save-behavior nil
-           epg-pinentry-mode 'loopback)
+  (:option auth-source-pass-extra-query-keywords t   ; Enable extra query keywords for auth-source-pass
+           auth-source-save-behavior nil             ; Disable saving behavior for auth-source
+           epg-pinentry-mode 'loopback)              ; Set pinentry mode to loopback for GPG
   (:when-loaded
-    (auth-source-pass-enable)
-    (setenv "GPG_AGENT_INFO" nil)))
+    (auth-source-pass-enable)                        ; Enable `auth-source-pass` to use pass for auth-source
+    (setenv "GPG_AGENT_INFO" nil)))                  ; Unset GPG_AGENT_INFO environment variable
 
 (setup dired
   (:defer (:require dired))
