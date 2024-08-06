@@ -153,9 +153,9 @@
   (:with-mode (java-ts-mode python-ts-mode)
     (:require indent-bars)
     (:hook indent-bars-mode))
-  (:option indent-bars-treesit-support t
+  (:option indent-bars-display-on-blank-lines nil
+           indent-bars-treesit-support t
            indent-bars-no-descend-string t
-           indent-bars-treesit-ignore-blank-lines-types '("module")
            indent-bars-prefer-character t
            indent-bars-no-stipple-char ?\u254e
            indent-bars-treesit-scope '((python function_definition class_definition for_statement
