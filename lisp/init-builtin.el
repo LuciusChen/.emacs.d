@@ -87,7 +87,6 @@
 
 (setup tool-bar (:when-loaded (tool-bar-mode -1)))
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
-(setup menu-bar (:when-loaded (menu-bar-mode -1)))
 
 ;; This is where =epg-pinentry-mode= directly handles GPG password input,
 ;; without needing an external pinentry.
