@@ -46,6 +46,7 @@
              global-corfu-modes '(prog-mode telega-chat-mode))
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
+             "<right>" corfu-quit
              "TAB"  corfu-next
              [tab]  corfu-next
              "S-TAB"  corfu-previous
