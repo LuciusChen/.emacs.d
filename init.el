@@ -166,7 +166,7 @@
     password-store
     (emt :host github :repo "roife/emt")
     (meow :host github :repo "meow-edit/meow")
-    ;; (dape :host github :repo "svaante/dape")
+    (dape :host github :repo "svaante/dape")
     (gptel :host github :repo "LuciusChen/gptel")
     (telega :host github :repo "LuciusChen/telega.el")
     (yasnippet :host github :repo "joaotavora/yasnippet")
