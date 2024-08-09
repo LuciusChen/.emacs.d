@@ -23,7 +23,7 @@
 (setup my-html-mode (:file-match "\\.wxml\\'"))
 (setup java-ts-mode (:file-match "\\.java\\'"))
 (setup python-ts-mode (:file-match "\\.py\\'"))
-(setup yaml-ts-mode (:file-match "\\.yaml\\'"))
+(setup yaml-ts-mode (:file-match "\\.ya?ml\\'"))
 (setup vue-mode (:file-match "\\.vue\\'")
        (:hooks vue-mode-hook (lambda ()
                                (setq-local tab-width 2)
