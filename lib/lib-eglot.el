@@ -42,7 +42,8 @@
   (let* ((jdtls-cache-dir (file-name-concat user-emacs-directory "cache" "lsp-cache"))
          (project-dir (file-name-nondirectory (directory-file-name (project-root (project-current)))))
          (data-dir (expand-file-name (file-name-concat jdtls-cache-dir (md5 project-dir))))
-         (jvm-args `(,(concat "-javaagent:" (expand-file-name "~/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar"))
+         ;; lombok 版本不能过低，会导致 dape 启动不能加载。
+         (jvm-args `(,(concat "-javaagent:" (expand-file-name "~/.m2/repository/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar"))
                      "-Xmx8G"
                      ;; "-XX:+UseG1GC"
                      "-XX:+UseZGC"

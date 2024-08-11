@@ -89,6 +89,7 @@
              ("\\*Org Select\\*$")
              ("\\*chatgpt\\*$")
              ("\\*Help\\*$")
+             ("\\*vterm\\*$")
              ("\\*Telega User\\*$")
              ("\\*Telegram Chat Info\\*$")
              ("\\*Telegram Message Info\\*$")

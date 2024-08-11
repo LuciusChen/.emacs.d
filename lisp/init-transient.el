@@ -10,7 +10,8 @@
                 "C-c e e" emacs-access-transient
                 "C-c e g" gptel-menu
                 "C-c e p" prog-commands
-                "C-c e m" magit-commands)
+                "C-c e m" magit-commands
+                "C-c e d" dape-transient)
     (:with-map transient-base-map
       (:bind "<escape>" transient-quit-one))
     (:option transient-semantic-coloring t)
@@ -75,6 +76,28 @@
         ("p" "Unpushed section" magit-jump-to-unpushed-to-pushremote)
         ("M-p" "previous sibling section" magit-section-backward-sibling)
         ("M-n" "next sibling section" magit-section-forward-sibling)
-        ]])))
+        ]])
+
+    (transient-define-prefix dape-transient ()
+      "Transient for dape."
+      [["Stepping"
+        ("n" "Next" dape-next :transient t)
+        ("i" "Step in" dape-step-in :transient t)
+        ("o" "Step out" dape-step-out :transient t)
+        ("c" "Continue" dape-continue :transient t)
+        ("r" "Restart" dape-restart :transient t)]
+       ["Breakpoints"
+        ("bb" "Toggle" dape-breakpoint-toggle :transient t)
+        ("bd" "Delete" dape-breakpoint-remove-at-point :transient t)
+        ("bD" "Delete all" dape-breakpoint-remove-all :transient t)
+        ("bl" "Log" dape-breakpoint-log :transient t)]
+       ["Info"
+        ("si" "Info" dape-info :transient t)
+        ("sm" "Memory" dape-read-memory :transient t)
+        ("ss" "Select Stack" dape-select-stack :transient t)
+        ("R" "Repl" dape-repl :transient t)]
+       ["Quit"
+        ("qq" "Quit" dape-quit :transient nil)
+        ("qk" "Kill" dape-kill :transient nil)]])))
 (provide 'init-transient)
 ;;; init-transient.el ends here
