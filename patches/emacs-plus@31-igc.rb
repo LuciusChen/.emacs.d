@@ -51,6 +51,7 @@ class EmacsPlusAT31 < EmacsBase
   depends_on "imagemagick" => :optional
   depends_on "dbus" => :optional
   depends_on "mailutils" => :optional
+  depends_on "libmps"
 
   if build.with? "x11"
     depends_on "libxaw"
@@ -83,7 +84,7 @@ class EmacsPlusAT31 < EmacsBase
   if ENV['HOMEBREW_EMACS_PLUS_31_REVISION']
     url "https://github.com/emacs-mirror/emacs.git", :revision => ENV['HOMEBREW_EMACS_PLUS_31_REVISION']
   else
-    url "https://github.com/emacs-mirror/emacs.git", :branch => "master"
+    url "https://github.com/emacs-mirror/emacs.git", :branch => "scratch/igc"
   end
 
   #
@@ -172,6 +173,12 @@ class EmacsPlusAT31 < EmacsBase
       ohai "ImageMagick PKG_CONFIG_PATH: ", imagemagick_lib_path
       ENV.prepend_path "PKG_CONFIG_PATH", imagemagick_lib_path
     end
+
+    # build with mps
+    args << "--with-mps"
+
+    ENV.append "CFLAGS", "-I#{Formula["libmps"].include}"
+    ENV.append "CFLAGS", "-I#{Formula["libmps"].lib}"
 
     args << "--with-modules"
     args << "--with-rsvg"
