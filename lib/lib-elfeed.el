@@ -111,6 +111,10 @@
     ("https://github.com/reorx/hugo-PaperModX/commits.atom" github)
     ("https://github.com/protesilaos/modus-themes/commits.atom" github)
     ("https://github.com/Hammerspoon/hammerspoon/commits.atom" github)
+
+    ;; sourcehut
+    ("https://git.sr.ht/~pkal/setup/log/rss.xml" sourcehut)
+
     ;; Instagram
     ;; backup https://openrss.org/www.instagram.com/user
     ("https://rss.app/feeds/BvpIvcGZPXKBZVzS.xml"  instagram) ;; @miantanzhou
@@ -182,6 +186,7 @@
         ((member "novel" tags) (nerd-icons-faicon "nf-fa-book" :face '(:foreground "#02C298")))
         ((member "forum" tags) (nerd-icons-faicon "nf-fa-forumbee" :face '(:foreground "#EF9120")))
         ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
+        ((member "sourcehut" tags) (nerd-icons-faicon "nf-fa-circle_o"))
         (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
 
 (defun +elfeed-search-print-entry--better-default (entry)
