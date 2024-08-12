@@ -160,8 +160,16 @@
            indent-bars-no-stipple-char ?\u254e
            indent-bars-treesit-scope '((python function_definition class_definition for_statement
                                                if_statement with_statement while_statement))))
+
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
+
+;; Java
+;; https://github.com/microsoft/java-debug
+
+;; JS
+;; https://github.com/microsoft/vscode-js-debug/releases/ --> =js-debug-dap-<version>.tar.gz=
+;; mkdir -p ~/.emacs.d/debug-adapters && tar -xvzf js-debug-dap-<version>.tar.gz -C ~/.emacs.d/debug-adapters
 (setup dape (:option dape-buffer-window-arrangement 'right))
 
 (setup separedit
