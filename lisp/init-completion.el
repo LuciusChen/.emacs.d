@@ -80,18 +80,19 @@
              ;; 取消 eglot log
              eglot-events-buffer-config '(:size 0 :format full))
     ;; Java
-    ;; $brew install jdtls
+    ;; $ brew install jdtls
+
     ;; Python
-    ;; $brew install pipx
-    ;; $pipx install pyright
-    ;; HTML $brew install vscode-langservers-extracted
+    ;; $ brew install pipx
+    ;; $ pipx install pyright
+    ;; HTML $ brew install vscode-langservers-extracted
     (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
-                    ;; curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-                    ;; nvm install node
-                    ;; sudo npm install -g typescript
-                    ;; npm install -g @volar/vue-language-server
+                    ;; $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+                    ;; $ nvm install node
+                    ;; $ sudo npm install -g typescript
+                    ;; $ npm install -g @volar/vue-language-server
                     (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
-                    ;; npm install -g typescript-language-server
+                    ;; $ npm install -g typescript-language-server
                     (js-mode . ("typescript-language-server" "--stdio"))
                     (typescript-mode . ("typescript-language-server" "--stdio"))
                     (java-ts-mode . jdtls-command-contact)))

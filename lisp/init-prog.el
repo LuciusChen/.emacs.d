@@ -169,8 +169,15 @@
 
 ;; JS
 ;; https://github.com/microsoft/vscode-js-debug/releases/ --> =js-debug-dap-<version>.tar.gz=
-;; mkdir -p ~/.emacs.d/debug-adapters && tar -xvzf js-debug-dap-<version>.tar.gz -C ~/.emacs.d/debug-adapters
-(setup dape (:option dape-buffer-window-arrangement 'right))
+;; $ mkdir -p ~/.emacs.d/debug-adapters && tar -xvzf js-debug-dap-<version>.tar.gz -C ~/.emacs.d/debug-adapters
+
+;; Python
+;; $ pipx install debugpy
+(setup dape
+  (:global "<f5>" dape)
+  (:option dape-buffer-window-arrangement 'right)
+  ;; Save buffers on startup, useful for interpreted languages
+  (:hook dape-start-hook (lambda () (save-some-buffers t t))))
 
 (setup separedit
   (:defer (:require separedit))
