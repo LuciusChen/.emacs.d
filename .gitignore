@@ -18,3 +18,4 @@ transient/
 tree-sitter/
 var/
 debug-adapters/
+elpa/
