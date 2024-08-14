@@ -103,6 +103,7 @@
     diredfl
     separedit
     cdlatex
+    pyvenv
     consult
     mmm-mode
     ox-hugo
