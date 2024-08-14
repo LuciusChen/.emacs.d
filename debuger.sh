@@ -1,8 +1,8 @@
 #!/bin/bash
-# Use curl to get the JSON response for the latest release
-# Use grep to find the line containing file URL
-# Use cut and tr to extract the URL
-# Use wget to download it
+# Use `curl` to get the JSON response for the latest release
+# Use `grep` to find the line containing file URL
+# Use `cut` and `tr` to extract the URL
+# Use `wget` to download it
 curl -s https://api.github.com/repos/microsoft/vscode-js-debug/releases/latest \
 | grep "browser_download_url.*gz" \
 | cut -d : -f 2,3 \
