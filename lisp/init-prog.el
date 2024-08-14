@@ -164,20 +164,29 @@
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
 
-;; Java
-;; https://github.com/microsoft/java-debug
-
-;; JS
-;; https://github.com/microsoft/vscode-js-debug/releases/ --> =js-debug-dap-<version>.tar.gz=
-;; $ mkdir -p ~/.emacs.d/debug-adapters && tar -xvzf js-debug-dap-<version>.tar.gz -C ~/.emacs.d/debug-adapters
+;; Java and JS --> ~/.emacs.d/debuger.sh
 
 ;; Python
 ;; $ pipx install debugpy
 (setup dape
-  (:global "<f5>" dape)
-  (:option dape-buffer-window-arrangement 'right)
-  ;; Save buffers on startup, useful for interpreted languages
-  (:hook dape-start-hook (lambda () (save-some-buffers t t))))
+  (:with-mode prog-mode
+    (:require dape))
+  (:when-loaded
+    (:global "<f5>" dape)
+    (:option dape-buffer-window-arrangement 'right)
+    ;; Save buffers on startup, useful for interpreted languages
+    (:hook dape-start-hook (lambda () (save-some-buffers t t)))))
+
+(setup pyvenv
+  (:with-mode (python-mode python-ts-mode)
+    (:require pyvenv)
+    (:when-loaded
+      (:option pyvenv-post-activate-hooks
+               (list (lambda ()
+                       (setq python-shell-interpreter (concat pyvenv-virtual-env "/bin/python3")))))
+      pyvenv-post-deactivate-hooks
+      (list (lambda ()
+              (setq python-shell-interpreter "python3"))))))
 
 (setup separedit
   (:defer (:require separedit))

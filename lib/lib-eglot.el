@@ -42,7 +42,7 @@
   (let* ((jdtls-cache-dir (file-name-concat user-emacs-directory "cache" "lsp-cache"))
          (project-dir (file-name-nondirectory (directory-file-name (project-root (project-current)))))
          (data-dir (expand-file-name (file-name-concat jdtls-cache-dir (md5 project-dir))))
-         ;; lombok 版本不能过低，会导致 dape 启动不能加载。
+         ;; lombok 版本不能过低，会导致 dape 启动 lombok 不能加载。
          (jvm-args `(,(concat "-javaagent:" (expand-file-name "~/.m2/repository/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar"))
                      "-Xmx8G"
                      ;; "-XX:+UseG1GC"
@@ -58,7 +58,7 @@
                           `("-data" ,data-dir)
                           `(:initializationOptions
                             (:bundles
-                             [,(file-truename "~/.m2/repository/com/microsoft/java/com.microsoft.java.debug.plugin/0.53.0/com.microsoft.java.debug.plugin-0.53.0.jar")])))))
+                             [,(file-truename "~/.emacs.d/debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-0.53.0.jar")]))))) ;; ~/.emacs.d/debuger.sh
     contact))
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here
