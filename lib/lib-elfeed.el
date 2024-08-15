@@ -164,12 +164,12 @@
     ;; Bilibili
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/72270557"     bilibili) ;; 芳斯塔芙
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/18706318"     bilibili) ;; 龙女之声
+    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/6429226"      bilibili) ;; 原来是西门大嫂
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/1498726302"   bilibili) ;; 何限梁
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/7487399"      bilibili) ;; 努力的Lorre
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/470156882"    bilibili) ;; 小艾大叔
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/38053181"     bilibili) ;; oooooohmygosh
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/6330633"      bilibili) ;; 小胡仙儿
-    ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/18202105"     bilibili) ;; 绵羊料理
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/125526"       bilibili) ;; -LKs-
     ("https://rsshub.sheerwill.xyz/bilibili/user/dynamic/20375812"     bilibili) ;; 博士萌
     ))

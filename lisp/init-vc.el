@@ -103,6 +103,8 @@ A scope may be provided to a commit's type, to provide additional contextual inf
   ;; Make it easier to see that a topic was closed.
   (:when-loaded
     (:face forge-topic-closed ((t (:strike-through t))))
+    ;; 这里的 token 还是放在 .authinfo 当中，备份在 pass 中。
+    ;; 因为文件名不支持 192.168.1.220:9081/api/v4 的格式，因此不能直接存在 pass 中。
     (add-to-list 'forge-alist
                  '("192.168.1.220:9081" "192.168.1.220:9081/api/v4"
                    "192.168.1.220:9081" forge-gitlab-repository))
