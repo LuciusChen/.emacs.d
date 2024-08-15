@@ -101,7 +101,13 @@ A scope may be provided to a commit's type, to provide additional contextual inf
 (setup forge
   (:load-after magit)
   ;; Make it easier to see that a topic was closed.
-  (:face forge-topic-closed ((t (:strike-through t)))))
+  (:when-loaded
+    (:face forge-topic-closed ((t (:strike-through t))))
+    (add-to-list 'forge-alist
+                 '("192.168.1.220:9081" "192.168.1.220:9081/api/v4"
+                   "192.168.1.220:9081" forge-gitlab-repository))
+    (add-to-list 'ghub-insecure-hosts "192.168.1.220:9081/api/v4")
+    (add-to-list 'ghub-insecure-hosts "192.168.1.220:9081")))
 
 (setup diff-hl
   (:defer (diff-hl-mode))
