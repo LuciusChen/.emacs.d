@@ -33,7 +33,8 @@
       :info-manual "Emacs quick access"
       [["Emacs"
         ("-r" "repos" "~/.emacs.d/straight/repos/")
-        ("-c" "settings" "~/.emacs.d/lisp/")]
+        ("-c" "settings" "~/.emacs.d/lisp/")
+        ("-p" "projects" "~/IdeaProjects/")]
        ["Files"
         ("-t" "telega" "~/.telega/")
         ("-a" "agenda" "agenda")
