@@ -101,6 +101,7 @@
 (setup dired
   (:defer (:require dired))
   (:when-loaded
+    (:with-map dired-mode-map (:bind "<up>" dired-up-directory))
     (:with-map ctl-x-map (:bind "\C-j" 'dired-jump))
     (:with-map ctl-x-4-map (:bind "\C-j" 'dired-jump-other-window))
     (:option dired-recursive-deletes 'top
