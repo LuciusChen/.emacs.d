@@ -107,6 +107,7 @@
     consult
     mmm-mode
     ox-hugo
+    posframe
     scratch
     diff-hl
     company
@@ -169,6 +170,7 @@
     (meow :host github :repo "meow-edit/meow")
     (dape :host github :repo "svaante/dape")
     (gptel :host github :repo "LuciusChen/gptel")
+    (gptel-quick :host github :repo "karthink/gptel-quick")
     (telega :host github :repo "LuciusChen/telega.el")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (dashboard :host github :repo "LuciusChen/dashboard")

@@ -535,6 +535,14 @@
   (:when-loaded (:also-load lib-deft)))
 
 (setup ox-hugo
-  (:after ox (require 'ox-hugo)))
+  (:after ox (require 'ox-hugo))
+  (:when-loaded
+    (:advice org-hugo-export-wim-to-md
+             :after
+             (lambda (&rest _)
+               (let ((default-directory (replace-regexp-in-string "org" "hugo" *org-path*)))
+                 (if (eq (call-process "hugo" nil nil) 0)
+                     (message "Hugo compilation successful")
+                   (message "Hugo compilation failed")))))))
 (provide 'init-org)
 ;;; init-org.el ends here
