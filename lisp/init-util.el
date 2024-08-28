@@ -124,6 +124,6 @@ STATUS-PLIST is a plist of status events as per `url-retrieve'."
   (:defer (:require ready-player))
   (:when-loaded
     (ready-player-add-to-auto-mode-alist)
-    (add-to-list 'ready-player-supported-media "m4r")))
+    (add-to-list 'ready-player-supported-audio "m4r")))
 (provide 'init-util)
 ;;; init-util.el ends here
