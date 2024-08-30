@@ -179,7 +179,8 @@
     (diminish 'auto-revert-mode)))
 
 (setup recentf
-  (:hook-into after-init)
+  ;; (:hook-into after-init)
+  (:defer (:require recentf))
   (:when-loaded
     (:option recentf-auto-cleanup 'never
              recentf-max-saved-items 100

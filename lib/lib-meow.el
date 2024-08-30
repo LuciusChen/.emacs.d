@@ -79,7 +79,7 @@
    '("t" . meow-till)
    '("u" . meow-undo)
    '("U" . vundo)
-   '("v" . meow-visit)
+   '("V" . meow-visit)
    '("w" . meow-mark-word)
    '("W" . meow-mark-symbol)
    '("x" . meow-line)
