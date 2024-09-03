@@ -155,7 +155,8 @@ mkdir build
 cd build
 cmake ..
 make
-copy tgs2png somewhere into $PATH
+# copy tgs2png somewhere into $PATH
+sudo cp -rf tgs2png /opt/local/bin
 #+end_src
 
 可以 =C-h v= 查看 =exec-path= 变量的值，将 tsg2png 复制到对应的路径即可。另外针对 video stickers 需要 =brew install ffmpeg= 才可以播放。
