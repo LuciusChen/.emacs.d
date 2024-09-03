@@ -74,11 +74,14 @@
   (:defer (:require eglot))
   (:when-loaded
     (:also-load lib-eglot)
-    (:with-mode (python-ts-mode java-ts-mode js-mode typescript-mode)
+    (:with-mode (python-ts-mode java-ts-mode js-mode typescript-mode latex-mode)
       (:hook eglot-ensure))
     (:option eglot-events-buffer-size 0
              ;; 取消 eglot log
              eglot-events-buffer-config '(:size 0 :format full))
+    ;; Latex
+    ;; $ luarocks install digestif
+    ;;
     ;; Java
     ;; $ brew install jdtls
 
