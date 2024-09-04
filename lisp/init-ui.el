@@ -58,9 +58,7 @@
       (set-face-attribute 'width-font-face nil :font "iosevkaTerm Nerd Font Mono 14") ;; PragmataPro Liga
       (setq buffer-face-mode-face 'width-font-face)
       (buffer-face-mode))
-    (:with-mode prog-mode (:hook buffer-font))
-    (:with-mode vterm-mode (:hook buffer-font))
-    (:with-mode nxml-mode (:hook buffer-font))))
+    (:with-mode (vterm-mode nxml-mode latex-mode prog-mode) (:hook buffer-font))))
 
 (setup dimmer
   (:defer (dimmer-mode t))
