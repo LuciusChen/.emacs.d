@@ -170,6 +170,7 @@ With \\[universal-argument] prefix arg, create a new inferior shell buffer even
 if one already exists."
     (interactive)
     (require 'comint)
+    (project-other-window-command)
     (let* ((default-directory (project-root (project-current t)))
            (default-project-shell-name (project-prefixed-buffer-name "shell"))
            (shell-buffer (get-buffer default-project-shell-name)))
