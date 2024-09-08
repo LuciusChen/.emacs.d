@@ -147,7 +147,6 @@
     vterm-toggle
     treesit-auto
     org-cliplink
-    doom-modeline
     markdown-mode
     consult-eglot
     mode-line-bell
