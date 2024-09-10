@@ -135,7 +135,7 @@
   "Compose the default modeline with mode-related information.
 This includes the MEOW status, general status, buffer identification,
 mode name, VC branch, and buffer position."
-  (let ((position '((-3 "%p") " %l:%c " modeline-misc-info)))
+  (let ((position '((-3 "%p") " %l:%c " mode-line-misc-info)))
     (nano-modeline-compose '(:eval (nano-modeline-meow-status))
                            '(:eval (nano-modeline-status))
                            'mode-line-buffer-identification
