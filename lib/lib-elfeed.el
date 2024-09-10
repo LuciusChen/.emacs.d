@@ -86,12 +86,12 @@
     ("https://leancrew.com/all-this/feed/" blog)
     ("https://morss.it/https://www.allthingsdistributed.com/atom.xml" program)
     ("https://samwho.dev/rss.xml" program)
-    ("https://morss.it/https://matt-rickard.com/" program)
+    ("https://morss.it/https://matt-rickard.com/rss" program)
     ("https://guangzhengli.com/index.xml" program)
     ;; Emacs
     ("https://andreyorst.gitlab.io/feed.xml" emacs)
     ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
-    ("https://morss.it/susam.net/" emacs)
+    ("https://morss.it/susam.net/feed.xml" emacs)
     ("https://karthinks.com/index.xml" emacs)
     ;; Forum
 
