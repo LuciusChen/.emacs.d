@@ -111,14 +111,11 @@
 (defun nano-modeline-status ()
   "Return buffer status: read-only (RO), modified (**) or read-write (RW)"
   (cond ((and buffer-file-name (buffer-modified-p))
-         (eval-when-compile
-           (propertize " RW " 'face 'nano-modeline-status-**)))
+         (propertize " RW " 'face 'nano-modeline-status-**))
         (buffer-read-only
-         (eval-when-compile
-           (propertize " RO " 'face 'nano-modeline-status-RO)))
+         (propertize " RO " 'face 'nano-modeline-status-RO))
         (t
-         (eval-when-compile
-           (propertize " RW " 'face 'nano-modeline-status-RW)))))
+         (propertize " RW " 'face 'nano-modeline-status-RW))))
 
 (defun nano-modeline-vc-branch ()
   "Return current VC branch if any."
@@ -131,11 +128,22 @@
                 " "))
     " "))
 
+(defun nano-modeline-text-scale()
+  "Return a string representing the current text scale amount.
+If `text-scale-mode-amount` is non-zero, the string shows the
+text scale amount with a leading '+' or '-' to indicate the direction.
+Returns nil if `text-scale-mode-amount` is zero or not bound."
+  (and (boundp 'text-scale-mode-amount)
+       (/= text-scale-mode-amount 0)
+       (format
+        (if (> text-scale-mode-amount 0) " (%+d)" " (%-d)")
+        text-scale-mode-amount)))
+
 (defun nano-modeline-default-mode ()
   "Compose the default modeline with mode-related information.
 This includes the MEOW status, general status, buffer identification,
 mode name, VC branch, and buffer position."
-  (let ((position '((-3 "%p") " %l:%c " mode-line-misc-info)))
+  (let ((position '((-3 "%p") " %l:%c " mode-line-misc-info (:eval (nano-modeline-text-scale)))))
     (nano-modeline-compose '(:eval (nano-modeline-meow-status))
                            '(:eval (nano-modeline-status))
                            'mode-line-buffer-identification
