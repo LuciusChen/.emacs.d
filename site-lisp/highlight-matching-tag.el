@@ -1,4 +1,4 @@
-;;; highlight-matching-tag.el --- Highlight matching tag
+;;; highlight-matching-tag.el --- Highlight matching tag -*- lexical-binding: t -*-
 
 ;; Filename: highlight-matching-tag.el
 ;; Description: Highlight matching tag
