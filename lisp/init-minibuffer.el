@@ -4,11 +4,39 @@
 (setup mode-line-bell
   (:hook-into after-init))
 
-(setup tecoline
-  (:require tecoline)
-  (setq-default mode-line-buffer-identification
-                '(:propertize "%12b" face nano-modeline-name)
-                mode-line-format (nano-modeline-default-mode)))
+(setup doom-modeline
+  (:defer (:require doom-modeline))
+  (:when-loaded
+    (doom-modeline-mode)
+    (:option doom-modeline-height 18
+             doom-modeline-buffer-file-name-style 'auto
+             doom-modeline-buffer-modification-icon t
+             doom-modeline-bar-width 4
+             doom-modeline-hud t
+             doom-modeline-hud-min-height 1)
+    (doom-modeline-def-segment +buffer-info
+      "Customize doom-modeline to remove modification indication"
+      (let ((buffer-name (doom-modeline--buffer-name)))
+        (when (derived-mode-p 'telega-chat-mode 'org-agenda-mode)
+          (setq buffer-name
+                (propertize buffer-name 'face
+                            `(:inherit doom-modeline))))
+        (concat
+         (doom-modeline-spc)
+         (doom-modeline--buffer-mode-icon)
+         (doom-modeline--buffer-state-icon)
+         buffer-name)))
+
+    (doom-modeline-def-modeline 'disbale-modification-indication
+      '(bar workspace-name window-number modals +buffer-info selection-info)
+      '(misc-info minor-modes buffer-encoding major-mode time))
+
+    (:hooks doom-modeline-mode-hook
+            (lambda ()
+              (doom-modeline-set-modeline 'disbale-modification-indication 'default)))
+
+    (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disbale-modification-indication))
+    (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disbale-modification-indication))))
 
 (setup vertico
   (:defer (:require vertico))

@@ -118,6 +118,7 @@
     js2-mode
     move-dup
     diminish
+    doom-modeline
     org-roam
     git-link
     webpaste
