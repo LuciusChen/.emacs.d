@@ -22,6 +22,13 @@
 
 ;; For a full copy of the GNU General Public License
 ;; see <https://www.gnu.org/licenses/>.
+
+;; (setup tecoline
+;;   (:require tecoline)
+;;   (setq-default mode-line-buffer-identification
+;;                 '(:propertize "%12b" face nano-modeline-name)
+;;                 mode-line-format (nano-modeline-default-mode)))
+
 (defgroup nano-modeline nil
   "T E C O Modeline"
   :group 'nano)
