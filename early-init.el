@@ -162,7 +162,7 @@
 
     ;; Shave seconds off startup time by starting the scratch buffer in
     ;; `fundamental-mode'
-    (setq initial-major-mode 'fundamental-mode
+    (setq initial-major-mode 'lisp-interaction-mode
           initial-scratch-message nil)))
 
 ;;; Disable unneeded UI elements
