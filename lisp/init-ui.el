@@ -110,9 +110,7 @@
 (setup tab-bar
   (:defer (:require tab-bar))
   (:when-loaded
-    (:global "s-{" tab-bar-switch-to-prev-tab
-             "s-}" tab-bar-switch-to-next-tab
-             "s-t" tab-bar-new-tab
+    (:global "s-t" tab-bar-new-tab
              "s-w" tab-bar-close-tab)
     (:require lib-tabbar)
     (:option tab-bar-separator ""
