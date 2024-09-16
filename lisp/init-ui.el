@@ -84,10 +84,11 @@
               "\\*Async Shell Command\\*"
               help-mode
               compilation-mode)
-             ("\\*Org Select\\*$")
-             ("\\*chatgpt\\*$")
              ("\\*Help\\*$")
+             ("\\*xref\\*$")
+             ("\\*chatgpt\\*$")
              ("\\*vterm\\*$")
+             ("\\*Org Select\\*$")
              ("\\*Telega User\\*$")
              ("\\*Telegram Chat Info\\*$")
              ("\\*Telegram Message Info\\*$")
