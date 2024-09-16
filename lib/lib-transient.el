@@ -79,7 +79,7 @@ ARGS should be a list where the first element is the path to the repositories."
          (file (completing-read "Find file: " files nil t)))
     (find-file (file-name-concat repopath file))))
 
-(defun lucius/java-to-xml-mapper ()
+(defun +java-to-xml-mapper ()
   "Jump from a Java mapper file to the corresponding XML mapper file.
 If the cursor is on a method name in the Java file, jump to the corresponding
 method definition in the XML file."

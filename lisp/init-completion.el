@@ -109,9 +109,9 @@
   (:when-loaded (eglot-booster-mode)))
 
 (setup xref
-  ;; 用 Popper 替代了 lucius/xref-show-xrefs 以及 :option 配置
+  ;; 用 Popper 替代了 +xref-show-xrefs 以及 :option 配置
   ;;
-  ;;   (defun lucius/xref-show-xrefs (fetcher display-action)
+  ;;   (defun +xref-show-xrefs (fetcher display-action)
   ;;     "Display some Xref values produced by FETCHER using DISPLAY-ACTION.
   ;; Do not jump to the first xref, just move the focus to the xref window."
   ;;     (let ((buf (xref--show-xref-buffer fetcher
@@ -122,14 +122,14 @@
   ;;         (when window
   ;;           (select-window window)))))
 
-  (defun lucius/xref-quit-window ()
+  (defun +xref-quit-window ()
     "Quit the xref window."
     (let ((xref-window (get-buffer-window "*xref*")))
       (when xref-window
         (quit-window nil xref-window))))
 
   ;; (:option xref-auto-jump-to-first-xref t
-  ;;          xref-show-xrefs-function #'lucius/xref-show-xrefs)
-  (:hooks xref-after-jump-hook lucius/xref-quit-window))
+  ;;          xref-show-xrefs-function #'+xref-show-xrefs)
+  (:hooks xref-after-jump-hook +xref-quit-window))
 (provide 'init-completion)
 ;;; init-completion.el ends here
