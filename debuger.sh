@@ -16,4 +16,5 @@ rm latest-vscode-js-debug.tar.gz
 cd ~/.emacs.d/debug-adapters
 git clone https://github.com/microsoft/java-debug.git
 cd java-debug
+# add `-U`' to force update.
 ./mvnw clean install
