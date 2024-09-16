@@ -58,7 +58,8 @@
                           `("-data" ,data-dir)
                           `(:initializationOptions
                             (:bundles
-                             [,(file-truename "~/.emacs.d/debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-0.53.0.jar")]))))) ;; ~/.emacs.d/debuger.sh
+                             ;; ~/.emacs.d/debuger.sh
+                             [,(file-truename "~/.emacs.d/debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-0.53.0.jar")])))))
     contact))
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here
