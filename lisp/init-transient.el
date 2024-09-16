@@ -53,7 +53,7 @@
         ("D" "find-references" xref-find-references)
         ("i" "find-impl" eglot-find-implementation)
         ("s" "find-symbols" xref-find-apropos)
-        ("x" "find-mapper-xml" lucius/java-to-xml-mapper)
+        ("x" "find-mapper-xml" +java-to-xml-mapper)
         ("o" "find-def-other-window" xref-find-definitions-other-window)
         ]
        ["Code action"
