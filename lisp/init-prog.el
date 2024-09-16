@@ -164,7 +164,9 @@
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
 
-;; Java and JS --> ~/.emacs.d/debuger.sh
+;; Java and JS --> ~/.emacs.d/debuger.sh (chmod 777 debuger.sh)
+;; if build failed, see https://github.com/microsoft/java-debug/issues/569
+;; add `-U`' to force update.
 
 ;; Python
 ;; $ pipx install debugpy
