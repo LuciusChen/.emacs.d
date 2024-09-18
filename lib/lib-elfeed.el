@@ -93,6 +93,7 @@
     ("https://morss.it/https://blog.dornea.nu/feed.xml" emacs)
     ("https://morss.it/susam.net/feed.xml" emacs)
     ("https://karthinks.com/index.xml" emacs)
+    ("https://lepisma.xyz/atom.xml" emacs)
     ;; Forum
 
     ;; Economics
