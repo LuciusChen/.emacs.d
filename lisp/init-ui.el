@@ -3,9 +3,9 @@
 ;;; Code:
 (setup frame
   (:when-loaded
-    (let ((no-border '(internal-border-width . 0)))
-      (add-to-list 'default-frame-alist no-border)
-      (add-to-list 'initial-frame-alist no-border))))
+    (let ((border '(internal-border-width . 12)))
+      (add-to-list 'default-frame-alist border)
+      (add-to-list 'initial-frame-alist border))))
 
 ;; Non-zero values for `line-spacing' can mess up ansi-term and co,
 ;; so we zero it explicitly in those cases.
