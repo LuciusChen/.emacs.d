@@ -203,5 +203,4 @@
 (setq tab-bar-mode t)
 
 (provide 'early-init)
-
 ;;; early-init.el ends here

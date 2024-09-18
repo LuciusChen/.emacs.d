@@ -22,17 +22,6 @@
 (defconst *IS-LINUX* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
 (defconst *org-path* "~/Library/CloudStorage/Dropbox/org")
 
-(when *IS-MAC*
-  ;; modify meta from ⌥ to ⌘
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'super)
-  ;; Make mouse wheel / trackpad scrolling less jerky
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
-  (dolist (multiple '("" "double-" "triple-"))
-    (dolist (direction '("right" "left"))
-      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
-  (global-set-key (kbd "M-`") 'ns-next-frame))
-
 ;; Install straight.el
 ;; branch develop
 ;; (setq straight-repository-branch "develop")
@@ -107,7 +96,6 @@
     consult
     mmm-mode
     ox-hugo
-    posframe
     scratch
     diff-hl
     company
@@ -170,7 +158,6 @@
     (meow :host github :repo "meow-edit/meow")
     (dape :host github :repo "svaante/dape")
     (gptel :host github :repo "LuciusChen/gptel")
-    (gptel-quick :host github :repo "karthink/gptel-quick")
     (telega :host github :repo "LuciusChen/telega.el")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (dashboard :host github :repo "LuciusChen/dashboard")
@@ -195,6 +182,7 @@
 (require 'init-setup)
 (require 'init-builtin)
 (require 'init-ui)
+(when *IS-MAC* (require 'init-mac))
 
 (require 'init-editing)
 (require 'init-vc)
