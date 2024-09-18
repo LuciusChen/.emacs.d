@@ -171,8 +171,7 @@
 ;; Python
 ;; $ pipx install debugpy
 (setup dape
-  (:with-mode prog-mode
-    (:require dape))
+  (:defer (:require dape))
   (:when-loaded
     (:global "<f5>" dape)
     (:option dape-buffer-window-arrangement 'right)
@@ -180,15 +179,15 @@
     (:hook dape-start-hook (lambda () (save-some-buffers t t)))))
 
 (setup pyvenv
-  (:with-mode (python-mode python-ts-mode)
-    (:require pyvenv)
-    (:when-loaded
-      (:option pyvenv-post-activate-hooks
-               (list (lambda ()
-                       (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
-      pyvenv-post-deactivate-hooks
-      (list (lambda ()
-              (setq python-shell-interpreter "python3"))))))
+  (:defer (:require pyvenv))
+  (:when-loaded
+    (pyvenv-mode t)
+    (:option pyvenv-post-activate-hooks
+             (list (lambda ()
+                     (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3"))))
+             pyvenv-post-deactivate-hooks
+             (list (lambda ()
+                     (setq python-shell-interpreter "python3"))))))
 
 (setup separedit
   (:defer (:require separedit))
