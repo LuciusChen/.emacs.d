@@ -100,11 +100,46 @@ A scope may be provided to a commit's type, to provide additional contextual inf
 
 (setup forge
   (:load-after magit)
-  ;; Make it easier to see that a topic was closed.
   (:when-loaded
+    ;; Make it easier to see that a topic was closed.
     (:face forge-topic-closed ((t (:strike-through t))))
     ;; 这里的 token 还是放在 .authinfo 当中，备份在 pass 中。
     ;; 因为文件名不支持 192.168.1.220:9081/api/v4 的格式，因此不能直接存在 pass 中。
+    ;; 利用函数检查条目，从 pass 中读取密码创建 .authinfo 条目。
+    (defun get-pass-entry (entry)
+      "Get the first line of the pass entry."
+      (let ((output (shell-command-to-string (concat "pass show " entry " | head -n 1"))))
+        (replace-regexp-in-string "\\`[ \t\n\r]+\\|[ \t\n\r]+\\'" "" output)))
+
+    (defun check-and-update-authinfo ()
+      "Check if the specific entry exists in .authinfo, if not, insert it from pass."
+      (let ((authinfo-file "~/.authinfo")
+            (machine "192.168.1.220:9081/api/v4")
+            (login "lucius^forge")
+            (pass-entry "authinfo/gitlab-zj"))
+        ;; Check if .authinfo file exists
+        (unless (file-exists-p authinfo-file)
+          (with-temp-buffer
+            (let ((password (get-pass-entry pass-entry)))
+              (insert (format "machine %s login %s password %s\n" machine login password))
+              (write-region (point-min) (point-max) authinfo-file)
+              (message "File created and entry added."))))
+        ;; Check if the specific entry exists in .authinfo
+        (let ((entry-found nil))
+          (with-temp-buffer
+            (insert-file-contents authinfo-file)
+            (setq entry-found (re-search-forward (format "machine %s login %s" (regexp-quote machine) (regexp-quote login)) nil t)))
+          (unless entry-found
+            (let ((password (get-pass-entry pass-entry)))
+              (with-temp-buffer
+                (insert-file-contents authinfo-file)
+                (goto-char (point-max))
+                (insert (format "machine %s login %s password %s\n" machine login password))
+                (write-region (point-min) (point-max) authinfo-file)
+                (message "Entry added.")))))))
+
+    (check-and-update-authinfo)
+
     (add-to-list 'forge-alist
                  '("192.168.1.220:9081" "192.168.1.220:9081/api/v4"
                    "192.168.1.220:9081" forge-gitlab-repository))
