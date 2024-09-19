@@ -1,4 +1,6 @@
-;; -*- lexical-binding: t -*-
+;;; init-minimum.el --- Insert description here -*- lexical-binding: t -*-
+;;; Commentary:
+;;; Code:
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
 (setq debug-on-error t)
@@ -157,3 +159,4 @@ See `advice-add' for more details."
   :after-loaded t)
 ;; ==== put your code below this line! ====
 ;; emacs -Q -l ~/.emacs.d/init-minimum.el
+;;; init-minimum.el ends here

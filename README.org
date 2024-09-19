@@ -19,13 +19,7 @@
 
 例如添加透明 patch，需要在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@30.rb= 中添加 =local_patch "ns-alpha-background", sha: "eae9abd14c2d00315806116e0eaba09510e98738b420d6e40a9d7d97d9437b81"= 并把 ns-alpha-background.patch 文件放在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-30=  下。
 ** .authinfo
-#+begin_example
-machine api.openai.com login apikey password ****
-machine matrix.org login @lucius_chen:matrix.org  password ****
-machine api.github.com login LuciusChen^forge password ****
-#+end_example
-
-Matrix 的 key 是在 All Settings -> Help & About 当中的 Access Token 处获取。
+这一块全部存入 pass 后开启 =auth-source-pass-enable= 自动读取，其中自建的 gitlab 的 =machine= 值必须是 =192.168.1.220:9081/api/v4= 格式，不能存入 pass。因此我换了名字存入 pass，写了函数自动读取写入 =.authinfo= 中，自动化这个配置过程。
 ** Reader
 [[file:assets/org.png]]
 用过一段时间的 [[https://read.readwise.io][Readwise Reader]]，选择其的原因在于可以配合沉浸式翻译，达到快速阅读英文书籍及文章的目的。但是目前在 Emacs 当中也可以通过 gpt 的应用达到相同的目的。
