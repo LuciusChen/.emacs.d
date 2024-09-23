@@ -147,7 +147,9 @@
 (setup treesit-auto
   (:autoload global-treesit-auto-mode)
   (:option treesit-auto-install 'prompt)
-  (:when-loaded (global-treesit-auto-mode)))
+  (:when-loaded
+    (treesit-auto-add-to-auto-mode-alist 'all)
+    (global-treesit-auto-mode)))
 
 (setup indent-bars
   (:with-mode (java-ts-mode python-ts-mode)
