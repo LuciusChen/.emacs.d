@@ -207,8 +207,9 @@ unreadable. Returns the names of envvars that were changed."
     password-store-otp
     password-store
     (emt :host github :repo "roife/emt")
-    (meow :host github :repo "meow-edit/meow")
     (dape :host github :repo "svaante/dape")
+    (meow :host github :repo "meow-edit/meow")
+    (eee :host github :repo "eval-exec/eee.el" :files (:defaults "*.el" "*.sh"))
     (gptel :host github :repo "LuciusChen/gptel")
     (telega :host github :repo "LuciusChen/telega.el")
     (yasnippet :host github :repo "joaotavora/yasnippet")

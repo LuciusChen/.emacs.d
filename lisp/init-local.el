@@ -42,5 +42,20 @@ If DEST, a buffer, is provided, insert the markup there."
           (goto-char next))))
     (pop-to-buffer buff)
     (goto-char (point-min))))
+
+(setup eee
+  (:defer (:require eee)
+          (:option ee-terminal-command "wezterm")))
+
+(defun ee-git-diff--callback(_process)
+  (message "ee-git-diff--callback"))
+
+(defun ee-git-diff()
+  (interactive)
+  (let* ((working-directory (ee-get-project-dir-or-current-dir))
+         (full-command (format  "cd %s && osascript -e 'tell application \"WezTerm\" to activate' && PAGER=delta git diff HEAD~1"
+                                working-directory)))
+    (ee-start-process-shell-command-in-terminal
+     "ee-git-diff" full-command #'ee-git-diff--callback)))
 (provide 'init-local)
 ;;; init-local.el ends here
