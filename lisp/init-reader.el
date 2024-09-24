@@ -79,8 +79,11 @@
 
 (setup go-translate
   (:defer (:require go-translate)
-          (:global "C-c g" gt-do-translate))
+          (:global "C-c s g" gt-do-translate
+                   "C-c s s" gt-do-setup
+                   "C-c s p" gt-do-speak))
   (:when-loaded
+    (:also-load gt-extension)
     (:option gt-langs '(en zh)
              gt-buffer-render-follow-p t
              gt-buffer-render-window-config
@@ -98,15 +101,52 @@
                        (encode-coding-string (funcall secret) 'utf-8)
                      secret)
                  (user-error "No `gptel-api-key' found in the auth source")))
-             gt-default-translator
-             (gt-translator
-              :engines (list (gt-chatgpt-engine :if 'not-word)
-                             (gt-deepl-engine :if 'not-word :cache nil)
-                             (gt-google-engine :if 'word)
-                             ;; (gt-bing-engine :if '(and not-word parts)) ; 只有翻译内容不是单词且是多个段落时启用
-                             (gt-youdao-dict-engine :if '(or src:zh tgt:zh)) ; 只有翻译中文时启用
-                             (gt-youdao-suggest-engine :if '(and word src:en)))
-              :render  (gt-buffer-render)))))
+             gt-preset-translators
+             `((default . ,(gt-translator
+                            :taker (list (gt-taker :pick nil :if 'selection)
+                                         ;; (gt-taker :text 'paragraph :pick 'gt-text-at-point :if 'pdf-view-mode)
+                                         (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
+                                         (gt-taker :text 'word))
+                            :engines (list (gt-deepl-engine :if 'not-word :cache nil)
+                                           (gt-chatgpt-engine :if 'not-word)
+                                           (gt-google-engine :if 'word)
+                                           ;; (gt-bing-engine :if '(and not-word parts)) ; 只有翻译内容不是单词且是多个段落时启用
+                                           (gt-youdao-dict-engine :if '(or src:zh tgt:zh)) ; 只有翻译中文时启用
+                                           (gt-youdao-suggest-engine :if '(and word src:en)))
+                            :render  (list (gt-overlay-render :if 'read-only)
+                                           (gt-buffer-render))))
+               ;; gt-insert-render
+               (after-source-insert . ,(gt-translator
+                                        :taker (gt-taker :text 'buffer :pick 'paragraph)
+                                        :engines (gt-google-engine)
+                                        :render (gt-insert-render :type 'after)))
+               (replace-source-chat-insert . ,(gt-translator
+                                               :taker (gt-taker :text 'paragraph :pick nil)
+                                               :engines (gt-google-engine)
+                                               :render (gt-insert-render :type 'replace)))
+               (only-translate-rare-insert . ,(gt-translator
+                                               :taker (gt-taker :text 'paragraph
+                                                                :pick 'word
+                                                                :pick-pred (lambda (w) (length> w 6)))
+                                               :engines (gt-google-engine)
+                                               :render (gt-insert-render :type 'after
+                                                                         :rfmt " (%s)"
+                                                                         :rface '(:foreground "grey"))))
+               ;; gt-overlay-render
+               (after-source-overlay . ,(gt-translator
+                                         :taker (gt-taker :text 'buffer :pick 'paragraph)
+                                         :engines (gt-google-engine)
+                                         :render (gt-overlay-render :type 'after
+                                                                    :sface nil
+                                                                    :rface 'font-lock-doc-face)))
+               (only-translate-rare-overlay . ,(gt-translator
+                                                :taker (gt-taker :text 'buffer :pick 'word :pick-pred (lambda (w) (length> w 5)))
+                                                :engines (gt-google-engine)
+                                                :render (gt-overlay-render :type 'after
+                                                                           :sface nil
+                                                                           :rfmt "%s"
+                                                                           :rdisp '(space (:width 0.3) raise 0.6)
+                                                                           :rface '(:foreground "grey" :height 0.5))))))))
 
 (setup elfeed
   (:global "C-x w" elfeed)
