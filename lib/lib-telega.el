@@ -85,12 +85,5 @@ NOTE: macOS only."
                    :caption (telega-fmt-text "#copyleft")
                    :disable_content_type_detection nil))
             (message (format "Saved to cloud: %s" fname))))))))
-
-(defun lg-telega-root-mode ()
-  (hl-line-mode 1))
-
-(defun lg-telega-chat-update (chat)
-  (with-telega-root-buffer
-    (hl-line-highlight)))
 (provide 'lib-telega)
 ;;; lib-telega.el ends here

@@ -198,6 +198,18 @@ if one already exists."
     ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
     (diminish 'auto-revert-mode)))
 
+(setup hl-line (global-hl-line-mode))
+
+(setup faces
+  (defun +suggest-other-faces (func &rest args)
+    (if global-hl-line-mode
+        (progn
+          (global-hl-line-mode -1)
+          (prog1 (apply func args)
+            (global-hl-line-mode 1)))
+      (apply func args)))
+  (:advice face-at-point :around #'+suggest-other-faces))
+
 (setup recentf
   (:hook-into after-init)
   (:when-loaded
