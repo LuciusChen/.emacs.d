@@ -100,7 +100,7 @@
                  (user-error "No `gptel-api-key' found in the auth source")))
              gt-default-translator
              (gt-translator
-              :engines (list (gt-chatgpt-engine :if '(and not-word parts))
+              :engines (list (gt-chatgpt-engine :if 'not-word)
                              (gt-google-engine :if 'word)
                              ;; (gt-bing-engine :if '(and not-word parts)) ; 只有翻译内容不是单词且是多个段落时启用
                              (gt-youdao-dict-engine :if '(or src:zh tgt:zh)) ; 只有翻译中文时启用
