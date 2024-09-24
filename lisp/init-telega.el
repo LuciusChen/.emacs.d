@@ -108,9 +108,7 @@
     ;; ignore messages from blocked senders (users or chats)
     (add-hook 'telega-msg-ignore-predicates
               (telega-match-gen-predicate 'msg '(sender is-blocked)))
-    ;; 聊天列表高亮
-    ;; https://github.com/zevlg/telega.el/wiki/Configuration-snippets
-    (:with-mode telega-root-mode (:hook lg-telega-root-mode))
+
     (:with-mode telega-chat-mode
       (:require company)
       (:hook +telega-completion-setup)
