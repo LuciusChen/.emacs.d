@@ -77,12 +77,35 @@
 以下是你要处理的文本
 ==="))))
 
-(setup immersive-translate
-  (:option immersive-translate-backend 'chatgpt
-           immersive-translate-chatgpt-host "api.openai.com")
-  (:with-mode elfeed-show-mode
-    (:hook immersive-translate-setup))
-  (:hooks nov-pre-html-render-hook immersive-translate-setup))
+(setup go-translate
+  (:defer (:require go-translate)
+          (:global "C-c g" gt-do-translate))
+  (:when-loaded
+    (:option gt-langs '(en zh)
+             gt-buffer-render-follow-p t
+             gt-buffer-render-window-config
+             '((display-buffer-reuse-window display-buffer-in-direction)
+               (direction . bottom)
+               (window-height . 0.4))
+             gt-chatgpt-key
+             (lambda ()
+               (if-let* ((auth-info (car (auth-source-search
+                                          :host "api.openai.com"
+                                          :user "apikey"
+                                          :require '(:secret))))
+                         (secret (plist-get auth-info :secret)))
+                   (if (functionp secret)
+                       (encode-coding-string (funcall secret) 'utf-8)
+                     secret)
+                 (user-error "No `gptel-api-key' found in the auth source")))
+             gt-default-translator
+             (gt-translator
+              :engines (list (gt-chatgpt-engine :if '(and not-word parts))
+                             (gt-google-engine :if 'word)
+                             ;; (gt-bing-engine :if '(and not-word parts)) ; 只有翻译内容不是单词且是多个段落时启用
+                             (gt-youdao-dict-engine :if '(or src:zh tgt:zh)) ; 只有翻译中文时启用
+                             (gt-youdao-suggest-engine :if '(and word src:en)))
+              :render  (gt-buffer-render)))))
 
 (setup elfeed
   (:global "C-x w" elfeed)

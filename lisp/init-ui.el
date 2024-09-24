@@ -55,7 +55,7 @@
             server-after-make-frame-hook +setup-fonts)
     (defun buffer-font()
       (make-face 'width-font-face)
-      (set-face-attribute 'width-font-face nil :font "PragmataPro Liga 14") ;; PragmataPro Liga ;; iosevkaTerm Nerd Font Mono
+      (set-face-attribute 'width-font-face nil :font "iosevkaTerm Nerd Font Mono 14") ;; PragmataPro Liga
       (setq buffer-face-mode-face 'width-font-face)
       (buffer-face-mode))
     (:with-mode (vterm-mode nxml-mode latex-mode prog-mode) (:hook buffer-font))))

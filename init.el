@@ -206,6 +206,7 @@ unreadable. Returns the names of envvars that were changed."
     whitespace-cleanup-mode
     password-store-otp
     password-store
+    go-translate
     (emt :host github :repo "roife/emt")
     (dape :host github :repo "svaante/dape")
     (meow :host github :repo "meow-edit/meow")
@@ -220,7 +221,6 @@ unreadable. Returns the names of envvars that were changed."
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
-    (immersive-translate :host github :repo "Elilif/emacs-immersive-translate")
     (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))
     (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))))
 
