@@ -84,6 +84,13 @@
                    "C-c s p" gt-do-speak))
   (:when-loaded
     (:also-load gt-extension)
+
+    (cl-defmethod gt-text :around ((taker gt-taker) translator)
+      "Extend the original gt-text method to handle pdf-view-mode."
+      (if (eq major-mode 'pdf-view-mode)
+          (gt-text-at-point nil 'pdf-view-mode)
+        (cl-call-next-method)))
+
     (:option gt-langs '(en zh)
              gt-buffer-render-follow-p t
              gt-buffer-render-window-config
@@ -104,16 +111,16 @@
              gt-preset-translators
              `((default . ,(gt-translator
                             :taker (list (gt-taker :pick nil :if 'selection)
-                                         ;; (gt-taker :text 'paragraph :pick 'gt-text-at-point :if 'pdf-view-mode)
+                                         ;; (gt-taker :text 'paragraph :pick #'gt-text-at-point :if 'pdf-view-mode)
                                          (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
                                          (gt-taker :text 'word))
                             :engines (list (gt-deepl-engine :if 'not-word :cache nil)
                                            (gt-chatgpt-engine :if 'not-word)
                                            (gt-google-engine :if 'word)
                                            ;; (gt-bing-engine :if '(and not-word parts)) ; 只有翻译内容不是单词且是多个段落时启用
-                                           (gt-youdao-dict-engine :if '(or src:zh tgt:zh)) ; 只有翻译中文时启用
+                                           (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
                                            (gt-youdao-suggest-engine :if '(and word src:en)))
-                            :render  (list (gt-overlay-render :if 'read-only)
+                            :render  (list (gt-overlay-render :if '(Info-mode help-mode helpful-mode devdocs-mode))
                                            (gt-buffer-render))))
                ;; gt-insert-render
                (after-source-insert . ,(gt-translator
