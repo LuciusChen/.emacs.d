@@ -83,7 +83,6 @@
                    "C-c s s" gt-do-setup
                    "C-c s p" gt-do-speak))
   (:when-loaded
-    (:also-load gt-extension)
 
     (cl-defmethod gt-text :around ((taker gt-taker) translator)
       "Extend the original gt-text method to handle pdf-view-mode."
