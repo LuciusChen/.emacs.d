@@ -149,10 +149,8 @@
                                                 :taker (gt-taker :text 'buffer :pick 'word :pick-pred (lambda (w) (length> w 5)))
                                                 :engines (gt-google-engine)
                                                 :render (gt-overlay-render :type 'after
-                                                                           :sface nil
-                                                                           :rfmt "%s"
-                                                                           :rdisp '(space (:width 0.3) raise 0.6)
-                                                                           :rface '(:foreground "grey" :height 0.5))))))))
+                                                                           :rfmt "(%s)"
+                                                                           :rface '(:foreground "grey"))))))))
 
 (setup elfeed
   (:global "C-x w" elfeed)
