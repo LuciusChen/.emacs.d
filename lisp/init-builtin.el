@@ -44,7 +44,7 @@
             truncate-partial-width-windows nil
             history-length 1000
             use-short-answers t
-            ;; 改善 CJK 换行
+            ;; Improve CJK wrapping
             word-wrap-by-category t
             read-process-output-max (* 1024 1024)
             ;; Suppress GUI features
