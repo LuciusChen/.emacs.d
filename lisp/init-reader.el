@@ -110,13 +110,12 @@
              gt-preset-translators
              `((default . ,(gt-translator
                             :taker (list (gt-taker :pick nil :if 'selection)
-                                         ;; (gt-taker :text 'paragraph :pick #'gt-text-at-point :if 'pdf-view-mode)
                                          (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
                                          (gt-taker :text 'word))
                             :engines (list (gt-deepl-engine :if 'not-word :cache nil)
                                            (gt-chatgpt-engine :if 'not-word)
                                            (gt-google-engine :if 'word)
-                                           ;; (gt-bing-engine :if '(and not-word parts)) ; 只有翻译内容不是单词且是多个段落时启用
+                                           ;; (gt-bing-engine :if '(and not-word parts))
                                            (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
                                            (gt-youdao-suggest-engine :if '(and word src:en)))
                             :render  (list (gt-overlay-render :if '(Info-mode help-mode helpful-mode devdocs-mode))
