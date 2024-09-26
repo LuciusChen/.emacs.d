@@ -96,26 +96,26 @@
              '((display-buffer-reuse-window display-buffer-in-direction)
                (direction . bottom)
                (window-height . 0.4))
-             gt-chatgpt-key
-             (lambda ()
-               (if-let* ((auth-info (car (auth-source-search
-                                          :host "api.openai.com"
-                                          :user "apikey"
-                                          :require '(:secret))))
-                         (secret (plist-get auth-info :secret)))
-                   (if (functionp secret)
-                       (encode-coding-string (funcall secret) 'utf-8)
-                     secret)
-                 (user-error "No `gptel-api-key' found in the auth source")))
+             ;; Commenting out this code requires turning on auth-source-pass-enable.
+             ;; gt-chatgpt-key
+             ;; (lambda ()
+             ;;   (if-let* ((auth-info (car (auth-source-search
+             ;;                              :host "api.openai.com"
+             ;;                              :user "apikey"
+             ;;                              :require '(:secret))))
+             ;;             (secret (plist-get auth-info :secret)))
+             ;;       (if (functionp secret)
+             ;;           (encode-coding-string (funcall secret) 'utf-8)
+             ;;         secret)
+             ;;     (user-error "No `gptel-api-key' found in the auth source")))
              gt-preset-translators
              `((default . ,(gt-translator
                             :taker (list (gt-taker :pick nil :if 'selection)
                                          (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
                                          (gt-taker :text 'word))
-                            :engines (list (gt-deepl-engine :if 'not-word :cache nil)
-                                           (gt-chatgpt-engine :if 'not-word)
+                            :engines (list (gt-deepl-engine :pro t :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
+                                           ;; (gt-chatgpt-engine :if 'not-word)
                                            (gt-google-engine :if 'word)
-                                           ;; (gt-bing-engine :if '(and not-word parts))
                                            (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
                                            (gt-youdao-suggest-engine :if '(and word src:en)))
                             :render  (list (gt-overlay-render :if '(Info-mode help-mode helpful-mode devdocs-mode))

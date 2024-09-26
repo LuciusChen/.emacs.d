@@ -121,6 +121,7 @@ unreadable. Returns the names of envvars that were changed."
      :pin nil)
     nov
     sis
+    plz
     avy
     mpv
     cape
