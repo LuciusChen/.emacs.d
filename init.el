@@ -212,7 +212,7 @@ unreadable. Returns the names of envvars that were changed."
     (dape :host github :repo "svaante/dape")
     (meow :host github :repo "meow-edit/meow")
     (eee :host github :repo "eval-exec/eee.el" :files (:defaults "*.el" "*.sh"))
-    (gptel :host github :repo "LuciusChen/gptel")
+    (gptel :host github :repo "karthink/gptel" :branch "feature-capabilities")
     (telega :host github :repo "LuciusChen/telega.el")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (dashboard :host github :repo "LuciusChen/dashboard")
