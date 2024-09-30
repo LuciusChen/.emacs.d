@@ -1,7 +1,7 @@
 ;;; popup-frames.el --- Create popup frames for specific commands -*- lexical-binding: t; -*-
 
-;; Author: Your Name <your.email@example.com>
-;; URL: https://github.com/yourusername/popup-frames
+;; Author: Protesilaos Stavrou
+;; URL: https://protesilaos.com/codelog/2024-09-19-emacs-command-popup-frame-emacsclient/
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "24.3"))
 
