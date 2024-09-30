@@ -43,6 +43,16 @@ If DEST, a buffer, is provided, insert the markup there."
     (pop-to-buffer buff)
     (goto-char (point-min))))
 
+(defun +git-link-interactive ()
+  "Open the Git repository homepage interactively.
+
+This function sets the default directory to the root of the current project
+and then prompts the user to generate a URL for the project's repository
+using `git-link-homepage`, which is opened in the user's web browser."
+  (interactive)
+  (let ((default-directory (project-root (project-current t))))
+    (browse-url (call-interactively #'git-link-homepage))))
+
 (setup eee
   (:defer (:require eee)
           (:option ee-terminal-command "wezterm")))

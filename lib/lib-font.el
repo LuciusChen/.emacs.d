@@ -31,7 +31,7 @@
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
-                      (font-spec :family "LXGW WenKai Screen")))
+                      (font-spec :family "LXGW WenKai")))
   ;; Setting fall-back fonts
   ;; https://idiocy.org/emacs-fonts-and-fontsets.html
   (dolist (font '("Jigmo" "Jigmo2" "Jigmo3"))
