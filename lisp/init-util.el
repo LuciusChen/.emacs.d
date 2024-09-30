@@ -1,6 +1,8 @@
 ;;; init-util.el --- util -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+(setup popup-frames (:defer (:require popup-frames)))
+
 (setup dired-hacks
   (:load-after dired)
   (:when-loaded

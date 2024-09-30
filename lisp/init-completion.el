@@ -51,7 +51,7 @@
              [tab]  corfu-next
              "S-TAB"  corfu-previous
              [backtab]  corfu-previous))
-    (:with-mode eshell-mode
+    (:with-mode vterm-mode
       (:hook (lambda () (setq-local corfu-auto nil)))
       (setq-default corfu-auto t)
       (setq-default corfu-quit-no-match 'separator))))
