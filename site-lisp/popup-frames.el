@@ -8,10 +8,12 @@
 ;;; Commentary:
 
 ;; This package provides functionality to create popup frames for specific
-;; commands. It also integrates with other packages like `org-capture` and
+;; commands.  It also integrates with other packages like `org-capture` and
 ;; `password-store` if they are available.
 
 ;;; Code:
+(eval-when-compile
+  (require 'server))
 
 (defun popup-frame-delete (&rest _)
   "Kill selected frame if it has parameter `popup-frame'."
@@ -19,7 +21,16 @@
     (delete-frame)))
 
 (defmacro popup-frame-define (command title &optional delete-frame)
-  "Define interactive function to call COMMAND in frame with TITLE."
+  "Define an interactive function to call COMMAND in a frame with TITLE.
+
+COMMAND is the function to be called when the popup frame is opened.
+TITLE is the title of the popup frame.
+
+If DELETE-FRAME is non-nil, the popup frame will be deleted after
+the command is executed. Otherwise, the frame will remain open.
+
+The function created will be named `popup-frame-COMMAND', where
+COMMAND is the name of the provided command."
   `(defun ,(intern (format "popup-frame-%s" command)) ()
      (interactive)
      (let* ((frame (make-frame
@@ -48,22 +59,6 @@
   (unless (server-running-p)
     (server-start)))
 
-(defun chatgpt-translate ()
-  "Prompt for text to translate and copy the result to the clipboard.
-This function uses ChatGPT to perform the translation and returns
-only the translated content."
-  (interactive)
-  (let* ((gt-chatgpt-system-prompt "你是资深的中英文翻译，只返回翻译后的内容。")
-         (gt-chatgpt-user-prompt-template (lambda (text _)
-                                            (read-string
-                                             "Prompt: "
-                                             (format "帮我翻译以下内容: %s" text)))))
-
-    (gt-start (gt-translator
-               :taker (gt-taker :langs '(en zh) :text 'buffer :pick nil :prompt t)
-               :engines (gt-chatgpt-engine :cache nil)
-               :render (gt-kill-ring-render)))))
-
 ;; This code defines popup frames for specific commands after loading the respective packages.
 ;; The naming convention for the commands follows a pattern:
 ;; Each command is defined with `popup-frame-define`, and can be invoked using `emacsclient`
@@ -83,6 +78,21 @@ only the translated content."
   (popup-frame-define password-store-copy "minimal-popup" 'delete-frame))
 
 (with-eval-after-load 'go-translate
+  (defun chatgpt-translate ()
+    "Prompt for text to translate and copy the result to the clipboard.
+This function uses ChatGPT to perform the translation and returns
+only the translated content."
+    (interactive)
+    (let* ((gt-chatgpt-system-prompt "你是资深的中英文翻译，只返回翻译后的内容。")
+           (gt-chatgpt-user-prompt-template (lambda (text _)
+                                              (read-string
+                                               "Prompt: "
+                                               (format "帮我翻译以下内容: %s" text)))))
+
+      (gt-start (gt-translator
+                 :taker (gt-taker :langs '(en zh) :text 'buffer :pick nil :prompt t)
+                 :engines (gt-chatgpt-engine :cache nil)
+                 :render (gt-kill-ring-render)))))
   (popup-frame-define chatgpt-translate "translate-popup" 'delete-frame))
 
 (provide 'popup-frames)
