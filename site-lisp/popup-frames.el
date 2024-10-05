@@ -40,10 +40,10 @@ COMMAND is the name of the provided command."
             (display-buffer-alist '(("")
                                     (display-buffer-full-frame))))
        (select-frame frame)
+       (select-frame-set-input-focus frame)
        (tab-bar-mode -1)
        (set-frame-size (selected-frame) 80 20)
        (switch-to-buffer "popup-frame-hidden-buffer")
-       (select-frame-set-input-focus (selected-frame))
        (condition-case nil
            (progn
              (call-interactively ',command)
