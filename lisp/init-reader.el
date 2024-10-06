@@ -111,8 +111,7 @@
              gt-preset-translators
              `((default . ,(gt-translator
                             :taker (list (gt-taker :pick nil :if 'selection)
-                                         (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
-                                         (gt-taker :text 'buffer :if '(telega-webpage-mode))
+                                         (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode helpful-mode devdocs-mode))
                                          (gt-taker :text 'word))
                             :engines (list (gt-deepl-engine :pro t :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
                                            ;; (gt-chatgpt-engine :if 'not-word)
