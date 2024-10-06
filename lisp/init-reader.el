@@ -112,13 +112,14 @@
              `((default . ,(gt-translator
                             :taker (list (gt-taker :pick nil :if 'selection)
                                          (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
+                                         (gt-taker :text 'buffer :if '(telega-webpage-mode))
                                          (gt-taker :text 'word))
                             :engines (list (gt-deepl-engine :pro t :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
                                            ;; (gt-chatgpt-engine :if 'not-word)
                                            (gt-google-engine :if 'word)
                                            (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
                                            (gt-youdao-suggest-engine :if '(and word src:en)))
-                            :render  (list (gt-overlay-render :if '(Info-mode help-mode helpful-mode devdocs-mode))
+                            :render  (list (gt-overlay-render :if '(Info-mode help-mode telega-webpage-mode helpful-mode devdocs-mode))
                                            (gt-buffer-render))))
                ;; gt-insert-render
                (after-source-insert . ,(gt-translator
