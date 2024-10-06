@@ -174,6 +174,8 @@
                                         ("ruled,linesnumbered" "algorithm2e" t)
                                         ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
                                         ;; ("" "algpseudocode" t)
+                                        ;; for chinese preview
+                                        ("fontset=LXGW WenKai,UTF8" "ctex" t)
                                         ))
     ;; Increase preview width
     (plist-put org-latex-preview-appearance-options :page-width 0.8)
