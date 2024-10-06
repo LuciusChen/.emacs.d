@@ -12,8 +12,6 @@
 ;; `password-store` if they are available.
 
 ;;; Code:
-(eval-when-compile
-  (require 'server))
 
 (defun popup-frame-delete (&rest _)
   "Kill selected frame if it has parameter `popup-frame'."
@@ -27,7 +25,7 @@ COMMAND is the function to be called when the popup frame is opened.
 TITLE is the title of the popup frame.
 
 If DELETE-FRAME is non-nil, the popup frame will be deleted after
-the command is executed. Otherwise, the frame will remain open.
+the command is executed.  Otherwise, the frame will remain open.
 
 The function created will be named `popup-frame-COMMAND', where
 COMMAND is the name of the provided command."
