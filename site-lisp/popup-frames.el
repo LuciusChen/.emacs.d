@@ -34,6 +34,7 @@ COMMAND is the name of the provided command."
      (let* ((frame (make-frame
                     '((title . ,title)
                       (window-system . ns)
+                      (minibuffer . only)
                       (popup-frame . t))))
             (display-buffer-alist '(("")
                                     (display-buffer-full-frame))))
@@ -41,7 +42,8 @@ COMMAND is the name of the provided command."
        (tab-bar-mode -1)
        (set-frame-size (selected-frame) 80 20)
        (select-frame-set-input-focus frame)
-       (switch-to-buffer "popup-frame-hidden-buffer")
+       ;; When opened (minibuffer.only), comment out this line.
+       ;; (switch-to-buffer "popup-frame-hidden-buffer")
        (condition-case nil
            (progn
              (call-interactively ',command)
