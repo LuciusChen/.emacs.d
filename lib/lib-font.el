@@ -4,7 +4,7 @@
 (defun +setup-fonts ()
   "Setup fonts."
   ;; Setting the default
-  (set-face-attribute 'default nil :font "JetBrains Mono 14" :weight 'normal)
+  (set-face-attribute 'default nil :font *default-font* :weight 'normal)
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
   ;; "Emacs 28 now has 'emoji . before, emoji is part of 'symbol"
@@ -12,11 +12,7 @@
   ;; 分布比较散，所以还是先设置 'unicode 后再设置 CJK 比较靠谱。
   ;; 特例：'emoji 就会导致 ⛈️ fallback 到 ⛈
   ;; https://emacs-china.org/t/emacs/15676/34
-  (cl-loop for font in '("Apple Color Emoji"
-                         "Noto Color Emoji"
-                         "Noto Emoji"
-                         "Segoe UI Emoji"
-                         "Symbola")
+  (cl-loop for font in *emoji-fonts*
            when (find-font (font-spec :name font))
            return (set-fontset-font
                    t
@@ -31,19 +27,19 @@
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
-                      (font-spec :family "LXGW WenKai")))
+                      (font-spec :family *zh-default-font*)))
   ;; Setting fall-back fonts
   ;; https://idiocy.org/emacs-fonts-and-fontsets.html
-  (dolist (font '("Jigmo" "Jigmo2" "Jigmo3"))
+  (dolist (font *fallback-fonts*)
     (when (member font (font-family-list))
       (set-fontset-font "fontset-default" 'han font nil 'append)))
   ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
-  (set-fontset-font t '(#xE000 . #xF8FF) "Symbols Nerd Font Mono")
+  (set-fontset-font t '(#xE000 . #xF8FF) *symbol-default-font*)
   ;; Set font for specific characters
   ;; (set-fontset-font nil ?❤ "Symbols Nerd Font Mono")
 
-  (set-fontset-font t 'javanese "Noto Sans Javanese"))
+  (set-fontset-font t 'javanese *jp-default-font*))
 
 (defconst jetbrains-ligature-mode--ligatures
   '("-->" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"

@@ -10,12 +10,19 @@
 (defconst *spell-check-support-enabled* nil ) ;; Enable with t if you prefer
 (defconst *IS-MAC* (eq system-type 'darwin))
 (defconst *IS-LINUX* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
-;; (defconst IS-WINDOWS  (memq system-type '(cygwin windows-nt ms-dos)))
-;; (defconst IS-BSD      (memq system-type '(darwin berkeley-unix gnu/kfreebsd)))
-;; (defconst EMACS28+    (> emacs-major-version 27))
-;; (defconst EMACS29+    (> emacs-major-version 28))
-;; (defconst MODULES     (featurep 'dynamic-modules))
-;; (defconst NATIVECOMP  (featurep 'native-compile))
+(defconst *org-path* "~/Library/CloudStorage/Dropbox/org")
+(defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
+(defconst *emoji-fonts* '("Apple Color Emoji"
+                          "Noto Color Emoji"
+                          "Noto Emoji"
+                          "Segoe UI Emoji"
+                          "Symbola"))
+(defconst *default-font* "JetBrains Mono 14")
+(defconst *pro-font* "iosevka")
+(defconst *term-default-font* "iosevkaTerm Nerd Font Mono 14")
+(defconst *zh-default-font* "LXGW WenKai")
+(defconst *jp-default-font* "Noto Sans Javanese")
+(defconst *symbol-default-font* "Symbols Nerd Font Mono")
 
 (when *IS-MAC*
   ;; modify meta from ⌥ to ⌘
