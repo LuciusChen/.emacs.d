@@ -49,7 +49,7 @@ the command is executed.  Otherwise, the frame will remain open."
          (delete-frame frame)))))
 
 ;; Integration with `server`
-(with-eval-after-load 'server
+(when (require 'server nil 'noerror)
   (unless (server-running-p)
     (server-start)))
 
