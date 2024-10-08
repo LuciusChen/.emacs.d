@@ -25,30 +25,24 @@ COMMAND is the function to be called when the popup frame is opened.
 TITLE is the title of the popup frame.
 
 If DELETE-FRAME is non-nil, the popup frame will be deleted after
-the command is executed.  Otherwise, the frame will remain open.
-
-The function created will be named `popup-frame-COMMAND', where
-COMMAND is the name of the provided command."
+the command is executed.  Otherwise, the frame will remain open."
   `(defun ,(intern (format "popup-frame-%s" command)) ()
      (interactive)
-     (let* ((frame (make-frame
-                    '((title . ,title)
-                      (window-system . ns)
-                      (minibuffer . only)
-                      (popup-frame . t))))
-            (display-buffer-alist '(("")
-                                    (display-buffer-full-frame))))
+     (let* ((frame-parameters '((title . ,title)
+                                (window-system . ns)
+                                (popup-frame . t)))
+            (frame (make-frame (if ,delete-frame
+                                   (append frame-parameters '((minibuffer . only)))
+                                 frame-parameters))))
        (select-frame frame)
-       (tab-bar-mode -1)
        (set-frame-size (selected-frame) 80 20)
        (select-frame-set-input-focus frame)
-       ;; When opened (minibuffer.only), comment out this line.
-       ;; (switch-to-buffer "popup-frame-hidden-buffer")
+       (unless ,delete-frame
+         (switch-to-buffer "popup-frame-hidden-buffer"))
        (condition-case nil
            (progn
              (call-interactively ',command)
-             (delete-other-windows)
-             (tab-bar-mode 1))
+             (delete-other-windows))
          (error (delete-frame frame)))
        (when ,delete-frame
          (sit-for 0.2)
@@ -67,17 +61,17 @@ COMMAND is the name of the provided command."
 ;; For example:
 ;; - For `org-capture`, the command is:
 ;;   emacsclient -e '(popup-frame-org-capture)'
-(with-eval-after-load 'org-capture
+(when (require 'org nil 'noerror)
   (popup-frame-define org-capture "capture-popup")
   (add-hook 'org-capture-after-finalize-hook #'popup-frame-delete))
 
-(with-eval-after-load 'org-roam
+(when (require 'org-roam nil 'noerror)
   (popup-frame-define org-roam-dailies-capture-today "capture-popup"))
 
-(with-eval-after-load 'password-store
+(when (require 'password-store nil 'noerror)
   (popup-frame-define password-store-copy "minimal-popup" 'delete-frame))
 
-(with-eval-after-load 'go-translate
+(when (require 'go-translate nil 'noerror)
   (defun chatgpt-translate ()
     "Prompt for text to translate and copy the result to the clipboard.
 This function uses ChatGPT to perform the translation and returns
