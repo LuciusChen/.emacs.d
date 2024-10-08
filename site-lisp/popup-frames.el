@@ -89,6 +89,45 @@ only the translated content."
                  :render (gt-kill-ring-render)))))
   (popup-frame-define chatgpt-translate "translate-popup" 'delete-frame))
 
+(when (require 'org-cliplink nil 'noerror)
+  (defun save-bookmark ()
+    "Save a bookmark from clipboard to a selected Org heading in a specified Org file.
+The title is extracted from the page at the URL in the clipboard."
+    (interactive)
+    (let ((org-file (concat *org-path* "/main/20220506185941-Pinboard.org"))  ;; Replace with your file path
+          (url (current-kill 0))  ;; Get the URL from the clipboard
+          (title nil))  ;; Initialize title
+      (org-cliplink-retrieve-title
+       url
+       (lambda (url retrieved-title)
+         (setq title retrieved-title)  ;; Set the retrieved title
+         ;; Now we can proceed to insert the link
+         (with-temp-buffer
+           (insert-file-contents org-file)
+           (goto-char (point-min))
+           (let (headings)
+             ;; Collect all top-level headings
+             (while (re-search-forward "^\\* \\(.*\\)$" nil t)
+               (push (match-string 1) headings))
+             (setq headings (nreverse headings))
+
+             ;; Let the user select a heading
+             (let ((selected-heading (completing-read "Select a heading: " headings)))
+               ;; Insert the link under the selected heading
+               (goto-char (point-min))
+               (if (re-search-forward (format "^\\* %s$" (regexp-quote selected-heading)) nil t)
+                   (progn
+                     (forward-line 1)  ;; Move to below the heading
+                     (insert (format "- [[%s][%s]]\n" url title))  ;; Insert link with extracted title
+                     (write-region (point-min) (point-max) org-file)
+                     (message "Bookmark saved under heading: %s" selected-heading))
+                 (message "Heading not found: %s" selected-heading)))))))
+      ;; Wait for the title to be retrieved
+      (while (not title)
+        (sit-for 0.1)))))  ;; Pause briefly to allow for title retrieval
+
+(popup-frame-define save-bookmark "bookmark-popup" 'delete-frame)
+
 (provide 'popup-frames)
 
 ;;; popup-frames.el ends here
