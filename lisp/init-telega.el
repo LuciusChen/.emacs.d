@@ -16,6 +16,7 @@
     (:with-map telega-prefix-map
       (:bind
        "p" telega-chatbuf-filter-search
+       "d" telega-chat-remove-member
        "h" telega-notifications-history
        "x" telega-chatbuf-thread-cancel))
     (:with-map telega-msg-button-map
