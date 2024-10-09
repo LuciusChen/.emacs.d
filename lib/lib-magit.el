@@ -61,7 +61,7 @@
         (when (equal magit-buffer-file-name file)
           (kill-this-buffer))))))
 
-(defun modi/magit-log--abbreviate-author (&rest args)
+(defun +magit-log--abbreviate-author (&rest args)
   "The first arg is AUTHOR, abbreviate it.
 First Last  -> F Last
 First.Last  -> F Last
@@ -80,5 +80,15 @@ It is assumed that the author has only one or two names."
                         (replace-regexp-in-string "\\(.\\).*?[. ]+\\(.*\\)" "\\1 \\2" author))))
     (setf (nth 1 (car args)) author-abbr))
   (car args))
+
+(defun +git-link-interactive ()
+  "Open the Git repository homepage interactively.
+
+This function sets the default directory to the root of the current project
+and then prompts the user to generate a URL for the project's repository
+using `git-link-homepage`, which is opened in the user's web browser."
+  (interactive)
+  (let ((default-directory (project-root (project-current t))))
+    (browse-url (call-interactively #'git-link-homepage))))
 (provide 'lib-magit)
 ;;; lib-magit.el ends here

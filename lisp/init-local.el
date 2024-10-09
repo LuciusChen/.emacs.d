@@ -42,30 +42,5 @@ If DEST, a buffer, is provided, insert the markup there."
           (goto-char next))))
     (pop-to-buffer buff)
     (goto-char (point-min))))
-
-(defun +git-link-interactive ()
-  "Open the Git repository homepage interactively.
-
-This function sets the default directory to the root of the current project
-and then prompts the user to generate a URL for the project's repository
-using `git-link-homepage`, which is opened in the user's web browser."
-  (interactive)
-  (let ((default-directory (project-root (project-current t))))
-    (browse-url (call-interactively #'git-link-homepage))))
-
-(setup eee
-  (:defer (:require eee)
-          (:option ee-terminal-command "wezterm")))
-
-(defun ee-git-diff--callback(_process)
-  (message "ee-git-diff--callback"))
-
-(defun ee-git-diff()
-  (interactive)
-  (let* ((working-directory (ee-get-project-dir-or-current-dir))
-         (full-command (format  "cd %s && osascript -e 'tell application \"WezTerm\" to activate' && PAGER=delta git diff HEAD~1"
-                                working-directory)))
-    (ee-start-process-shell-command-in-terminal
-     "ee-git-diff" full-command #'ee-git-diff--callback)))
 (provide 'init-local)
 ;;; init-local.el ends here
