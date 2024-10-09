@@ -88,7 +88,7 @@ A scope may be provided to a commit's type, to provide additional contextual inf
       ;; Also reduce the author column width to 11 as the author name is being
       ;; abbreviated below.
       (:option magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
-      (advice-add 'magit-log-format-margin :filter-args #'modi/magit-log--abbreviate-author))
+      (advice-add 'magit-log-format-margin :filter-args #'+magit-log--abbreviate-author))
     (:with-mode magit-status-mode
       (:require gptel)
       (defun gptel-commit ()
