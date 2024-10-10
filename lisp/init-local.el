@@ -43,22 +43,21 @@ If DEST, a buffer, is provided, insert the markup there."
     (pop-to-buffer buff)
     (goto-char (point-min))))
 
+;; pipx install aider
 (setup aider
-  (:defer (:require aider))
-  (:option aider-args '("--model" "gpt-4o-mini"))
-  (setenv "OPENAI_API_KEY"
-          (funcall (lambda ()
-                     (if-let* ((auth-info (car (auth-source-search
-                                                :host "api.openai.com"
-                                                :user "apikey"
-                                                :require '(:secret))))
-                               (secret (plist-get auth-info :secret)))
-                         (if (functionp secret)
-                             (encode-coding-string (funcall secret) 'utf-8)
-                           secret)
-                       (user-error "No `gptel-api-key' found in the auth source")))))
-  ;; Check if the environment variable is set correctly
-  (message "OPENAI_API_KEY: %s" (getenv "OPENAI_API_KEY"))
-  )
+  (:load-after password-store)
+  (:option aider-args '("–no-auto-commits" "--model" "gpt-4o-mini"))
+  (:when-loaded
+    (setenv "OPENAI_API_KEY"
+            (funcall (lambda ()
+                       (if-let* ((auth-info (car (auth-source-search
+                                                  :host "api.openai.com"
+                                                  :user "apikey"
+                                                  :require '(:secret))))
+                                 (secret (plist-get auth-info :secret)))
+                           (if (functionp secret)
+                               (encode-coding-string (funcall secret) 'utf-8)
+                             secret)
+                         (user-error "No `gptel-api-key' found in the auth source")))))))
 (provide 'init-local)
 ;;; init-local.el ends here
