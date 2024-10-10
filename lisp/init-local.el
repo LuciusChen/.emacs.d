@@ -46,7 +46,7 @@ If DEST, a buffer, is provided, insert the markup there."
 ;; pipx install aider
 (setup aider
   (:load-after password-store)
-  (:option aider-args '("–no-auto-commits" "--model" "gpt-4o-mini"))
+  (:option aider-args '("--model" "gpt-4o-mini"))
   (:when-loaded
     (let ((auth-info (car (auth-source-search
                            :host "api.openai.com"
@@ -55,8 +55,8 @@ If DEST, a buffer, is provided, insert the markup there."
       (when auth-info
         (let ((secret (plist-get auth-info :secret)))
           (setenv "OPENAI_API_KEY"
-                   (if (functionp secret)
-                       (encode-coding-string (funcall secret) 'utf-8)
-                     secret)))))))
+                  (if (functionp secret)
+                      (encode-coding-string (funcall secret) 'utf-8)
+                    secret)))))))
 (provide 'init-local)
 ;;; init-local.el ends here
