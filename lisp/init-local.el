@@ -57,7 +57,8 @@ If DEST, a buffer, is provided, insert the markup there."
                              (encode-coding-string (funcall secret) 'utf-8)
                            secret)
                        (user-error "No `gptel-api-key' found in the auth source")))))
-
+  ;; Check if the environment variable is set correctly
+  (message "OPENAI_API_KEY: %s" (getenv "OPENAI_API_KEY"))
   )
 (provide 'init-local)
 ;;; init-local.el ends here
