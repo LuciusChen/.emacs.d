@@ -42,5 +42,34 @@ If DEST, a buffer, is provided, insert the markup there."
           (goto-char next))))
     (pop-to-buffer buff)
     (goto-char (point-min))))
+
+(setup aider
+  (:defer (:require aider))
+  (:option aider-args '("--model" "gpt-4o-mini"))
+  ;; (setenv "OPENAI_API_KEY" (string-trim
+  ;;                           (lambda ()
+  ;;                             (if-let* ((auth-info (car (auth-source-search
+  ;;                                                        :host "api.openai.com"
+  ;;                                                        :user "apikey"
+  ;;                                                        :require '(:secret))))
+  ;;                                       (secret (plist-get auth-info :secret)))
+  ;;                                 (if (functionp secret)
+  ;;                                     (encode-coding-string (funcall secret) 'utf-8)
+  ;;                                   secret)
+  ;;                               (user-error "No `gptel-api-key' found in the auth source"))))
+  ;;         )
+  (setenv "OPENAI_API_KEY"
+          (funcall (lambda ()
+                     (if-let* ((auth-info (car (auth-source-search
+                                                :host "api.openai.com"
+                                                :user "apikey"
+                                                :require '(:secret))))
+                               (secret (plist-get auth-info :secret)))
+                         (if (functionp secret)
+                             (encode-coding-string (funcall secret) 'utf-8)
+                           secret)
+                       (user-error "No `gptel-api-key' found in the auth source")))))
+
+  )
 (provide 'init-local)
 ;;; init-local.el ends here
