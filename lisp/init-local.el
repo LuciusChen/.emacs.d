@@ -48,16 +48,15 @@ If DEST, a buffer, is provided, insert the markup there."
   (:load-after password-store)
   (:option aider-args '("–no-auto-commits" "--model" "gpt-4o-mini"))
   (:when-loaded
-    (setenv "OPENAI_API_KEY"
-            (funcall (lambda ()
-                       (if-let* ((auth-info (car (auth-source-search
-                                                  :host "api.openai.com"
-                                                  :user "apikey"
-                                                  :require '(:secret))))
-                                 (secret (plist-get auth-info :secret)))
-                           (if (functionp secret)
-                               (encode-coding-string (funcall secret) 'utf-8)
-                             secret)
-                         (user-error "No `gptel-api-key' found in the auth source")))))))
+    (let ((auth-info (car (auth-source-search
+                           :host "api.openai.com"
+                           :user "apikey"
+                           :require '(:secret)))))
+      (when auth-info
+        (let ((secret (plist-get auth-info :secret)))
+          (setenv "OPENAI_API_KEY"
+                   (if (functionp secret)
+                       (encode-coding-string (funcall secret) 'utf-8)
+                     secret)))))))
 (provide 'init-local)
 ;;; init-local.el ends here
