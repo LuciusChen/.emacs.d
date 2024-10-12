@@ -8,8 +8,8 @@
   "Passes through required cquery initialization options"
   `(
     :typescript (
-                 :serverPath ,(expand-file-name "~/.nvm/versions/node/v20.2.0/lib/node_modules/typescript/lib/tsserverlibrary.js")
-                 :tsdk ,(expand-file-name "~/.nvm/versions/node/v20.2.0/lib/node_modules/typescript/lib/"))
+                 :serverPath ,(expand-file-name "~/.nvm/versions/node/v22.9.0/lib/node_modules/typescript/lib/tsserverlibrary.js")
+                 :tsdk ,(expand-file-name "~/.nvm/versions/node/v22.9.0/lib/node_modules/typescript/lib/"))
     :languageFeatures (
                        :references t
                        :implementation t
