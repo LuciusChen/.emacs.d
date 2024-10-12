@@ -22,3 +22,4 @@ mastodon.plstore
 .org-id-locations
 org-clock-save.el
 forge-database.sqlite
+.aider*

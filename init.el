@@ -232,6 +232,7 @@ unreadable. Returns the names of envvars that were changed."
     (consult-mu :host github :repo "armindarvish/consult-mu")
     (eglot-booster :host github :repo "jdtsmith/eglot-booster")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
+    (aider :host github :repo "tninja/aider.el")
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))

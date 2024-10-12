@@ -116,7 +116,7 @@ A scope may be provided to a commit's type, to provide additional contextual inf
       (let ((authinfo-file "~/.authinfo")
             (machine "192.168.1.220:9081/api/v4")
             (login "lucius^forge")
-            (pass-entry "authinfo/gitlab-zj"))
+            (pass-entry "gitlab-zj"))
         ;; Check if .authinfo file exists
         (unless (file-exists-p authinfo-file)
           (with-temp-buffer
