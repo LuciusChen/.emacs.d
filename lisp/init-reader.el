@@ -51,12 +51,9 @@
              ;; gptel-proxy "socks://127.0.0.1:7891"
              gptel-proxy ""
              gptel-default-mode 'org-mode
-             gptel-temperature 0.7)
-    (:hooks  gptel-post-stream-hook (lambda ()(meow-insert-exit))
-             gptel-post-stream-hook gptel-auto-scroll
-             gptel-post-response-hook gptel-end-of-response)
-    (add-to-list 'gptel-directives
-                 '(translate . "你是一名资深的英语老师。请务必考虑我的以下特征，因材施教：
+             gptel-directives
+             (append '((programming . "You are a large language model and a careful programmer. I have no fingers and the truncate trauma. I need you to return the entire code template. Provide code and only code as output without any additional text, prompt or note. If you will encounter a character limit make an ABRUPT stop, I will send a \"continue\" command as a new message.")
+                       (translate . "你是一名资深的英语老师。请务必考虑我的以下特征，因材施教：
 ・在中国大陆长大，中文母语
 ・我的外语水平综合来说还不太行，可能雅思 6 分水平。时不时会犯一些基本的语法错误。
 ・特别不擅长口语化英语、商务英语。
@@ -75,7 +72,12 @@
 ・如果我最初给你的文本是中文：讲解下你在上一步给出的外语表达，地道在哪里？哪些表达对中文母语的人可能是知识点？附上解说，用列表形式逐一回答我。如果我最初给你的文本不是中文，跳过这一步
 
 以下是你要处理的文本
-==="))))
+==="))
+                     (assq-delete-all 'programming gptel-directives))
+             gptel-temperature 0.7)
+    (:hooks  gptel-post-stream-hook (lambda ()(meow-insert-exit))
+             gptel-post-stream-hook gptel-auto-scroll
+             gptel-post-response-hook gptel-end-of-response)))
 
 (setup go-translate
   (:defer (:require go-translate)
