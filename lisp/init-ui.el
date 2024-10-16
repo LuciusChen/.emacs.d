@@ -120,6 +120,7 @@
     (:require lib-tabbar)
     (:option tab-bar-separator ""
              tab-bar-close-button-show nil
+             tab-bar-new-tab-to 'rightmost
              tab-bar-tab-hints t
              tab-bar-new-tab-choice "*scratch*"
              tab-bar-select-tab-modifiers '(super)
