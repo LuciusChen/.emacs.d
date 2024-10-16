@@ -128,8 +128,8 @@
       (when xref-window
         (quit-window nil xref-window))))
 
-  ;; (:option xref-auto-jump-to-first-xref t
-  ;;          xref-show-xrefs-function #'+xref-show-xrefs)
+  (:option xref-auto-jump-to-first-xref 'move)
+  ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)
   (:hooks xref-after-jump-hook +xref-quit-window))
 (provide 'init-completion)
 ;;; init-completion.el ends here
