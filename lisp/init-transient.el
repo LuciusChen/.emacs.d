@@ -84,8 +84,7 @@
       :transient-suffix 'transient--do-stay
       :transient-non-suffix 'transient--do-exit
       [["Draw Rectangle and Select Brush"
-        ("m" "Draw Rectangle and Select Brush" uniline-transient-moverect)]
-       ["Insert Glyphs and Rotate Arrow"
+        ("m" "Draw Rectangle and Select Brush" uniline-transient-moverect)
         ("a" "Insert Glyphs and Rotate Arrow" uniline-transient-arrows)]])
 
     (transient-define-prefix uniline-transient-moverect ()
