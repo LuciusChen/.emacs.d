@@ -19,10 +19,11 @@
        "d" telega-chat-remove-member
        "h" telega-notifications-history
        "x" telega-chatbuf-thread-cancel))
-    (:with-map telega-msg-button-map
-      (:bind
-       "C" +telega-save-file-to-clipboard
-       "s" +telega-msg-save-to-cloud-copyleft))
+    (if *IS-MAC*
+        (:with-map telega-msg-button-map
+          (:bind
+           "C" +telega-save-file-to-clipboard
+           "s" +telega-msg-save-to-cloud-copyleft)))
     (:also-load telega-url-shorten
                 telega-bridge-bot
                 telega-mnz
