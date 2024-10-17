@@ -94,8 +94,7 @@
      "C-x C-e" +eval-last-sexp-or-region
      "C-c C-e" pp-eval-expression
      "C-c C-l" +load-this-file
-     "C-c x"   macrostep-expand
-     "C-c X"   macrostep-collapse))
+     "C-c x"   macrostep-expand))
   (:advice pp-display-expression :after +make-read-only)
   (:hooks emacs-lisp-mode-hook +maybe-set-bundled-elisp-readonly))
 
