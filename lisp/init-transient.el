@@ -126,10 +126,10 @@
        ("+"        (lambda () (format-glyph "Thick lines  " "┏━┛")) uniline--set-brush-2     :transient t)
        ("="        (lambda () (format-glyph "Double lines " "╔═╝")) uniline--set-brush-3     :transient t)
        ("#"        (lambda () (format-glyph "Block lines  " "▄▄▟")) uniline--set-brush-block :transient t)]
-      ["Other"
-       ("C-x u" "Undo" uniline--hydra-rect-undo :transient t)
-       ("RET" "Exit" uniline--hydra-rect-quit)
-       ("q" "Quit" transient-quit-all)])
+      ["Other" ;; Note that if tbanel/uniline is used, the function below is missing `hydra-`.
+       ("C-x u" "Undo" uniline--rect-undo :transient t)
+       ("RET" "Exit" uniline--rect-quit)
+       ("q" "Quit" transient-quit-one)])
 
     (transient-define-prefix uniline-font-transient ()
       "Select a font for the frame."
@@ -197,7 +197,7 @@
        ("#" (lambda () (format-glyph "Insert " "#")) self-insert-command :transient t)]
       ["Other"
        ("f" "font" uniline-font-transient)
-       ("q" "Quit" transient-quit-all)
+       ("q" "Quit" transient-quit-one)
        ("RET" "Quit" transient-quit-all)])
 
     ;; dape
