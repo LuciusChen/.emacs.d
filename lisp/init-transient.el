@@ -17,31 +17,7 @@
       (:bind "<escape>" transient-quit-one))
     (:option transient-semantic-coloring t)
 
-    (defun format-glyph (description glyphs)
-      "Return a lambda that formats DESCRIPTION with GLYPHS for transient display."
-      (concat description " " (propertize glyphs 'face 'transient-value)))
-
-    (defun my-prefix-init (obj)
-      (oset obj value `(,(concat "--foo=" (buffer-name)))))
-
-    (transient-define-prefix test ()
-      ;; :value '("--foo=bar")
-      ;; :value `(,(concat "--foo=" (buffer-name)))
-      :value 1
-      [(test-option-infix)]
-      [("p" "print value" print-essentials)])
-
-    (transient-define-infix test-option-infix ()
-      :class 'transient-option
-      :key "-f"
-      :description "My option"
-      :argument "--foo="
-      :choices '("1" "2" "3" "4" "5"))
-
-    (defun print-essentials ()
-      (interactive)
-      (pp (transient-args 'test))
-      (pp (transient-arg-value "--foo=" (transient-args 'test))))
+    ;; org daily
 
     (transient-define-prefix journal-transient ()
       "Journal menu"
@@ -54,6 +30,8 @@
       ["Commands"
        ("RET" "Journal files switch"   journal-options)]
       [("q" "Quit"           transient-quit-one)])
+
+    ;; file access
 
     (transient-define-prefix  emacs-access-transient ()
       "Emacs quick access"
@@ -72,6 +50,7 @@
 
     ;; transient 适合大量单一相关的功能需要在 buffer 进行交互的，单纯频次较高的功能按键其实并不适合。
     ;; TODO 需要改为单纯的快捷键
+
     (transient-define-prefix prog-commands ()
       "Prog commands"
       :info-manual "Prog commands"
@@ -105,13 +84,19 @@
         ("M-p" "previous sibling section" magit-section-backward-sibling)
         ("M-n" "next sibling section"     magit-section-forward-sibling)]])
 
+    ;; uniline
+
+    (defun format-glyph (description glyphs)
+      "Return a lambda that formats DESCRIPTION with GLYPHS for transient display."
+      (concat description " " (propertize glyphs 'face 'transient-value)))
+
     (transient-define-prefix uniline-transient ()
       "Transient command for uniline."
       :transient-suffix 'transient--do-stay
       :transient-non-suffix 'transient--do-exit
       [["Draw Rectangle and Select Brush"
-        ("m" "Draw Rectangle and Select Brush" uniline-transient-moverect)
-        ("a" "Insert Glyphs and Rotate Arrow" uniline-transient-arrows)]])
+        ("m" "Move and Draw Rectangle, and manage brush settings" uniline-transient-moverect)
+        ("a" "Insert Glyphs and Rotate Arrow"                     uniline-transient-arrows)]])
 
     (transient-define-prefix uniline-transient-moverect ()
       "Move and draw rectangle, and manage brush settings."
@@ -137,10 +122,10 @@
        ("y" "Yank" uniline-yank-rectangle)]
       ["Brush"
        ("<delete>" "Erase lines"      uniline--set-brush-0)
-       ("-"        (lambda () (format-glyph "Thin lines   " "╭─╯")) uniline--set-brush-1)
-       ("+"        (lambda () (format-glyph "Thick lines  " "┏━┛")) uniline--set-brush-2)
-       ("="        (lambda () (format-glyph "Double lines " "╔═╝")) uniline--set-brush-3)
-       ("#"        (lambda () (format-glyph "Block lines  " "▄▄▟")) uniline--set-brush-block)]
+       ("-"        (lambda () (format-glyph "Thin lines   " "╭─╯")) uniline--set-brush-1     :transient t)
+       ("+"        (lambda () (format-glyph "Thick lines  " "┏━┛")) uniline--set-brush-2     :transient t)
+       ("="        (lambda () (format-glyph "Double lines " "╔═╝")) uniline--set-brush-3     :transient t)
+       ("#"        (lambda () (format-glyph "Block lines  " "▄▄▟")) uniline--set-brush-block :transient t)]
       ["Other"
        ("C-x u" "Undo" uniline--hydra-rect-undo :transient t)
        ("RET" "Exit" uniline--hydra-rect-quit)
@@ -159,18 +144,47 @@
        ["Other"
         ("*" "Customize" (lambda () (interactive) (customize-face 'default)))]])
 
+    ;; Use the infix of transient to achieve an effect similar to the hydra prefix parameter.
+    ;;
+    ;; Hydra ==> prefix argument (num) + Heads
+    ;; Transient ==> prefix + infix (num)
+
+    (defmacro define-glyph-commands (commands)
+      `(progn
+         ,@(mapcar (lambda (command)
+                     (let ((name (car command))
+                           (glyph-type (cadr command))
+                           (is-backward (caddr command)))
+                       `(defun ,name (arg)
+                          (interactive
+                           (list (if current-prefix-arg
+                                     (prefix-numeric-value current-prefix-arg)
+                                   (read-number "Enter a number: " 1))))
+                          (uniline--insert-glyph ,glyph-type ,is-backward arg))))
+                   commands)))
+
+    (define-glyph-commands
+     ((uniline-insert-fw-arrow  'a nil)
+      (uniline-insert-fw-square 's nil)
+      (uniline-insert-fw-oshape 'o nil)
+      (uniline-insert-fw-cross  'x nil)
+      (uniline-insert-bw-arrow  'a t)
+      (uniline-insert-bw-square 's t)
+      (uniline-insert-bw-oshape 'o t)
+      (uniline-insert-bw-cross  'x t)))
+
     (transient-define-prefix uniline-transient-arrows ()
       "Transient for inserting glyphs and rotating arrows."
       [
        "Insert Glyph"
-       ("a" (lambda () (format-glyph "insert-fw-arrow   " "[▷ ▶ → ▹ ▸]")) uniline-insert-fw-arrow  :transient t)
-       ("A" (lambda () (format-glyph "insert-bw-arrow   " "[◁ ◀ ← ◃ ◂]")) uniline-insert-bw-arrow  :transient t)
-       ("s" (lambda () (format-glyph "insert-fw-square  " "[□ ■ ◇ ◆ ◊]")) uniline-insert-fw-square :transient t)
-       ("S" (lambda () (format-glyph "insert-bw-square  " "[◊ ◆ ◇ ■ □]")) uniline-insert-bw-square :transient t)
-       ("o" (lambda () (format-glyph "insert-fw-o-shape " "[· ● ◦ Ø ø]")) uniline-insert-fw-oshape :transient t)
-       ("O" (lambda () (format-glyph "insert-bw-o-shape " "[ø Ø ◦ ● ·]")) uniline-insert-bw-oshape :transient t)
-       ("x" (lambda () (format-glyph "insert-fw-cross   " "[╳ ÷ × ± ¤]")) uniline-insert-fw-cross  :transient t)
-       ("X" (lambda () (format-glyph "insert-bw-cross   " "[¤ ± × ÷ ╳]")) uniline-insert-bw-cross  :transient t)]
+       ("a" (lambda () (format-glyph "insert-fw-arrow   " "[▷ ▶ → ▹ ▸]")) uniline-insert-fw-arrow)
+       ("A" (lambda () (format-glyph "insert-bw-arrow   " "[◁ ◀ ← ◃ ◂]")) uniline-insert-bw-arrow)
+       ("s" (lambda () (format-glyph "insert-fw-square  " "[□ ■ ◇ ◆ ◊]")) uniline-insert-fw-square)
+       ("S" (lambda () (format-glyph "insert-bw-square  " "[◊ ◆ ◇ ■ □]")) uniline-insert-bw-square)
+       ("o" (lambda () (format-glyph "insert-fw-o-shape " "[· ● ◦ Ø ø]")) uniline-insert-fw-oshape)
+       ("O" (lambda () (format-glyph "insert-bw-o-shape " "[ø Ø ◦ ● ·]")) uniline-insert-bw-oshape)
+       ("x" (lambda () (format-glyph "insert-fw-cross   " "[╳ ÷ × ± ¤]")) uniline-insert-fw-cross)
+       ("X" (lambda () (format-glyph "insert-bw-cross   " "[¤ ± × ÷ ╳]")) uniline-insert-bw-cross)]
       ["Rotate Arrow"
        ("S-<left>"  "Rotate left"  uniline-rotate-lf← :transient t)
        ("S-<right>" "Rotate right" uniline-rotate-ri→ :transient t)
@@ -185,6 +199,8 @@
        ("f" "font" uniline-font-transient)
        ("q" "Quit" transient-quit-all)
        ("RET" "Quit" transient-quit-all)])
+
+    ;; dape
 
     (transient-define-prefix dape-transient ()
       "Transient for dape."
