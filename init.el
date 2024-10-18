@@ -28,8 +28,8 @@
                           "Segoe UI Emoji"
                           "Symbola"))
 (defconst *default-font* "JetBrains Mono 14")
-(defconst *pro-font* "iosevka")
-(defconst *term-default-font* "iosevkaTerm Nerd Font Mono 14")
+(defconst *org-font* "iosevka")
+(defconst *term-default-font* "PragmataPro Mono Liga 14")
 (defconst *zh-default-font* "LXGW WenKai")
 (defconst *jp-default-font* "Noto Sans Javanese")
 (defconst *symbol-default-font* "Symbols Nerd Font Mono")
