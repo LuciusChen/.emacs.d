@@ -40,7 +40,7 @@
    (if *IS-MAC*
        '(";" . sis-meow-reverse)
      '(";" . meow-reverse))
-   '("," . Meow-inner-of-thing)
+   '("," . meow-inner-of-thing)
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
    '("]" . meow-end-of-thing)
