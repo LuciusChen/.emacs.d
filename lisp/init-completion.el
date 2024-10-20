@@ -70,36 +70,47 @@
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
+
+;; Latex
+;; $ luarocks install digestif
+;; ╺═══════════════════════════════════════╸
+;; Java
+;; $ brew install jdtls
+;; ╺═══════════════════════════════════════╸
+;; Python
+;; $ brew install pipx
+;; $ pipx install pyright
+;; ╺═══════════════════════════════════════
+;; HTML
+;; $ brew install vscode-langservers-extracted
+;; ╺═══════════════════════════════════════
+;; JS
+;; $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+;; $ nvm install node
+;; $ sudo npm install -g typescript
+;; $ npm install -g @volar/vue-language-server
+;; $ npm install -g typescript-language-server
+
 (setup eglot
   (:defer (:require eglot))
   (:when-loaded
     (:also-load lib-eglot)
-    (:with-mode (python-ts-mode java-ts-mode js-mode typescript-mode latex-mode)
+    (:with-mode (python-ts-mode java-ts-mode js-mode typescript-mode vue-mode latex-mode)
       (:hook eglot-ensure))
     (:option eglot-events-buffer-size 0
-             ;; 取消 eglot log
-             eglot-events-buffer-config '(:size 0 :format full))
-    ;; Latex
-    ;; $ luarocks install digestif
-    ;;
-    ;; Java
-    ;; $ brew install jdtls
-
-    ;; Python
-    ;; $ brew install pipx
-    ;; $ pipx install pyright
-    ;; HTML $ brew install vscode-langservers-extracted
-    (dolist (item '((my-html-mode . ("vscode-html-language-server" "--stdio"))
-                    ;; $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-                    ;; $ nvm install node
-                    ;; $ sudo npm install -g typescript
-                    ;; $ npm install -g @volar/vue-language-server
-                    (vue-mode . (eglot-volar "vue-language-server" "--stdio"))
-                    ;; $ npm install -g typescript-language-server
-                    (js-mode . ("typescript-language-server" "--stdio"))
-                    (typescript-mode . ("typescript-language-server" "--stdio"))
-                    (java-ts-mode . jdtls-command-contact)))
-      (push item eglot-server-programs))
+             eglot-events-buffer-config '(:size 0 :format full)) ;; 取消 eglot log
+    (dolist (item (list
+                   (cons 'my-html-mode '("vscode-html-language-server" "--stdio"))
+                   ;; ╭──────────────────────────────────────────────────────────────────╮
+                   ;; │https://github.com/joaotavora/eglot/discussions/1184              │
+                   ;; │只支持 *.vue 文件内 find references，不支持 *.js。 （VSCode 验证）│
+                   ;; ╰──────────────────────────────────────────────────────────────────╯
+                   (cons '(vue-mode vue-ts-mode typescript-ts-mode typescript-mode)
+                         `("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options)))
+                   (cons 'js-mode '("typescript-language-server" "--stdio"))
+                   ;; https://github.com/joaotavora/eglot/discussions/1185
+                   (cons 'java-ts-mode 'jdtls-command-contact)))
+      (add-to-list 'eglot-server-programs item))
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster

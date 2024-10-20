@@ -86,6 +86,114 @@
 
     ;; uniline
 
+    ;; (defun uniline-draw-diagonal-line (char num-lines direction upward)
+    ;;   "Draw a diagonal line with CHAR over NUM-LINES lines.
+    ;;    DIRECTION should be either `left' or `right'.
+    ;;    UPWARD should be non-nil to draw upward."
+    ;;   (let ((spaces (current-column)))
+    ;;     (dotimes (i num-lines)
+    ;;       ;; Move to the calculated column
+    ;;       (move-to-column spaces t)
+    ;;       ;; Delete any character at the target position to overwrite it
+    ;;       (unless (eolp)
+    ;;         (delete-char 1))
+    ;;       ;; Insert the character
+    ;;       (insert-char char)
+    ;;       (unless (= i (1- num-lines))  ; Skip moving if it's the last iteration
+    ;;         ;; Calculate spaces to insert based on direction
+    ;;         (setq spaces (if upward
+    ;;                          (max 0 (- spaces (if (equal direction "right") 1 -1)))
+    ;;                        (max 0 (+ spaces (if (equal direction "right") 1 -1)))))
+    ;;         ;; Move to the next line
+    ;;         (if upward
+    ;;             (forward-line -1)
+    ;;           (if (eobp)
+    ;;               (newline)
+    ;;             (forward-line 1))))))
+    ;;   ;; Ensure the cursor is at the last inserted character
+    ;;   (end-of-line)
+    ;;   (backward-char))
+
+    ;; (defun uniline-draw-right-diagonal-down (num-lines)
+    ;;   "Draw a downward right-diagonal line with '╲' over NUM-LINES lines."
+    ;;   (interactive
+    ;;    (list (if current-prefix-arg
+    ;;              (prefix-numeric-value current-prefix-arg)
+    ;;            (read-number "Enter number of lines (default 1): " 1))))
+    ;;   (uniline-draw-diagonal-line ?╲ num-lines "right" nil))
+
+    ;; (defun uniline-draw-left-diagonal-down (num-lines)
+    ;;   "Draw a downward left-diagonal line with '╱' over NUM-LINES lines."
+    ;;   (interactive
+    ;;    (list (if current-prefix-arg
+    ;;              (prefix-numeric-value current-prefix-arg)
+    ;;            (read-number "Enter number of lines (default 1): " 1))))
+    ;;   (uniline-draw-diagonal-line ?╱ num-lines "left" nil))
+
+    ;; (defun uniline-draw-right-diagonal-up (num-lines)
+    ;;   "Draw an upward right-diagonal line with '╲' over NUM-LINES lines."
+    ;;   (interactive
+    ;;    (list (if current-prefix-arg
+    ;;              (prefix-numeric-value current-prefix-arg)
+    ;;            (read-number "Enter number of lines (default 1): " 1))))
+    ;;   (uniline-draw-diagonal-line ?╲ num-lines "right" t))
+
+    ;; (defun uniline-draw-left-diagonal-up (num-lines)
+    ;;   "Draw an upward left-diagonal line with '╱' over NUM-LINES lines."
+    ;;   (interactive
+    ;;    (list (if current-prefix-arg
+    ;;              (prefix-numeric-value current-prefix-arg)
+    ;;            (read-number "Enter number of lines (default 1): " 1))))
+    ;;   (uniline-draw-diagonal-line ?╱ num-lines "left" t))
+
+    (defun uniline-draw-diagonal-line (char repeat direction upward)
+      "Draw a diagonal line with CHAR over REPEAT lines.
+   DIRECTION should be either `left' or `right'.
+   UPWARD should be non-nil to draw upward."
+      (let ((spaces (current-column)))
+        (dotimes (i repeat)
+          ;; Move to the calculated column
+          (move-to-column spaces t)
+          ;; Delete any character at the target position to overwrite it
+          (unless (eolp)
+            (delete-char 1))
+          ;; Insert the character
+          (insert-char char)
+          (unless (= i (1- repeat))  ; Skip moving if it's the last iteration
+            ;; Calculate spaces to insert based on direction
+            (setq spaces (if upward
+                             (max 0 (- spaces (if (equal direction "right") 1 -1)))
+                           (max 0 (+ spaces (if (equal direction "right") 1 -1)))))
+            ;; Move to the next line
+            (if upward
+                (forward-line -1)
+              (if (eobp)
+                  (newline)
+                (forward-line 1))))))
+      ;; Ensure the cursor is at the last inserted character
+      (end-of-line)
+      (backward-char))
+
+    (defun uniline-draw-right-diagonal-down (&optional repeat)
+      "Draw a downward right-diagonal line with '╲' over REPEAT lines."
+      (interactive "P")
+      (uniline-draw-diagonal-line ?╲ (or (and repeat (prefix-numeric-value repeat)) 1) "right" nil))
+
+    (defun uniline-draw-left-diagonal-down (&optional repeat)
+      "Draw a downward left-diagonal line with '╱' over REPEAT lines."
+      (interactive "P")
+      (uniline-draw-diagonal-line ?╱ (or (and repeat (prefix-numeric-value repeat)) 1) "left" nil))
+
+    (defun uniline-draw-right-diagonal-up (&optional repeat)
+      "Draw an upward right-diagonal line with '╲' over REPEAT lines."
+      (interactive "P")
+      (uniline-draw-diagonal-line ?╲ (or (and repeat (prefix-numeric-value repeat)) 1) "right" t))
+
+    (defun uniline-draw-left-diagonal-up (&optional repeat)
+      "Draw an upward left-diagonal line with '╱' over REPEAT lines."
+      (interactive "P")
+      (uniline-draw-diagonal-line ?╱ (or (and repeat (prefix-numeric-value repeat)) 1) "left" t))
+
     (defun format-glyph (description glyphs)
       "Return a lambda that formats DESCRIPTION with GLYPHS for transient display."
       (concat description " " (propertize glyphs 'face 'transient-value)))
@@ -175,8 +283,7 @@
 
     (transient-define-prefix uniline-transient-arrows ()
       "Transient for inserting glyphs and rotating arrows."
-      [
-       "Insert Glyph"
+      ["Insert Glyph"
        ("a" (lambda () (format-glyph "insert-fw-arrow   " "[▷ ▶ → ▹ ▸]")) uniline-insert-fw-arrow)
        ("A" (lambda () (format-glyph "insert-bw-arrow   " "[◁ ◀ ← ◃ ◂]")) uniline-insert-bw-arrow)
        ("s" (lambda () (format-glyph "insert-fw-square  " "[□ ■ ◇ ◆ ◊]")) uniline-insert-fw-square)
@@ -194,7 +301,11 @@
        ("-" (lambda () (format-glyph "Insert " "-")) self-insert-command :transient t)
        ("+" (lambda () (format-glyph "Insert " "+")) self-insert-command :transient t)
        ("=" (lambda () (format-glyph "Insert " "=")) self-insert-command :transient t)
-       ("#" (lambda () (format-glyph "Insert " "#")) self-insert-command :transient t)]
+       ("#" (lambda () (format-glyph "Insert " "#")) self-insert-command :transient t)
+       ("r" (lambda () (format-glyph "Insert ↓" "╲")) uniline-draw-right-diagonal-down :transient t)
+       ("p" (lambda () (format-glyph "Insert ↓" "╱")) uniline-draw-left-diagonal-down  :transient t)
+       ("R" (lambda () (format-glyph "Insert ↑" "╲")) uniline-draw-right-diagonal-up   :transient t)
+       ("P" (lambda () (format-glyph "Insert ↑" "╱")) uniline-draw-left-diagonal-up    :transient t)]
       ["Other"
        ("f" "font" uniline-font-transient)
        ("q" "Quit" transient-quit-one)
