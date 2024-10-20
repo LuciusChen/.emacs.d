@@ -24,10 +24,7 @@
 (setup java-ts-mode (:file-match "\\.java\\'"))
 (setup python-ts-mode (:file-match "\\.py\\'"))
 (setup yaml-ts-mode (:file-match "\\.ya?ml\\'"))
-(setup vue-mode (:file-match "\\.vue\\'")
-       (:hooks vue-mode-hook (lambda ()
-                               (setq-local tab-width 2)
-                               (eglot-ensure))))
+(setup vue-mode (:file-match "\\.vue\\'"))
 
 (setup apheleia
   (:global "C-c C-x C-f" apheleia-format-buffer)

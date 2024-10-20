@@ -213,8 +213,7 @@ if one already exists."
 (setup recentf
   (:hook-into after-init)
   (:when-loaded
-    (:option recentf-auto-cleanup 'never
-             recentf-max-saved-items 100
+    (:option recentf-max-saved-items 100
              recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
                                    "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
                                    "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
