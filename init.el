@@ -219,6 +219,7 @@ unreadable. Returns the names of envvars that were changed."
     whitespace-cleanup-mode
     password-store-otp
     password-store
+    meow-tree-sitter
     go-translate
     (emt :host github :repo "roife/emt")
     (dape :host github :repo "svaante/dape")

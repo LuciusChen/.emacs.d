@@ -58,5 +58,9 @@ If DEST, a buffer, is provided, insert the markup there."
                   (if (functionp secret)
                       (encode-coding-string (funcall secret) 'utf-8)
                     secret)))))))
+
+(setup meow-tree-sitter
+  (:defer (:require meow-tree-sitter))
+  (:when-loaded (meow-tree-sitter-register-defaults)))
 (provide 'init-local)
 ;;; init-local.el ends here
