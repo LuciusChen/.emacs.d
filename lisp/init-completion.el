@@ -95,7 +95,7 @@
   (:defer (:require eglot))
   (:when-loaded
     (:also-load lib-eglot)
-    (:with-mode (python-ts-mode java-ts-mode js-mode typescript-mode vue-mode latex-mode)
+    (:with-mode (python-ts-mode js-mode typescript-mode vue-mode latex-mode)
       (:hook eglot-ensure))
     (:option eglot-events-buffer-size 0
              eglot-events-buffer-config '(:size 0 :format full)) ;; 取消 eglot log
@@ -109,9 +109,30 @@
                          `("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options)))
                    (cons 'js-mode '("typescript-language-server" "--stdio"))
                    ;; https://github.com/joaotavora/eglot/discussions/1185
-                   (cons 'java-ts-mode 'jdtls-command-contact)))
+                   ;; 由 eglot-java 接管
+                   ;; (cons 'java-ts-mode 'jdtls-command-contact)
+                   ))
       (add-to-list 'eglot-server-programs item))
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
+
+(setup eglot-java
+  (:with-mode (java-mode java-ts-mode)
+    (:hook eglot-java-mode))
+  (:when-loaded
+    (:require lib-eglot)
+    (:option
+     eglot-java-server-install-dir jdtls-install-dir
+     eglot-java-eclipse-jdt-cache-directory "~/.emacs.d/cache/"
+     eglot-java-eclipse-jdt-config-directory "~/.emacs.d/share/eclipse.jdt.ls/config_mac_arm/"
+     eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
+                                   "-Xmx8G"
+                                   ;; "-XX:+UseG1GC"
+                                   "-XX:+UseZGC"
+                                   "-XX:+UseStringDeduplication"
+                                   ;; "-XX:FreqInlineSize=325"
+                                   ;; "-XX:MaxInlineLevel=9"
+                                   "-XX:+UseCompressedOops")
+     eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster
 ;; Download the executable file from the address above and place it in your exec-path.
