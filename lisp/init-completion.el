@@ -108,8 +108,8 @@
                    (cons '(vue-mode vue-ts-mode typescript-ts-mode typescript-mode)
                          `("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options)))
                    (cons 'js-mode '("typescript-language-server" "--stdio"))
-                   ;; https://github.com/joaotavora/eglot/discussions/1185
                    ;; 由 eglot-java 接管
+                   ;; https://github.com/joaotavora/eglot/discussions/1185
                    ;; (cons 'java-ts-mode 'jdtls-command-contact)
                    ))
       (add-to-list 'eglot-server-programs item))
@@ -122,8 +122,8 @@
     (:require lib-eglot)
     (:option
      eglot-java-server-install-dir jdtls-install-dir
-     eglot-java-eclipse-jdt-cache-directory "~/.emacs.d/cache/"
-     eglot-java-eclipse-jdt-config-directory "~/.emacs.d/share/eclipse.jdt.ls/config_mac_arm/"
+     eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
+     eglot-java-eclipse-jdt-config-directory (concat user-emacs-directory "share/eclipse.jdt.ls/config_mac_arm/")
      eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
                                    "-Xmx8G"
                                    ;; "-XX:+UseG1GC"
