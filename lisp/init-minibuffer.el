@@ -39,11 +39,11 @@
 ;;     (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disable-modification-indication))
 ;;     (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disable-modification-indication))))
 
-(setup tecoline
-  (:require tecoline)
-  (setq-default mode-line-buffer-identification
-                '(:propertize "%12b" face nano-modeline-name)
-                mode-line-format (nano-modeline-default-mode)))
+;; (setup tecoline
+;;   (:require tecoline)
+;;   (setq-default mode-line-buffer-identification
+;;                 '(:propertize "%12b" face nano-modeline-name)
+;;                 mode-line-format (nano-modeline-default-mode)))
 
 (setup vertico
   (:defer (:require vertico))

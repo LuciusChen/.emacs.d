@@ -20,6 +20,35 @@
                                             :documentColor t))
                   :vue (:hybridMode :json-false))))
 
+(defun get-latest-lombok-jar ()
+  "Return the path to the latest Lombok JAR file."
+  (let* ((lombok-dir (expand-file-name "~/.m2/repository/org/projectlombok/lombok/"))
+         (versions (directory-files lombok-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$"))
+         (latest-version-dir (car (last (sort versions
+                                              (lambda (a b)
+                                                (version< (file-name-nondirectory a)
+                                                          (file-name-nondirectory b))))))))
+    (when latest-version-dir
+      (car (directory-files latest-version-dir t "lombok-[0-9.]+\\.jar$")))))
+
+(defun custom-eglot-java-init-opts (server eglot-java-eclipse-jdt)
+  "Custom options that will be merged with any default settings."
+  `(:bundles [,(file-truename
+                (car
+                 (directory-files
+                  (expand-file-name "~/.emacs.d/debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/")
+                  t "com.microsoft.java.debug.plugin-[0-9.]+\\.jar$" t)))]))
+
+(defvar jdtls-install-dir
+  (let ((base-dir "/opt/homebrew/Cellar/jdtls/"))
+    (car (last (sort
+                (directory-files base-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+                (lambda (a b)
+                  (version< (file-name-nondirectory a)
+                            (file-name-nondirectory b)))))))
+  "The installation directory of the latest jdtls version.")
+
+
 (defun jdtls-command-contact (&optional interactive)
   "Construct the command to start JDTLS with appropriate options and arguments.
 

@@ -144,6 +144,7 @@ unreadable. Returns the names of envvars that were changed."
     wgrep
     setup
     eglot
+    eglot-java
     corfu
     vundo
     forge
