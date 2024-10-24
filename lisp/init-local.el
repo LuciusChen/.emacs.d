@@ -59,6 +59,12 @@ If DEST, a buffer, is provided, insert the markup there."
                       (encode-coding-string (funcall secret) 'utf-8)
                     secret)))))))
 
+(defun save-buffer-always ()
+  "Save the buffer even if it is not modified."
+  (interactive)
+  (set-buffer-modified-p t)
+  (save-buffer))
+
 (setup meow-tree-sitter
   (:defer (:require meow-tree-sitter))
   (:when-loaded (meow-tree-sitter-register-defaults)))

@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (defun vue-eglot-init-options ()
+  "VUE language server init options."
   (let ((tsdk-path (expand-file-name
                     "lib"
                     (string-trim-right (shell-command-to-string "npm list --global --parseable typescript | head -n1")))))
@@ -32,7 +33,9 @@
       (car (directory-files latest-version-dir t "lombok-[0-9.]+\\.jar$")))))
 
 (defun custom-eglot-java-init-opts (server eglot-java-eclipse-jdt)
-  "Custom options that will be merged with any default settings."
+  "Return custom initialization options for the Java language server.
+
+SERVER and EGLOT-JAVA-ECLIPSE-JDT are passed by Eglot."
   `(:bundles [,(file-truename
                 (car
                  (directory-files
