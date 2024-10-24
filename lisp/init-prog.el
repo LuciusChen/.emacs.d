@@ -148,7 +148,7 @@
     (global-treesit-auto-mode)))
 
 (setup indent-bars
-  (:with-mode (java-ts-mode python-ts-mode)
+  (:with-mode (java-ts-mode python-ts-mode vue-mode typescript-mode typescript-ts-mode)
     (:require indent-bars)
     (:hook indent-bars-mode))
   (:option indent-bars-display-on-blank-lines nil
