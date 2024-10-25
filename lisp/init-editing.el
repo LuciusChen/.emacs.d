@@ -33,6 +33,14 @@
               (run-hooks 'meow-leaving-insert-mode-hook))))
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
+(setup meow-tree-sitter
+  (:defer (:require meow-tree-sitter))
+  (:when-loaded (meow-tree-sitter-register-defaults)))
+
+(setup window-numbering
+  (:defer (:require window-numbering))
+  (:when-loaded (window-numbering-mode)))
+
 (setup sis
   ;; brew tap laishulu/macism
   ;; brew install macism
