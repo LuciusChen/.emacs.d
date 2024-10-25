@@ -52,7 +52,7 @@
 ;;
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (push "^No window numbered .$" debug-ignored-errors)
 
@@ -81,14 +81,6 @@ This is called before automatic assignment begins.  The function should
 return a number to have it assigned to the current-window, nil otherwise."
   :group 'window-numbering
   :type 'function)
-
-(defconst window-numbering-mode-line-position 1
-  "The position in the mode-line `window-numbering-mode' displays the number.")
-
-(defface window-numbering-face
-  '()
-  "Face used for the number in the mode-line."
-  :group 'window-numbering)
 
 (defvar window-numbering-table nil
   "table -> (window vector . number table)")
@@ -172,15 +164,6 @@ windows to numbers."
             windows))
     (dolist (window windows)
       (window-numbering-assign window))))
-
-(defun window-numbering-get-number-string (&optional window)
-  (let ((s (int-to-string (window-numbering-get-number window))))
-    (propertize s 'face 'window-numbering-face)))
-
-(defun window-numbering-get-number (&optional window)
-  (let ((ht (cdr (gethash (selected-frame) window-numbering-table))))
-    (when (hash-table-p ht)
-      (gethash (or window (selected-window)) ht))))
 
 (defvar window-numbering-keymap
   (let ((map (make-sparse-keymap)))
