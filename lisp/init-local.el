@@ -64,9 +64,5 @@ If DEST, a buffer, is provided, insert the markup there."
   (interactive)
   (set-buffer-modified-p t)
   (save-buffer))
-
-(setup meow-tree-sitter
-  (:defer (:require meow-tree-sitter))
-  (:when-loaded (meow-tree-sitter-register-defaults)))
 (provide 'init-local)
 ;;; init-local.el ends here
