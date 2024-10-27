@@ -37,10 +37,6 @@
   (:defer (:require meow-tree-sitter))
   (:when-loaded (meow-tree-sitter-register-defaults)))
 
-(setup window-numbering
-  (:defer (:require window-numbering))
-  (:when-loaded (window-numbering-mode)))
-
 (setup sis
   ;; brew tap laishulu/macism
   ;; brew install macism

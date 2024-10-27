@@ -63,7 +63,7 @@
 (setup dimmer
   (:defer (dimmer-mode t))
   (:when-loaded
-    (setq-default dimmer-fraction 0.15)
+    (setq-default dimmer-fraction 0.25)
     (defun +display-non-graphic-p ()
       (not (display-graphic-p)))
     (add-to-list 'dimmer-exclusion-predicates '+display-non-graphic-p)
