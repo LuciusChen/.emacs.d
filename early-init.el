@@ -51,12 +51,6 @@
 ;; Disable package.el in favor of straight.el
 (setq package-enable-at-startup nil
       package-quickstart nil)
-;; benchmark
-(add-to-list 'load-path
-             "~/.emacs.d/straight/repos/benchmark-init-el")
-(require 'benchmark-init)
-;; To disable collection of benchmark data after init is done.
-(add-hook 'after-init-hook 'benchmark-init/deactivate)
 
 (unless (daemonp)
   (let ((old-value (default-toplevel-value 'file-name-handler-alist)))

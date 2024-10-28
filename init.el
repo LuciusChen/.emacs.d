@@ -205,7 +205,6 @@ unreadable. Returns the names of envvars that were changed."
     markdown-mode
     consult-eglot
     mode-line-bell
-    benchmark-init
     embark-consult
     elfeed-tube-mpv
     typescript-mode
