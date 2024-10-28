@@ -19,7 +19,6 @@
 (setup my-html-mode (:file-match "\\.html\\'"))
 (setup jsp-mode (:file-match "\\.jsp\\'"))
 (setup wxss-mode (:file-match "\\.wxss\\'"))
-;; (setup wxml-mode (:file-match "\\.wxml\\'"))
 (setup my-html-mode (:file-match "\\.wxml\\'"))
 (setup java-ts-mode (:file-match "\\.java\\'"))
 (setup python-ts-mode (:file-match "\\.py\\'"))

@@ -27,8 +27,8 @@
   "Enable window-numbering-mode if it hasn't been loaded yet."
   (unless my-window-numbering-loaded
     (require 'window-numbering)
-    (setq my-window-numbering-loaded t)
-    (window-numbering-mode)))
+    (setq my-window-numbering-loaded t))
+  (window-numbering-mode))
 
 (provide 'lib-window)
 ;;; lib-window.el ends here
