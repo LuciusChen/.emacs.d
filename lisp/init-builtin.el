@@ -153,16 +153,25 @@
 (setup indent
   (:defer (:option  tab-always-indent 'complete)))
 
+;; Change global font size easily
+(setup default-text-scale (:hook-into after-init))
+
+(setup frame
+  (:when-loaded
+    (let ((border '(internal-border-width . 12)))
+      (add-to-list 'default-frame-alist border)
+      (add-to-list 'initial-frame-alist border))))
+
+;; Non-zero values for `line-spacing' can mess up ansi-term and co,
+;; so we zero it explicitly in those cases.
+(setup term (:with-mode term-mode (:hook (lambda () (setq line-spacing 0)))))
+
 (setup window
   (:require lib-window)
   (:global "C-x |" split-window-horizontally-instead
            "C-x _" split-window-vertically-instead
            "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))
-           "C-x 2" (lambda () (interactive)(select-window (split-window-vertically))))
-  (:advice split-window-right :after +enable-window-numbering-mode)
-  (:advice delete-window :after (lambda (&rest _args)
-                                  (if (bound-and-true-p window-numbering-mode)
-                                      (window-numbering-mode -1)))))
+           "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
 
 (setup project
   (defun +project-shell ()

@@ -88,7 +88,7 @@
 ;; $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 ;; $ nvm install node
 ;; $ sudo npm install -g typescript
-;; $ npm install -g @volar/vue-language-server
+;; $ npm install -g @vue/language-server
 ;; $ npm install -g typescript-language-server
 
 (setup eglot

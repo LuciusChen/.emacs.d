@@ -1,19 +1,6 @@
 ;;; init-ui.el --- Behaviour specific to non-TTY frames -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(setup frame
-  (:when-loaded
-    (let ((border '(internal-border-width . 12)))
-      (add-to-list 'default-frame-alist border)
-      (add-to-list 'initial-frame-alist border))))
-
-;; Non-zero values for `line-spacing' can mess up ansi-term and co,
-;; so we zero it explicitly in those cases.
-(setup term (:with-mode term-mode (:hook (lambda () (setq line-spacing 0)))))
-
-;; Change global font size easily
-(setup default-text-scale (:hook-into after-init))
-
 (setup dashboard
   (:after nerd-icons)
   (:option dashboard-latitude 32.09703
@@ -71,6 +58,10 @@
 
 (setup nerd-icons (:defer (:require nerd-icons)))
 
+(setup window-numbering
+  (:defer (:require window-numbering))
+  (:when-loaded (window-numbering-mode)))
+
 (setup popper
   (:global "C-~"   popper-toggle
            "M-~"   popper-cycle
@@ -80,8 +71,6 @@
                                    win
                                    (max 26 (floor (frame-height) 2))
                                    26))
-           popper-echo-dispatch-keys '("M-1" "M-2" "M-3" "M-4" "M-5"
-                                       "M-6" "M-7" "M-8" "M-9" "M-0")
            popper-reference-buffers
            '(("\\*Messages\\*"
               "Output\\*$"
