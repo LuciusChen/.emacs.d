@@ -159,7 +159,10 @@
            "C-x _" split-window-vertically-instead
            "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))
            "C-x 2" (lambda () (interactive)(select-window (split-window-vertically))))
-  (:advice split-window-right :after +enable-window-numbering-mode))
+  (:advice split-window-right :after +enable-window-numbering-mode)
+  (:advice delete-window :after (lambda (&rest _args)
+                                  (if (bound-and-true-p window-numbering-mode)
+                                      (window-numbering-mode -1)))))
 
 (setup project
   (defun +project-shell ()
