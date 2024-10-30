@@ -3,9 +3,8 @@
 ;;; Code:
 (defun vue-eglot-init-options ()
   "VUE language server init options."
-  (let ((tsdk-path (expand-file-name
-                    "lib"
-                    (string-trim-right (shell-command-to-string "npm list --global --parseable typescript | head -n1")))))
+  (let ((tsdk-path (expand-file-name "typescript/lib"
+                                     (string-trim-right (shell-command-to-string "npm root -g")))))
     `(:typescript (:tsdk ,tsdk-path
                          :languageFeatures (:completion
                                             (:defaultTagNameCase "both"
