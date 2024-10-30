@@ -28,7 +28,7 @@
                           "Segoe UI Emoji"
                           "Symbola"))
 (defconst *default-font* "JetBrains Mono 14")
-(defconst *org-font* "iosevka")
+(defconst *org-font* "PragmataPro")
 (defconst *term-default-font* "PragmataPro Mono Liga 14")
 (defconst *zh-default-font* "LXGW WenKai")
 (defconst *jp-default-font* "Noto Sans Javanese")
@@ -49,8 +49,8 @@
 
   (defun +load-env-file (file &optional noerror)
     "Read and set envvars from FILE.
-If NOERROR is non-nil, don't throw an error if the file doesn't exist or is
-unreadable. Returns the names of envvars that were changed."
+     If NOERROR is non-nil, don't throw an error if the file doesn't exist or is
+     unreadable. Returns the names of envvars that were changed."
     (if (not (file-readable-p file))
         (unless noerror
           (signal 'file-error (list "Couldn't read envvar file" file)))
