@@ -58,9 +58,9 @@
 
 (setup nerd-icons (:defer (:require nerd-icons)))
 
-(setup window-numbering
-  (:defer (:require window-numbering))
-  (:when-loaded (window-numbering-mode)))
+(setup window-navigation
+  (:defer (:require window-navigation))
+  (:when-loaded (window-navigation-mode)))
 
 (setup popper
   (:global "C-~"   popper-toggle
