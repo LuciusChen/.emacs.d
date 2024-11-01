@@ -158,6 +158,7 @@
 (setup avy
   (:global "C-;" avy-goto-char
            "C-:" avy-goto-char-in-line)
+  (:option avy-style 'de-bruijn)
   (:defer (:require ace-pinyin)
           (ace-pinyin-global-mode +1)))
 

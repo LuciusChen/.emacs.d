@@ -82,7 +82,7 @@
 ;; $ pipx install pyright
 ;; ╺═══════════════════════════════════════
 ;; HTML
-;; $ brew install vscode-langservers-extracted
+;; $ npm install -g vscode-langservers-extracted
 ;; ╺═══════════════════════════════════════
 ;; JS
 ;; $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
