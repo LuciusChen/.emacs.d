@@ -1,11 +1,11 @@
-;;; window-numbering.el --- Numbered window shortcuts
+;;; window-navigation.el --- Numbered window shortcuts
 ;;
 ;; Copyright (C) 2006-2007, 2013, 2015 Nikolaj Schumacher <bugs * nschum , de>
 ;;
 ;; Author: Nikolaj Schumacher <bugs * nschum de>
 ;; Version: 1.1.2
 ;; Keywords: faces, matching
-;; URL: http://nschum.de/src/emacs/window-numbering-mode/
+;; URL: http://nschum.de/src/emacs/window-navigation-mode/
 ;; Compatibility: GNU Emacs 22.x, GNU Emacs 23.x, GNU Emacs 24.x
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -25,22 +25,22 @@
 ;;
 ;;; Commentary:
 ;;
-;; Enable window-numbering-mode and use M-1 through M-0 to navigate.
+;; Enable window-navigation-mode and use M-1 through M-0 to navigate.
 ;;
-;; If you want to affect the numbers, use window-numbering-before-hook or
-;; window-numbering-assign-func.
+;; If you want to affect the numbers, use window-navigation-before-hook or
+;; window-navigation-assign-func.
 ;; For instance, to always assign the calculator window the number 9, add the
 ;; following to your .emacs:
 ;;
-;; (setq window-numbering-assign-func
+;; (setq window-navigation-assign-func
 ;;       (lambda () (when (equal (buffer-name) "*Calculator*") 9)))
 ;;
 ;;; Changes Log:
 ;;
-;;    Fix numbering of minibuffer for recent Emacs versions.
+;;    Fix navigation of minibuffer for recent Emacs versions.
 ;;
 ;; 2013-03-23 (1.1.2)
-;;    Fix numbering in terminal mode with menu bar visible.
+;;    Fix navigation in terminal mode with menu bar visible.
 ;;    Add face for window number.  (thanks to Chen Bin)
 ;;
 ;; 2008-04-11 (1.1.1)
@@ -48,7 +48,7 @@
 ;;    Cleaned up code and migrated to `defcustom'.
 ;;
 ;; 2007-02-18 (1.1)
-;;    Added window-numbering-before-hook, window-numbering-assign-func.
+;;    Added window-navigation-before-hook, window-navigation-assign-func.
 ;;
 ;;; Code:
 
@@ -56,40 +56,40 @@
 
 (push "^No window numbered .$" debug-ignored-errors)
 
-(defgroup window-numbering nil
+(defgroup window-navigation nil
   "Numbered window shortcuts"
   :group 'convenience)
 
-(defcustom window-numbering-auto-assign-0-to-minibuffer t
-  "*If non-nil, `window-numbering-mode' assigns 0 to the minibuffer if active."
-  :group 'window-numbering
+(defcustom window-navigation-auto-assign-0-to-minibuffer t
+  "*If non-nil, `window-navigation-mode' assigns 0 to the minibuffer if active."
+  :group 'window-navigation
   :type '(choice (const :tag "Off" nil)
                  (const :tag "On" t)))
 
-(defcustom window-numbering-before-hook nil
-  "*Hook called before `window-numbering-mode' starts assigning numbers.
+(defcustom window-navigation-before-hook nil
+  "*Hook called before `window-navigation-mode' starts assigning numbers.
 The number of windows that will be numbered is passed as a parameter.
-Use `window-numbering-assign' to manually assign some of them a number.
+Use `window-navigation-assign' to manually assign some of them a number.
 If you want to assign a number to just one buffer, use
-`window-numbering-assign-func' instead."
-  :group 'window-numbering
+`window-navigation-assign-func' instead."
+  :group 'window-navigation
   :type 'hook)
 
-(defcustom window-numbering-assign-func nil
-  "*Function called for each window by `window-numbering-mode'.
+(defcustom window-navigation-assign-func nil
+  "*Function called for each window by `window-navigation-mode'.
 This is called before automatic assignment begins.  The function should
 return a number to have it assigned to the current-window, nil otherwise."
-  :group 'window-numbering
+  :group 'window-navigation
   :type 'function)
 
-(defvar window-numbering-table nil
+(defvar window-navigation-table nil
   "table -> (window vector . number table)")
 
 (defun select-window-by-number (i &optional arg)
-  "Select window given number I by `window-numbering-mode'.
+  "Select window given number I by `window-navigation-mode'.
 If prefix ARG is given, delete the window instead of selecting it."
   (interactive "P")
-  (let ((windows (car (gethash (selected-frame) window-numbering-table)))
+  (let ((windows (car (gethash (selected-frame) window-navigation-table)))
         window)
     (if (and (>= i 0) (< i 10)
              (setq window (aref windows i)))
@@ -105,7 +105,7 @@ If prefix ARG is given, delete the window instead of selecting it."
            (interactive "P")
            (select-window-by-number ,i arg))))
 
-(defun window-numbering-calculate-left (windows)
+(defun window-navigation-calculate-left (windows)
   (let ((i 9) left)
     (while (>= i 0)
       (let ((window (aref windows i)))
@@ -114,58 +114,58 @@ If prefix ARG is given, delete the window instead of selecting it."
       (cl-decf i))
     left))
 
-(defvar window-numbering-windows nil
+(defvar window-navigation-windows nil
   "A vector listing the window for each number.")
-(defvar window-numbering-numbers
+(defvar window-navigation-numbers
   "A hash map containing each window's number.")
-(defvar window-numbering-left
+(defvar window-navigation-left
   "A list of unused window numbers.")
 
-(defun window-numbering-assign (window &optional number)
+(defun window-navigation-assign (window &optional number)
   (if number
-      (if (aref window-numbering-windows number)
+      (if (aref window-navigation-windows number)
           (progn (message "Number %s assigned to two buffers (%s and %s)"
-                          number window (aref window-numbering-windows number))
+                          number window (aref window-navigation-windows number))
                  nil)
-        (setf (aref window-numbering-windows number) window)
-        (puthash window number window-numbering-numbers)
-        (setq window-numbering-left (delq number window-numbering-left))
+        (setf (aref window-navigation-windows number) window)
+        (puthash window number window-navigation-numbers)
+        (setq window-navigation-left (delq number window-navigation-left))
         t)
     ;; else default adding
-    (when window-numbering-left
-      (unless (gethash window window-numbering-numbers)
-        (let ((number (car window-numbering-left)))
-          (window-numbering-assign window number)
+    (when window-navigation-left
+      (unless (gethash window window-navigation-numbers)
+        (let ((number (car window-navigation-left)))
+          (window-navigation-assign window number)
           number)))))
 
-(defun window-numbering-update ()
-  "Update the window numbering for the current frame.
+(defun window-navigation-update ()
+  "Update the window navigation for the current frame.
 Optional parameter PREASSIGNED-WINDOWS is a hashmap already mapping some
 windows to numbers."
-  (setq window-numbering-windows (make-vector 10 nil)
-        window-numbering-numbers (make-hash-table :size 10)
-        window-numbering-left
-        (window-numbering-calculate-left window-numbering-windows))
+  (setq window-navigation-windows (make-vector 10 nil)
+        window-navigation-numbers (make-hash-table :size 10)
+        window-navigation-left
+        (window-navigation-calculate-left window-navigation-windows))
   (puthash (selected-frame)
-           (cons window-numbering-windows window-numbering-numbers)
-           window-numbering-table)
-  (when (and window-numbering-auto-assign-0-to-minibuffer
+           (cons window-navigation-windows window-navigation-numbers)
+           window-navigation-table)
+  (when (and window-navigation-auto-assign-0-to-minibuffer
              (active-minibuffer-window))
-    (window-numbering-assign (active-minibuffer-window) 0))
+    (window-navigation-assign (active-minibuffer-window) 0))
   (let ((windows (window-list nil 0 (frame-first-window))))
-    (run-hook-with-args 'window-numbering-before-hook windows)
-    (when window-numbering-assign-func
+    (run-hook-with-args 'window-navigation-before-hook windows)
+    (when window-navigation-assign-func
       (mapc (lambda (window)
               (with-selected-window window
                 (with-current-buffer (window-buffer window)
-                  (let ((num (funcall window-numbering-assign-func)))
+                  (let ((num (funcall window-navigation-assign-func)))
                     (when num
-                      (window-numbering-assign window num))))))
+                      (window-navigation-assign window num))))))
             windows))
     (dolist (window windows)
-      (window-numbering-assign window))))
+      (window-navigation-assign window))))
 
-(defvar window-numbering-keymap
+(defvar window-navigation-keymap
   (let ((map (make-sparse-keymap)))
     (define-key map "\M-0" 'select-window-0)
     (define-key map "\M-1" 'select-window-1)
@@ -178,30 +178,30 @@ windows to numbers."
     (define-key map "\M-8" 'select-window-8)
     (define-key map "\M-9" 'select-window-9)
     map)
-  "Keymap used in by `window-numbering-mode'.")
+  "Keymap used in by `window-navigation-mode'.")
 
 ;;;###autoload
-(define-minor-mode window-numbering-mode
+(define-minor-mode window-navigation-mode
   "A minor mode that assigns a number to each window."
   :init-value nil
   :lighter nil
-  :keymap window-numbering-keymap
+  :keymap window-navigation-keymap
   :global t
-  (if window-numbering-mode
-      (unless window-numbering-table
+  (if window-navigation-mode
+      (unless window-navigation-table
         (save-excursion
-          (setq window-numbering-table (make-hash-table :size 16))
-          (add-hook 'minibuffer-setup-hook 'window-numbering-update)
+          (setq window-navigation-table (make-hash-table :size 16))
+          (add-hook 'minibuffer-setup-hook 'window-navigation-update)
           (add-hook 'window-configuration-change-hook
-                    'window-numbering-update)
+                    'window-navigation-update)
           (dolist (frame (frame-list))
             (select-frame frame)
-            (window-numbering-update))))
-    (remove-hook 'minibuffer-setup-hook 'window-numbering-update)
+            (window-navigation-update))))
+    (remove-hook 'minibuffer-setup-hook 'window-navigation-update)
     (remove-hook 'window-configuration-change-hook
-                 'window-numbering-update)
-    (setq window-numbering-table nil)))
+                 'window-navigation-update)
+    (setq window-navigation-table nil)))
 
-(provide 'window-numbering)
+(provide 'window-navigation)
 
-;;; window-numbering.el ends here
+;;; window-navigation.el ends here
