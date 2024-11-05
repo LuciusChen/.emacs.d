@@ -38,7 +38,7 @@
   (:when-loaded (meow-tree-sitter-register-defaults)))
 
 (setup sis
-  ;; brew tap laishulu/macism
+  ;; brew tap laishulu/homebrew
   ;; brew install macism
   (:option sis-external-ism "macism"
            sis-english-source "com.apple.keylayout.ABC"
