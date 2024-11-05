@@ -27,10 +27,10 @@ index e3b3d40df43..862ccaa66d0 100644
          {
            if (face && (NS_FACE_BACKGROUND (face)
 diff --git a/src/nsfns.m b/src/nsfns.m
-index c521140bd68..3d1ac5c01eb 100644
+index 3c012ca8f05..e0ed88bcfb8 100644
 --- a/src/nsfns.m
 +++ b/src/nsfns.m
-@@ -301,7 +301,7 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
+@@ -299,7 +299,7 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
    struct face *face;
    NSColor *col;
    NSView *view = FRAME_NS_VIEW (f);
@@ -39,7 +39,7 @@ index c521140bd68..3d1ac5c01eb 100644
  
    block_input ();
    if (ns_lisp_to_color (arg, &col))
-@@ -316,11 +316,10 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
+@@ -314,11 +314,10 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
    f->output_data.ns->background_color = col;
  
    FRAME_BACKGROUND_PIXEL (f) = [col unsignedLong];
@@ -52,7 +52,7 @@ index c521140bd68..3d1ac5c01eb 100644
  
        if (alpha != (EmacsCGFloat) 1.0)
            [[view window] setOpaque: NO];
-@@ -330,10 +329,7 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
+@@ -328,10 +327,7 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
        face = FRAME_DEFAULT_FACE (f);
        if (face)
          {
@@ -64,7 +64,7 @@ index c521140bd68..3d1ac5c01eb 100644
            update_face_from_frame_parameter (f, Qbackground_color, arg);
          }
  
-@@ -346,6 +342,36 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
+@@ -344,6 +340,36 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
    unblock_input ();
  }
  
@@ -101,7 +101,7 @@ index c521140bd68..3d1ac5c01eb 100644
  
  static void
  ns_set_cursor_color (struct frame *f, Lisp_Object arg, Lisp_Object oldval)
-@@ -1107,7 +1133,7 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
+@@ -1109,7 +1135,7 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
    ns_set_z_group,
    0, /* x_set_override_redirect */
    gui_set_no_special_glyphs,
@@ -111,7 +111,7 @@ index c521140bd68..3d1ac5c01eb 100644
  #ifdef NS_IMPL_COCOA
    ns_set_appearance,
 diff --git a/src/nsterm.m b/src/nsterm.m
-index f26cdb17903..182aa3ff74f 100644
+index 8862a74f129..b81ae4044d9 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
 @@ -2627,8 +2627,9 @@ Hide the window (X11 semantics)
@@ -154,17 +154,17 @@ index f26cdb17903..182aa3ff74f 100644
            NSRectFill (NSMakeRect (0, y, width, height));
            NSRectFill (NSMakeRect (FRAME_PIXEL_WIDTH (f) - width,
                                    y, width, height));
-@@ -2977,7 +2979,8 @@ Hide the window (X11 semantics)
-     {
-       NSTRACE_RECT ("clearRect", clearRect);
+@@ -2980,7 +2982,8 @@ Hide the window (X11 semantics)
+         {
+           NSTRACE_RECT ("clearRect", clearRect);
  
--      [[NSColor colorWithUnsignedLong:face->background] set];
-+      [[[NSColor colorWithUnsignedLong:face->background]
-+	 colorWithAlphaComponent: f->alpha_background] set];
-       NSRectFill (clearRect);
+-          [[NSColor colorWithUnsignedLong:face->background] set];
++          [[[NSColor colorWithUnsignedLong:face->background]
++             colorWithAlphaComponent: f->alpha_background] set];
+           NSRectFill (clearRect);
+         }
      }
- 
-@@ -3008,7 +3011,7 @@ Hide the window (X11 semantics)
+@@ -3012,7 +3015,7 @@ Hide the window (X11 semantics)
        else
          bm_color = f->output_data.ns->cursor_color;
  
@@ -238,7 +238,7 @@ index f26cdb17903..182aa3ff74f 100644
  
  	  NSRectFill (NSMakeRect (x, s->y, background_width, s->height));
  	}
-@@ -8546,8 +8556,9 @@ - (void)toggleFullScreen: (id)sender
+@@ -8607,8 +8617,9 @@ - (void)toggleFullScreen: (id)sender
          }
  
        [w setContentView:[fw contentView]];
@@ -250,7 +250,7 @@ index f26cdb17903..182aa3ff74f 100644
          [w setOpaque: NO];
  
        f->border_width = [w borderWidth];
-@@ -9284,9 +9295,10 @@ - (instancetype) initWithEmacsFrame: (struct frame *) f
+@@ -9345,9 +9356,10 @@ - (instancetype) initWithEmacsFrame: (struct frame *) f
        f->border_width = [self borderWidth];
  
        col = [NSColor colorWithUnsignedLong:NS_FACE_BACKGROUND
