@@ -38,45 +38,72 @@
   (:when-loaded (meow-tree-sitter-register-defaults)))
 
 (setup sis
-  ;; brew tap laishulu/homebrew
-  ;; brew install macism
-  (:option sis-external-ism "macism"
-           sis-english-source "com.apple.keylayout.ABC"
-           sis-inline-tighten-head-rule nil
-           sis-default-cursor-color "#cf7fa7"
-           sis-other-cursor-color "orange")
-  (:hooks meow-insert-exit-hook sis-set-english)
-  (if *IS-MAC*
-      (sis-ism-lazyman-config
-       "com.apple.keylayout.ABC"
-       "im.rime.inputmethod.Squirrel.Hans")
-    (sis-ism-lazyman-config "1" "2" 'fcitx))
-  ;; enable the /cursor color/ mode
-  (sis-global-cursor-color-mode t)
-  ;; enable the /respect/ mode
-  (sis-global-respect-mode t)
-  ;; enable the /context/ mode for all buffers
-  (sis-global-context-mode t)
-  ;; enable the /inline english/ mode for all buffers
-  ;; (sis-global-inline-mode t)
-  (add-to-list 'sis-context-hooks 'meow-insert-enter-hook)
-  ;; org title 处切换 Rime，telega 聊天时切换 Rime。
-  ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。
-  (add-to-list 'sis-context-detectors
-               (lambda (&rest _)
-                 (when (and meow-insert-mode
-                            (or (derived-mode-p 'org-mode
-                                                'gfm-mode
-                                                'telega-chat-mode)
-                                (string-match-p "*new toot*" (buffer-name))))
-                   'other)))
+  (:defer (:require sis))
+  (:when-loaded
+    (defun sis--init-ism ()
+      "Init input source manager."
+      ;; `sis-do-get'and `sis-do-set' takes the first precedence.
 
-  (defun +meow-focus-change-function ()
-    (if (frame-focus-state)
-        (sis-set-english)
-      (meow-insert-exit)))
+      (unless (and (functionp sis-do-get)
+                   (functionp sis-do-set))
+        (when (fboundp 'mac-input-source)
+          (setq sis--ism 'emp)))
 
-  (add-function :after after-focus-change-function '+meow-focus-change-function))
+      ;; make `sis-do-set' and `sis-do-get'
+      (when sis--ism
+        ;; avoid override user customized sis-do-get
+        (unless (functionp sis-do-get)
+          (setq sis-do-get (sis--mk-get-fn)))
+        ;; avoid override user customized sis-do-set
+        (unless (functionp sis-do-set)
+          (setq sis-do-set (sis--mk-set-fn))))
+
+      ;; successfully inited
+      (when (and (functionp sis-do-get)
+                 (functionp sis-do-set))
+        ;; a t `sis--ism' means customized by `sis-do-get' and `sis-do-set'
+        (unless sis--ism (setq sis--ism t)))
+
+      ;; just inited, successfully or not
+      (setq sis--ism-inited t))
+
+    (:option sis-english-source "com.apple.keylayout.ABC"
+             ;; sis-external-ism "macism"
+             sis-inline-tighten-head-rule nil
+             sis-default-cursor-color "#cf7fa7"
+             sis-other-cursor-color "orange")
+    (:hooks meow-insert-exit-hook sis-set-english)
+    (if *IS-MAC*
+        (sis-ism-lazyman-config
+         "com.apple.keylayout.ABC"
+         "im.rime.inputmethod.Squirrel.Hans")
+      (sis-ism-lazyman-config "1" "2" 'fcitx))
+    ;; enable the /cursor color/ mode
+    (sis-global-cursor-color-mode t)
+    ;; enable the /respect/ mode
+    (sis-global-respect-mode t)
+    ;; enable the /context/ mode for all buffers
+    (sis-global-context-mode t)
+    ;; enable the /inline english/ mode for all buffers
+    ;; (sis-global-inline-mode t)
+    (add-to-list 'sis-context-hooks 'meow-insert-enter-hook)
+    ;; org title 处切换 Rime，telega 聊天时切换 Rime。
+    ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。
+    (add-to-list 'sis-context-detectors
+                 (lambda (&rest _)
+                   (when (and meow-insert-mode
+                              (or (derived-mode-p 'org-mode
+                                                  'gfm-mode
+                                                  'telega-chat-mode)
+                                  (string-match-p "*new toot*" (buffer-name))))
+                     'other)))
+
+    (defun +meow-focus-change-function ()
+      (if (frame-focus-state)
+          (sis-set-english)
+        (meow-insert-exit)))
+
+    (add-function :after after-focus-change-function '+meow-focus-change-function)))
 
 (when *IS-MAC*
   (setup emt
