@@ -37,7 +37,7 @@
      telega-notifications-mode 1
      telega-notifications-msg-temex '(and (not outgoing)
                                           (not (chat (or (type channel))))
-                                          (contains "dape\\|jdtls\\|eglot\\|meow\\|patch\\|[eE]macs\\|telega\\|@Lucius_Chen"))
+                                          (contains "dape\\|jdtls\\|eglot\\|meow\\|[sS]potify\\|[eE]macs\\|telega\\|@Lucius_Chen"))
      ;; telega-msg-heading-with-date-and-status t
      ;; telega-debug t
      ;; telega-server-verbosity 4
