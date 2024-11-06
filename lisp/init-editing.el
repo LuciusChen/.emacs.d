@@ -40,33 +40,6 @@
 (setup sis
   (:defer (:require sis))
   (:when-loaded
-    ;; (defun sis--init-ism ()
-    ;;   "Init input source manager."
-    ;;   ;; `sis-do-get'and `sis-do-set' takes the first precedence.
-
-    ;;   (unless (and (functionp sis-do-get)
-    ;;                (functionp sis-do-set))
-    ;;     (when (fboundp 'mac-input-source)
-    ;;       (setq sis--ism 'emp)))
-
-    ;;   ;; make `sis-do-set' and `sis-do-get'
-    ;;   (when sis--ism
-    ;;     ;; avoid override user customized sis-do-get
-    ;;     (unless (functionp sis-do-get)
-    ;;       (setq sis-do-get (sis--mk-get-fn)))
-    ;;     ;; avoid override user customized sis-do-set
-    ;;     (unless (functionp sis-do-set)
-    ;;       (setq sis-do-set (sis--mk-set-fn))))
-
-    ;;   ;; successfully inited
-    ;;   (when (and (functionp sis-do-get)
-    ;;              (functionp sis-do-set))
-    ;;     ;; a t `sis--ism' means customized by `sis-do-get' and `sis-do-set'
-    ;;     (unless sis--ism (setq sis--ism t)))
-
-    ;;   ;; just inited, successfully or not
-    ;;   (setq sis--ism-inited t))
-
     (:option sis-english-source "com.apple.keylayout.ABC"
              ;; sis-external-ism "macism"
              sis-inline-tighten-head-rule nil
