@@ -1,5 +1,5 @@
 diff --git a/src/nsfns.m b/src/nsfns.m
-index 3c012ca8f05..4792d0d5ce5 100644
+index 3c012ca8f05..0167e07f73c 100644
 --- a/src/nsfns.m
 +++ b/src/nsfns.m
 @@ -47,6 +47,7 @@ Updated by Christian Limpach (chris@nice.ch)
@@ -10,12 +10,12 @@ index 3c012ca8f05..4792d0d5ce5 100644
  
  #if MAC_OS_X_VERSION_MAX_ALLOWED >= 120000
  #include <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
-@@ -1143,7 +1144,514 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
+@@ -1143,7 +1144,479 @@ Turn the input menu (an NSMenu) into a lisp list for tracking on lisp side.
    return Qnil;
  }
  
 +/* From CFData to a lisp string.  Always returns a unibyte string.  */
-+Lisp_Object
++static Lisp_Object
 +cfdata_to_lisp (CFDataRef data)
 +{
 +  CFIndex len = CFDataGetLength (data);
@@ -28,7 +28,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +
 +/* From CFString to a lisp string.  Returns a unibyte string
 +   containing a UTF-8 byte sequence.  */
-+Lisp_Object
++static Lisp_Object
 +cfstring_to_lisp_nodecode (CFStringRef string)
 +{
 +  Lisp_Object result = Qnil;
@@ -61,11 +61,9 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +/* From CFString to a lisp string.  Never returns a unibyte string
 +   (even if it only contains ASCII characters).
 +   This may cause GC during code conversion. */
-+Lisp_Object
++static Lisp_Object
 +cfstring_to_lisp (CFStringRef string)
 +{
-+  // eassert (!mac_gui_thread_p ());
-+
 +  Lisp_Object result = cfstring_to_lisp_nodecode (string);
 +
 +  if (!NILP (result))
@@ -80,7 +78,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +}
 +
 +/* C string to CFString.  */
-+CFStringRef
++static CFStringRef
 +cfstring_create_with_utf8_cstring (const char *c_str)
 +{
 +  CFStringRef str;
@@ -96,7 +94,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +/* Lisp string containing a UTF-8 byte sequence to CFString.  Unlike
 +   cfstring_create_with_utf8_cstring, this function preserves NUL
 +   characters.  */
-+CFStringRef
++static CFStringRef
 +cfstring_create_with_string_noencode (Lisp_Object s)
 +{
 +  CFStringRef string = CFStringCreateWithBytes (NULL, SDATA (s), SBYTES (s),
@@ -111,7 +109,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +}
 +
 +/* Lisp string to CFString.  */
-+CFStringRef
++static CFStringRef
 +cfstring_create_with_string (Lisp_Object s)
 +{
 +  // eassert (!mac_gui_thread_p ());
@@ -135,7 +133,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +/* Create and return a TISInputSource object from a Lisp
 +   representation of the input source SOURCE.  Return NULL if a
 +   TISInputSource object cannot be created.  */
-+static TISInputSourceRef
++TISInputSourceRef
 +mac_create_input_source_from_lisp (Lisp_Object source)
 +{
 +  TISInputSourceRef __block result = NULL;
@@ -217,7 +215,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +
 +/* Return a Lisp representation of the input souce SOURCE, optionally
 +   with its properties if FORMAT is non-nil.  */
-+static Lisp_Object
++Lisp_Object
 +mac_input_source_properties (TISInputSourceRef source, Lisp_Object format)
 +{
 +  struct {
@@ -231,14 +229,10 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +    {kTISPropertyInputSourceIsSelectCapable,	QCselect_capable_p},
 +    {kTISPropertyInputSourceIsEnabled,		QCenabled_p},
 +    {kTISPropertyInputSourceIsSelected,		QCselected_p},
-+    /* kTISPropertyInputSourceID (used as the main key) */
 +    {kTISPropertyBundleID,			QCbundle_id},
 +    {kTISPropertyInputModeID,			QCinput_mode_id},
 +    {kTISPropertyLocalizedName,			QClocalized_name},
 +    {kTISPropertyInputSourceLanguages,		QClanguages},
-+    /* kTISPropertyUnicodeKeyLayoutData (unused) */
-+    /* kTISPropertyIconRef (unused) */
-+    /* kTISPropertyIconImageURL (handled separately) */
 +  };
 +  Lisp_Object result = Qnil;
 +  CFStringRef __block source_id;
@@ -261,29 +255,13 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +	    {
 +	      CFURLRef __block url;
 +
-+	      // mac_within_gui (^{
-+		  url = TISGetInputSourceProperty (source,
-+						   kTISPropertyIconImageURL);
-+		// });
++              url = TISGetInputSourceProperty (source,
++                                               kTISPropertyIconImageURL);
 +	      if (url)
 +		{
 +		  CFStringRef str = NULL;
 +
-+		  /* Workaround for wrong icon image URL on OS X 10.10. */
-+		  // if (mac_operating_system_version.major == 10
-+		  //     && mac_operating_system_version.minor == 10)
-+		  //   {
-+		  //     CFURLRef fixed =
-+		  //       mac_tis_create_fixed_icon_image_url (url);
-+
-+		  //     if (fixed)
-+		  //       {
-+		  //         CFRelease (url);
-+		  //         url = fixed;
-+		  //       }
-+		  //   }
-+
-+		  url = CFURLCopyAbsoluteURL (url);
++                  url = CFURLCopyAbsoluteURL (url);
 +		  if (url)
 +		    {
 +		      str = CFURLCopyFileSystemPath (url, kCFURLPOSIXPathStyle);
@@ -306,13 +284,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +		CFStringRef key = keys[i-1].cf;
 +		CFTypeRef __block value;
 +
-+		// mac_within_gui (^{
-+		    value = TISGetInputSourceProperty (source, key);
-+		  // });
-+		// if (value)
-+		//   plist = Fcons (keys[i-1].sym,
-+		// 		 Fcons (cfobject_to_lisp (value, 0, -1),
-+		// 			plist));
++                value = TISGetInputSourceProperty (source, key);
 +	      }
 +
 +	  if (!EQ (format, Qt) && SYMBOLP (format) && CONSP (plist))
@@ -411,8 +383,6 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +  TISInputSourceRef input_source;
 +
 +  check_window_system (NULL);
-+  // mac_check_input_source (source, false);
-+  // if (!(SYMBOLP (format) || mac_symbol_list_p (format)))
 +  if (!(SYMBOLP (format)))
 +    error ("FORMAT must be a symbol or a list of symbols");
 +
@@ -445,19 +415,14 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +  CFArrayRef __block list = NULL;
 +
 +  check_window_system (NULL);
-+  // if (!(NILP (type) || EQ (type, Qt) || EQ (type, Qascii_capable_keyboard)))
-+    // error ("TYPE must be nil, t, or `ascii-capable-keyboard'");
-+  // if (!(SYMBOLP (format) || mac_symbol_list_p (format)))
 +  if (!(SYMBOLP (format)))
 +    error ("FORMAT must be a symbol or a list of symbols");
 +
 +  block_input ();
-+  // mac_within_gui (^{
-+      if (EQ (type, Qascii_capable_keyboard))
-+	list = TISCreateASCIICapableInputSourceList ();
-+      else
-+	list = TISCreateInputSourceList (NULL, !NILP (type));
-+    // });
++  if (EQ (type, Qascii_capable_keyboard))
++    list = TISCreateASCIICapableInputSourceList ();
++  else
++    list = TISCreateInputSourceList (NULL, !NILP (type));
 +  if (list)
 +    {
 +      CFIndex index, count = CFArrayGetCount (list);
@@ -468,7 +433,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +	    mac_input_source_properties (((TISInputSourceRef)
 +					  CFArrayGetValueAtIndex (list, index)),
 +					 format);
-+
+ 
 +	  result = Fcons (properties, result);
 +	}
 +      CFRelease (list);
@@ -500,7 +465,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
 +      return Qnil;
 +
 +  check_window_system (NULL);
- 
++
 +  block_input ();
 +  input_source = mac_create_input_source_from_lisp (source);
 +  if (input_source)
@@ -525,7 +490,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
  static void
  do_unwind_create_frame (Lisp_Object frame)
  {
-@@ -3940,6 +4448,22 @@ - (Lisp_Object)lispString
+@@ -3940,6 +4413,22 @@ - (Lisp_Object)lispString
    DEFSYM (Qdark, "dark");
    DEFSYM (Qlight, "light");
  
@@ -548,7 +513,7 @@ index 3c012ca8f05..4792d0d5ce5 100644
    DEFVAR_LISP ("ns-icon-type-alist", Vns_icon_type_alist,
                 doc: /* Alist of elements (REGEXP . IMAGE) for images of icons associated to frames.
  If the title of a frame matches REGEXP, then IMAGE.tiff is
-@@ -4027,6 +4551,9 @@ - (Lisp_Object)lispString
+@@ -4027,6 +4516,9 @@ - (Lisp_Object)lispString
  
    defsubr (&Sx_show_tip);
    defsubr (&Sx_hide_tip);
