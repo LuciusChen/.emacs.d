@@ -97,7 +97,8 @@ class EmacsPlusAT31 < EmacsBase
   local_patch "system-appearance", sha: "9eb3ce80640025bff96ebaeb5893430116368d6349f4eb0cb4ef8b3d58477db6"
   local_patch "poll", sha: "59e876f82e6fd8e4583bc2456339eda4f989c86b1e16a02b0726702e95f60825" if build.with? "poll"
   local_patch "round-undecorated-frame", sha: "7451f80f559840e54e6a052e55d1100778abc55f98f1d0c038a24e25773f2874"
-  local_patch "ns-alpha-background", sha: "6c174aff2602b64255ce8952f91302ede51e213be090f1b39e06913bbe0b086b"
+  local_patch "ns-alpha-background", sha: "b9d45ec62fa546aab1c4f8083f95e5443d368af295ac973416640c49a0e66bcb"
+  local_patch "ns-mac-input-source", sha: "99fefba9eb0725743a901cd95e0deb575193e1d258094cb56ccbac37ada0ffa2"
 
   #
   # Install
