@@ -75,7 +75,7 @@ img.org-latex.org-latex-inline.medium-zoom-image {
 2024-10-19: [[https://github.com/laishulu/macism][laishulu/macism]] 已经合并 PR。
 2024-11-05: =ns-mac-input-source.patch= 应用后可以原生支持切换输入法了，主要是添加了 =mac-input-source= 方法，可以很方便的用 [[https://github.com/laishulu/emacs-smart-input-source][laishulu/emacs-smart-input-source]] 切换输入法。
 
-另，Sequoia 系统中增加了 CursorUIViewservice 进程来显示输入法状态，经常会卡死导致内存占用。可以通过下面的命令彻底关闭。
+另，Sequoia 系统中增加了 CursorUIViewservice 进程来显示输入法状态，经常会卡死导致内存占用。可以通过下面的命令彻底关闭。参考自 [[https://www.reddit.com/r/MacOS/comments/16vmjfc/comment/kcq6nql/][Reddit - Dive into anything]]。
 
 #+begin_src shell
 sudo mkdir -p /Library/Preferences/FeatureFlags/Domain && sudo /usr/libexec/PlistBuddy -c "Add 'redesigned_text_cursor:Enabled' bool false" /Library/Preferences/FeatureFlags/Domain/UIKit.plist && sudo shutdown -r now
