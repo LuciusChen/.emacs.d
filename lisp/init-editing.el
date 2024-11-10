@@ -156,7 +156,7 @@
                            1)))))))
 
 (setup avy
-  (:global "C-;" avy-goto-char
+  (:global "C-;" avy-goto-word-or-subword-1
            "C-:" avy-goto-char-in-line)
   (:option avy-style 'de-bruijn)
   (:defer (:require ace-pinyin)
