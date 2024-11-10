@@ -56,11 +56,10 @@
      telega-symbols-emojify
      (cl-reduce (lambda (emojify key)
                   (assq-delete-all key emojify))
-                '(verified vertical-bar button-close checkmark forum heavy-checkmark reply reply-quote horizontal-bar forward)
+                '(verified vertical-bar checkmark forum heavy-checkmark reply reply-quote horizontal-bar forward)
                 :initial-value telega-symbols-emojify)
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
-     telega-symbol-button-close (nerd-icons-faicon "nf-fa-window_close_o")
      telega-symbol-saved-messages-tag-end (nerd-icons-faicon "nf-fa-tag")
      telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
      telega-symbol-flames (nerd-icons-mdicon "nf-md-delete_clock")
@@ -70,6 +69,24 @@
      telega-symbol-forward (nerd-icons-octicon "nf-oct-cross_reference")
      telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
+     ;; palettes
+     telega-builtin-palettes-alist '((light
+                                      ((:outline "#d32f2f") (:foreground "#c62828"))
+                                      ((:outline "#f57c00") (:foreground "#ef6c00"))
+                                      ((:outline "#8e24aa") (:foreground "#7b1fa2"))
+                                      ((:outline "#388e3c") (:foreground "#2e7d32"))
+                                      ((:outline "#0288d1") (:foreground "#0277bd"))
+                                      ((:outline "#1976d2") (:foreground "#1565c0"))
+                                      ((:outline "#d81b60") (:foreground "#c2185b")))
+                                     (dark
+                                      ((:outline "#ef9a9a") (:foreground "#e57373"))
+                                      ((:outline "#ffe0b2") (:foreground "#ffcc80"))
+                                      ((:outline "#ce93d8") (:foreground "#ba68c8"))
+                                      ((:outline "#a5d6a7") (:foreground "#81c784"))
+                                      ((:outline "#b2ebf2") (:foreground "#80deea"))
+                                      ((:outline "#90caf9") (:foreground "#64b5f6"))
+                                      ((:outline "#f8bbd0") (:foreground "#f48fb1"))))
+
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
