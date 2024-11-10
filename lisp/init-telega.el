@@ -28,6 +28,7 @@
                 telega-bridge-bot
                 telega-mnz
                 lib-telega
+                cl-lib
                 telega-notifications
                 ;; If language-detection is available,
                 ;; then laguage could be detected automatically
@@ -52,6 +53,11 @@
      ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
+     telega-symbols-emojify
+     (cl-reduce (lambda (emojify key)
+                  (assq-delete-all key emojify))
+                '(verified vertical-bar button-close checkmark forum heavy-checkmark reply reply-quote horizontal-bar forward)
+                :initial-value telega-symbols-emojify)
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
      telega-symbol-button-close (nerd-icons-faicon "nf-fa-window_close_o")
