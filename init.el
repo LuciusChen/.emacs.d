@@ -86,6 +86,51 @@
              (file-exists-p +env-file))
     (+load-env-file +env-file)))
 
+;; 1. Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
+;;    由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
+;;
+;; 2. Telega 中的 telega-bridge-bot 同步 matrix 的头像需要 token，存放在 pass 中时，会导致
+;;    telega root 错乱（原因未知）。
+;; 以上原因，使得这些条目依旧存放在 .authinfo 当中，密码从 pass 获取。
+;; 利用函数检查条目，从 pass 中读取密码创建 .authinfo 条目。
+(defun get-pass-entry (entry)
+  "Get the first line of the pass entry.
+ENTRY is the name of the password store entry to retrieve."
+  (let ((output (shell-command-to-string (concat "pass show " entry " | head -n 1"))))
+    (replace-regexp-in-string "\\`[ \t\n\r]+\\|[ \t\n\r]+\\'" "" output)))
+
+(defun check-and-update-authinfo (entries)
+  "Check if specific entries exist in .authinfo, if not, insert them from pass.
+ENTRIES is a list of lists, where each sublist contains three strings:
+- MACHINE: the machine name.
+- LOGIN: the login name.
+- PASS-ENTRY: the name of the entry in the password store."
+  (let ((authinfo-file "~/.authinfo"))
+    ;; Create the .authinfo file if it doesn't exist
+    (unless (file-exists-p authinfo-file)
+      (write-region "" nil authinfo-file))
+    ;; Check and add entries if they don't exist
+    (dolist (entry entries)
+      (let* ((machine (nth 0 entry))
+             (login (nth 1 entry))
+             (pass-entry (nth 2 entry))
+             (entry-found nil))
+        (with-temp-buffer
+          (insert-file-contents authinfo-file)
+          (setq entry-found (re-search-forward (format "machine %s login %s" (regexp-quote machine) (regexp-quote login)) nil t)))
+        (unless entry-found
+          (let ((password (get-pass-entry pass-entry)))
+            (with-temp-buffer
+              (insert-file-contents authinfo-file)
+              (goto-char (point-max))
+              (insert (format "machine %s login %s password %s\n" machine login password))
+              (write-region (point-min) (point-max) authinfo-file)
+              (message "Entry for machine %s added." machine))))))))
+
+(check-and-update-authinfo
+ '(("192.168.1.220:9081/api/v4" "lucius^forge" "gitlab-zj")
+   ("matrix.org" "@lucius_chen:matrix.org" "matrix.org")))
+
 ;; Install straight.el
 ;; branch develop
 (setq straight-repository-branch "develop")
