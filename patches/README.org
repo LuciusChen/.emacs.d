@@ -1,0 +1,1 @@
+=ns-mac-input-source.patch= 可以和 =ns-alpha-background.patch= 一起使用，执行 =sh/apply-patches.sh= 即可。
