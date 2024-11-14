@@ -75,7 +75,7 @@ ARGS should be a list where the first element is the path to the repositories."
                     ((string-equal key "books") (concat *org-path* "/bib/files"))
                     (t (expand-file-name key))))
          (fd-cmd (concat "fd --no-ignore-vcs . --base-directory " repopath))
-         (files (split-string (shell-command-to-string fd-cmd) "\n"))
+         (files (cl-remove-if #'string-empty-p (split-string (shell-command-to-string fd-cmd) "\n")))
          (file (completing-read "Find file: " files nil t)))
     (find-file (file-name-concat repopath file))))
 
