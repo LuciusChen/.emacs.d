@@ -1,5 +1,5 @@
 ;;; init-telega.el  --- Custom configuration -*- lexical-binding: t -*-
-;;; Commentary
+;;; Commentary:
 (setup telega
   ;; @LawxenceX
   ;; telega 中 telega-prefix-map 定义的是 defvar，
@@ -38,7 +38,7 @@
      telega-notifications-mode 1
      telega-notifications-msg-temex '(and (not outgoing)
                                           (not (chat (or (type channel))))
-                                          (contains "dape\\|jdtls\\|eglot\\|meow\\|[sS]potify\\|[eE]macs\\|telega\\|@Lucius_Chen"))
+                                          (contains "dape\\|jdtls\\|eglot\\|meow\\|[eE]macs\\|telega\\|@Lucius_Chen"))
      ;; telega-msg-heading-with-date-and-status t
      ;; telega-debug t
      ;; telega-server-verbosity 4
@@ -48,8 +48,6 @@
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
      telega-avatar-workaround-gaps-for '(return t)
-     telega-symbol-eye (nerd-icons-faicon "nf-fa-eye")
-     telega-symbol-codeblock (nerd-icons-devicon "nf-dev-code")
      ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
