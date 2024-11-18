@@ -7,35 +7,6 @@
              (telega-url-at-point))))
     (xwidget-webkit-browse-url entry-link)))
 
-(defun replace-end-image-space-with-X (string)
-  "Replace the last space in STRING with an X if it has text properties."
-  (if-let* ((end-pos (- (length string) 1))
-            (blank? (string= (substring string end-pos) " "))
-            (text-properties (text-properties-at end-pos string)))
-      ;; replace the last space with an X inplace
-      (store-substring string end-pos "X")
-    string))
-
-(defun company-box--make-candidate! (candidate)
-  (let* ((annotation (-some->> (company-call-backend 'annotation candidate)
-                       (replace-end-image-space-with-X) ; added this line
-                       (replace-regexp-in-string "[ \t\n\r]+" " ")
-                       (string-trim)))
-         (len-candidate (string-width candidate))
-         (len-annotation (if annotation ; use string-pixel-width instead of string-width
-                             (/ (string-pixel-width annotation)
-                                (frame-char-width))
-                           0))
-         (len-total (+ len-candidate len-annotation))
-         (backend (company-box--backend candidate)))
-    (when (> len-total company-box--max)
-      (setq company-box--max len-total))
-    (list candidate
-          annotation
-          len-candidate
-          len-annotation
-          backend)))
-
 ;; 补全
 (defun +telega-completion-setup ()
   (make-variable-buffer-local 'completion-at-point-functions)
