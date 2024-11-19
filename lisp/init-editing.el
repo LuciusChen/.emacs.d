@@ -78,6 +78,29 @@
 
     (add-function :after after-focus-change-function '+meow-focus-change-function)))
 
+(if (and (eq system-type 'darwin) (fboundp 'mac-input-source))
+    (progn
+      (defvar last-ime (mac-input-source))
+
+      (defun emacs-ime-disable ()
+        (setq last-ime (mac-input-source))
+        (mac-select-input-source "com.apple.keylayout.ABC"))
+
+      (defun emacs-ime-enable ()
+        (mac-select-input-source last-ime))
+
+      (defun toggle-ime ()
+        (interactive)
+        (if (string= (mac-input-source) "com.apple.keylayout.ABC")
+            (emacs-ime-enable)
+          (emacs-ime-disable)))
+
+      (add-hook 'evil-insert-state-entry-hook 'emacs-ime-enable)
+      (add-hook 'evil-insert-state-exit-hook 'emacs-ime-disable)
+
+      ;; Bind F13 to toggle IME
+      (global-set-key (kbd "<f13>") 'toggle-ime)))
+
 (when *IS-MAC*
   (setup emt
     (:defer (:require emt)
