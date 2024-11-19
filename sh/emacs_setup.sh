@@ -36,3 +36,5 @@ echo "Patches applied successfully."
 
 # Install emacs-plus@31 with specified options
 brew install emacs-plus@31 --with-savchenkovaleriy-big-sur-icon --with-xwidgets
+
+osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@31/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
