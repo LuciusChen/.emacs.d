@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# uninstall first
+# Uninstall first
 brew uninstall emacs-plus@31
 
 # Navigate to the repository and pull the latest changes
@@ -22,11 +22,17 @@ cp "$FORMULA_PATH" "${FORMULA_PATH}.bak"
 # Define the insertion point in the formula
 INSERTION_POINT="round-undecorated-frame"
 
-# Inject local_patch lines into the formula
-sed -i '' "/$INSERTION_POINT/a\\
+# Check if the patches are already included
+if ! grep -q "local_patch \"ns-alpha-background\"" "$FORMULA_PATH"; then
+  # Inject local_patch lines into the formula
+  sed -i '' "/$INSERTION_POINT/a\\
   local_patch \"ns-alpha-background\", sha: \"$SHA_ALPHA\"\\
   local_patch \"ns-mac-input-source\", sha: \"$SHA_INPUT\"
 " "$FORMULA_PATH"
+  echo "Patches added to the formula."
+else
+  echo "Patches already exist in the formula."
+fi
 
 # Create symbolic links instead of copying the patch files
 ln -sf "$PATCH_DIR/ns-alpha-background.patch" "$TARGET_PATCH_DIR/ns-alpha-background.patch"
