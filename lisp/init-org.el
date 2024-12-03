@@ -315,7 +315,6 @@
              "C-x <down>"  org-move-subtree-down
              "C-c r r"     +org-roam-rg-search)
   (:when-loaded
-    (:require emacsql-sqlite-builtin)
     (:option
      org-roam-directory (file-truename *org-path*)
      org-roam-database-connector 'sqlite-builtin

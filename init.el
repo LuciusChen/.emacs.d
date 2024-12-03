@@ -218,7 +218,6 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     move-dup
     diminish
     doom-modeline
-    org-roam
     git-link
     webpaste
     apheleia
@@ -260,7 +259,6 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     default-text-scale
     language-detection
     nerd-icons-completion
-    emacsql-sqlite-builtin
     whitespace-cleanup-mode
     password-store-otp
     password-store
@@ -271,7 +269,8 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     (meow :host github :repo "meow-edit/meow")
     (gptel :host github :repo "karthink/gptel")
     (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
-    (telega :host github :repo "LuciusChen/telega.el" :branch "diy")
+    (org-roam :host github :repo "LuciusChen/org-roam")
+    (telega :host github :repo "LuciusChen/telega.el");; :branch "diy")
     ;; (telega :host github :repo "zevlg/telega.el")
     (yasnippet :host github :repo "joaotavora/yasnippet")
     (dashboard :host github :repo "LuciusChen/dashboard")
