@@ -2,7 +2,6 @@
 
 # Uninstall first
 if brew list --versions emacs-plus@31 > /dev/null 2>&1; then
-  # 如果已安装，先卸载
   echo "Uninstalling existing emacs-plus@31..."
   brew uninstall emacs-plus@31
 else
