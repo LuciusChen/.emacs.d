@@ -26,18 +26,35 @@ INSERTION_POINT="round-undecorated-frame"
 # Function to calculate SHA and inject patch
 inject_patches() {
   local inserted=false
+  local existing_user_patches=()
+
+  # Read all existing user-defined patches from the formula
+  while read -r line; do
+    if [[ $line =~ local_patch\ \"([^\"]+)\".*#\ user_patch ]]; then
+      existing_user_patches+=("${BASH_REMATCH[1]}")
+    fi
+  done < <(grep "local_patch" "$FORMULA_PATH")
+
+  # Remove entries for user patches that no longer exist
+  for old_patch in "${existing_user_patches[@]}"; do
+    if [ ! -f "$PATCH_DIR/$old_patch.patch" ]; then
+      sed -i '' "/local_patch \"$old_patch\".*# user_patch/d" "$FORMULA_PATH"
+      echo "Removed user patch $old_patch from the formula."
+      rm -f "$TARGET_PATCH_DIR/$old_patch.patch"
+      echo "Removed symbolic link for $old_patch."
+    fi
+  done
+
+  # Process new user patches
   for patch in "$PATCH_DIR"/*.patch; do
-    # Extract the base name of the patch (without .patch extension)
     local patch_name
     patch_name=$(basename "$patch" .patch)
     local sha
     sha=$(shasum -a 256 "$patch" | awk '{ print $1 }')
 
-    # Check if the patch is already included
     if ! grep -q "local_patch \"$patch_name\"" "$FORMULA_PATH"; then
-      # Inject local_patch lines into the formula
       sed -i '' "/$INSERTION_POINT/a\\
-  local_patch \"$patch_name\", sha: \"$sha\"
+  local_patch \"$patch_name\", sha: \"$sha\" # user_patch
 " "$FORMULA_PATH"
       echo "Patch $patch_name added to the formula."
       inserted=true
@@ -45,7 +62,6 @@ inject_patches() {
       echo "Patch $patch_name already exists in the formula."
     fi
 
-    # Create symbolic links instead of copying the patch files
     ln -sf "$patch" "$TARGET_PATCH_DIR/${patch_name}.patch"
   done
 
@@ -63,3 +79,4 @@ inject_patches
 brew install emacs-plus@31 --with-savchenkovaleriy-big-sur-icon --with-xwidgets
 
 osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@31/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
+
