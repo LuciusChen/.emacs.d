@@ -112,6 +112,7 @@ A scope may be provided to a commit's type, to provide additional contextual inf
 (setup diff-hl
   (:defer (diff-hl-mode))
   (:when-loaded
+    (:option diff-hl-update-async t)
     (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
             magit-pre-refresh-hook diff-hl-magit-post-refresh
             prog-mode-hook diff-hl-mode
