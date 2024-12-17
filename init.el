@@ -45,46 +45,35 @@
       (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
   (global-set-key (kbd "M-`") 'ns-next-frame)
 
-  (defconst +env-file (concat user-emacs-directory ".env"))
+  (defconst +env-file (concat user-emacs-directory ".env")
+    "Path to the environment variable file.")
 
   (defun +load-env-file (file &optional noerror)
-    "Read and set envvars from FILE.
-     If NOERROR is non-nil, don't throw an error if the file doesn't exist or is
-     unreadable. Returns the names of envvars that were changed."
-    (if (not (file-readable-p file))
-        (unless noerror
-          (signal 'file-error (list "Couldn't read envvar file" file)))
-      (let (envvars environment)
+    "Load environment variables from FILE.
+If NOERROR is non-nil, suppress errors if the file doesn't exist or isn't readable.
+Returns a list of environment variable names that were set or modified."
+    (when (and (file-exists-p file) (file-readable-p file))
+      (let ((envvars nil) (environment nil))
         (with-temp-buffer
-          (save-excursion
-            (insert "\n")
-            (insert-file-contents file))
-          (while (re-search-forward "\n *\\([^#= \n]*\\)=" nil t)
-            (push (match-string 1) envvars)
-            (push (buffer-substring
-                   (match-beginning 1)
-                   (1- (or (save-excursion
-                             (when (re-search-forward "^\\([^= ]+\\)=" nil t)
-                               (line-beginning-position)))
-                           (point-max))))
-                  environment)))
+          (insert-file-contents file)
+          (while (re-search-forward "^[ \t]*\\([^#= \n]+\\)=\\(.*\\)$" nil t)
+            (let ((key (match-string 1))
+                  (value (match-string 2)))
+              (push key envvars)
+              (push (format "%s=%s" key value) environment)
+              (setenv key value))))
+        ;; Update process-environment and exec-path
         (when environment
-          (setq process-environment
-                (append (nreverse environment) process-environment)
-                exec-path
-                (if (member "PATH" envvars)
-                    (append (split-string (getenv "PATH") path-separator t)
-                            (list exec-directory))
-                  exec-path)
-                shell-file-name
-                (if (member "SHELL" envvars)
-                    (or (getenv "SHELL") shell-file-name)
-                  shell-file-name))
-          envvars))))
+          (setq process-environment (append (nreverse environment) process-environment))
+          (when (member "PATH" envvars)
+            (setq exec-path (append (split-string (getenv "PATH") path-separator t)
+                                    (list exec-directory))))
+          (when (member "SHELL" envvars)
+            (setq shell-file-name (or (getenv "SHELL") shell-file-name))))
+        envvars)))
 
-  (when (and (or (display-graphic-p))
-             (file-exists-p +env-file))
-    (+load-env-file +env-file)))
+  (when (and (display-graphic-p) (file-exists-p +env-file))
+    (+load-env-file +env-file t)))
 
 ;; 1. Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
 ;;    由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
