@@ -231,6 +231,7 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     prettier-js
     consult-dir
     swift-mode
+    org-sliced-images
     vterm
     vterm-toggle
     treesit-auto

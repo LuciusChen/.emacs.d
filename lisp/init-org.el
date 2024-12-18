@@ -12,6 +12,8 @@
    "C-c b"     org-cite-insert)
   (:when-loaded
     (:also-load lib-org)
+    (:also-load org-sliced-images)
+    (org-sliced-images-mode)
     (:option
      org-directory *org-path*
      org-image-actual-width nil
