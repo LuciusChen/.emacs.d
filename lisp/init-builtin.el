@@ -211,7 +211,18 @@ if one already exists."
     ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
     (diminish 'auto-revert-mode)))
 
-(setup hl-line (global-hl-line-mode))
+(setup hl-line
+  (:option hl-line-range-function
+           (lambda () (cons (line-end-position)
+                            (line-beginning-position 2))))
+  (global-hl-line-mode))
+
+(setup paren
+  (:option show-paren-when-point-inside-paren t
+           show-paren-when-point-in-periphery t
+           show-paren-context-when-offscreen t
+           show-paren-delay 0.2
+           blink-matching-paren-highlight-offscreen t))
 
 (setup faces
   (defun +suggest-other-faces (func &rest args)

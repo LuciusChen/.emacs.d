@@ -1,5 +1,6 @@
 ;;; init-reader.el  --- Custom configuration -*- lexical-binding: t -*-
-;;; Commentary
+;;; Commentary:
+
 (setup gfm-mode (:file-match "\\.md\\'"))
 
 (setup nov
@@ -116,8 +117,8 @@
                             :taker (list (gt-taker :pick nil :if 'selection)
                                          (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode))
                                          (gt-taker :text 'word))
-                            :engines (list (gt-deepl-engine :pro t :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
-                                           ;; (gt-chatgpt-engine :if 'not-word)
+                            :engines (list (gt-deepl-engine :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
+                                           (gt-chatgpt-engine :if 'not-word)
                                            (gt-google-engine :if 'word)
                                            (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
                                            (gt-youdao-suggest-engine :if '(and word src:en)))

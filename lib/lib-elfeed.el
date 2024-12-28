@@ -112,6 +112,8 @@
     ("https://github.com/reorx/hugo-PaperModX/commits.atom" github)
     ("https://github.com/protesilaos/modus-themes/commits.atom" github)
     ("https://github.com/Hammerspoon/hammerspoon/commits.atom" github)
+    ("https://github.com/amzxyz/RIME-LMDG/releases.atom" github)
+    ("https://github.com/iDvel/rime-ice/commits.atom" github)
 
     ;; sourcehut
     ("https://git.sr.ht/~pkal/setup/log/rss.xml" sourcehut)
