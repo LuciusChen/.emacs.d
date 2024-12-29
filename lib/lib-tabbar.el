@@ -1,14 +1,6 @@
 ;;; lib-tabbar.el --- tabbar -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(defun tab-bar-format-menu-bar ()
-  "Produce the Menu button for the tab bar that shows the menu bar."
-  `((menu-bar menu-item
-              (format " %s "
-                      (nerd-icons-sucicon "nf-custom-emacs"
-                                          :face '(:inherit nerd-icons-purple)))
-              tab-bar-menu-bar :help "Menu Bar")))
-
 (defun +tab-bar-tab-name-function ()
   (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
          (count (length (window-list-1 nil 'nomini)))

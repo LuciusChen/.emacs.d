@@ -118,8 +118,7 @@
              ;; Add spaces for tab-name
              tab-bar-tab-name-function '+tab-bar-tab-name-function
              tab-bar-tab-name-format-function '+tab-bar-tab-name-format-function
-             tab-bar-format '(tab-bar-format-menu-bar
-                              tab-bar-format-tabs
+             tab-bar-format '(tab-bar-format-tabs
                               tab-bar-format-add-tab
                               tab-bar-format-align-right
                               +tab-bar-telega-icon))
