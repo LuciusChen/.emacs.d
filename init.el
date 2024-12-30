@@ -27,7 +27,7 @@
                           "Noto Emoji"
                           "Segoe UI Emoji"
                           "Symbola"))
-(defconst *default-font* "MonoLisa 13")
+(defconst *default-font* "MonoLisa 14")
 (defconst *org-font* "PragmataPro")
 (defconst *term-default-font* "PragmataPro Mono Liga 14")
 (defconst *prog-font* "MonoLisa 13")
