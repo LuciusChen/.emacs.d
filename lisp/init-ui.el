@@ -40,12 +40,26 @@
     ;; 偶发切换窗口时，字体设置失效。 modify 2023-08-22
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts)
-    (defun buffer-font()
-      (make-face 'width-font-face)
-      (set-face-attribute 'width-font-face nil :font *term-default-font*) ;; PragmataPro Liga
-      (setq buffer-face-mode-face 'width-font-face)
+    (defun set-buffer-font (font-name)
+      "Set the font for the current buffer to FONT-NAME."
+      (make-face 'custom-font-face)
+      (set-face-attribute 'custom-font-face nil :font font-name)
+      (setq buffer-face-mode-face 'custom-font-face)
       (buffer-face-mode))
-    (:with-mode (vterm-mode nxml-mode latex-mode prog-mode) (:hook buffer-font))))
+
+    (defun set-font-for-modes (font-alist)
+      "Set fonts for different modes based on FONT-ALIST."
+      (dolist (entry font-alist)
+        (let ((mode (car entry))
+              (font (cdr entry)))
+          (add-hook (intern (format "%s-hook" mode))
+                    (lambda () (set-buffer-font font))))))
+
+    (set-font-for-modes
+     `((vterm-mode . ,*term-default-font*)
+       (nxml-mode  . ,*prog-font*)
+       (latex-mode . ,*prog-font*)
+       (prog-mode  . ,*prog-font*)))))
 
 (setup dimmer
   (:defer (dimmer-mode t))
