@@ -27,9 +27,10 @@
                           "Noto Emoji"
                           "Segoe UI Emoji"
                           "Symbola"))
-(defconst *default-font* "JetBrains Mono 14")
+(defconst *default-font* "MonoLisa 13")
 (defconst *org-font* "PragmataPro")
 (defconst *term-default-font* "PragmataPro Mono Liga 14")
+(defconst *prog-font* "MonoLisa 13")
 (defconst *zh-default-font* "LXGW WenKai")
 (defconst *jp-default-font* "Noto Sans Javanese")
 (defconst *symbol-default-font* "Symbols Nerd Font Mono")
@@ -223,7 +224,6 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     org-modern
     ace-pinyin
     marginalia
-    git-commit
     org-remark
     elfeed-tube
     org-roam-ui
