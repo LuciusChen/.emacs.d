@@ -123,7 +123,7 @@
     (:option
      eglot-java-server-install-dir jdtls-install-dir
      eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
-     eglot-java-eclipse-jdt-config-directory (concat user-emacs-directory "share/eclipse.jdt.ls/config_mac_arm/")
+     eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir "/config_mac_arm/")
      eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
                                    "-Xmx8G"
                                    ;; "-XX:+UseG1GC"
