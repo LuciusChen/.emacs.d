@@ -37,7 +37,6 @@
 (when window-system
   (setup font
     (:require lib-font)
-    ;; 偶发切换窗口时，字体设置失效。 modify 2023-08-22
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts)
     (defun set-buffer-font (font-name)
