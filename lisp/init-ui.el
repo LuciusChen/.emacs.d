@@ -56,6 +56,7 @@
 
     (set-font-for-modes
      `((vterm-mode . ,*term-default-font*)
+       (org-agenda-mode . ,*org-font*)
        (nxml-mode  . ,*prog-font*)
        (latex-mode . ,*prog-font*)
        (prog-mode  . ,*prog-font*)))))
