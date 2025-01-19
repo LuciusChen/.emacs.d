@@ -84,10 +84,10 @@
 
       (defun toggle-ime ()
         (interactive)
-        (let ((current-ime (mac-input-source)))
-          (if (string= current-ime "com.apple.keylayout.ABC")
-              (mac-select-input-source "im.rime.inputmethod.Squirrel.Hans")
-            (mac-select-input-source "com.apple.keylayout.ABC"))))
+        (let* ((current-ime (mac-input-source))
+               (next-ime (or (cadr (member current-ime ime-list))
+                             (car ime-list))))  ;; Cycle to the next IME or start from the beginning
+          (mac-select-input-source next-ime)))
 
       ;; Bind F13 to toggle IME
       (global-set-key (kbd "<f13>") 'toggle-ime)))
