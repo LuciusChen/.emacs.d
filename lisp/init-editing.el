@@ -80,23 +80,14 @@
 
 (if (and (eq system-type 'darwin) (fboundp 'mac-input-source))
     (progn
-      (defvar last-ime (mac-input-source))
-
-      (defun emacs-ime-disable ()
-        (setq last-ime (mac-input-source))
-        (mac-select-input-source "com.apple.keylayout.ABC"))
-
-      (defun emacs-ime-enable ()
-        (mac-select-input-source last-ime))
+      (defvar ime-list '("im.rime.inputmethod.Squirrel.Hans" "com.apple.keylayout.ABC"))
 
       (defun toggle-ime ()
         (interactive)
-        (if (string= (mac-input-source) "com.apple.keylayout.ABC")
-            (emacs-ime-enable)
-          (emacs-ime-disable)))
-
-      (add-hook 'evil-insert-state-entry-hook 'emacs-ime-enable)
-      (add-hook 'evil-insert-state-exit-hook 'emacs-ime-disable)
+        (let ((current-ime (mac-input-source)))
+          (if (string= current-ime "com.apple.keylayout.ABC")
+              (mac-select-input-source "im.rime.inputmethod.Squirrel.Hans")
+            (mac-select-input-source "com.apple.keylayout.ABC"))))
 
       ;; Bind F13 to toggle IME
       (global-set-key (kbd "<f13>") 'toggle-ime)))
