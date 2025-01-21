@@ -28,7 +28,7 @@
                           "Segoe UI Emoji"
                           "Symbola"))
 (defconst *default-font* "MonoLisa 14")
-(defconst *org-font* "PragmataPro")
+(defconst *org-font* "PragmataPro 14")
 (defconst *term-default-font* "PragmataPro Mono Liga 14")
 (defconst *prog-font* "MonoLisa 13")
 (defconst *zh-default-font* "LXGW WenKai")
