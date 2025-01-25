@@ -86,66 +86,6 @@
 
     ;; uniline
 
-    ;; (defun uniline-draw-diagonal-line (char num-lines direction upward)
-    ;;   "Draw a diagonal line with CHAR over NUM-LINES lines.
-    ;;    DIRECTION should be either `left' or `right'.
-    ;;    UPWARD should be non-nil to draw upward."
-    ;;   (let ((spaces (current-column)))
-    ;;     (dotimes (i num-lines)
-    ;;       ;; Move to the calculated column
-    ;;       (move-to-column spaces t)
-    ;;       ;; Delete any character at the target position to overwrite it
-    ;;       (unless (eolp)
-    ;;         (delete-char 1))
-    ;;       ;; Insert the character
-    ;;       (insert-char char)
-    ;;       (unless (= i (1- num-lines))  ; Skip moving if it's the last iteration
-    ;;         ;; Calculate spaces to insert based on direction
-    ;;         (setq spaces (if upward
-    ;;                          (max 0 (- spaces (if (equal direction "right") 1 -1)))
-    ;;                        (max 0 (+ spaces (if (equal direction "right") 1 -1)))))
-    ;;         ;; Move to the next line
-    ;;         (if upward
-    ;;             (forward-line -1)
-    ;;           (if (eobp)
-    ;;               (newline)
-    ;;             (forward-line 1))))))
-    ;;   ;; Ensure the cursor is at the last inserted character
-    ;;   (end-of-line)
-    ;;   (backward-char))
-
-    ;; (defun uniline-draw-right-diagonal-down (num-lines)
-    ;;   "Draw a downward right-diagonal line with '╲' over NUM-LINES lines."
-    ;;   (interactive
-    ;;    (list (if current-prefix-arg
-    ;;              (prefix-numeric-value current-prefix-arg)
-    ;;            (read-number "Enter number of lines (default 1): " 1))))
-    ;;   (uniline-draw-diagonal-line ?╲ num-lines "right" nil))
-
-    ;; (defun uniline-draw-left-diagonal-down (num-lines)
-    ;;   "Draw a downward left-diagonal line with '╱' over NUM-LINES lines."
-    ;;   (interactive
-    ;;    (list (if current-prefix-arg
-    ;;              (prefix-numeric-value current-prefix-arg)
-    ;;            (read-number "Enter number of lines (default 1): " 1))))
-    ;;   (uniline-draw-diagonal-line ?╱ num-lines "left" nil))
-
-    ;; (defun uniline-draw-right-diagonal-up (num-lines)
-    ;;   "Draw an upward right-diagonal line with '╲' over NUM-LINES lines."
-    ;;   (interactive
-    ;;    (list (if current-prefix-arg
-    ;;              (prefix-numeric-value current-prefix-arg)
-    ;;            (read-number "Enter number of lines (default 1): " 1))))
-    ;;   (uniline-draw-diagonal-line ?╲ num-lines "right" t))
-
-    ;; (defun uniline-draw-left-diagonal-up (num-lines)
-    ;;   "Draw an upward left-diagonal line with '╱' over NUM-LINES lines."
-    ;;   (interactive
-    ;;    (list (if current-prefix-arg
-    ;;              (prefix-numeric-value current-prefix-arg)
-    ;;            (read-number "Enter number of lines (default 1): " 1))))
-    ;;   (uniline-draw-diagonal-line ?╱ num-lines "left" t))
-
     (defun uniline-draw-diagonal-line (char repeat direction upward)
       "Draw a diagonal line with CHAR over REPEAT lines.
    DIRECTION should be either `left' or `right'.
@@ -254,7 +194,7 @@
 
     ;; Use the infix of transient to achieve an effect similar to the hydra prefix parameter.
     ;;
-    ;; Hydra ==> prefix argument (num) + Heads
+    ;; Hydra     ==> prefix argument (num) + Heads
     ;; Transient ==> prefix + infix (num)
 
     (defmacro define-glyph-commands (commands)
