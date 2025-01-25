@@ -35,92 +35,6 @@
 (defconst *jp-default-font* "Noto Sans Javanese")
 (defconst *symbol-default-font* "Symbols Nerd Font Mono")
 
-(when *IS-MAC*
-  ;; modify meta from ⌥ to ⌘
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'super)
-  ;; Make mouse wheel / trackpad scrolling less jerky
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
-  (dolist (multiple '("" "double-" "triple-"))
-    (dolist (direction '("right" "left"))
-      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
-  (global-set-key (kbd "M-`") 'ns-next-frame)
-
-  (defconst +env-file (concat user-emacs-directory ".env")
-    "Path to the environment variable file.")
-
-  (defun +load-env-file (file &optional noerror)
-    "Load environment variables from FILE.
-If NOERROR is non-nil, suppress errors if the file doesn't exist or isn't readable.
-Returns a list of environment variable names that were set or modified."
-    (when (and (file-exists-p file) (file-readable-p file))
-      (let ((envvars nil) (environment nil))
-        (with-temp-buffer
-          (insert-file-contents file)
-          (while (re-search-forward "^[ \t]*\\([^#= \n]+\\)=\\(.*\\)$" nil t)
-            (let ((key (match-string 1))
-                  (value (match-string 2)))
-              (push key envvars)
-              (push (format "%s=%s" key value) environment)
-              (setenv key value))))
-        ;; Update process-environment and exec-path
-        (when environment
-          (setq process-environment (append (nreverse environment) process-environment))
-          (when (member "PATH" envvars)
-            (setq exec-path (append (split-string (getenv "PATH") path-separator t)
-                                    (list exec-directory))))
-          (when (member "SHELL" envvars)
-            (setq shell-file-name (or (getenv "SHELL") shell-file-name))))
-        envvars)))
-
-  (when (and (display-graphic-p) (file-exists-p +env-file))
-    (+load-env-file +env-file t)))
-
-;; 1. Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
-;;    由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
-;;
-;; 2. Telega 中的 telega-bridge-bot 同步 matrix 的头像需要 token，存放在 pass 中时，会导致
-;;    telega root 错乱（原因未知）。
-;; 以上原因，使得这些条目依旧存放在 .authinfo 当中，密码从 pass 获取。
-;; 利用函数检查条目，从 pass 中读取密码创建 .authinfo 条目。
-(defun get-pass-entry (entry)
-  "Get the first line of the pass entry.
-ENTRY is the name of the password store entry to retrieve."
-  (let ((output (shell-command-to-string (concat "pass show " entry " | head -n 1"))))
-    (replace-regexp-in-string "\\`[ \t\n\r]+\\|[ \t\n\r]+\\'" "" output)))
-
-(defun check-and-update-authinfo (entries)
-  "Check if specific entries exist in .authinfo, if not, insert them from pass.
-ENTRIES is a list of lists, where each sublist contains three strings:
-- MACHINE: the machine name.
-- LOGIN: the login name.
-- PASS-ENTRY: the name of the entry in the password store."
-  (let ((authinfo-file "~/.authinfo"))
-    ;; Create the .authinfo file if it doesn't exist
-    (unless (file-exists-p authinfo-file)
-      (write-region "" nil authinfo-file))
-    ;; Check and add entries if they don't exist
-    (dolist (entry entries)
-      (let* ((machine (nth 0 entry))
-             (login (nth 1 entry))
-             (pass-entry (nth 2 entry))
-             (entry-found nil))
-        (with-temp-buffer
-          (insert-file-contents authinfo-file)
-          (setq entry-found (re-search-forward (format "machine %s login %s" (regexp-quote machine) (regexp-quote login)) nil t)))
-        (unless entry-found
-          (let ((password (get-pass-entry pass-entry)))
-            (with-temp-buffer
-              (insert-file-contents authinfo-file)
-              (goto-char (point-max))
-              (insert (format "machine %s login %s password %s\n" machine login password))
-              (write-region (point-min) (point-max) authinfo-file)
-              (message "Entry for machine %s added." machine))))))))
-
-(check-and-update-authinfo
- '(("192.168.1.220:9081/api/v4" "lucius^forge" "gitlab-zj")
-   ("matrix.org" "@lucius_chen:matrix.org" "matrix.org")))
-
 ;; Install straight.el
 ;; branch develop
 (setq straight-repository-branch "develop")
@@ -173,7 +87,6 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     mpv
     cape
     deft
-    ;; rime
     ebib
     citar
     wgrep
@@ -258,6 +171,7 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     (dape :host github :repo "svaante/dape")
     (meow :host github :repo "meow-edit/meow")
     (gptel :host github :repo "karthink/gptel")
+    (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
     (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
     (org-roam :host github :repo "LuciusChen/org-roam")
     (telega :host github :repo "LuciusChen/telega.el");; :branch "diy")
@@ -268,6 +182,7 @@ ENTRIES is a list of lists, where each sublist contains three strings:
     (consult-mu :host github :repo "armindarvish/consult-mu")
     (eglot-booster :host github :repo "jdtsmith/eglot-booster")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
+    ;; (exemplify-align :host sourcehut :repo "flandrew/exemplify-align")
     (aider :host github :repo "tninja/aider.el")
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
@@ -282,6 +197,27 @@ ENTRIES is a list of lists, where each sublist contains three strings:
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
 
+(when *IS-MAC*
+  ;; modify meta from ⌥ to ⌘
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super)
+  ;; Make mouse wheel / trackpad scrolling less jerky
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
+  (dolist (multiple '("" "double-" "triple-"))
+    (dolist (direction '("right" "left"))
+      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
+  (global-set-key (kbd "M-`") 'ns-next-frame)
+
+  (require 'init-env))
+
+;; 1. Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
+;;    由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
+;;
+;; 2. Telega 中的 telega-bridge-bot 同步 matrix 的头像需要 token，存放在 pass 中时，会导致
+;;    telega root 错乱（原因未知）。
+;; 以上原因，使得这些条目依旧存放在 .authinfo 当中，密码从 pass 获取。
+;; 利用函数检查条目，从 pass 中读取密码创建 .authinfo 条目。
+(require 'init-auth)
 (require 'init-setup)
 (require 'init-builtin)
 (require 'init-ui)
@@ -303,7 +239,7 @@ ENTRIES is a list of lists, where each sublist contains three strings:
 
 (require 'init-local)
 ;; (require 'init-beancount)
-;; (require 'init-rime)
+
 (provide 'init)
 ;; Local Variables:
 ;; coding: utf-8

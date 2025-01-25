@@ -46,7 +46,7 @@ If DEST, a buffer, is provided, insert the markup there."
 ;; pipx install aider
 (setup aider
   (:load-after password-store)
-  (:option aider-args '("--model" "gpt-4o-mini"))
+  (:option aider-args '("--no-auto-commits" "--model" "gpt-4o-mini"))
   (:when-loaded
     (let ((auth-info (car (auth-source-search
                            :host "api.openai.com"
@@ -58,6 +58,13 @@ If DEST, a buffer, is provided, insert the markup there."
                   (if (functionp secret)
                       (encode-coding-string (funcall secret) 'utf-8)
                     secret)))))))
+
+(setup ultra-scroll
+  (:defer (:require ultra-scroll))
+  (:when-loaded
+    (:option scroll-conservatively 101 ; important!
+             scroll-margin 0)
+    (ultra-scroll-mode 1)))
 
 (defun save-buffer-always ()
   "Save the buffer even if it is not modified."

@@ -61,6 +61,7 @@
              [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame
              [remap goto-line] 'consult-goto-line)
     (:also-load lib-consult)
+    (:option consult-async-min-input 2)
     (:hooks minibuffer-setup-hook mcfly-time-travel)))
 
 (setup consult-dir
