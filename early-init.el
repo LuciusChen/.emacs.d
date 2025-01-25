@@ -164,7 +164,7 @@
 (when (bound-and-true-p tooltip-mode)
   (tooltip-mode -1))
 
-;; Disable GUIs because theyr are inconsistent across systems, desktop
+;; Disable GUIs because they're are inconsistent across systems, desktop
 ;; environments, and themes, and they don't match the look of Emacs.
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
