@@ -76,7 +76,19 @@
 ==="))
                      (assq-delete-all 'programming gptel-directives))
              gptel-temperature 0.7)
-    (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
+    (gptel-make-gemini "Gemini"
+      :key (auth-source-pick-first-password
+            :host "api.gemini.com"
+            :user "gemini")
+      :stream t)
+    (gptel-make-openai "DeepSeek"
+      :host "api.deepseek.com"
+      :endpoint "/chat/completions"
+      :stream t
+      :key (auth-source-pick-first-password
+            :host "api.deepseek.com"
+            :user "deepseek")
+      :models '(deepseek-chat deepseek-coder))
     (:hooks  gptel-post-stream-hook (lambda ()(meow-insert-exit))
              gptel-post-stream-hook gptel-auto-scroll
              gptel-post-response-hook gptel-end-of-response)))
