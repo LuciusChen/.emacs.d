@@ -1,4 +1,7 @@
 ;; lib-ebib.el --- Initialize org	-*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
+
 (defun ebib-create-key (key _db)
   "Return the KEY in DB for the Org mode note."
   (format "%s" key))

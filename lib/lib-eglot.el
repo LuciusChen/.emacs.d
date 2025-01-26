@@ -1,6 +1,7 @@
 ;;; lib-eglot.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+
 (defun vue-eglot-init-options ()
   "VUE language server init options."
   (let ((tsdk-path (expand-file-name "typescript/lib"

@@ -1,6 +1,7 @@
 ;;; lib-font.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+
 (defun +setup-fonts ()
   "Setup fonts."
   ;; Setting the default

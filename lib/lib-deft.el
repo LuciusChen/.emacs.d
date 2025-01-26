@@ -1,4 +1,7 @@
 ;; lib-deft.el --- Initialize org	-*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
+
 ;; deft parse title
 (defun +deft-parse-title (file contents)
   "Parse the given FILE and CONTENTS and determine the title.
