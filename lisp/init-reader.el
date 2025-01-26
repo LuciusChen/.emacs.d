@@ -88,7 +88,7 @@
       :key (auth-source-pick-first-password
             :host "api.deepseek.com"
             :user "deepseek")
-      :models '(deepseek-chat deepseek-coder))
+      :models '(deepseek-chat deepseek-reasoner))
     (:hooks  gptel-post-stream-hook (lambda ()(meow-insert-exit))
              gptel-post-stream-hook gptel-auto-scroll
              gptel-post-response-hook gptel-end-of-response)))
