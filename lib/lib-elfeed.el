@@ -1,6 +1,7 @@
 ;;; lib-elfeed.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+
 ;;;###autoload
 (cl-defun +org-roam-capture-ref (&key title url)
   "Capture the TITLE and URL with multiple `org-roam' templates."
@@ -31,14 +32,14 @@
   (interactive)
   (with-current-buffer (elfeed-search-buffer)
     (elfeed-save-excursion
-      (let* ((inhibit-read-only t)
-             (standard-output (current-buffer)))
-        (erase-buffer)
-        (+elfeed-overview--update-list)
-        (dolist (entry elfeed-search-entries)
-          (funcall elfeed-search-print-entry-function entry)
-          (insert "\n"))
-        (setf elfeed-search-last-update (float-time))))
+     (let* ((inhibit-read-only t)
+            (standard-output (current-buffer)))
+       (erase-buffer)
+       (+elfeed-overview--update-list)
+       (dolist (entry elfeed-search-entries)
+         (funcall elfeed-search-print-entry-function entry)
+         (insert "\n"))
+       (setf elfeed-search-last-update (float-time))))
     (when (zerop (buffer-size))
       ;; If nothing changed, force a header line update
       (force-mode-line-update))
@@ -56,11 +57,11 @@
                                       feed))))
              (func (byte-compile (elfeed-search-compile-filter filter))))
         (with-elfeed-db-visit (entry feed)
-          (when (funcall func entry feed count)
-            (setf (cdr tail) (list entry)
-                  tail (cdr tail)
-                  count (1+ count))
-            (elfeed-db-return)))))
+                              (when (funcall func entry feed count)
+                                (setf (cdr tail) (list entry)
+                                      tail (cdr tail)
+                                      count (1+ count))
+                                (elfeed-db-return)))))
     (let ((entries (cdr head))
           (elfeed-search-sort-function
            (lambda (a b)
@@ -160,8 +161,11 @@
     ))
 
 (defun nerd-icon-for-tags (tags)
-  "Generate Nerd Font icon based on tags.
-  Returns default if no match."
+  "Generate a Nerd Font icon based on TAGS.
+
+TAGS is a list of strings representing tags associated with an item.
+The function returns a specific Nerd Font icon corresponding to
+certain tags, with a default icon if no specific match is found."
   (cond ((member "youtube" tags)  (nerd-icons-faicon "nf-fa-youtube_play" :face '(:foreground "#FF0200")))
         ((member "instagram" tags) (nerd-icons-faicon "nf-fa-instagram" :face '(:foreground "#FF00B9")))
         ((member "emacs" tags) (nerd-icons-sucicon "nf-custom-emacs" :face '(:foreground "#9A5BBE")))
@@ -227,6 +231,20 @@
       (message "%s" (propertize "Not a video link!" 'face 'elfeed-log-warn-level-face)))))
 
 (defun +elfeed-tube-download (entries)
+  "Download YouTube videos from Elfeed entries.
+
+ENTRIES is a list of Elfeed entries to be downloaded.  This function
+works in both `elfeed-search-mode` and `elfeed-show-mode`.  It uses
+`yt-dlp` to download videos to the `~/Downloads/` directory.
+
+When called interactively, it prompts the user to download the entry
+at point or the selected entries, depending on the current mode.  It
+only processes entries that are identified as YouTube URLs.
+
+For each entry, a new process is started to download the video using
+`yt-dlp`, and a message is shown upon starting and completing each
+download.  If the entry is not a YouTube URL, a message is displayed
+and the download is cancelled."
   (interactive
    (list
     (cond
