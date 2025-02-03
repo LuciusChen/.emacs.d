@@ -1,5 +1,6 @@
 ;;; init-reader.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary:
+;;; Code:
 
 (setup gfm-mode (:file-match "\\.md\\'"))
 

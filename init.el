@@ -167,6 +167,7 @@
     password-store
     meow-tree-sitter
     go-translate
+    eshell-syntax-highlighting
     (emt :host github :repo "roife/emt")
     (dape :host github :repo "svaante/dape")
     (meow :host github :repo "meow-edit/meow")

@@ -41,47 +41,6 @@
                  '("0[xX][0-9a-fA-F]\\{2\\}\\([0-9A-Fa-f]\\{6\\}\\)\\b"
                    (0 (rainbow-colorize-hexadecimal-without-sharp))))))
 
-(setup vterm
-  (:defer (:require vterm))
-  (:when-loaded
-    (:also-load lib-font)
-    (:with-map vterm-mode-map
-      (:bind "C-y" vterm-yank
-             "M-y" vterm-yank-pop
-             "C-k" vterm-send-C-k-and-kill))
-    (:option vterm-shell "zsh"
-             vterm-always-compile-module t)
-    (defun vterm-send-C-k-and-kill ()
-      "Send `C-k' to libvterm, and put content in kill-ring."
-      (interactive)
-      (kill-ring-save (point) (vterm-end-of-line))
-      (vterm-send-key "k" nil nil t))))
-
-(setup vterm-toggle
-  (:after vterm
-    (:global [f8] vterm-toggle
-             [f9] vterm-compile)
-    (:with-map vterm-mode-map
-      (:bind [f8] vterm-toggle
-             [(control return)] vterm-toggle-insert-cd)))
-  (:when-loaded
-    (:option vterm-toggle-cd-auto-create-buffer nil)
-    (defvar vterm-compile-buffer nil)
-    (defun vterm-compile ()
-      "Compile the program including the current buffer in `vterm'."
-      (interactive)
-      (setq compile-command (compilation-read-command compile-command))
-      (let ((vterm-toggle-use-dedicated-buffer t)
-            (vterm-toggle--vterm-dedicated-buffer (if (vterm-toggle--get-window)
-                                                      (vterm-toggle-hide)
-                                                    vterm-compile-buffer)))
-        (with-current-buffer (vterm-toggle-cd)
-          (setq vterm-compile-buffer (current-buffer))
-          (rename-buffer "*vterm compilation*")
-          (compilation-shell-minor-mode 1)
-          (vterm-send-M-w)
-          (vterm-send-string compile-command t))))))
-
 (setup verb (:option verb-babel-timeout 60.0))
 
 (setup mastodon

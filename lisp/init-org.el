@@ -1,5 +1,7 @@
 ;;; init-org.el --- Org-mode config -*- lexical-binding: t -*-
 ;;; Commentary:
+;;; Code:
+
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
   (:global
