@@ -71,5 +71,6 @@ If DEST, a buffer, is provided, insert the markup there."
   (interactive)
   (set-buffer-modified-p t)
   (save-buffer))
+
 (provide 'init-local)
 ;;; init-local.el ends here
