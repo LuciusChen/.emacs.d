@@ -57,7 +57,7 @@
                          (string-trim branch-raw)))
                (dirty (not
                        (string= "" (string-trim (shell-command-to-string "git status --porcelain")))))
-               (dirty-info (if dirty " ✎" " ✔")))
+               (dirty-info (if dirty " 🖉" " ✔")))
           (concat (propertize "⎇ " 'face 'modus-themes-fg-green-warmer)
                   (propertize branch 'face 'modus-themes-fg-magenta-warmer)
                   (propertize dirty-info 'face
