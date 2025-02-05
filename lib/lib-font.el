@@ -6,6 +6,13 @@
   "Setup fonts."
   ;; Setting the default
   (set-face-attribute 'default nil :font *default-font* :weight 'normal)
+
+  (set-face-attribute 'fixed-pitch-serif nil
+                      :family (face-attribute 'default :family)
+                      :height (face-attribute 'default :height)
+                      :weight (face-attribute 'default :weight)
+                      :slant (face-attribute 'default :slant))
+
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
   ;; "Emacs 28 now has 'emoji . before, emoji is part of 'symbol"
