@@ -43,9 +43,24 @@ cp "$FORMULA_PATH" "${FORMULA_PATH}.bak"
 # Modify the formula based on the version type
 if [ "$VERSION_TYPE" = "mps" ]; then
   echo "Switching to MPS version."
+
+  # Check if Xcode is installed
+  if ! xcode-select -p > /dev/null 2>&1; then
+      echo "Xcode is not installed. Please install Xcode from the App Store."
+      exit 1
+  fi
+
+  # Check if Xcode initial setup is required
+  if ! xcodebuild -checkFirstLaunchStatus > /dev/null 2>&1; then
+      echo "Running Xcode first launch setup..."
+      sudo xcodebuild -runFirstLaunch
+  fi
+
   # Ensure libmps is installed
   if ! brew list --versions libmps > /dev/null 2>&1; then
     brew install libmps --HEAD
+  else
+    echo "libmps is already installed."
   fi
 
   # Update the formula for MPS
