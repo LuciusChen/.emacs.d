@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Function to print usage
+usage() {
+  echo "Usage: $0 [normal|mps]"
+  echo "  normal: Install the normal version of emacs-plus@31 (default)"
+  echo "  mps: Install the MPS version of emacs-plus@31"
+  exit 1
+}
+
+# Set default version type
+VERSION_TYPE="normal"
+
+# Check if the user provided an argument and if it's valid
+if [ -n "$1" ]; then
+  if [ "$1" = "normal" ] || [ "$1" = "mps" ]; then
+    VERSION_TYPE=$1
+  else
+    usage
+  fi
+fi
+
 # Uninstall first
 if brew list --versions emacs-plus@31 > /dev/null 2>&1; then
   echo "Uninstalling existing emacs-plus@31..."
@@ -19,6 +39,25 @@ TARGET_PATCH_DIR="/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patc
 
 # Copy the original formula for backup
 cp "$FORMULA_PATH" "${FORMULA_PATH}.bak"
+
+# Modify the formula based on the version type
+if [ "$VERSION_TYPE" = "mps" ]; then
+  echo "Switching to MPS version."
+  # Ensure libmps is installed
+  if ! brew list --versions libmps > /dev/null 2>&1; then
+    brew install libmps --HEAD
+  fi
+
+  # Update the formula for MPS
+  sed -i '' 's|:branch => "master"|:branch => "feature/igc"|' "$FORMULA_PATH"
+  sed -i '' '/args << "--with-gnutls"/a\
+    args << "--with-mps=yes"
+' "$FORMULA_PATH"
+else
+  echo "Switching to normal version."
+  # Revert any changes for MPS if needed
+  git checkout "$FORMULA_PATH"
+fi
 
 # Define the insertion point in the formula
 INSERTION_POINT="round-undecorated-frame"
@@ -79,4 +118,3 @@ inject_patches
 brew install emacs-plus@31 --with-savchenkovaleriy-big-sur-icon --with-xwidgets
 
 osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@31/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
-
