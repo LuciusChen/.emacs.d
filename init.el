@@ -236,6 +236,7 @@
 (require 'init-org)
 
 (require 'init-telega)
+(require 'init-shell)
 (require 'init-mu4e)
 
 (require 'init-local)
