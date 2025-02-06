@@ -119,15 +119,9 @@
   (:defer (:require flymake))
   (:when-loaded
     (:option flymake-no-changes-timeout nil
+             flymake-show-diagnostics-at-end-of-line t
              flymake-fringe-indicator-position 'right-fringe)
     (:with-mode prog-mode (:hook flymake-mode))))
-
-(setup sideline-flymake
-  (:load-after flymake)
-  (:when-loaded
-    (:option sideline-flymake-display-mode 'point
-             sideline-backends-right '(sideline-flymake))
-    (:with-mode flymake-mode (:hook sideline-mode))))
 
 (setup js
   (:also-load lib-js)
