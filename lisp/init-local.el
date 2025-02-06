@@ -1,5 +1,7 @@
 ;;; init-local.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary:
+;;; Code:
+
 (defun jao-eww-to-org (&optional dest)
   "Render the current eww buffer using org markup.
 If DEST, a buffer, is provided, insert the markup there."
