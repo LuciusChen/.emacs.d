@@ -71,13 +71,7 @@
     (:with-mode org-mode
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
-      (:hook (lambda () (setq truncate-lines nil)))
-      (:hook (lambda ()(make-face 'width-font-face)
-               (set-face-attribute 'width-font-face nil :font *org-font*)
-               (setq buffer-face-mode-face 'width-font-face)
-               (buffer-face-mode)
-               ;; org-table 字体好像并没有跟随 org-mode，所以单独设置。
-               (set-face-attribute 'org-table nil :family *org-font*))))
+      (:hook (lambda () (setq truncate-lines nil))))
     (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
@@ -499,8 +493,6 @@
            org-insert-heading-respect-content t
            org-modern-table-horizontal 0.2
            org-modern-checkbox nil
-           org-modern-list '((43 . "➢")
-                             (45 . "➣"))
            org-ellipsis "[+]")
   (:when-loaded
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
