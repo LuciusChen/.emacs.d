@@ -39,21 +39,6 @@
     (:require lib-font)
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts)
-    (defun set-buffer-font (font-name)
-      "Set the font for the current buffer to FONT-NAME."
-      (make-face 'custom-font-face)
-      (set-face-attribute 'custom-font-face nil :font font-name)
-      (setq buffer-face-mode-face 'custom-font-face)
-      (buffer-face-mode))
-
-    (defun set-font-for-modes (font-alist)
-      "Set fonts for different modes based on FONT-ALIST."
-      (dolist (entry font-alist)
-        (let ((mode (car entry))
-              (font (cdr entry)))
-          (add-hook (intern (format "%s-hook" mode))
-                    (lambda () (set-buffer-font font))))))
-
     (set-font-for-modes
      `((vterm-mode . ,*term-default-font*)
        (nxml-mode  . ,*prog-font*)
@@ -138,9 +123,9 @@
                               +tab-bar-telega-icon))
     (:hooks telega-connection-state-hook +tab-bar-telega-icon-update
             telega-kill-hook +tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)))
+    (:advice telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
+    (:advice telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
+    (:advice telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
+    (:advice telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)))
 (provide 'init-ui)
 ;;; init-ui.el ends here
