@@ -2,6 +2,21 @@
 ;;; Commentary:
 ;;; Code:
 
+(defun set-buffer-font (font-name)
+  "Set the font for the current buffer to FONT-NAME."
+  (make-face 'custom-font-face)
+  (set-face-attribute 'custom-font-face nil :font font-name)
+  (setq buffer-face-mode-face 'custom-font-face)
+  (buffer-face-mode))
+
+(defun set-font-for-modes (font-alist)
+  "Set fonts for different modes based on FONT-ALIST."
+  (dolist (entry font-alist)
+    (let ((mode (car entry))
+          (font (cdr entry)))
+      (add-hook (intern (format "%s-hook" mode))
+                (lambda () (set-buffer-font font))))))
+
 (defun +setup-fonts ()
   "Setup fonts."
   ;; Setting the default

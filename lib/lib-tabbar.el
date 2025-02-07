@@ -1,7 +1,13 @@
 ;;; lib-tabbar.el --- tabbar -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+
 (defun +tab-bar-tab-name-function ()
+  "Generate a name for the current tab based on the buffer name.
+If the buffer name exceeds `tab-bar-tab-name-truncated-max` characters,
+truncate it and append `tab-bar-tab-name-ellipsis`.  If there are multiple
+windows in the tab, append the count of windows in parentheses.
+Return the formatted tab name."
   (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
          (count (length (window-list-1 nil 'nomini)))
          (truncated-tab-name (if (< (length raw-tab-name)
@@ -15,6 +21,14 @@
       truncated-tab-name)))
 
 (defun +tab-bar-tab-name-format-function (tab i)
+  "Format the display name for a tab in the tab bar.
+TAB is the tab descriptor, and I is the tab index.  Apply custom
+styling to the tab name and index using `tab-bar-tab-face-function`.
+
+- Prefix the tab with its index and a colon, styled with a bold weight.
+- Surround the tab name with spaces, adjusting vertical alignment
+  for aesthetics.
+- Return the formatted tab name with applied text properties."
   (let ((face (funcall tab-bar-tab-face-function tab)))
     (concat
      ;; change tab-bar's height
@@ -26,6 +40,30 @@
 (defvar +tab-bar-telega-indicator-cache nil)
 
 (defun +tab-bar-telega-icon-update (&rest rest)
+  "Update the Telega icon in the tab bar, reflecting notification counts.
+This function takes REST as an optional argument, though it is not used
+within the function body.
+
+The function checks if the Telega server is live and if the server buffer
+is active.  It computes various counts, including:
+
+- The number of unread messages (`unread-count`).
+- The number of mentions (`mentioned-count`).
+- The number of unread reactions (`reaction-count`).
+- The number of keyword matches (`keyword-count`).
+
+The total `notification-count` is the sum of these counts.  If this total
+is greater than zero, a formatted string with icons and counts is returned.
+This string includes:
+
+- A Telegram icon.
+- A bullet with the unread count.
+- An at-sign with the mention count.
+- A heart with the reaction count.
+- A hash with the keyword count.
+
+The function uses `nerd-icons-faicon` for the Telegram icon and applies
+specific faces to the counts for visual differentiation."
   (setq +tab-bar-telega-indicator-cache
         (when (and (fboundp 'telega-server-live-p)
                    (telega-server-live-p)
@@ -58,6 +96,10 @@
                       "] "))))))
 
 (defun +tab-bar-telega-icon ()
+  "Return the Telega icon for the tab bar, updating if necessary.
+This function checks if `+tab-bar-telega-indicator-cache` is set.  If it is,
+the cached value is returned.  Otherwise, it calls `+tab-bar-telega-icon-update`
+to refresh the icon and returns the updated value."
   (or +tab-bar-telega-indicator-cache
       (+tab-bar-telega-icon-update)))
 (provide 'lib-tabbar)
