@@ -255,5 +255,9 @@ if one already exists."
 (setup python
   (:option python-indent-guess-indent-offset t
            python-indent-guess-indent-offset-verbose nil))
+
+;; Don't scale font on trackpad pinch!
+(global-unset-key (kbd "<pinch>"))
+
 (provide 'init-builtin)
 ;;; init-builtin.el ends here
