@@ -89,7 +89,5 @@
                                (list (vector (regexp-quote pat)
                                              0
                                              'compose-gstring-for-graphic)))))
-;; Don't scale font on trackpad pinch!
-(global-unset-key (kbd "<pinch>"))
 (provide 'lib-font)
 ;;; lib-font.el ends here
