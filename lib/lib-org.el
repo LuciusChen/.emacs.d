@@ -4,14 +4,20 @@
 
 ;; Save the corresponding buffers
 (defun log-todo-next-creation-date (&rest ignore)
-  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'"
+  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'.
+
+IGNORE is a placeholder for any arguments passed to this function."
   (when (and (string= (org-get-todo-state) "NEXT")
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
+
 ;; Copy Done To-Dos to Today
 (defun org-roam-copy-todo-to-today ()
+  "Refile DONE or CANCELLED TODO items to today's org-roam daily file."
   (interactive)
-  (when (and (or (equal org-state "DONE") (equal org-state "CANCELLED")) (not (org-find-property "STYLE")))
+  (when (and (or (equal org-state "DONE")
+                 (equal org-state "CANCELLED"))
+             (not (org-find-property "STYLE")))
     (let ((org-refile-keep t) ;; Set this to nil to delete the original!
           (org-after-refile-insert-hook #'save-buffer)
           today-file
@@ -28,12 +34,7 @@
 ;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
 ;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
 (defun dired-copy-images-links ()
-  "Works only in dired-mode, put in kill-ring,
-  ready to be yanked in some other org-mode file,
-  the links of marked image files using file-name-base as #+CAPTION.
-  If no file marked then do it on all images files of directory.
-  No file is moved nor copied anywhere.
-  This is intended to be used with org-redisplay-inline-images."
+  "Copy links of marked image files in Dired to the `kill-ring`."
   (interactive)
   (if (derived-mode-p 'dired-mode)
       (let* ((marked-files (dired-get-marked-files))
@@ -52,7 +53,7 @@
                      (file-name-base marked-file)
                      "\n#+ATTR_ORG: :width 800"
                      "\n[[file:"
-                     ;; 需要绝对路径则直接用 marked-file
+                     ;; Use absolute path if needed
                      (replace-regexp-in-string "^\\(~/\\|/Users/[^/]+/\\)Library/CloudStorage/Dropbox/org/[^/]*/" "" marked-file)
                      "]]\n\n")
              nil)))
@@ -61,13 +62,14 @@
     (message "Error: Does not work outside dired-mode")))
 
 (defun gtd-save-org-buffers ()
-  "Save `org-agenda-files' buffers without user confirmation.
-See also `org-save-all-org-buffers'"
+  "Save buffers associated with the variable `org-agenda-files`."
   (interactive)
   (message "Saving org-agenda-files buffers...")
-  (save-some-buffers t (lambda ()
-                         (when (member (buffer-file-name) org-agenda-files)
-                           t)))
+  (save-some-buffers
+   t
+   (lambda ()
+     (when (member (buffer-file-name) org-agenda-files)
+       t)))
   (message "Saving org-agenda-files buffers... done"))
 
 (defun ebib-create-key (key _db)
@@ -95,6 +97,7 @@ See also `org-save-all-org-buffers'"
     (format "%s" (with-temp-buffer (org-time-stamp-inactive nil)))))
 
 (defun +org-latex-preview-reload ()
+  "Clear the LaTeX preview cache and refresh LaTeX previews in the current buffer."
   (interactive)
   (call-interactively 'org-latex-preview-clear-cache)
   (org-latex-preview 'buffer))
