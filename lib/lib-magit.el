@@ -2,6 +2,12 @@
 ;;; Commentary:
 ;;; Code:
 (defun +magit-or-vc-log-file (&optional prompt)
+  "Show the version control log for the current file.
+
+If the current file is under Git version control, use Magit's log view.
+If PROMPT is provided, display the Magit log popup for additional options.
+Otherwise, display the log directly.  If the file is not under Git, use
+the built-in VC log view instead."
   (interactive "P")
   (if (and (buffer-file-name)
            (eq 'Git (vc-backend (buffer-file-name))))
@@ -63,12 +69,12 @@
 
 (defun +magit-log--abbreviate-author (&rest args)
   "The first arg is AUTHOR, abbreviate it.
-First Last  -> F Last
-First.Last  -> F Last
-Last, First -> F Last
-First       -> First (no change).
+  First Last  -> F Last
+  First.Last  -> F Last
+  Last, First -> F Last
+  First       -> First (no change).
 
-It is assumed that the author has only one or two names."
+  It is assumed that the author has only one or two names."
   ;; ARGS               -> '((REV AUTHOR DATE))
   ;; (car ARGS)         -> '(REV AUTHOR DATE)
   ;; (nth 1 (car ARGS)) -> AUTHOR

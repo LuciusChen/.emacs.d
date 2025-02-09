@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (defun meow-setup ()
+  "Meow setup."
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
