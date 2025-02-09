@@ -16,14 +16,20 @@
       (insert ";;; " fname " ends here\n"))))
 
 (defun +eval-last-sexp-or-region (prefix)
-  "Eval region from BEG to END if active, otherwise the last sexp."
+  "Eval region from BEG to END if active, otherwise the last sexp.
+
+If a region is active, evaluate the region.  Otherwise, evaluate the
+last s-expression.  PREFIX is passed to `pp-eval-last-sexp` when evaluating
+the last s-expression."
   (interactive "P")
   (if (and (mark) (use-region-p))
       (eval-region (min (point) (mark)) (max (point) (mark)))
     (pp-eval-last-sexp prefix)))
 
 (defun +make-read-only (_expression out-buffer-name &rest _)
-  "Enable `view-mode' in the output buffer - if any - so it can be closed with `\"q\"."
+  "Enable `view-mode' in the output buffer, OUT-BUFFER-NAME, if it exists.
+
+This allows the buffer to be closed easily with \"q\"."
   (when (get-buffer out-buffer-name)
     (with-current-buffer out-buffer-name
       (view-mode 1))))

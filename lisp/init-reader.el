@@ -132,7 +132,7 @@
                                          (gt-taker :text 'word))
                             :engines (list (gt-chatgpt-engine :if 'not-word)
                                            (gt-google-engine :if 'word)
-                                           ;; (gt-deepl-engine :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
+                                           (gt-deepl-engine :pro t :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
                                            (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
                                            (gt-youdao-suggest-engine :if '(and word src:en)))
                             :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode eww-mode helpful-mode devdocs-mode))
