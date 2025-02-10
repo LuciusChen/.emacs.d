@@ -91,7 +91,6 @@
     citar
     wgrep
     setup
-    eglot
     eglot-java
     corfu
     vundo
