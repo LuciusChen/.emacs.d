@@ -297,7 +297,15 @@
 
 (setup org-habit
   (:after org-agenda
-    (:option org-habit-show-done-always-green t)
+    (:option org-habit-following-days 1
+             org-habit-preceding-days 7
+             org-habit-show-all-today t
+             org-habit-graph-column 57
+             org-habit-overdue-glyph ?○
+             org-habit-alert-glyph ?○
+             org-habit-today-glyph ?○
+             org-habit-completed-glyph ?●
+             org-habit-show-done-always-green t)
     (:with-feature org-agenda
       (:also-load org-habit)
       (let ((agenda-sorting-strategy (assoc 'agenda org-agenda-sorting-strategy)))

@@ -1,5 +1,7 @@
 ;;; init-telega.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary:
+;;; Code:
+
 (setup telega
   ;; @LawxenceX
   ;; telega 中 telega-prefix-map 定义的是 defvar，
