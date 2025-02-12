@@ -101,10 +101,8 @@
              eglot-events-buffer-config '(:size 0 :format full)) ;; 取消 eglot log
     (dolist (item (list
                    (cons 'my-html-mode '("vscode-html-language-server" "--stdio"))
-                   ;; ╭──────────────────────────────────────────────────────────────────╮
-                   ;; │https://github.com/joaotavora/eglot/discussions/1184              │
-                   ;; │只支持 *.vue 文件内 find references，不支持 *.js。 （VSCode 验证）│
-                   ;; ╰──────────────────────────────────────────────────────────────────╯
+                   ;; https://github.com/joaotavora/eglot/discussions/1184
+                   ;; 只支持 *.vue 文件内 find references，不支持 *.js。 （VSCode 验证）
                    (cons '(vue-mode vue-ts-mode typescript-ts-mode typescript-mode)
                          `("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options)))
                    (cons 'js-mode '("typescript-language-server" "--stdio"))

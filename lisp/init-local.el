@@ -25,6 +25,12 @@
              scroll-margin 0)
     (ultra-scroll-mode 1)))
 
+(setup projectile
+  (:defer (:require projectile))
+  (:when-loaded
+    (projectile-mode +1)
+    (:option projectile-project-search-path '("~/IdeaProjects/"))))
+
 (defun save-buffer-always ()
   "Save the buffer even if it is not modified."
   (interactive)

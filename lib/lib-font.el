@@ -2,11 +2,12 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun set-buffer-font (font-name)
-  "Set the font for the current buffer to FONT-NAME."
-  (make-face 'custom-font-face)
-  (set-face-attribute 'custom-font-face nil :font font-name)
-  (setq buffer-face-mode-face 'custom-font-face)
+(defun set-buffer-font (font face-name)
+  "Set the current buffer's font to FONT using FACE-NAME."
+  (unless (facep face-name)
+    (make-face face-name))
+  (set-face-attribute face-name nil :font font)
+  (setq buffer-face-mode-face face-name)
   (buffer-face-mode))
 
 (defun set-font-for-modes (font-alist)
@@ -15,7 +16,9 @@
     (let ((mode (car entry))
           (font (cdr entry)))
       (add-hook (intern (format "%s-hook" mode))
-                (lambda () (set-buffer-font font))))))
+                (lambda ()
+                  (let ((face-name (intern (format "%s-font-face" mode))))
+                    (set-buffer-font font face-name)))))))
 
 (defun +setup-fonts ()
   "Setup fonts."
@@ -62,7 +65,14 @@
   ;; Set font for specific characters
   ;; (set-fontset-font nil ?❤ "Symbols Nerd Font Mono")
 
-  (set-fontset-font t 'javanese *jp-default-font*))
+  (set-fontset-font t 'javanese *jp-default-font*)
+  (set-font-for-modes
+   `((vterm-mode . ,*term-default-font*)
+     (nxml-mode  . ,*prog-font*)
+     (org-mode   . ,*org-font*)
+     (latex-mode . ,*prog-font*)
+     (prog-mode  . ,*prog-font*)))
+  )
 
 (defconst jetbrains-ligature-mode--ligatures
   '("-->" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"
