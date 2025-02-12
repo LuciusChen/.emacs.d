@@ -140,6 +140,7 @@
     org-roam-ui
     rainbow-mode
     prettier-js
+    projectile
     consult-dir
     swift-mode
     org-sliced-images

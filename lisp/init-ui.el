@@ -38,13 +38,7 @@
   (setup font
     (:require lib-font)
     (:hooks window-setup-hook +setup-fonts
-            server-after-make-frame-hook +setup-fonts)
-    (set-font-for-modes
-     `((vterm-mode . ,*term-default-font*)
-       (nxml-mode  . ,*prog-font*)
-       (org-mode   . ,*org-font*)
-       (latex-mode . ,*prog-font*)
-       (prog-mode  . ,*prog-font*)))))
+            server-after-make-frame-hook +setup-fonts)))
 
 (setup dimmer
   (:defer (dimmer-mode t))
