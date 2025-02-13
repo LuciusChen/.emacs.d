@@ -18,25 +18,6 @@
                       (encode-coding-string (funcall secret) 'utf-8)
                     secret)))))))
 
-(setup ultra-scroll
-  (:defer (:require ultra-scroll))
-  (:when-loaded
-    (:option scroll-conservatively 101 ; important!
-             scroll-margin 0)
-    (ultra-scroll-mode 1)))
-
-(setup projectile
-  (:defer (:require projectile))
-  (:when-loaded
-    (projectile-mode +1)
-    (:option projectile-project-search-path '("~/IdeaProjects/"))))
-
-(defun save-buffer-always ()
-  "Save the buffer even if it is not modified."
-  (interactive)
-  (set-buffer-modified-p t)
-  (save-buffer))
-
 (defun my/my-open-Marked ()
   "Open the current file in Marked 2."
   (interactive)
