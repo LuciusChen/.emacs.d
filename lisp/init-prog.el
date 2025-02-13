@@ -115,10 +115,16 @@
 ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
 (setup sql (:when-loaded (sql-set-product 'mysql)))
 
+(setup projectile
+  (:defer (:require projectile))
+  (:when-loaded
+    (projectile-mode +1)
+    (:option projectile-project-search-path '("~/IdeaProjects/"))))
+
 (setup flymake
   (:defer (:require flymake))
   (:when-loaded
-    (:option flymake-no-changes-timeout nil
+    (:option flymake-no-changes-timeout 0.5
              flymake-show-diagnostics-at-end-of-line t
              flymake-fringe-indicator-position 'right-fringe)
     (:with-mode prog-mode (:hook flymake-mode))))

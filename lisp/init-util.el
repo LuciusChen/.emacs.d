@@ -58,6 +58,13 @@
     (ready-player-add-to-auto-mode-alist)
     (add-to-list 'ready-player-supported-audio "m4r")))
 
+(setup ultra-scroll
+  (:defer (:require ultra-scroll))
+  (:when-loaded
+    (:option scroll-conservatively 101 ; important!
+             scroll-margin 0)
+    (ultra-scroll-mode 1)))
+
 (setup uniline (:defer (:require uniline)))
 (provide 'init-util)
 ;;; init-util.el ends here
