@@ -168,7 +168,7 @@
            indent-bars-treesit-support t
            indent-bars-no-descend-string t
            indent-bars-prefer-character t
-           indent-bars-no-stipple-char ?\u254e
+           indent-bars-no-stipple-char ?\u2502
            indent-bars-treesit-scope '((python function_definition class_definition for_statement
                                                if_statement with_statement while_statement))))
 
