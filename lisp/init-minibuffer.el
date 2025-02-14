@@ -52,8 +52,8 @@
              "M-g f" consult-recent-file
              "M-g r" consult-ripgrep
              "M-g p" consult-project-buffer
-             "M-g x" consult-recent-xref
              "M-g y" consult-flymake
+             "M-g g" consult-global-mark
              ;; brew install fd
              "M-g d" consult-fd
              [remap switch-to-buffer] consult-buffer
@@ -61,7 +61,9 @@
              [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame
              [remap goto-line] 'consult-goto-line)
     (:also-load lib-consult)
-    (:option consult-async-min-input 2)
+    (:option consult-async-min-input 2
+             xref-show-xrefs-function #'consult-xref
+             xref-show-definitions-function #'consult-xref)
     (:hooks minibuffer-setup-hook mcfly-time-travel)))
 
 (setup consult-dir

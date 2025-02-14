@@ -70,7 +70,12 @@ A scope may be provided to a commit's type, to provide additional contextual inf
              magit-save-repository-buffers nil
              ;; Don't display parent/related refs in commit buffers; they are rarely
              ;; helpful and only add to runtime costs.
-             magit-revision-insert-related-refs nil)
+             magit-revision-insert-related-refs nil
+             magit-blame-styles '((headings
+                                   (heading-format . "  %C %-18a%f %-80s  %H\n")
+                                   (show-message . t))
+                                  (highlight
+                                   (highlight-face . magit-blame-highlight))))
     (:advice magit-status :around #'magit-fullscreen)
     (:advice magit-mode-quit-window :after #'magit-restore-screen)
     ;; kill 因为 blob-next 和 blob-previous 产生的 buffer
