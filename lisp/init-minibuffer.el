@@ -53,7 +53,7 @@
              "M-g r" consult-ripgrep
              "M-g p" consult-project-buffer
              "M-g y" consult-flymake
-             "M-g g" consult-global-mark
+             "M-g m" consult-global-mark
              ;; brew install fd
              "M-g d" consult-fd
              [remap switch-to-buffer] consult-buffer
