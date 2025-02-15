@@ -24,5 +24,6 @@
   (if (not buffer-file-name)
       (error "Must be visiting a file")
     (call-process-shell-command (format "open -a \"Marked 2\" \"%s\"" buffer-file-name))))
+
 (provide 'init-local)
 ;;; init-local.el ends here

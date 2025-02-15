@@ -110,10 +110,10 @@
     ;; Prefer g-prefixed coreutils version of standard utilities when available
     (let ((gls (executable-find "gls")))
       (when gls (setq insert-directory-program gls)))
-    (diredfl-global-mode)
     (:with-mode dired-mode (:hook diff-hl-dired-mode
                                   dired-hide-details-mode
-                                  nerd-icons-dired-mode))))
+                                  nerd-icons-dired-mode
+                                  diredfl-mode))))
 
 (setup bookmark
   (:defer

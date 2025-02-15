@@ -3,11 +3,42 @@
 ;;; Code:
 (setup popup-frames (:defer (:require popup-frames)))
 
-(setup dired-hacks
-  (:load-after dired)
+(setup dirvish
+  (:defer (:require dirvish))
   (:when-loaded
-    (:option dired-subtree-line-prefix "  │  ")
-    (:with-map dired-mode-map (:bind "TAB" dired-subtree-toggle))))
+    (:global "C-c f f" dirvish
+             "C-c f s" dirvish-side)
+    (dirvish-override-dired-mode)
+    (:option dirvish-quick-access-entries
+             '(("h" "~/" "Home")
+               ("e" "~/.emacs.d/" "Emacs")
+               ("p" "~/IdeaProjects/" "Projects"))
+             dirvish--debouncing-delay 2
+             dirvish-attributes
+             '(file-time file-size collapse subtree-state vc-state)
+             delete-by-moving-to-trash t
+             dired-listing-switches
+             "-l --almost-all --human-readable --group-directories-first --no-group")
+    (:with-map dirvish-mode-map
+      (:bind "a"    dirvish-quick-access
+             "q"    dirvish-quit
+             "f"    dirvish-file-info-menu
+             "y"    dirvish-yank-menu
+             "N"    dirvish-narrow
+             "^"    dirvish-history-last
+             "h"    dirvish-history-jump
+             "s"    dirvish-quicksort
+             "v"    dirvish-vc-menu
+             "TAB"  dirvish-subtree-toggle
+             "M-f"  dirvish-history-go-forward
+             "M-b"  dirvish-history-go-backward
+             "M-l"  dirvish-ls-switches-menu
+             "M-m"  dirvish-mark-menu
+             "M-t"  dirvish-layout-toggle
+             "M-s"  dirvish-setup-menu
+             "M-e"  dirvish-emerge-menu
+             "M-j"  dirvish-fd-jump))
+    (:with-mode dirvish-directory-view-mode (:hook diredfl-mode))))
 
 (setup webpaste
   (:defer (:require webpaste)
