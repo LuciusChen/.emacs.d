@@ -193,9 +193,8 @@
 (setq vc-follow-symlinks t)
 
 ;; load module settings
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
+(dolist (dir '("lisp" "lib" "site-lisp"))
+  (add-to-list 'load-path (expand-file-name dir user-emacs-directory)))
 
 (when *IS-MAC*
   ;; modify meta from ⌥ to ⌘
