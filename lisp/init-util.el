@@ -28,7 +28,6 @@
              "^"    dirvish-history-last
              "h"    dirvish-history-jump
              "s"    dirvish-quicksort
-             "v"    dirvish-vc-menu
              "TAB"  dirvish-subtree-toggle
              "M-f"  dirvish-history-go-forward
              "M-b"  dirvish-history-go-backward
