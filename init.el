@@ -142,6 +142,7 @@
     prettier-js
     projectile
     consult-dir
+    dirvish
     swift-mode
     org-sliced-images
     vterm
@@ -186,7 +187,6 @@
     (aider :host github :repo "tninja/aider.el")
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
-    (dired-hacks :host github :repo "Fuco1/dired-hacks" :files (:defaults "*.el"))
     (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))))
 
 (dolist (e *use-package-list*) (straight-use-package e))
