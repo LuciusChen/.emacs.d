@@ -161,6 +161,7 @@
     rainbow-delimiters
     default-text-scale
     language-detection
+    nerd-icons-corfu
     nerd-icons-completion
     whitespace-cleanup-mode
     password-store-otp
