@@ -38,11 +38,14 @@
 (setup corfu
   (:defer (:require corfu))
   (:when-loaded
-    (:require nerd-icons)
+    (:require nerd-icons-corfu)
     ;; Using VS Code icons as an alternative
     (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
     (global-corfu-mode)
     (:option corfu-cycle t
+             corfu-auto t
+             corfu-auto-delay  0
+             corfu-auto-prefix 0
              global-corfu-modes '(prog-mode telega-chat-mode))
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
@@ -54,7 +57,10 @@
     (:with-mode vterm-mode
       (:hook (lambda () (setq-local corfu-auto nil)))
       (setq-default corfu-auto t)
-      (setq-default corfu-quit-no-match 'separator))))
+      (setq-default corfu-quit-no-match 'separator))
+    (:with-mode eshell-mode
+      (:hook (lambda () (setq-local corfu-auto nil)
+               (corfu-mode))))))
 
 (setup kind-icon
   (:load-after corfu)
