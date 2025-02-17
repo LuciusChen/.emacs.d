@@ -45,8 +45,8 @@
     (:option corfu-cycle t
              corfu-auto t
              corfu-auto-delay  0
-             corfu-auto-prefix 0
-             global-corfu-modes '(prog-mode telega-chat-mode))
+             corfu-auto-prefix 0)
+    (:with-mode prog-mode (:hook corfu-mode))
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
              "<right>" corfu-quit
