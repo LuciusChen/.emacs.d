@@ -76,6 +76,20 @@
 (setup mastodon
   (:defer (:require mastodon))
   (:when-loaded
+
+    (defun +mastodon-toot--translate-toot-text ()
+      "Translate text of toot at point.
+Uses `go-translate'."
+      (interactive)
+      (if mastodon-tl--buffer-spec
+          (if-let* ((toot (mastodon-tl--property 'item-json)))
+              (gt-start (gt-translator :taker (gt-taker :text (lambda () (mastodon-tl--content toot)))
+                                       :engines (gt-chatgpt-engine)))
+            (user-error "No toot to translate?"))
+        (user-error "No mastodon buffer?")))
+
+    (:with-map mastodon-mode-map
+      (:bind "a" +mastodon-toot--translate-toot-text))
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
              mastodon-tl--show-avatars t)))
