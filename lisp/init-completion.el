@@ -42,10 +42,7 @@
     ;; Using VS Code icons as an alternative
     (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
     (global-corfu-mode)
-    (:option corfu-cycle t
-             corfu-auto t
-             corfu-auto-delay  0
-             corfu-auto-prefix 0)
+    (:option corfu-cycle t)
     (:with-mode prog-mode (:hook corfu-mode))
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
