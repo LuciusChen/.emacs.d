@@ -78,13 +78,15 @@
   (:when-loaded
 
     (defun +mastodon-toot--translate-toot-text ()
-      "Translate text of toot at point.
-Uses `go-translate'."
+      "Translate text of toot at point using `go-translate`."
       (interactive)
       (if mastodon-tl--buffer-spec
           (if-let* ((toot (mastodon-tl--property 'item-json)))
-              (gt-start (gt-translator :taker (gt-taker :text (lambda () (mastodon-tl--content toot)))
-                                       :engines (gt-chatgpt-engine)))
+              (condition-case err
+                  (gt-start (gt-translator :taker (gt-taker :text (lambda () (mastodon-tl--content toot)))
+                                           :engines (gt-chatgpt-engine)))
+                (error
+                 (user-error "Translation error: %s" (error-message-string err))))
             (user-error "No toot to translate?"))
         (user-error "No mastodon buffer?")))
 
