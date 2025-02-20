@@ -148,6 +148,7 @@
               (gt-start (gt-translator :taker (gt-taker :pick nil :if 'selection)
                                        :engines (gt-chatgpt-engine :if 'selection)
                                        :render (gt-overlay-render :type 'after
+                                                                  :rfmt "\n---------- Translation ----------\n%s"
                                                                   :sface nil
                                                                   :rface '(:foreground "grey"))))
             (error
