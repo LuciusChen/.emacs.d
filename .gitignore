@@ -8,6 +8,7 @@ eshell/
 modules/
 persist/
 request/
+dirvish/
 straight/
 transient/
 tree-sitter/
@@ -23,5 +24,7 @@ nov-places
 mastodon.plstore
 .org-id-locations
 org-clock-save.el
-forge-database.sqlite
+.bookmarks.el
+forge*.sqlite
+*.eld
 .aider*
