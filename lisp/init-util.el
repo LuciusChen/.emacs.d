@@ -146,7 +146,7 @@
           (setq mark-active t)
           (condition-case err
               (gt-start (gt-translator :taker (gt-taker :pick nil :if 'selection)
-                                       :engines (gt-deepl-engine :pro t :if 'selection)
+                                       :engines (gt-chatgpt-engine :if 'selection)
                                        :render (gt-overlay-render :type 'after
                                                                   :sface nil
                                                                   :rface '(:foreground "grey"))))
