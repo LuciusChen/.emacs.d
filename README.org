@@ -211,4 +211,4 @@ sudo cp -rf tgs2png /opt/local/bin
 | =C-x 3=   | Split current window in two horizontally |
 | =C-x o=   | Switch to other window                   |
 *** Rollback emacs-plus with Homebrew
-`$ HOMEBREW_EMACS_PLUS_31_REVISION=6abea4d98d1d964c68a78cb9b5321071da851654 brew install emacs-plus@31 [OPTIONS]`
+=$ HOMEBREW_EMACS_PLUS_31_REVISION=6abea4d98d1d964c68a78cb9b5321071da851654 brew install emacs-plus@31 [OPTIONS]=
