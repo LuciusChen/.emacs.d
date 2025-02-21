@@ -4,7 +4,6 @@
 
 ;; pipx install aider
 (setup aider
-  (:load-after password-store)
   (:option aider-args '("--no-auto-commits" "--model" "gpt-4o-mini"))
   (:when-loaded
     (let ((auth-info (car (auth-source-search

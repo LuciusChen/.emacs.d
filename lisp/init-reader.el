@@ -109,7 +109,7 @@
 
     (:option gt-langs '(en zh)
              gt-chatgpt-user-prompt-template
-             "Please translate the following text into %s, ensuring that the original line breaks and formatting are preserved as much as possible. Additionally, any proper nouns should remain unchanged. Make sure to wrap lines at 120 characters, but if a word needs to be split, complete the word and then proceed to a new line:\n%s"
+             "Please translate the following text into %s, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n%s"
              gt-buffer-render-follow-p t
              gt-buffer-render-window-config
              '((display-buffer-reuse-window display-buffer-in-direction)

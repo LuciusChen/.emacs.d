@@ -77,44 +77,30 @@
   (:defer (:require mastodon))
   (:when-loaded
 
-    ;; (defun +mastodon-toot--translate-toot-text ()
-    ;;   "Translate text of toot at point using `go-translate`."
-    ;;   (interactive)
-    ;;   (if mastodon-tl--buffer-spec
-    ;;       (if-let* ((toot (mastodon-tl--property 'item-json)))
-    ;;           (condition-case err
-    ;;               (gt-start (gt-translator :taker (gt-taker :text (lambda () (mastodon-tl--content toot)))
-    ;;                                        :engines (gt-chatgpt-engine)))
-    ;;             (error
-    ;;              (user-error "Translation error: %s" (error-message-string err))))
-    ;;         (user-error "No toot to translate?"))
-    ;;     (user-error "No mastodon buffer?")))
+    (defun line-has-item-json-p ()
+      (beginning-of-line)
+      (get-text-property (point) 'item-json))
 
-    (defun +mastodon-toot--bounds-at-point ()
-      "Return the bounds of the toot at point, excluding the last line with metadata and boosted line."
+    (defun +mastodon-toot--bounds-as-list (&optional _)
+      "Return a list containing the bounds of the toot at point, excluding metadata and boosted lines."
       (let ((pos (point)))
         (save-excursion
-          (let ((start pos)
-                (end pos))
-            ;; Helper function to check if the current line is part of a toot
-            (defun line-has-item-json-p ()
-              (beginning-of-line)
-              (get-text-property (point) 'item-json))
-
+          (let* ((start pos)
+                 (end pos))
             ;; Move to the start of the current toot
             (while (and (not (bobp)) (line-has-item-json-p))
-              (setq start (point))
+              (setq start (line-beginning-position))
               (forward-line -1))
             (unless (line-has-item-json-p)
               (forward-line 1)
-              (setq start (point)))
+              (setq start (line-beginning-position)))
 
             ;; Check for "boosted" in the first two lines
             (goto-char start)
-            (dotimes (_ 2)  ;; Check up to two lines for "boosted"
+            (dotimes (_ 2)
               (when (string-match-p "boosted" (thing-at-point 'line t))
                 (forward-line 1)
-                (setq start (point)))
+                (setq start (line-beginning-position)))
               (forward-line 1))
 
             ;; Move to the end of the current toot
@@ -122,40 +108,28 @@
             (while (and (not (eobp)) (line-has-item-json-p))
               (forward-line 1))
             ;; Step back two lines to exclude the last line (metadata)
-            (forward-line -2)
-            (setq end (point))
+            (forward-line -3)
+            (setq end (line-end-position))
 
             ;; Ensure end is not before start
             (when (< end start)
               (setq end start))
-            (cons start end)))))
+            (list (cons start end))))))
 
     (defun +mastodon-toot--translate-toot-text ()
       "Translate text of toot at point using `go-translate`."
       (interactive)
       (unless mastodon-tl--buffer-spec
         (user-error "Not in a Mastodon buffer"))
-      (let ((bounds (+mastodon-toot--bounds-at-point)))
-        (unless bounds
-          (user-error "No toot at point"))
-        (let ((start (car bounds))
-              (end (cdr bounds)))
-          (goto-char start)
-          (push-mark (point) t t)
-          (goto-char end)
-          (setq mark-active t)
-          (condition-case err
-              (gt-start (gt-translator :taker (list (gt-taker :pick nil :if 'selection :langs '(en zh))
-                                                    (gt-taker :pick nil :if 'selection :langs '(ja zh))
-                                                    (gt-taker :pick nil :if 'selection :langs '(fr zh))
-                                                    (gt-taker :pick nil :if 'selection :langs '(de zh)))
-                                       :engines (gt-chatgpt-engine)
-                                       :render (gt-overlay-render :type 'after
-                                                                  :rfmt "\n---------- Translation ----------\n%s"
-                                                                  :sface nil
-                                                                  :rface '(:foreground "grey"))))
-            (error
-             (user-error "Translation error: %s" (error-message-string err)))))))
+      (gt-start (gt-translator :taker (list (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(en zh))
+                                            (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(ja zh))
+                                            (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(fr zh))
+                                            (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(de zh)))
+                               :engines (gt-chatgpt-engine)
+                               :render (gt-overlay-render :type 'after
+                                                          :rfmt "\n--- Translation ---\n%s"
+                                                          :sface nil
+                                                          :rface '(:foreground "grey")))))
 
     (:with-map mastodon-mode-map
       (:bind "a" +mastodon-toot--translate-toot-text))
@@ -179,5 +153,7 @@
     (ultra-scroll-mode 1)))
 
 (setup uniline (:defer (:require uniline)))
+
+(setup speed-type (:defer (:require speed-type)))
 (provide 'init-util)
 ;;; init-util.el ends here

@@ -164,6 +164,7 @@
     nerd-icons-corfu
     nerd-icons-completion
     whitespace-cleanup-mode
+    speed-type
     password-store-otp
     password-store
     meow-tree-sitter
@@ -185,7 +186,7 @@
     (eglot-booster :host github :repo "jdtsmith/eglot-booster")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
     ;; (exemplify-align :host sourcehut :repo "flandrew/exemplify-align")
-    (aider :host github :repo "tninja/aider.el")
+    (aider :host github :repo "tninja/aider.el" :files ("aider.el"))
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))))
