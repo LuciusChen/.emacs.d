@@ -27,10 +27,10 @@
                           "Noto Emoji"
                           "Segoe UI Emoji"
                           "Symbola"))
-(defconst *default-font* "MonoLisa 14")
+(defconst *default-font* "MonoLisa Lucius 14")
 (defconst *org-font* "PragmataPro 14")
 (defconst *term-default-font* "PragmataPro Mono Liga 14")
-(defconst *prog-font* "MonoLisa 13")
+(defconst *prog-font* "MonoLisa Lucius 13")
 (defconst *zh-default-font* "LXGW WenKai")
 (defconst *jp-default-font* "Noto Sans Javanese")
 (defconst *symbol-default-font* "Symbols Nerd Font Mono")

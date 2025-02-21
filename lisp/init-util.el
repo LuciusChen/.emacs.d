@@ -145,7 +145,10 @@
           (goto-char end)
           (setq mark-active t)
           (condition-case err
-              (gt-start (gt-translator :taker (gt-taker :pick nil :if 'selection :langs '(en ja fr de zh))
+              (gt-start (gt-translator :taker (list (gt-taker :pick nil :if 'selection :langs '(en zh))
+                                                    (gt-taker :pick nil :if 'selection :langs '(ja zh))
+                                                    (gt-taker :pick nil :if 'selection :langs '(fr zh))
+                                                    (gt-taker :pick nil :if 'selection :langs '(de zh)))
                                        :engines (gt-chatgpt-engine)
                                        :render (gt-overlay-render :type 'after
                                                                   :rfmt "\n---------- Translation ----------\n%s"

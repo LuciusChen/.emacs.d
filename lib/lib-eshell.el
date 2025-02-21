@@ -28,7 +28,7 @@
         (time (propertize (format-time-string "%H:%M:%S") 'face 'font-lock-comment-face))
         (sign (if (= (user-uid) 0)
                   (propertize "\n#" 'face 'modus-themes-fg-blue-intense)
-                (propertize "\nλ" 'face 'modus-themes-fg-red-warmer))))
+                (propertize "\n$" 'face 'modus-themes-fg-red-warmer))))
     (concat hr dir
             (when git-info (concat separator git-info))
             separator time sign " ")))
