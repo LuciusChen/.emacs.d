@@ -54,8 +54,8 @@
              "S-TAB"  corfu-previous
              [backtab]  corfu-previous))
     (:with-mode eshell-mode
-      (:hook (lambda () (setq-local corfu-auto nil)
-               (corfu-mode))))))
+      (:local-set corfu-auto nil)
+      (corfu-mode))))
 
 (setup kind-icon
   (:load-after corfu)
