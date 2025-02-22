@@ -67,7 +67,8 @@
     (:hooks minibuffer-setup-hook mcfly-time-travel)))
 
 (setup consult-dir
-  (:after vertico
+  (:load-after vertico)
+  (:when-loaded
     (:global "C-x C-d" consult-dir)
     (:with-map vertico-map
       (:bind
@@ -96,14 +97,14 @@
 (setup wgrep (:load-after consult))
 
 (setup marginalia
-  (:after vertico
+  (:load-after vertico)
+  (:when-loaded
     (:option marginalia-annotators '(marginalia-annotators-heavy
-                                     marginalia-annotators-light
-                                     nil))
+                                     marginalia-annotators-light nil))
     (marginalia-mode)))
 
 (setup nerd-icons-completion
-  (:after vertico
-    (nerd-icons-completion-mode)))
+  (:load-after vertico)
+  (:when-loaded (nerd-icons-completion-mode)))
 (provide 'init-minibuffer)
 ;;; init-minibuffer.el ends here

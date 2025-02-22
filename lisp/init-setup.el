@@ -24,13 +24,6 @@ See `advice-add' for more details."
   :ensure '(nil nil func)
   :repeatable t)
 
-(setup-define :after
-  (lambda (feature &rest body)
-    `(:with-feature ,feature
-       (:when-loaded ,@body)))
-  :documentation "Eval BODY after FEATURE."
-  :indent 1)
-
 (setup-define :hooks
   (lambda (hook func)
     `(add-hook ',hook #',func))
