@@ -389,9 +389,10 @@
     ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
     (:advice org-roam-node-read--to-candidate :override +org-roam-node-read--to-candidate)
     (org-roam-db-autosync-enable)
-    (:also-load embark)
-    (:also-load lib-org-embark)
-    (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map))))
+    (:with-feature embark
+      (:when-loaded
+        (:also-load lib-org-embark)
+        (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map))))))
 
 (setup bibtex
   (:load-after org)

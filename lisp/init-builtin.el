@@ -167,7 +167,7 @@
 (setup term (:with-mode term-mode (:hook (lambda () (setq line-spacing 0)))))
 
 (setup window
-  (:require lib-window)
+  (:also-load lib-window)
   (:global "C-x |" split-window-horizontally-instead
            "C-x _" split-window-vertically-instead
            "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))

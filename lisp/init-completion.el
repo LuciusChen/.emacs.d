@@ -120,7 +120,7 @@
   (:with-mode (java-mode java-ts-mode)
     (:hook eglot-java-mode))
   (:when-loaded
-    (:require lib-eglot)
+    (:also-load lib-eglot)
     (:option
      eglot-java-server-install-dir jdtls-install-dir
      eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
