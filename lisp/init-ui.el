@@ -15,7 +15,7 @@
 
 (setup custom
   (:when-loaded
-    (:require lib-appearance)
+    (:also-load lib-appearance)
     (:global "M-C-8" (lambda () (interactive) (+adjust-opacity nil -2))
              "M-C-7" (lambda () (interactive) (+adjust-opacity nil 2))
              ;; Stop C-z from minimizing windows under OS X
@@ -35,7 +35,7 @@
 
 (when window-system
   (setup font
-    (:require lib-font)
+    (:also-load lib-font)
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts)))
 
@@ -98,7 +98,7 @@
   (:when-loaded
     (:global "s-t" tab-bar-new-tab
              "s-w" tab-bar-close-tab)
-    (:require lib-tabbar)
+    (:also-load lib-tabbar)
     (:option tab-bar-separator ""
              tab-bar-close-button-show nil
              tab-bar-new-tab-to 'rightmost
