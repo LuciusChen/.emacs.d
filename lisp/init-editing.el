@@ -144,8 +144,8 @@
 (setup whitespace-cleanup-mode
   (:global [remap just-one-space] cycle-spacing)
   (setq-default show-trailing-whitespace nil)
-  (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
-    (add-hook hook (lambda () (setq-local show-trailing-whitespace t))))
+  (:with-mode (prog-mode text-mode conf-mode)
+    (:local-set show-trailing-whitespace t))
   (global-whitespace-cleanup-mode)
   (diminish 'whitespace-cleanup-mode))
 
