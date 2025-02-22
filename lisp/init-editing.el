@@ -3,7 +3,7 @@
 ;;; Code:
 (setup meow
   (:also-load lib-meow)
-  (:autoload meow-setup)
+  (:with-function meow-setup (:autoload-this))
   (meow-global-mode 1)
   (meow-setup)
   (:option  wrap-keymap (let ((map (make-keymap)))
@@ -136,7 +136,7 @@
 ;; 手动开启 hs-minor-mode
 (setup hideshow
   (:also-load lib-hs)
-  (:autoload hs-global-cycle)
+  (:with-function hs-global-cycle (:autoload-this))
   (:with-map hs-minor-mode-map
     (:bind "C-<tab>" hs-cycle
            "C-S-<tab>" hs-global-cycle)))

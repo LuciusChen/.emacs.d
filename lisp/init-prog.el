@@ -152,9 +152,9 @@
     (+major-mode-lighter 'js2-jsx-mode "JSX2")))
 
 (setup treesit-auto
-  (:autoload global-treesit-auto-mode)
-  (:option treesit-auto-install 'prompt)
+  (:defer (:require treesit-auto))
   (:when-loaded
+    (:option treesit-auto-install 'prompt)
     (treesit-auto-add-to-auto-mode-alist 'all)
     (global-treesit-auto-mode)))
 

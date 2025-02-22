@@ -1,5 +1,7 @@
 ;;; init-setup.el --- Setup.el config -*- lexical-binding: t -*-
 ;;; Commentary:
+;;; Code:
+
 (require 'setup)
 (require 'cl-lib)
 (require 'map)
@@ -28,17 +30,6 @@ See `advice-add' for more details."
        (:when-loaded ,@body)))
   :documentation "Eval BODY after FEATURE."
   :indent 1)
-
-(setup-define :autoload
-  (lambda (func)
-    (let ((fn (if (memq (car-safe func) '(quote function))
-                  (cadr func)
-                func)))
-      `(unless (fboundp (quote ,fn))
-         (autoload (function ,fn) ,(symbol-name (setup-get 'feature)) nil t))))
-  :documentation "Autoload COMMAND if not already bound."
-  :repeatable t
-  :signature '(FUNC ...))
 
 (setup-define :hooks
   (lambda (hook func)
