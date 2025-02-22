@@ -73,7 +73,7 @@
     (highlight-matching-tag 1)))
 
 (setup mmm-mode
-  (:with-mode prog-mode (:hook (lambda()(:require mmm-mode))))
+  (:with-mode prog-mode (:require mmm-mode))
   (:when-loaded
     (:option mmm-parse-when-idle t
              mmm-global-classes nil
