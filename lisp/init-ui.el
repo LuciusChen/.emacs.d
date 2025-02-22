@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 (setup dashboard
-  (:after nerd-icons)
   (:option dashboard-latitude 32.09703
            dashboard-longitude 118.77969
            dashboard-path-max-length 75

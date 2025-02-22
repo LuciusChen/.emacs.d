@@ -19,13 +19,13 @@
       (vterm-send-key "k" nil nil t))))
 
 (setup vterm-toggle
-  (:after vterm
+  (:load-after vterm)
+  (:when-loaded
     (:global [f8] vterm-toggle
              [f9] vterm-compile)
     (:with-map vterm-mode-map
       (:bind [f8] vterm-toggle
-             [(control return)] vterm-toggle-insert-cd)))
-  (:when-loaded
+             [(control return)] vterm-toggle-insert-cd))
     (:option vterm-toggle-cd-auto-create-buffer nil)
     (defvar vterm-compile-buffer nil)
     (defun vterm-compile ()

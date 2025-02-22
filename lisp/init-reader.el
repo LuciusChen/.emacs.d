@@ -39,7 +39,8 @@
              "C-c i d" org-remark-delete))))
 
 (setup org-remark-nov
-  (:after nov (org-remark-nov-mode +1)))
+  (:load-after nov)
+  (:when-loaded (org-remark-nov-mode +1)))
 
 (setup gptel
   (:when-loaded
@@ -183,7 +184,8 @@
     (:with-map elfeed-search-mode-map (:bind "L" +elfeed-overview))))
 
 (setup elfeed-tube
-  (:after elfeed
+  (:load-after elfeed)
+  (:when-loaded
     (:with-map elfeed-show-mode-map
       (:bind "F" elfeed-tube-fetch
              [remap save-buffer] elfeed-tube-save))

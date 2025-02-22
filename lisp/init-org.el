@@ -76,7 +76,7 @@
             org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
 
 (setup ob-core
-  (:after org)
+  (:load-after org)
   (:when-loaded
     (:also-load ob-plantuml
                 ob-python
@@ -104,7 +104,7 @@
                 "* %? :NOTE:\n%U\n%a\n" :clock-resume t)))))
 
 (setup org-clock
-  (:after org)
+  (:load-after org)
   (:global "C-c o j" org-clock-goto
            "C-c o l" org-clock-in-last
            "C-c o i" org-clock-in
@@ -296,7 +296,8 @@
       (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t)))))
 
 (setup org-habit
-  (:after org-agenda
+  (:load-after org-agenda)
+  (:when-loaded
     (:option org-habit-following-days 1
              org-habit-preceding-days 7
              org-habit-show-all-today t
@@ -312,15 +313,16 @@
         (setcdr agenda-sorting-strategy (remove 'habit-down (cdr agenda-sorting-strategy)))))))
 
 (setup org-roam
-  (:global   "C-c n l"     org-roam-buffer-toggle
-             "C-c n f"     org-roam-node-find
-             "C-c n i"     org-roam-node-insert
-             "C-c n j"     org-roam-dailies-capture-today
-             "C-c n I"     org-roam-node-insert-immediate
-             "C-x <up>"    org-move-subtree-up
-             "C-x <down>"  org-move-subtree-down
-             "C-c r r"     +org-roam-rg-search)
+  (:load-after org)
   (:when-loaded
+    (:global   "C-c n l"     org-roam-buffer-toggle
+               "C-c n f"     org-roam-node-find
+               "C-c n i"     org-roam-node-insert
+               "C-c n j"     org-roam-dailies-capture-today
+               "C-c n I"     org-roam-node-insert-immediate
+               "C-x <up>"    org-move-subtree-up
+               "C-x <down>"  org-move-subtree-down
+               "C-c r r"     +org-roam-rg-search)
     (:option
      org-roam-directory (file-truename *org-path*)
      org-roam-database-connector 'sqlite-builtin
@@ -384,14 +386,12 @@
      (concat "${type:10} ${doom-hierarchy:120} "
              (propertize "${tags:*}" 'face 'org-tag)))
     (:also-load lib-org-roam)
-    (:also-load lib-org-embark)
-    (:advice
-     ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
-     org-roam-node-read--to-candidate
-     :override +org-roam-node-read--to-candidate)
+    ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
+    (:advice org-roam-node-read--to-candidate :override +org-roam-node-read--to-candidate)
     (org-roam-db-autosync-enable)
-    (:after embark
-      (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
+    (:also-load embark)
+    (:also-load lib-org-embark)
+    (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map))))
 
 (setup bibtex
   (:load-after org)
@@ -540,7 +540,7 @@
   (:when-loaded (:also-load lib-deft)))
 
 (setup ox-hugo
-  (:after ox (require 'ox-hugo))
+  (:load-after ox)
   (:when-loaded
     (:advice org-hugo-export-wim-to-md
              :after
