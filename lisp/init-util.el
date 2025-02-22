@@ -77,62 +77,66 @@
   (:defer (:require mastodon))
   (:when-loaded
 
-    (defun line-has-item-json-p ()
-      (beginning-of-line)
-      (get-text-property (point) 'item-json))
+    (defun find-text-bounds (get-text-fn)
+      "Find the bounds of the text content returned by GET-TEXT-FN in the current buffer."
+      (let ((text-content (funcall get-text-fn)))
+        (when text-content
+          (save-excursion
+            (goto-char (point-min))
+            ;; Search for the exact text content
+            (when (search-forward text-content nil t)
+              (let ((start (match-beginning 0))
+                    (end (match-end 0)))
+                (list (cons start end))))))))
 
-    (defun +mastodon-toot--bounds-as-list (&optional _)
-      "Return a list containing the bounds of the toot at point, excluding metadata and boosted lines."
-      (let ((pos (point)))
-        (save-excursion
-          (let* ((start pos)
-                 (end pos))
-            ;; Move to the start of the current toot
-            (while (and (not (bobp)) (line-has-item-json-p))
-              (setq start (line-beginning-position))
-              (forward-line -1))
-            (unless (line-has-item-json-p)
-              (forward-line 1)
-              (setq start (line-beginning-position)))
+    (defun find-toot-text-bounds ()
+      "Find the bounds of the text content of the toot at point, excluding media."
+      (find-text-bounds
+       (lambda ()
+         (let ((toot (mastodon-tl--property 'item-json)))
+           (when toot
+             (mastodon-tl--render-text (mastodon-tl--field 'content toot) toot))))))
 
-            ;; Check for "boosted" in the first two lines
-            (goto-char start)
-            (dotimes (_ 2)
-              (when (string-match-p "boosted" (thing-at-point 'line t))
-                (forward-line 1)
-                (setq start (line-beginning-position)))
-              (forward-line 1))
+    (defun find-profile-note-bounds ()
+      "Find the bounds of the profile note of the user in the current buffer."
+      (find-text-bounds
+       (lambda ()
+         (let ((profile-json (mastodon-profile--profile-json)))
+           (when profile-json
+             (mastodon-tl--render-text (alist-get 'note profile-json) profile-json))))))
 
-            ;; Move to the end of the current toot
-            (goto-char pos)
-            (while (and (not (eobp)) (line-has-item-json-p))
-              (forward-line 1))
-            ;; Step back two lines to exclude the last line (metadata)
-            (forward-line -3)
-            (setq end (line-end-position))
+    (defun mastodon-translate-text (bounds-fn)
+      "Translate text using BOUNDS-FN to find the bounds in the current buffer."
+      (let ((bounds (funcall bounds-fn)))
+        (if bounds
+            (gt-start (gt-translator :taker (list (gt-taker :pick (lambda (&rest _) bounds) :langs '(en zh))
+                                                  (gt-taker :pick (lambda (&rest _) bounds) :langs '(ja zh))
+                                                  (gt-taker :pick (lambda (&rest _) bounds) :langs '(fr zh))
+                                                  (gt-taker :pick (lambda (&rest _) bounds) :langs '(de zh)))
+                                     :engines (gt-chatgpt-engine)
+                                     :render (gt-overlay-render :type 'after
+                                                                :rfmt "\n--- Translation ---\n%s"
+                                                                :sface nil
+                                                                :rface '(:foreground "grey"))))
+          (message "No text content to translate."))))
 
-            ;; Ensure end is not before start
-            (when (< end start)
-              (setq end start))
-            (list (cons start end))))))
-
-    (defun +mastodon-toot--translate-toot-text ()
-      "Translate text of toot at point using `go-translate`."
+    (defun mastodon-detect-and-translate ()
+      "Detect the content type under the cursor and translate it using `go-translate`."
       (interactive)
-      (unless mastodon-tl--buffer-spec
-        (user-error "Not in a Mastodon buffer"))
-      (gt-start (gt-translator :taker (list (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(en zh))
-                                            (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(ja zh))
-                                            (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(fr zh))
-                                            (gt-taker :pick #'+mastodon-toot--bounds-as-list :langs '(de zh)))
-                               :engines (gt-chatgpt-engine)
-                               :render (gt-overlay-render :type 'after
-                                                          :rfmt "\n--- Translation ---\n%s"
-                                                          :sface nil
-                                                          :rface '(:foreground "grey")))))
+      (cond
+       ;; Check if the current line is a toot
+       ((get-text-property (point) 'item-json)
+        (message "Toot detected at point.")
+        (mastodon-translate-text #'find-toot-text-bounds))
+       ;; Otherwise, assume we are dealing with a profile
+       ((mastodon-tl--profile-buffer-p)
+        (message "Profile detected.")
+        (mastodon-translate-text #'find-profile-note-bounds))
+       (t
+        (user-error "Not in a recognizable Mastodon buffer"))))
 
     (:with-map mastodon-mode-map
-      (:bind "a" +mastodon-toot--translate-toot-text))
+      (:bind "a" mastodon-detect-and-translate))
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
              mastodon-tl--show-avatars t)))

@@ -108,6 +108,7 @@
         (cl-call-next-method)))
 
     (:option gt-langs '(en zh)
+             gt-chatgpt-model "gpt-3.5-turbo"
              gt-chatgpt-user-prompt-template
              "Please translate the following text into %s, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n%s"
              gt-buffer-render-follow-p t
