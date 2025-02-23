@@ -81,6 +81,9 @@
 (defvar ime-list '("im.rime.inputmethod.Squirrel.Hans" "com.apple.keylayout.ABC"))
 
 (defun toggle-ime ()
+  "Toggle between input methods specified in `ime-list`.
+Cycle through the input methods by selecting the next one in the list.
+If the current input method is the last one, cycle back to the first."
   (interactive)
   (let* ((current-ime (mac-input-source))
          (next-ime (or (cadr (member current-ime ime-list))
