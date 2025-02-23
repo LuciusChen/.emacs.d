@@ -37,10 +37,11 @@
   (add-to-list 'auto-mode-alist pattern-mode-pair))
 
 (setup apheleia
-  (:global "C-c C-x C-f" apheleia-format-buffer)
-  (:with-mode prog-mode (:hook apheleia-global-mode))
-  (:with-mode nxml-mode (:hook (lambda () (apheleia-mode -1))))
+  (:with-mode prog-mode (:require apheleia)
+              (:hook apheleia-global-mode))
   (:when-loaded
+    (:global "C-c C-x C-f" apheleia-format-buffer)
+    (:with-mode nxml-mode (:hook (lambda () (apheleia-mode -1))))
     (defmacro set-apheleia-formatters (&rest mode-format-pairs)
       `(progn
          ,@(mapcar (lambda (pair)
