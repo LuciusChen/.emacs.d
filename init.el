@@ -240,7 +240,6 @@
 (require 'init-mu4e)
 
 (require 'init-local)
-;; (require 'init-beancount)
 
 (provide 'init)
 ;; Local Variables:
