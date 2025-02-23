@@ -78,19 +78,17 @@
 
     (add-function :after after-focus-change-function '+meow-focus-change-function)))
 
-(if (and (eq system-type 'darwin) (fboundp 'mac-input-source))
-    (progn
-      (defvar ime-list '("im.rime.inputmethod.Squirrel.Hans" "com.apple.keylayout.ABC"))
+(defvar ime-list '("im.rime.inputmethod.Squirrel.Hans" "com.apple.keylayout.ABC"))
 
-      (defun toggle-ime ()
-        (interactive)
-        (let* ((current-ime (mac-input-source))
-               (next-ime (or (cadr (member current-ime ime-list))
-                             (car ime-list))))  ;; Cycle to the next IME or start from the beginning
-          (mac-select-input-source next-ime)))
+(defun toggle-ime ()
+  (interactive)
+  (let* ((current-ime (mac-input-source))
+         (next-ime (or (cadr (member current-ime ime-list))
+                       (car ime-list))))  ;; Cycle to the next IME or start from the beginning
+    (mac-select-input-source next-ime)))
 
-      ;; Bind F13 to toggle IME
-      (global-set-key (kbd "<f13>") 'toggle-ime)))
+(setup (:only-if (and (eq system-type 'darwin) (fboundp 'mac-input-source)))
+  (:global "<f13>" 'toggle-ime))
 
 (when *IS-MAC*
   (setup emt

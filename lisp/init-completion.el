@@ -38,9 +38,9 @@
 (setup corfu
   (:defer (:require corfu))
   (:when-loaded
-    (:require nerd-icons-corfu)
-    ;; Using VS Code icons as an alternative
-    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+    (:with-feature nerd-icons-corfu
+      ;; Using VS Code icons as an alternative
+      (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
     (global-corfu-mode)
     (:option corfu-cycle t
              corfu-auto t
