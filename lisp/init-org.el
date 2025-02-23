@@ -126,12 +126,10 @@
 
 (setup ox-latex
   (:load-after org)
-  (:option
-   org-latex-listings 'minted
-   org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f -output-directory=%o %f")
-   org-preview-latex-default-process 'dvisvgm)
-  (:when-loaded
-    (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
+  (:option org-latex-listings 'minted
+           org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f -output-directory=%o %f")
+           org-preview-latex-default-process 'dvisvgm)
+  (:when-loaded (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
 
 (setup org-latex-preview
   (:load-after org)
@@ -390,8 +388,8 @@
     (:advice org-roam-node-read--to-candidate :override +org-roam-node-read--to-candidate)
     (org-roam-db-autosync-enable)
     (:after embark
-            (:also-load lib-org-embark)
-            (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
+      (:also-load lib-org-embark)
+      (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
 
 (setup bibtex
   (:load-after org)
