@@ -34,7 +34,7 @@
             window-setup-hook set-dividers-and-fringe-color)))
 
 (when window-system
-  (setup font
+  (setup faces
     (:also-load lib-font)
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts)))
