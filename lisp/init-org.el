@@ -126,10 +126,11 @@
 
 (setup ox-latex
   (:load-after org)
-  (:option org-latex-listings 'minted
-           org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f -output-directory=%o %f")
-           org-preview-latex-default-process 'dvisvgm)
-  (:when-loaded (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
+  (:when-loaded
+    (:option org-latex-listings 'minted
+             org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f -output-directory=%o %f")
+             org-preview-latex-default-process 'dvisvgm)
+    (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
 
 (setup org-latex-preview
   (:load-after org)
@@ -393,14 +394,15 @@
 
 (setup bibtex
   (:load-after org)
-  (:when-loaded (:option bibtex-file-path (concat *org-path* "/bib/")
-                         bibtex-files '("bibtex.bib")
-                         bibtex-notes-path (concat *org-path* "/main/")
-                         bibtex-align-at-equal-sign t
-                         bibtex-autokey-titleword-separator "-"
-                         bibtex-autokey-year-title-separator "-"
-                         bibtex-autokey-name-year-separator "-"
-                         bibtex-dialect 'biblatex)))
+  (:when-loaded
+    (:option bibtex-file-path (concat *org-path* "/bib/")
+             bibtex-files '("bibtex.bib")
+             bibtex-notes-path (concat *org-path* "/main/")
+             bibtex-align-at-equal-sign t
+             bibtex-autokey-titleword-separator "-"
+             bibtex-autokey-year-title-separator "-"
+             bibtex-autokey-name-year-separator "-"
+             bibtex-dialect 'biblatex)))
 
 (setup ebib
   (:load-after bibtex)
@@ -481,26 +483,26 @@
 
 (setup org-modern
   (:load-after org)
-  (:with-mode org-mode
-    (:hook org-modern-mode)
-    (:hook (lambda ()
-             "Beautify Org Checkbox Symbol"
-             (push '("[ ]" . "☐") prettify-symbols-alist)
-             (push '("[X]" . "☑" ) prettify-symbols-alist)
-             (push '("[-]" . "❍" ) prettify-symbols-alist)
-             (prettify-symbols-mode))))
-  (:option org-modern-star 'replace
-           org-modern-replace-stars "❑❍❑❍❑❍"
-           org-hide-emphasis-markers t
-           org-tags-column 0
-           org-modern-block-fringe 2
-           org-catch-invisible-edits 'show-and-error
-           org-special-ctrl-a/e t
-           org-insert-heading-respect-content t
-           org-modern-table-horizontal 0.2
-           org-modern-checkbox nil
-           org-ellipsis "[+]")
   (:when-loaded
+    (:with-mode org-mode
+      (:hook org-modern-mode)
+      (:hook (lambda ()
+               "Beautify Org Checkbox Symbol"
+               (push '("[ ]" . "☐") prettify-symbols-alist)
+               (push '("[X]" . "☑" ) prettify-symbols-alist)
+               (push '("[-]" . "❍" ) prettify-symbols-alist)
+               (prettify-symbols-mode))))
+    (:option org-modern-star 'replace
+             org-modern-replace-stars "❑❍❑❍❑❍"
+             org-hide-emphasis-markers t
+             org-tags-column 0
+             org-modern-block-fringe 2
+             org-catch-invisible-edits 'show-and-error
+             org-special-ctrl-a/e t
+             org-insert-heading-respect-content t
+             org-modern-table-horizontal 0.2
+             org-modern-checkbox nil
+             org-ellipsis "[+]")
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
     ;; https://emacs.stackexchange.com/questions/45291/change-color-of-org-mode-checkboxes
     (defface org-checkbox-todo-text
@@ -522,20 +524,22 @@
      'append)))
 
 (setup deft
-  (:option
-   deft-extensions '("md" "tex" "org" "conf")
-   deft-directory (concat *org-path* "/notes")
-   deft-recursive t
-   deft-strip-summary-regexp
-   (concat "\\("
-           "[\n\t]" ;; blank
-           "\\|^#\\+[[:alpha:]_]+:.*$" ;; org-mode metadata
-           "\\|^#\s[-]*$" ;; org-mode metadata
-           "\\|^:PROPERTIES:\n\\(.+\n\\)+:END:\n"
-           "\\)"))
-  (:advice deft-parse-title :override #'+deft-parse-title)
-  (:global [f7] deft)
-  (:when-loaded (:also-load lib-deft)))
+  (:defer (:require deft))
+  (:when-loaded
+    (:also-load lib-deft)
+    (:option
+     deft-extensions '("md" "tex" "org" "conf")
+     deft-directory (concat *org-path* "/notes")
+     deft-recursive t
+     deft-strip-summary-regexp
+     (concat "\\("
+             "[\n\t]" ;; blank
+             "\\|^#\\+[[:alpha:]_]+:.*$" ;; org-mode metadata
+             "\\|^#\s[-]*$" ;; org-mode metadata
+             "\\|^:PROPERTIES:\n\\(.+\n\\)+:END:\n"
+             "\\)"))
+    (:advice deft-parse-title :override #'+deft-parse-title)
+    (:global [f7] deft)))
 
 (setup ox-hugo
   (:load-after ox)
