@@ -5,18 +5,19 @@
 (setup vterm
   (:defer (:require vterm))
   (:when-loaded
-    (:also-load lib-font)
+
+    (defun vterm-send-C-k-and-kill ()
+      "Send `C-k' to libvterm, and put content in kill-ring."
+      (interactive)
+      (kill-ring-save (point) (vterm-end-of-line))
+      (vterm-send-key "k" nil nil t))
+
     (:with-map vterm-mode-map
       (:bind "C-y" vterm-yank
              "M-y" vterm-yank-pop
              "C-k" vterm-send-C-k-and-kill))
     (:option vterm-shell "zsh"
-             vterm-always-compile-module t)
-    (defun vterm-send-C-k-and-kill ()
-      "Send `C-k' to libvterm, and put content in kill-ring."
-      (interactive)
-      (kill-ring-save (point) (vterm-end-of-line))
-      (vterm-send-key "k" nil nil t))))
+             vterm-always-compile-module t)))
 
 (setup vterm-toggle
   (:load-after vterm)
