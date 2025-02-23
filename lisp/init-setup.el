@@ -38,6 +38,13 @@ See `advice-add' for more details."
       body))
   :documentation "Load the current feature after FEATURES.")
 
+(setup-define :after
+  (lambda (feature &rest body)
+    `(:with-feature ,feature
+       (:when-loaded ,@body)))
+  :documentation "Eval BODY after FEATURE."
+  :indent 1)
+
 (setup-define :face
   (lambda (face spec) `(custom-set-faces (quote (,face ,spec))))
   :documentation "Customize FACE to SPEC."
