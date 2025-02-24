@@ -141,28 +141,5 @@
   (:load-after eglot)
   (:when-loaded (eglot-booster-mode)))
 
-(setup xref
-  ;; 用 Popper 替代了 +xref-show-xrefs 以及 :option 配置
-  ;;
-  ;;   (defun +xref-show-xrefs (fetcher display-action)
-  ;;     "Display some Xref values produced by FETCHER using DISPLAY-ACTION.
-  ;; Do not jump to the first xref, just move the focus to the xref window."
-  ;;     (let ((buf (xref--show-xref-buffer fetcher
-  ;;                                        `((window . ,(selected-window))
-  ;;                                          (display-action . ,display-action)
-  ;;                                          (auto-jump . nil)))))
-  ;;       (let ((window (get-buffer-window buf)))
-  ;;         (when window
-  ;;           (select-window window)))))
-
-  (defun +xref-quit-window ()
-    "Quit the xref window."
-    (let ((xref-window (get-buffer-window "*xref*")))
-      (when xref-window
-        (quit-window nil xref-window))))
-
-  (:option xref-auto-jump-to-first-xref 'move)
-  ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)
-  (:hooks xref-after-jump-hook +xref-quit-window))
 (provide 'init-completion)
 ;;; init-completion.el ends here
