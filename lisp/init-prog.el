@@ -8,41 +8,30 @@
 (define-derived-mode wxss-mode css-mode "CSS")
 (define-derived-mode wxml-mode html-mode "HTML")
 
-(setup (:with-mode vue-mode
-         (:file-match "\\.vue\\'"))
-  (:with-mode jsp-mode
-    (:file-match "\\.jsp\\'"))
-  (:with-mode emacs-lisp-mode
-    (:file-match "\\.el\\'"))
-  (:with-mode wxss-mode
-    (:file-match "\\.wxss\\'"))
-  (:with-mode my-html-mode
-    (:file-match "\\.wxml\\'")
-    (:file-match "\\.html\\'"))
-  (:with-mode java-ts-mode
-    (:file-match "\\.java\\'"))
-  (:with-mode python-ts-mode
-    (:file-match "\\.py\\'"))
-  (:with-mode yaml-ts-mode
-    (:file-match "\\.ya?ml\\'"))
-  (:with-mode lua-ts-mode
-    (:file-match "\\.lua\\'"))
-  (:with-mode tsx-ts-mode
-    (:file-match "\\.tsx\\'")
-    (:file-match "\\.jsx\\'"))
-  (:with-mode js-mode
-    (:file-match "\\.js\\'"))
-  (:with-mode typescript-ts-mode
-    (:file-match "\\.mjs\\'")
-    (:file-match "\\.mts\\'")
-    (:file-match "\\.cjs\\'")
-    (:file-match "\\.ts\\'"))
-  (:with-mode json-ts-mode
-    (:file-match "\\.json\\'"))
-  (:with-mode dockerfile-ts-mode
-    (:file-match "\\.Dockerfile\\'"))
-  (:with-mode prisma-ts-mode
-    (:file-match "\\.prisma\\'")))
+(setup (:with-mode vue-mode (:file-match "\\.vue\\'"))
+  (:with-mode jsp-mode (:file-match "\\.jsp\\'"))
+  (:with-mode emacs-lisp-mode (:file-match "\\.el\\'"))
+  (:with-mode wxss-mode (:file-match "\\.wxss\\'"))
+  (:with-mode my-html-mode (:file-match "\\.wxml\\'")
+              (:file-match "\\.html\\'"))
+  (:with-mode java-ts-mode (:file-match "\\.java\\'"))
+  (:with-mode python-ts-mode (:file-match "\\.py\\'"))
+  (:with-mode yaml-ts-mode (:file-match "\\.ya?ml\\'"))
+  (:with-mode lua-ts-mode (:file-match "\\.lua\\'"))
+  (:with-mode tsx-ts-mode (:file-match "\\.tsx\\'")
+              (:file-match "\\.jsx\\'"))
+  (:with-mode js-mode (:file-match "\\.js\\'")
+              (:file-match "\\.es6\\'")
+              (:file-match "\\.js\\.erb\\'")
+              (:file-match "\\.es6\\.erb\\'"))
+  (:with-mode typescript-ts-mode (:file-match "\\.mjs\\'")
+              (:file-match "\\.mts\\'")
+              (:file-match "\\.cjs\\'")
+              (:file-match "\\.ts\\'"))
+  (:with-mode json-ts-mode (:file-match "\\.json\\'"))
+  (:with-mode dockerfile-ts-mode (:file-match "\\.Dockerfile\\'"))
+  (:with-mode prisma-ts-mode (:file-match "\\.prisma\\'"))
+  (:with-mode gfm-mode (:file-match "\\.md\\'")))
 
 (setup web-mode
   (:option web-mode-markup-indent-offset 2
@@ -119,10 +108,6 @@
   (:advice pp-display-expression :after +make-read-only)
   (:hooks emacs-lisp-mode-hook +maybe-set-bundled-elisp-readonly))
 
-;; js
-;;; Basic js-mode setup
-(setup js-mode (:file-match "\\.\\(js\\|es6\\)\\(\\.erb\\)?\\'"))
-
 ;; or the product can be set from a comment on the first line
 ;; -- -*- mode: sql; sql-product: mysql; -*-
 ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
@@ -175,21 +160,22 @@
   (:with-mode (java-ts-mode python-ts-mode vue-mode typescript-mode typescript-ts-mode js-mode)
     (:require indent-bars)
     (:hook indent-bars-mode))
-  (:option indent-bars-color '(highlight :face-bg t :blend 0.15)
-           indent-bars-pattern "."
-           indent-bars-width-frac 0.1
-           indent-bars-pad-frac 0.1
-           indent-bars-zigzag nil
-           indent-bars-color-by-depth '(:regexp "outline-\\([0-9]+\\)" :blend 1) ; blend=1: blend with BG only
-           indent-bars-highlight-current-depth '(:blend 0.5 :width 0.5) ; pump up the BG blend on current
-           indent-bars-display-on-blank-lines t
-           ;; indent-bars-display-on-blank-lines nil
-           indent-bars-treesit-support t
-           indent-bars-no-descend-string t
-           indent-bars-prefer-character t
-           indent-bars-no-stipple-char ?\u2502
-           indent-bars-treesit-scope '((python function_definition class_definition for_statement
-                                               if_statement with_statement while_statement))))
+  (:when-loaded
+    (:option indent-bars-color '(highlight :face-bg t :blend 0.15)
+             indent-bars-pattern "."
+             indent-bars-width-frac 0.1
+             indent-bars-pad-frac 0.1
+             indent-bars-zigzag nil
+             indent-bars-color-by-depth '(:regexp "outline-\\([0-9]+\\)" :blend 1) ; blend=1: blend with BG only
+             indent-bars-highlight-current-depth '(:blend 0.5 :width 0.5) ; pump up the BG blend on current
+             indent-bars-display-on-blank-lines t
+             ;; indent-bars-display-on-blank-lines nil
+             indent-bars-treesit-support t
+             indent-bars-no-descend-string t
+             indent-bars-prefer-character t
+             indent-bars-no-stipple-char ?\u2502
+             indent-bars-treesit-scope '((python function_definition class_definition for_statement
+                                                 if_statement with_statement while_statement)))))
 
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
@@ -230,7 +216,7 @@
 ;; xml format
 ;; M-: (execute-kbd-macro (kbd "M-% > < RET > C-q C-j < RET ! C-M-\\"))
 (defun +xml-format ()
-  "XML formating"
+  "XML formating."
   (interactive)
   (save-excursion
     (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
