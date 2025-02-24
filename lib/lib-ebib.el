@@ -19,6 +19,7 @@
   "Create inactive timestamp for the Org mode note."
   (let ((org-time-stamp-custom-formats org-time-stamp-custom-formats))
     (format "%s" (with-temp-buffer (org-time-stamp-inactive nil)))))
+
 ;;;; provide
 (provide 'lib-ebib)
 ;;; lib-ebib.el ends here.

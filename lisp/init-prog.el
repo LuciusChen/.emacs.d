@@ -62,10 +62,18 @@
             "--indent-type"
             "Spaces"
             filepath))
+    (setf (alist-get 'xmllint apheleia-formatters)
+          '("xmllint"
+            "--encode"
+            "utf-8"
+            "--format"
+            "-"))
     (set-apheleia-formatters
      (python-ts-mode . (isort black))
      (my-html-mode . prettier-html)
      (sql-mode . pgformatter)
+     (xml-mode . xmllint)
+     (nxml-mode . xmllint)
      (css-mode . prettier)
      (typescript-ts-mode . prettier)
      (js-ts-mode . prettier))))
@@ -213,12 +221,5 @@
     (:with-map help-mode-map (:bind "C-c '" separedit))
     (:option separedit-default-mode 'org-mode)))
 
-;; xml format
-;; M-: (execute-kbd-macro (kbd "M-% > < RET > C-q C-j < RET ! C-M-\\"))
-(defun +xml-format ()
-  "XML formating."
-  (interactive)
-  (save-excursion
-    (shell-command-on-region (mark) (point) "xmllint --encode utf-8 --format -" (buffer-name) t)))
 (provide 'init-prog)
 ;;; init-prog.el ends here

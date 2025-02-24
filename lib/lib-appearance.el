@@ -1,6 +1,7 @@
 ;;; lib-appearance.el --- theme setup -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
+
 ;; Ensure that themes will be applied even if they have not been customized
 (defun reapply-themes ()
   "Forcibly load the themes listed in `custom-enabled-themes'."
@@ -71,11 +72,5 @@ optional and is used to specify which frame's opacity to change."
           (set-opacity 60))
     (message "Non-graphical interface")))
 
-(defun +maybe-suspend-frame ()
-  "Suspend the current frame unless running on macOS with a window system.
-This function is interactive."
-  (interactive)
-  (unless (and *IS-MAC* window-system)
-    (suspend-frame)))
 (provide 'lib-appearance)
 ;;; lib-appearance.el ends here
