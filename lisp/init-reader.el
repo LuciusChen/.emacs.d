@@ -2,8 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(setup gfm-mode (:file-match "\\.md\\'"))
-
 (setup nov
   (:file-match "\\.epub\\'")
   (:when-loaded
@@ -23,14 +21,17 @@
 ;; pdf-view-themed-minor
 ;; Synchronize color filter with the present Emacs theme.
 (setup pdf-view
-  (:defer (:require pdf-tools))
-  (:file-match "\\.PDF\\'"))
+  (:defer (:require pdf-tools)
+          (:file-match "\\.PDF\\'"))
+  (:when-loaded
+    (:with-mode pdf-view-mode
+      (:hook pdf-view-themed-minor-mode))))
 
 (setup org-remark
   (:load-after org)
   (:when-loaded
-    (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
     (:global "C-c i m" org-remark-mark)
+    (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
     (:with-map org-remark-mode-map
       (:bind "C-c i o" org-remark-open
              "C-c i ]" org-remark-view-next
@@ -193,10 +194,9 @@
       (:bind "F" elfeed-tube-fetch
              [remap save-buffer] elfeed-tube-save)))
   (:when-loaded
-    (elfeed-tube-setup)
     ;; (:option mpv-default-options '("--http-proxy=http://127.0.0.1:7890"
     ;;                                "--ytdl-raw-options-append=proxy=http://127.0.0.1:7890"))
-    ))
+    (elfeed-tube-setup)))
 
 (setup elfeed-tube-mpv
   (:load-after elfeed)
