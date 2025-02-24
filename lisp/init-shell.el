@@ -22,8 +22,7 @@
 (setup vterm-toggle
   (:load-after vterm)
   (:when-loaded
-    (:global [f8] vterm-toggle
-             [f9] vterm-compile)
+    (:global [f8] vterm-toggle)
     (:with-map vterm-mode-map
       (:bind [f8] vterm-toggle
              [(control return)] vterm-toggle-insert-cd))
@@ -47,6 +46,7 @@
 (setup esh-mode
   (:defer (:require esh-mode))
   (:when-loaded
+    (:global [f9] eshell)
     (:also-load lib-eshell)
     (:option eshell-prompt-function 'eshell-prompt-multiline
              eshell-highlight-prompt nil

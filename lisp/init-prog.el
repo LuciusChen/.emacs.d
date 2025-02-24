@@ -43,13 +43,13 @@
               (:hook apheleia-global-mode))
   (:when-loaded
     (:global "C-c C-x C-f" apheleia-format-buffer)
-    (:with-mode nxml-mode (:hook (lambda () (apheleia-mode -1))))
+    ;; (:with-mode nxml-mode (:hook (lambda () (apheleia-mode -1))))
     (defmacro set-apheleia-formatters (&rest mode-format-pairs)
       `(progn
          ,@(mapcar (lambda (pair)
                      `(setf (alist-get ',(car pair) apheleia-mode-alist) ',(cdr pair)))
                    mode-format-pairs)))
-    ;; $ brew install isort black google-java-format stylua
+    ;; $ brew install isort black google-java-format stylua libxml2
     ;; $ npm install -g prettier
     ;; (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))
     ;; (setf (alist-get 'java-ts-mode apheleia-mode-alist) 'google-java-format)
@@ -156,6 +156,30 @@
     (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))
     (+major-mode-lighter 'js2-mode "JS2")
     (+major-mode-lighter 'js2-jsx-mode "JSX2")))
+
+(setup xref
+  ;; 用 Popper 替代了 +xref-show-xrefs 以及 :option 配置
+  ;;
+  ;;   (defun +xref-show-xrefs (fetcher display-action)
+  ;;     "Display some Xref values produced by FETCHER using DISPLAY-ACTION.
+  ;; Do not jump to the first xref, just move the focus to the xref window."
+  ;;     (let ((buf (xref--show-xref-buffer fetcher
+  ;;                                        `((window . ,(selected-window))
+  ;;                                          (display-action . ,display-action)
+  ;;                                          (auto-jump . nil)))))
+  ;;       (let ((window (get-buffer-window buf)))
+  ;;         (when window
+  ;;           (select-window window)))))
+
+  (defun +xref-quit-window ()
+    "Quit the xref window."
+    (let ((xref-window (get-buffer-window "*xref*")))
+      (when xref-window
+        (quit-window nil xref-window))))
+
+  (:option xref-auto-jump-to-first-xref 'move)
+  ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)
+  (:hooks xref-after-jump-hook +xref-quit-window))
 
 (setup treesit-auto
   (:defer (:require treesit-auto))
