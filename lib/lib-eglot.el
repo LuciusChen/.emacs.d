@@ -109,5 +109,6 @@ Returns:
                                ;; Use the latest Java Debug plugin jar
                                [,(file-truename java-debug-jar)])))))
       contact)))
+
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here
