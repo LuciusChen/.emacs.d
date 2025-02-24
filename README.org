@@ -27,9 +27,8 @@
 这一块全部存入 pass 后开启 =auth-source-pass-enable= 自动读取，其中自建的 gitlab 的 =machine= 值必须是 =192.168.1.220:9081/api/v4= 格式，不能存入 pass。因此我换了名字存入 pass，写了函数自动读取写入 =.authinfo= 中，自动化这个配置过程。
 ** Reader
 [[file:assets/org.png]]
-用过一段时间的 [[https://read.readwise.io][Readwise Reader]]，选择其的原因在于可以配合沉浸式翻译，达到快速阅读英文书籍及文章的目的。但是目前在 Emacs 当中也可以通过 gpt 的应用达到相同的目的。
 
-通过 [[https://github.com/Elilif/emacs-immersive-translate][Elilif/emacs-immersive-translate]] 进行翻译。其中 [[https://platform.openai.com/][OpenAI]] 需要绑定支付方式后才可以使用，可以使用我的 [[https://bewildcard.com/i/YAOHUA][WildCard]] 邀请链接注册充值，享受88折优惠。
+翻译现在切换到了 [[https://github.com/lorniu/go-translate][lorniu/go-translate]]，可以很方便的通过不同的展示方式展示最终的翻译结果，最让人满意的是可以自己定义 =:pick= 翻译源传入。使用下来 gpt 的翻译还是要较 DeepL 的效果更好的。其中 [[https://platform.openai.com/][OpenAI]] 需要绑定支付方式后才可以使用，可以使用我的 [[https://bewildcard.com/i/YAOHUA][WildCard]] 邀请链接注册充值，享受88折优惠。
 
 阅读书籍 ePub 用 [[https://depp.brause.cc/nov.el/][nov.el]]，阅读 PDF 用 [[https://github.com/vedang/pdf-tools][vedang/pdf-tools]]；RSS 订阅用 [[https://github.com/skeeto/elfeed][skeeto/elfeed]] 和 [[https://github.com/karthink/elfeed-tube][karthink/elfeed-tube]]，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
 
@@ -99,7 +98,8 @@ sudo npm install -g typescript
 npm install -g @volar/vue-language-server
 npm install -g typescript-language-server
 #+end_src
-** Telega
+** Social
+*** Telega
 针对 UI 做了一些修改
 [[https://github.com/LuciusChen/telega.el][GitHub - LuciusChen/telega.el: GNU Emacs telegram client (unofficial)]]
 
@@ -134,7 +134,7 @@ npm install -g typescript-language-server
 #+CAPTION: SCR-20240122-ppqy
 #+ATTR_ORG: :width 800
 [[file:assets/SCR-20240122-ppqy.png]]
-*** Building TDLib
+**** Building TDLib
 ~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。
 
 #+begin_src shell
@@ -154,7 +154,7 @@ ls -l /usr/local
 #+end_src
 
 如果报错 ~"user-error: TDLib is not installed into "/usr/local". Set ‘telega-server-libs-prefix’ to the TDLib installion path"~​，则可以通过 ~M-: (setq telega-server-libs-prefix “/path/to/tdlib/install/path”) RET~ 然后 ~M-x telega-server-build RET~ 重新构建。
-*** Animated Stickers
+**** Animated Stickers
 #+begin_src shell
 git clone https://github.com/zevlg/tgs2png.git
 git submodule init
@@ -168,52 +168,17 @@ sudo cp -rf tgs2png /opt/local/bin
 #+end_src
 
 可以 =C-h v= 查看 =exec-path= 变量的值，将 tsg2png 复制到对应的路径即可。另外针对 video stickers 需要 =brew install ffmpeg= 才可以播放。
-*** contrib 中的插件。
-**** telega-url-shorten
+**** 推荐 contrib 插件。
+***** telega-url-shorten
 原先插件的做法是针对每个网站的 URL 进行适配，并且配上与之相应的 icons，并不能完全满足所有 URL 缩短的目的，所以这里用 =^\\(https?://\\)\\(.\\{55\\}\\).*?$= 正则处理所有的 URL，超过一定长度后省略。
-**** telega-bridge-bot
+***** telega-bridge-bot
 可以方便的同步 Matrix 那边的头像到 Telega 这边，对于「图象记忆者」来说，根据「头像 + username」记忆人远比单独的 username 记忆要牢固快速的多。
 #+CAPTION: telega-bridge-bot
 #+ATTR_ORG: :width 800
 [[file:assets/telega-bridge-bot.png]]
-*** telega-mnz
+***** telega-mnz
 高亮消息中的代码块
-*** Frequent Shortcuts
-| =C-u C-c C-k= | 取消回复和附带的文件，不保留所输入文字（用得最多）        |
-| =C-c C-k=     | 取消回复和附带的文件，但保留所输入文字（不用 只用上面↑） |
-
-| =C-c  C-a= | 粘贴一切（常用，可覆盖以下两个场景：）                |
-| =C-c  C-v= | 贴 clipboard 里的东西（常用，比如刚截的图在剪贴板里） |
-| =C-c  C-f= | 粘媒体文件（偶用）                                    |
-
-| =M-g  m= | 下一个提醒（常用）                   |
-| =M-g  r= | 直接跳到最新消息（常用）             |
-| =M-g  != | 跳转到最新的 reactions            |
-| =M-g ^=  | 跳转到最新的 Pin 消息             |
-| =M-g x=  | 编辑消息发送后，回到被编辑消息位置 |
-
-聊天界面
-
-| =r=     | 回复该消息               |
-| =C-u r= | 在另一个聊天内回复该消息 |
-| =e=     | 编辑该消息               |
-| =d=     | 删除该消息               |
-| =f=     | forward                  |
-| =s=     | save                     |
-| =c=     | copy                     |
-** Tricks
-=C-x C-e= 可以执行 elisp 或者在 Scratch 中开启 =lisp-interaction-mode= 后，在需要执行的函数最后 =C-j= 执行。
-*** Working with Frame
-| Command | What it does                            |
-| =C-x 5 0= | Close current frame                     |
-| =C-x 5 1= | Close all frames except the current one |
-| =C-x 5 2= | Create a new frame                      |
-*** Working with windows
-| Command | What it does                             |
-| =C-x 0=   | Close current window                     |
-| =C-x 1=   | Close all windows except the current one |
-| =C-x 2=   | Split current window in two vertically   |
-| =C-x 3=   | Split current window in two horizontally |
-| =C-x o=   | Switch to other window                   |
+*** mastodon
+因为 Twitter 被 Elon Musk 收购后不太喜欢，尝试转向 mastodon 平台，Emacs 当中也有相应的客户端：[[https://codeberg.org/martianh/mastodon.el][martianh/mastodon.el]]，相对 X 的以 follow 为中心，mastodon 更像是 tag 为中心去关注话题，因此不同的语言很多，非常需要翻译。这里的翻译也是通过 [[https://github.com/lorniu/go-translate][lorniu/go-translate]] 自定义了获取 toots 的 bounds 传入 =go-taker= 的 =:pick= 参数进行翻译，也补全了 profile 的翻译（原作者提供的 lingva.el 好像没有针对这个）。
 *** Rollback emacs-plus with Homebrew
 =$ HOMEBREW_EMACS_PLUS_31_REVISION=6abea4d98d1d964c68a78cb9b5321071da851654 brew install emacs-plus@31 [OPTIONS]=
