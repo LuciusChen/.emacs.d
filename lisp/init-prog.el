@@ -2,39 +2,52 @@
 ;;; Commentary:
 ;;; Code:
 
-;; language
-(setup web-mode
-  (:option web-mode-markup-indent-offset 2
-           web-mode-code-indent-offset 2
-           web-mode-enable-current-column-highlight t))
-
 (define-derived-mode vue-mode web-mode "Vue")
 (define-derived-mode my-html-mode web-mode "Web")
 (define-derived-mode jsp-mode web-mode "Web")
 (define-derived-mode wxss-mode css-mode "CSS")
 (define-derived-mode wxml-mode html-mode "HTML")
 
-(dolist (pattern-mode-pair '(("\\.vue\\'" . vue-mode)
-                             ("\\.jsp\\'" . jsp-mode)
-                             ("\\.el\\'" . emacs-lisp-mode)
-                             ("\\.wxss\\'" . wxss-mode)
-                             ("\\.wxml\\'" . my-html-mode)
-                             ("\\.java\\'" . java-ts-mode)
-                             ("\\.py\\'" . python-ts-mode)
-                             ("\\.ya?ml\\'" . yaml-ts-mode)
-                             ("\\.html\\'" . my-html-mode)
-                             ("\\.lua\\'" . lua-ts-mode)
-                             ("\\.tsx\\'" . tsx-ts-mode)
-                             ("\\.js\\'" . js-mode)
-                             ("\\.mjs\\'" . typescript-ts-mode)
-                             ("\\.mts\\'" . typescript-ts-mode)
-                             ("\\.cjs\\'" . typescript-ts-mode)
-                             ("\\.ts\\'"  . typescript-ts-mode)
-                             ("\\.jsx\\'" . tsx-ts-mode)
-                             ("\\.json\\'" .  json-ts-mode)
-                             ("\\.Dockerfile\\'" . dockerfile-ts-mode)
-                             ("\\.prisma\\'" . prisma-ts-mode)))
-  (add-to-list 'auto-mode-alist pattern-mode-pair))
+(setup (:with-mode vue-mode
+         (:file-match "\\.vue\\'"))
+  (:with-mode jsp-mode
+    (:file-match "\\.jsp\\'"))
+  (:with-mode emacs-lisp-mode
+    (:file-match "\\.el\\'"))
+  (:with-mode wxss-mode
+    (:file-match "\\.wxss\\'"))
+  (:with-mode my-html-mode
+    (:file-match "\\.wxml\\'")
+    (:file-match "\\.html\\'"))
+  (:with-mode java-ts-mode
+    (:file-match "\\.java\\'"))
+  (:with-mode python-ts-mode
+    (:file-match "\\.py\\'"))
+  (:with-mode yaml-ts-mode
+    (:file-match "\\.ya?ml\\'"))
+  (:with-mode lua-ts-mode
+    (:file-match "\\.lua\\'"))
+  (:with-mode tsx-ts-mode
+    (:file-match "\\.tsx\\'")
+    (:file-match "\\.jsx\\'"))
+  (:with-mode js-mode
+    (:file-match "\\.js\\'"))
+  (:with-mode typescript-ts-mode
+    (:file-match "\\.mjs\\'")
+    (:file-match "\\.mts\\'")
+    (:file-match "\\.cjs\\'")
+    (:file-match "\\.ts\\'"))
+  (:with-mode json-ts-mode
+    (:file-match "\\.json\\'"))
+  (:with-mode dockerfile-ts-mode
+    (:file-match "\\.Dockerfile\\'"))
+  (:with-mode prisma-ts-mode
+    (:file-match "\\.prisma\\'")))
+
+(setup web-mode
+  (:option web-mode-markup-indent-offset 2
+           web-mode-code-indent-offset 2
+           web-mode-enable-current-column-highlight t))
 
 (setup apheleia
   (:with-mode prog-mode (:require apheleia)
@@ -69,9 +82,8 @@
      (js-ts-mode . prettier))))
 
 (setup highlight-matching-tag
-  (require 'highlight-matching-tag)
-  (:with-mode web-mode
-    (highlight-matching-tag 1)))
+  (:load-after web-mode)
+  (:when-loaded (highlight-matching-tag 1)))
 
 (setup mmm-mode
   (:with-mode prog-mode (:require mmm-mode))
