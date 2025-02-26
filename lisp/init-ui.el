@@ -1,6 +1,28 @@
 ;;; init-ui.el --- Behaviour specific to non-TTY frames -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+
+(setup tool-bar (:when-loaded (tool-bar-mode -1)))
+(setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
+(setup tooltip (:option tooltip-delay 2.5))
+;; Change global font size easily
+(setup default-text-scale (:hook-into after-init))
+;; Don't scale font on trackpad pinch!
+(global-unset-key (kbd "<pinch>"))
+
+(setup window
+  (:also-load lib-window)
+  (:global "C-x |" split-window-horizontally-instead
+           "C-x _" split-window-vertically-instead
+           "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))
+           "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
+
+(setup frame
+  (:when-loaded
+    (let ((border '(internal-border-width . 12)))
+      (add-to-list 'default-frame-alist border)
+      (add-to-list 'initial-frame-alist border))))
+
 (setup dashboard
   (:option dashboard-latitude 32.09703
            dashboard-longitude 118.77969
@@ -31,14 +53,23 @@
             after-make-frame-functions opacity-dark-theme
             window-setup-hook set-dividers-and-fringe-color)))
 
+(setup hl-line
+  (:option hl-line-range-function
+           (lambda () (cons (line-end-position)
+                            (line-beginning-position 2))))
+  (global-hl-line-mode))
+
 (when window-system
   (setup faces
-    (:also-load lib-font)
+    (:also-load lib-face)
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts)
     (:with-mode vterm-mode (:set-font *term-default-font*))
     (:with-mode (latex-mode prog-mode nxml-mode) (:set-font *prog-font*))
-    (:with-mode org-mode (:set-font *org-font*))))
+    (:with-mode org-mode (:set-font *org-font*))
+    (:advice face-at-point :around #'+suggest-other-faces)))
+
+(setup popup-frames (:defer (:require popup-frames)))
 
 (setup dimmer
   (:defer (dimmer-mode t))
@@ -121,5 +152,6 @@
     (:advice telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
     (:advice telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
     (:advice telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)))
+
 (provide 'init-ui)
 ;;; init-ui.el ends here

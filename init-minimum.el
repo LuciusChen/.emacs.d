@@ -53,22 +53,8 @@
 
 ;; load module settings
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-
-(when *IS-MAC*
-  ;; modify meta from ⌥ to ⌘
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'super)
-  ;; Make mouse wheel / trackpad scrolling less jerky
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
-  (dolist (multiple '("" "double-" "triple-"))
-    (dolist (direction '("right" "left"))
-      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
-  (global-set-key (kbd "M-`") 'ns-next-frame)
-
-  (require 'init-env))
-
 (require 'init-setup)
-
+(when *IS-MAC* (require 'init-mac))
 ;; ==== put your code below this line! ====
 ;; emacs -Q -l ~/.emacs.d/init-minimum.el
 ;;; init-minimum.el ends here
