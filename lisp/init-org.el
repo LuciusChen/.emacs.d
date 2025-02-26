@@ -72,8 +72,9 @@
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
       (:hook (lambda () (setq truncate-lines nil))))
-    (:hooks org-after-todo-state-change-hook log-todo-next-creation-date
-            org-after-todo-state-change-hook org-roam-copy-todo-to-today)))
+    (:with-hook org-after-todo-state-change-hook
+      (:hook log-todo-next-creation-date)
+      (:hook org-roam-copy-todo-to-today))))
 
 (setup ob-core
   (:load-after org)

@@ -5,7 +5,8 @@
 
 (setup files
   (:option  auto-save-default nil
-            make-backup-files nil))
+            make-backup-files nil
+            trusted-content '("~/.emacs.d/")))
 
 (setup dired
   (:defer (:require dired))
