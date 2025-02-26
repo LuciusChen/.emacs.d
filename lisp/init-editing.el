@@ -1,6 +1,78 @@
 ;;; init-editing.el --- enhance editing -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
+
+(setup emacs
+  (:option case-fold-search t
+           create-lockfiles nil
+           scroll-preserve-screen-position 'always
+           truncate-partial-width-windows nil
+           history-length 1000
+           use-short-answers t
+           ;; Improve CJK wrapping
+           word-wrap-by-category t
+           read-process-output-max (* 1024 1024)
+           ;; Suppress GUI features
+           use-file-dialog nil
+           use-dialog-box nil
+           ;; Window size and features
+           window-resize-pixelwise t
+           frame-resize-pixelwise t
+           indicate-buffer-boundaries 'left
+           display-line-numbers-width 2
+           ;; display-fill-column-indicator-character ?\u2502
+           case-fold-search t
+           create-lockfiles nil
+           scroll-preserve-screen-position 'always
+           truncate-partial-width-windows nil
+           history-length 1000)
+  ;; Better fringe symbol
+  (define-fringe-bitmap 'right-curly-arrow
+    [#b00000000
+     #b00000110
+     #b00001100
+     #b00011000
+     #b00110000
+     #b00011000
+     #b00001100
+     #b00000110])
+
+  (define-fringe-bitmap 'left-curly-arrow
+    [#b00000000
+     #b01100000
+     #b00110000
+     #b00011000
+     #b00001100
+     #b00011000
+     #b00110000
+     #b01100000]))
+
+(setup delete-selection (:hook-into after-init))
+(setup electric-pair (:hook-into after-init))
+(setup transient-mark (:hook-into after-init))
+(setup indent (:option tab-always-indent 'complete))
+(setup mouse (:option mouse-yank-at-point t))
+
+(setup paren
+  (:option show-paren-when-point-inside-paren t
+           show-paren-when-point-in-periphery t
+           show-paren-context-when-offscreen t
+           show-paren-delay 0.2
+           blink-matching-paren-highlight-offscreen t))
+
+(setup simple
+  (:global "C-." set-mark-command
+           "C-x C-." pop-global-mark
+           ;; 从光标位置删除到行首第一个非空格字符。
+           "C-M-<backspace>" (lambda ()
+                               (interactive)
+                               (let ((prev-pos (point)))
+                                 (back-to-indentation)
+                                 (kill-region (point) prev-pos))))
+  (:option  indent-tabs-mode nil
+            save-interprogram-paste-before-kill t
+            set-mark-command-repeat-pop t))
+
 (setup meow
   (:also-load lib-meow)
   (:with-function meow-setup (:autoload-this))
@@ -78,27 +150,9 @@
 
     (add-function :after after-focus-change-function '+meow-focus-change-function)))
 
-(defvar ime-list '("im.rime.inputmethod.Squirrel.Hans" "com.apple.keylayout.ABC"))
-
-(defun toggle-ime ()
-  "Toggle between input methods specified in `ime-list`.
-Cycle through the input methods by selecting the next one in the list.
-If the current input method is the last one, cycle back to the first."
-  (interactive)
-  (let* ((current-ime (mac-input-source))
-         (next-ime (or (cadr (member current-ime ime-list))
-                       (car ime-list))))  ;; Cycle to the next IME or start from the beginning
-    (mac-select-input-source next-ime)))
-
-(setup (:only-if (and (eq system-type 'darwin) (fboundp 'mac-input-source)))
-  (:global "<f13>" 'toggle-ime))
-
-(when *IS-MAC*
-  (setup emt
-    (:defer (:require emt)
-            (emt-ensure))
-    (:global "M-f" emt-forward-word
-             "M-b" emt-backward-word)))
+(setup auto-space
+  (:defer (:require auto-space))
+  (:when-loaded (auto-space-mode)))
 
 ;; 剪贴板查找
 (setup browse-kill-ring
@@ -124,6 +178,13 @@ If the current input method is the last one, cycle back to the first."
 ;; 彩虹括号
 (setup rainbow-delimiters
   (:hooks prog-mode-hook rainbow-delimiters-mode))
+
+(setup rainbow-mode
+  ;; add support for ARGB color format e.g "0xFFFF0000"
+  (:when-loaded
+    (add-to-list 'rainbow-hexadecimal-colors-font-lock-keywords
+                 '("0[xX][0-9a-fA-F]\\{2\\}\\([0-9A-Fa-f]\\{6\\}\\)\\b"
+                   (0 (rainbow-colorize-hexadecimal-without-sharp))))))
 
 (setup yasnippet
   (:defer (:require yasnippet))
@@ -182,6 +243,14 @@ If the current input method is the last one, cycle back to the first."
   (:hook-into text-mode)
   (:option goggles-pulse t))
 
-(when *IS-MAC* (require 'auto-space))
+(setup speed-type (:defer (:require speed-type)))
+
+(setup ultra-scroll
+  (:defer (:require ultra-scroll))
+  (:when-loaded
+    (:option scroll-conservatively 101 ; important!
+             scroll-margin 0)
+    (ultra-scroll-mode 1)))
+
 (provide 'init-editing)
 ;;; init-editing.el ends here

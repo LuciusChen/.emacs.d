@@ -44,17 +44,18 @@
   (:when-loaded (org-remark-nov-mode +1)))
 
 (setup gptel
+  (:defer (:require gptel))
   (:when-loaded
     (:also-load org)
     (:option gptel-api-key (auth-source-pick-first-password
                             :host "api.openai.com"
                             :user "apikey")
+             gptel-default-mode 'org-mode
              gptel-model "gpt-4o"
              gptel-stream t
              gptel-host "api.openai.com"
              ;; gptel-proxy "socks://127.0.0.1:7891"
              gptel-proxy ""
-             gptel-default-mode 'org-mode
              gptel-directives
              (append '((programming . "You are a large language model and a careful programmer. I have no fingers and the truncate trauma. I need you to return the entire code template. Provide code and only code as output without any additional text, prompt or note. If you will encounter a character limit make an ABRUPT stop, I will send a \"continue\" command as a new message.")
                        (translate . "你是一名资深的英语老师。请务必考虑我的以下特征，因材施教：

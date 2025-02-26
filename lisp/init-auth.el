@@ -1,47 +1,40 @@
-;;; init-auth.el --- Manage authinfo entries -*- lexical-binding: t -*-
+;;; init-auth.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
-
-;; This file contains functions to manage .authinfo entries using pass.
-
 ;;; Code:
 
-(defun get-pass-entry (entry)
-  "Get the first line of the pass entry.
-ENTRY is the name of the password store entry to retrieve."
-  (let ((output (shell-command-to-string (concat "pass show " entry " | head -n 1"))))
-    (replace-regexp-in-string "\\`[ \t\n\r]+\\|[ \t\n\r]+\\'" "" output)))
+;; This is where =epg-pinentry-mode= directly handles GPG password input,
+;; without needing an external pinentry.
+(setup auth-source-pass
+  (:load-after auth-source)
+  ;; (:defer (:require auth-source-pass))
+  (:when-loaded
+    (:option auth-source-pass-extra-query-keywords t   ; Enable extra query keywords for auth-source-pass
+             auth-source-save-behavior nil             ; Disable saving behavior for auth-source
+             epg-pinentry-mode 'loopback)              ; Set pinentry mode to loopback for GPG
+    (auth-source-pass-enable)                        ; Enable `auth-source-pass` to use pass for auth-source
+    (setenv "GPG_AGENT_INFO" nil)))                  ; Unset GPG_AGENT_INFO environment variable
 
-(defun check-and-update-authinfo (entries)
-  "Check if specific entries exist in .authinfo, if not, insert them from pass.
-ENTRIES is a list of lists, where each sublist contains three strings:
-- MACHINE: the machine name.
-- LOGIN: the login name.
-- PASS-ENTRY: the name of the entry in the password store."
-  (let ((authinfo-file "~/.authinfo"))
-    ;; Create the .authinfo file if it doesn't exist
-    (unless (file-exists-p authinfo-file)
-      (write-region "" nil authinfo-file))
-    ;; Check and add entries if they don't exist
-    (dolist (entry entries)
-      (let* ((machine (nth 0 entry))
-             (login (nth 1 entry))
-             (pass-entry (nth 2 entry))
-             (entry-found nil))
-        (with-temp-buffer
-          (insert-file-contents authinfo-file)
-          (setq entry-found (re-search-forward (format "machine %s login %s" (regexp-quote machine) (regexp-quote login)) nil t)))
-        (unless entry-found
-          (let ((password (get-pass-entry pass-entry)))
-            (with-temp-buffer
-              (insert-file-contents authinfo-file)
-              (goto-char (point-max))
-              (insert (format "machine %s login %s password %s\n" machine login password))
-              (write-region (point-min) (point-max) authinfo-file)
-              (message "Entry for machine %s added." machine))))))))
 
-(check-and-update-authinfo
- '(("192.168.1.220:9081/api/v4" "lucius^forge" "gitlab-zj")
-   ("matrix.org" "@lucius_chen:matrix.org" "matrix.org")))
+(setup password-store
+  (:defer (:require password-store))
+  (:when-loaded
+    (defun +password-store-insert (entry &optional password)
+      "Insert a new ENTRY containing PASSWORD or the current region if selected."
+      (interactive
+       (list (password-store--completing-read)
+             (if (use-region-p)
+                 (buffer-substring-no-properties (region-beginning) (region-end))
+               (read-passwd "Password: " t))))
+      (let* ((password (or password (read-passwd "Password: " t)))
+             (command (format "echo %s | %s insert -m -f %s"
+                              (shell-quote-argument password)
+                              password-store-executable
+                              (shell-quote-argument entry)))
+             (ret (process-file-shell-command command)))
+        (if (zerop ret)
+            (message "Successfully inserted entry for %s" entry)
+          (message "Cannot insert entry for %s" entry))))
+    (:advice password-store-insert :override +password-store-insert)))
 
 (provide 'init-auth)
 ;;; init-auth.el ends here

@@ -1,4 +1,4 @@
-;;; lib-font.el --- Insert description here -*- lexical-binding: t -*-
+;;; lib-face.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -74,5 +74,15 @@
                                (list (vector (regexp-quote pat)
                                              0
                                              'compose-gstring-for-graphic)))))
-(provide 'lib-font)
-;;; lib-font.el ends here
+
+(defun +suggest-other-faces (func &rest args)
+  "Temporarily disable `global-hl-line-mode' while executing FUNC with ARGS."
+  (if global-hl-line-mode
+      (progn
+        (global-hl-line-mode -1)
+        (prog1 (apply func args)
+          (global-hl-line-mode 1)))
+    (apply func args)))
+
+(provide 'lib-face)
+;;; lib-face.el ends here

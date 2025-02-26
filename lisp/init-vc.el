@@ -2,6 +2,19 @@
 ;;; Commentary:
 ;;; Code:
 
+(setup ediff-wind
+  (:option ediff-split-window-function 'split-window-horizontally
+           ediff-window-setup-function 'ediff-setup-windows-plain))
+
+(setup autorevert
+  (:defer (:require autorevert))
+  (:when-loaded
+    (:option  global-auto-revert-non-file-buffers t
+              auto-revert-verbose nil)
+    (global-auto-revert-mode)
+    ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
+    (diminish 'auto-revert-mode)))
+
 (defconst gptel-commit-prompt
   "The user provides the result of running `git diff --cached`. You suggest a conventional commit message. Don't add anything else to the response. The following describes conventional commits.
 
@@ -107,8 +120,19 @@ A scope may be provided to a commit's type, to provide additional contextual inf
 (setup forge
   (:load-after magit)
   (:when-loaded
+    (:also-load lib-forge)
     ;; Make it easier to see that a topic was closed.
     (:face forge-topic-closed ((t (:strike-through t))))
+    ;; 1. Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
+    ;;    由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
+    ;;
+    ;; 2. Telega 中的 telega-bridge-bot 同步 matrix 的头像需要 token，存放在 pass 中时，会导致
+    ;;    telega root 错乱（原因未知）。
+    ;; 以上原因，使得这些条目依旧存放在 .authinfo 当中，密码从 pass 获取。
+    ;; 利用函数检查条目，从 pass 中读取密码创建 .authinfo 条目。
+    (check-and-update-authinfo
+     '(("192.168.1.220:9081/api/v4" "lucius^forge" "gitlab-zj")
+       ("matrix.org" "@lucius_chen:matrix.org" "matrix.org")))
     (add-to-list 'forge-alist
                  '("192.168.1.220:9081" "192.168.1.220:9081/api/v4"
                    "192.168.1.220:9081" forge-gitlab-repository))
@@ -126,5 +150,6 @@ A scope may be provided to a commit's type, to provide additional contextual inf
             dired-mode-hook diff-hl-dired-mode)
     (:with-map diff-hl-mode-map
       (:bind "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))))
+
 (provide 'init-vc)
 ;;; init-vc.el ends here

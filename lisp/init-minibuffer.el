@@ -1,6 +1,14 @@
 ;;; init-minibuffer.el --- Config for minibuffer completion       -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
+
+(setup minibuffer
+  ;; 用于对补全候选项进行分类的变量。通过将它们设置为 nil，我们禁用了 Emacs 自动分类补全候选项的功能，从而获得更简洁的补全列表。
+  (:option completion-category-defaults nil
+           completion-category-overrides nil
+           ;; 将阈值设置为 4 表示只有当需要补全的字符数大于 4 时才会执行循环补全
+           completion-cycle-threshold 4))
+
 (setup mode-line-bell
   (:hook-into after-init))
 

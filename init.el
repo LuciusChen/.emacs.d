@@ -198,29 +198,9 @@
 (dolist (dir '("lisp" "lib" "site-lisp"))
   (add-to-list 'load-path (expand-file-name dir user-emacs-directory)))
 
-(when *IS-MAC*
-  ;; modify meta from ⌥ to ⌘
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'super)
-  ;; Make mouse wheel / trackpad scrolling less jerky
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
-  (dolist (multiple '("" "double-" "triple-"))
-    (dolist (direction '("right" "left"))
-      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
-  (global-set-key (kbd "M-`") 'ns-next-frame)
-
-  (require 'init-env))
-
-;; 1. Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
-;;    由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
-;;
-;; 2. Telega 中的 telega-bridge-bot 同步 matrix 的头像需要 token，存放在 pass 中时，会导致
-;;    telega root 错乱（原因未知）。
-;; 以上原因，使得这些条目依旧存放在 .authinfo 当中，密码从 pass 获取。
-;; 利用函数检查条目，从 pass 中读取密码创建 .authinfo 条目。
-(require 'init-auth)
 (require 'init-setup)
-(require 'init-builtin)
+(require 'init-auth)
+(when *IS-MAC* (require 'init-mac))
 (require 'init-ui)
 
 (require 'init-editing)
@@ -228,15 +208,14 @@
 (require 'init-minibuffer)
 (require 'init-completion)
 (require 'init-prog)
-
+(require 'init-nav)
 (require 'init-transient)
-(require 'init-reader)
-(require 'init-util)
 
 (require 'init-org)
+(require 'init-reader)
 
-(require 'init-telega)
 (require 'init-shell)
+(require 'init-social)
 (require 'init-mu4e)
 
 (require 'init-local)

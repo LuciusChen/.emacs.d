@@ -33,10 +33,19 @@
   (:with-mode prisma-ts-mode (:file-match "\\.prisma\\'"))
   (:with-mode gfm-mode (:file-match "\\.md\\'")))
 
+(setup display-fill-column-indicator (:hook-into prog-mode))
+(setup display-line-numbers (:hook-into prog-mode))
+
 (setup web-mode
   (:option web-mode-markup-indent-offset 2
            web-mode-code-indent-offset 2
            web-mode-enable-current-column-highlight t))
+
+(setup verb (:option verb-babel-timeout 60.0))
+
+(setup python
+  (:option python-indent-guess-indent-offset t
+           python-indent-guess-indent-offset-verbose nil))
 
 (setup apheleia
   (:with-mode prog-mode (:require apheleia)
@@ -244,6 +253,12 @@
     (:with-map minibuffer-mode-map (:bind "C-c '" separedit))
     (:with-map help-mode-map (:bind "C-c '" separedit))
     (:option separedit-default-mode 'org-mode)))
+
+(setup webpaste
+  (:defer (:require webpaste)
+          (:option webpaste-provider-priority '("paste.mozilla.org" "dpaste.org"))))
+
+(setup uniline (:defer (:require uniline)))
 
 (provide 'init-prog)
 ;;; init-prog.el ends here
