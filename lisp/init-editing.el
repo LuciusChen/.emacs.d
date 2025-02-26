@@ -47,11 +47,14 @@
      #b00110000
      #b01100000]))
 
-(setup delete-selection (:hook-into after-init))
-(setup electric-pair (:hook-into after-init))
-(setup transient-mark (:hook-into after-init))
+(setup (:with-hook after-init-hook
+         (:hook electric-pair-mode)
+         (:hook delete-selection-mode)
+         (:hook transient-mark-mode)))
+
 (setup indent (:option tab-always-indent 'complete))
 (setup mouse (:option mouse-yank-at-point t))
+
 
 (setup paren
   (:option show-paren-when-point-inside-paren t

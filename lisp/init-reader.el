@@ -93,9 +93,10 @@
             :host "api.deepseek.com"
             :user "deepseek")
       :models '(deepseek-chat deepseek-reasoner))
-    (:hooks  gptel-post-stream-hook (lambda ()(meow-insert-exit))
-             gptel-post-stream-hook gptel-auto-scroll
-             gptel-post-response-hook gptel-end-of-response)))
+    (:with-hook gptel-post-stream-hook
+      (:hook (lambda ()(meow-insert-exit)))
+      (:hook gptel-auto-scroll))
+    (:hooks gptel-post-response-hook gptel-end-of-response)))
 
 (setup go-translate
   (:defer (:require go-translate)
