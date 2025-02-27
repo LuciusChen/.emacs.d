@@ -2,15 +2,34 @@
 ;;; Commentary:
 ;;; Code:
 
+(setup (:with-hook after-init-hook
+         (:hook savehist-mode)
+         (:hook mode-line-bell-mode)))
+
+(setup recentf
+  (:hook-into after-init)
+  (:when-loaded
+    (:option recentf-max-saved-items 100
+             recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                                   "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                                   "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                                   (lambda (file) (file-in-directory-p file package-user-dir))
+                                   (expand-file-name recentf-save-file))
+             recentf-keep nil)
+    ;; Add dired directories to recentf file list.
+    (:with-mode dired-mode
+      (:hook (lambda () (recentf-add-file default-directory))))
+    (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
+    ;; HACK: Text properties inflate the size of recentf's files, and there is
+    ;; no purpose in persisting them (Must be first in the list!)
+    (add-to-list 'recentf-filename-handlers #'substring-no-properties)))
+
 (setup minibuffer
   ;; 用于对补全候选项进行分类的变量。通过将它们设置为 nil，我们禁用了 Emacs 自动分类补全候选项的功能，从而获得更简洁的补全列表。
   (:option completion-category-defaults nil
            completion-category-overrides nil
            ;; 将阈值设置为 4 表示只有当需要补全的字符数大于 4 时才会执行循环补全
            completion-cycle-threshold 4))
-
-(setup mode-line-bell
-  (:hook-into after-init))
 
 (setup doom-modeline
   (:defer (:require doom-modeline))
@@ -110,6 +129,12 @@
     (:option marginalia-annotators '(marginalia-annotators-heavy
                                      marginalia-annotators-light nil))
     (marginalia-mode)))
+
+(setup wgrep
+  (:with-map grep-mode-map
+    (:bind "e" wgrep-change-to-wgrep-mode
+           "C-x C-q" wgrep-change-to-wgrep-mode
+           "C-c C-c" wgrep-finish-edit)))
 
 (setup nerd-icons-completion
   (:load-after vertico)

@@ -1,10 +1,11 @@
 ;;; init-setup.el --- Setup.el config -*- lexical-binding: t -*-
 ;;; Commentary:
+
+;; setup extension
+
 ;;; Code:
 
 (require 'setup)
-(require 'cl-lib)
-(require 'map)
 
 (setup-define :defer
   (lambda (features)

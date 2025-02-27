@@ -55,7 +55,6 @@
 (setup indent (:option tab-always-indent 'complete))
 (setup mouse (:option mouse-yank-at-point t))
 
-
 (setup paren
   (:option show-paren-when-point-inside-paren t
            show-paren-when-point-in-periphery t

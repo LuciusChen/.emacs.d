@@ -140,6 +140,7 @@
   (:defer (:require flymake))
   (:when-loaded
     (:option flymake-no-changes-timeout 0.5
+             ;; emacs@30 feature
              flymake-show-diagnostics-at-end-of-line t
              flymake-fringe-indicator-position 'right-fringe)
     (:with-mode prog-mode (:hook flymake-mode))))
