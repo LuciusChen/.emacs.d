@@ -4,7 +4,7 @@
 
 (setup tool-bar (:when-loaded (tool-bar-mode -1)))
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
-(setup tooltip (:option tooltip-delay 2.5))
+(setup tooltip (:when-loaded (:option tooltip-delay 2.5)))
 ;; Change global font size easily
 (setup default-text-scale (:hook-into after-init))
 ;; Don't scale font on trackpad pinch!
@@ -106,6 +106,7 @@
              ("\\*xref\\*$")
              ("\\*chatgpt\\*$")
              ("\\*vterm\\*$")
+             ("\\*eshell\\*$")
              ("\\*Org Select\\*$")
              ("\\*Telega User\\*$")
              ("\\*Telegram Chat Info\\*$")
