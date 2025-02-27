@@ -1,11 +1,11 @@
 ;;; init-nav.el --- util -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(setup savehist (:hook-into after-init))
 
 (setup files
   (:option  auto-save-default nil
             make-backup-files nil
+            ;; emacs@31 feature
             trusted-content '("~/.emacs.d/")))
 
 (setup dired
@@ -28,24 +28,6 @@
 (setup bookmark
   (:defer
    (:option bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
-
-(setup recentf
-  (:hook-into after-init)
-  (:when-loaded
-    (:option recentf-max-saved-items 100
-             recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                                   "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                                   "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
-                                   (lambda (file) (file-in-directory-p file package-user-dir))
-                                   (expand-file-name recentf-save-file))
-             recentf-keep nil)
-    ;; Add dired directories to recentf file list.
-    (:with-mode dired-mode
-      (:hook (lambda () (recentf-add-file default-directory))))
-    (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
-    ;; HACK: Text properties inflate the size of recentf's files, and there is
-    ;; no purpose in persisting them (Must be first in the list!)
-    (add-to-list 'recentf-filename-handlers #'substring-no-properties)))
 
 ;; (setup project
 ;;   (defun +project-shell ()
