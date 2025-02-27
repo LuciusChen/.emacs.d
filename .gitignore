@@ -10,6 +10,7 @@ persist/
 request/
 dirvish/
 straight/
+eln-cache/
 transient/
 speed-type/
 tree-sitter/
