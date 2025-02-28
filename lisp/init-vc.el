@@ -54,18 +54,20 @@
     (:advice magit-blob-next :around #'kill-all-blob-next-after-quit)
     (:advice magit-blob-previous :around #'kill-all-blob-previous-after-quit)
     (when *IS-MAC*
-      (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))
+      (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))))
 
-    (:with-feature magit-log
-      ;; Set `magit-log-margin' value in :init as many other variables will be
-      ;; dynamically set based on its value when `magit-log' is loaded.
-      ;; (setq magit-log-margin '(t age magit-log-margin-width t 18)) ;Default value
-      ;; Show the commit ages with 1-char time units
-      ;;   minute->m, hour->h, day->d, week->w, month->M, year->Y
-      ;; Also reduce the author column width to 11 as the author name is being
-      ;; abbreviated below.
-      (:option magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
-      (:advice magit-log-format-margin :filter-args #'+magit-log--abbreviate-author))))
+(setup magit-log
+  (:load-after magit)
+  (:when-loaded
+    ;; Set `magit-log-margin' value in :init as many other variables will be
+    ;; dynamically set based on its value when `magit-log' is loaded.
+    ;; (setq magit-log-margin '(t age magit-log-margin-width t 18)) ;Default value
+    ;; Show the commit ages with 1-char time units
+    ;;   minute->m, hour->h, day->d, week->w, month->M, year->Y
+    ;; Also reduce the author column width to 11 as the author name is being
+    ;; abbreviated below.
+    (:option magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
+    (:advice magit-log-format-margin :filter-args #'+magit-log--abbreviate-author)))
 
 (setup forge
   (:load-after magit)

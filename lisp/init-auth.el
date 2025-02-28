@@ -6,7 +6,6 @@
 ;; without needing an external pinentry.
 (setup auth-source-pass
   (:load-after auth-source)
-  ;; (:defer (:require auth-source-pass))
   (:when-loaded
     (:option auth-source-pass-extra-query-keywords t   ; Enable extra query keywords for auth-source-pass
              auth-source-save-behavior nil             ; Disable saving behavior for auth-source
