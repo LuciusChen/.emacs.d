@@ -2,27 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
-(setup vterm
-  (:defer (:require vterm))
-  (:when-loaded
-
-    (defun vterm-send-C-k-and-kill ()
-      "Send `C-k' to libvterm, and put content in kill-ring."
-      (interactive)
-      (kill-ring-save (point) (vterm-end-of-line))
-      (vterm-send-key "k" nil nil t))
-
-    (:with-map vterm-mode-map
-      (:bind "C-y" vterm-yank
-             "M-y" vterm-yank-pop
-             "C-k" vterm-send-C-k-and-kill))
-    (:option vterm-shell "zsh"
-             vterm-always-compile-module t)))
-
 (setup vterm-toggle
-  (:load-after vterm)
+  (:global [f8] vterm-toggle)
   (:when-loaded
-    (:global [f8] vterm-toggle)
     (:with-map vterm-mode-map
       (:bind [f8] vterm-toggle
              [(control return)] vterm-toggle-insert-cd))
@@ -43,10 +25,26 @@
           (vterm-send-M-w)
           (vterm-send-string compile-command t))))))
 
-(setup esh-mode
-  (:defer (:require esh-mode))
+(setup vterm
+  (:load-after vterm-toggle)
   (:when-loaded
-    (:global [f9] eshell)
+
+    (defun vterm-send-C-k-and-kill ()
+      "Send `C-k' to libvterm, and put content in kill-ring."
+      (interactive)
+      (kill-ring-save (point) (vterm-end-of-line))
+      (vterm-send-key "k" nil nil t))
+
+    (:with-map vterm-mode-map
+      (:bind "C-y" vterm-yank
+             "M-y" vterm-yank-pop
+             "C-k" vterm-send-C-k-and-kill))
+    (:option vterm-shell "zsh"
+             vterm-always-compile-module t)))
+
+(setup esh-mode
+  (:global [f9] eshell)
+  (:when-loaded
     (:also-load lib-eshell)
     (:option eshell-prompt-function 'eshell-prompt-multiline
              eshell-highlight-prompt nil

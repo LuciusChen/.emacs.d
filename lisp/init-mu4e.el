@@ -73,7 +73,6 @@
 ;; mkdir -p ~/Mail/queued-mail && touch ~/Mail/queued-mail/index
 
 (setup mu4e
-  (:defer (:require mu4e))
   (:when-loaded
     ;; for sending mails
     (:require smtpmail)
