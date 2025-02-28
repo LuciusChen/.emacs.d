@@ -52,40 +52,23 @@
               (:hook apheleia-global-mode))
   (:when-loaded
     (:global "C-c C-x C-f" apheleia-format-buffer)
-    ;; (:with-mode nxml-mode (:hook (lambda () (apheleia-mode -1))))
-    (defmacro set-apheleia-formatters (&rest mode-format-pairs)
-      `(progn
-         ,@(mapcar (lambda (pair)
-                     `(setf (alist-get ',(car pair) apheleia-mode-alist) ',(cdr pair)))
-                   mode-format-pairs)))
     ;; $ brew install isort black google-java-format stylua libxml2
     ;; $ npm install -g prettier
-    ;; (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(isort black))
-    ;; (setf (alist-get 'java-ts-mode apheleia-mode-alist) 'google-java-format)
     (setf (alist-get 'google-java-format apheleia-formatters)
-          '("google-java-format"
-            "--aosp"
-            filepath))
+          '("google-java-format" "--aosp" filepath))
     (setf (alist-get 'stylua apheleia-formatters)
-          '("stylua"
-            "--indent-type"
-            "Spaces"
-            filepath))
+          '("stylua" "--indent-type" "Spaces" filepath))
     (setf (alist-get 'xmllint apheleia-formatters)
-          '("xmllint"
-            "--encode"
-            "utf-8"
-            "--format"
-            "-"))
-    (set-apheleia-formatters
-     (python-ts-mode . (isort black))
-     (my-html-mode . prettier-html)
-     (sql-mode . pgformatter)
-     (xml-mode . xmllint)
-     (nxml-mode . xmllint)
-     (css-mode . prettier)
-     (typescript-ts-mode . prettier)
-     (js-ts-mode . prettier))))
+          '("xmllint" "--encode" "utf-8" "--format" "-"))
+
+    (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black))
+    (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html)
+    (setf (alist-get 'sql-mode           apheleia-mode-alist) 'pgformatter)
+    (setf (alist-get 'xml-mode           apheleia-mode-alist) 'xmllint)
+    (setf (alist-get 'nxml-mode          apheleia-mode-alist) 'xmllint)
+    (setf (alist-get 'css-mode           apheleia-mode-alist) 'prettier)
+    (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'prettier)
+    (setf (alist-get 'js-ts-mode         apheleia-mode-alist) 'prettier)))
 
 (setup highlight-matching-tag
   (:load-after web-mode)
