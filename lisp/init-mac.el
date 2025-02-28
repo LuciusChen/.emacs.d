@@ -28,10 +28,11 @@
   (:global "<f13>" 'toggle-ime))
 
 (setup emt
-  (:defer (:require emt)
-          (emt-ensure))
-  (:global "M-f" emt-forward-word
-           "M-b" emt-backward-word))
+  (:defer (:require emt))
+  (:when-loaded
+    (:global "M-f" emt-forward-word
+             "M-b" emt-backward-word)
+    (emt-ensure)))
 
 (provide 'init-mac)
 ;;; init-mac.el ends here
