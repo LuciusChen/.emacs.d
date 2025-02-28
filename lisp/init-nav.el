@@ -72,7 +72,6 @@
              "f"    dirvish-file-info-menu
              "y"    dirvish-yank-menu
              "N"    dirvish-narrow
-             "^"    dirvish-history-last
              "h"    dirvish-history-jump
              "s"    dirvish-quicksort
              "TAB"  dirvish-subtree-toggle

@@ -185,7 +185,6 @@
     (consult-mu :host github :repo "armindarvish/consult-mu")
     (eglot-booster :host github :repo "jdtsmith/eglot-booster")
     (modus-themes :host github :repo "LuciusChen/modus-themes")
-    ;; (exemplify-align :host sourcehut :repo "flandrew/exemplify-align")
     (aider :host github :repo "tninja/aider.el" :files ("aider.el"))
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
