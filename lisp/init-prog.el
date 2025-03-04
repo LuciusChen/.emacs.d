@@ -178,7 +178,7 @@
   (:defer (:require treesit-auto))
   (:when-loaded
     (:option treesit-auto-install 'prompt)
-    (treesit-auto-add-to-auto-mode-alist 'all)
+    (treesit-auto-add-to-auto-mode-alist '(bash bibtex cmake commonlisp css dockerfile html java javascript json latex make lua org python rust ruby sql toml typescript typst vue yaml))
     (global-treesit-auto-mode)))
 
 (setup indent-bars
