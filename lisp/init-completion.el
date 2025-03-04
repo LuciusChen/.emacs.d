@@ -115,7 +115,7 @@
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
 
 ;; 若提示 [eglot] (warning) Could not find required eclipse.jdt.ls files (build required?)
-;; 则需要执行 elgot-java-upgrade-lsp-server
+;; 则需要执行 eglot-java-upgrade-lsp-server
 (setup eglot-java
   (:with-mode (java-mode java-ts-mode)
     (:hook eglot-java-mode))
