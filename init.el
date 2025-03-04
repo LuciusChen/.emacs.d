@@ -176,7 +176,7 @@
     (gptel :host github :repo "karthink/gptel")
     (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
     (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
-    (org-roam :host github :repo "LuciusChen/org-roam")
+    (org-roam :host github :repo "org-roam/org-roam")
     (telega :host github :repo "LuciusChen/telega.el");; :branch "diy")
     ;; (telega :host github :repo "zevlg/telega.el")
     (yasnippet :host github :repo "joaotavora/yasnippet")
