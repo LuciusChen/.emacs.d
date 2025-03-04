@@ -21,8 +21,6 @@
 
 ;;; Performance
 
-;; disable native comp
-(setq native-comp-speed -1)
 ;; Prefer loading newer compiled files
 (setq load-prefer-newer t)
 

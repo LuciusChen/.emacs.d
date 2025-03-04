@@ -16,7 +16,6 @@
     (diminish 'auto-revert-mode)))
 
 (setup magit
-  (:load-after vc)
   (:when-loaded
     (:also-load lib-magit)
     (:with-map magit-status-mode-map

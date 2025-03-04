@@ -188,15 +188,6 @@
                  '("0[xX][0-9a-fA-F]\\{2\\}\\([0-9A-Fa-f]\\{6\\}\\)\\b"
                    (0 (rainbow-colorize-hexadecimal-without-sharp))))))
 
-(setup yasnippet
-  (:defer (:require yasnippet))
-  (:when-loaded
-    (yas-global-mode)
-    ;; (:hooks after-init-hook yas-global-mode)
-    (:option yas-keymap-disable-hook
-             (lambda () (and (frame-live-p corfu--frame)
-                             (frame-visible-p corfu--frame))))))
-
 ;; 手动开启 hs-minor-mode
 (setup hideshow
   (:also-load lib-hs)

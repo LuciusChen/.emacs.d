@@ -70,6 +70,14 @@
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
+(setup yasnippet
+  (:load-after corfu)
+  (:when-loaded
+    (yas-global-mode)
+    (:option yas-keymap-disable-hook
+             (lambda () (and (frame-live-p corfu--frame)
+                             (frame-visible-p corfu--frame))))))
+
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 
 ;; Latex
