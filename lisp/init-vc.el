@@ -74,16 +74,10 @@
     (:also-load lib-forge)
     ;; Make it easier to see that a topic was closed.
     (:face forge-topic-closed ((t (:strike-through t))))
-    ;; 1. Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
-    ;;    由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
-    ;;
-    ;; 2. Telega 中的 telega-bridge-bot 同步 matrix 的头像需要 token，存放在 pass 中时，会导致
-    ;;    telega root 错乱（原因未知）。
-    ;; 以上原因，使得这些条目依旧存放在 .authinfo 当中，密码从 pass 获取。
-    ;; 利用函数检查条目，从 pass 中读取密码创建 .authinfo 条目。
+    ;; Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
+    ;; 由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
     (check-and-update-authinfo
-     '(("192.168.1.220:9081/api/v4" "lucius^forge" "gitlab-zj")
-       ("matrix.org" "@lucius_chen:matrix.org" "matrix.org")))
+     '(("192.168.1.220:9081/api/v4" "lucius^forge" "gitlab-forge")))
     (add-to-list 'forge-alist
                  '("192.168.1.220:9081" "192.168.1.220:9081/api/v4"
                    "192.168.1.220:9081" forge-gitlab-repository))
