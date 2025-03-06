@@ -23,5 +23,21 @@
 ・如果我最初给你的文本不是中文：对比你上一步的答案和我给你的外语文本，告诉我，我的文本有哪些地方可改进，包括不地道的表达、排版格式、语法用词等各方面。用列表形式逐一告诉我，错误的严重程度以及简单的解释。如果我最初给你的文本是中文，跳过这一步
 ・如果我最初给你的文本是中文：讲解下你在上一步给出的外语表达，地道在哪里？哪些表达对中文母语的人可能是知识点？附上解说，用列表形式逐一回答我。如果我最初给你的文本不是中文，跳过这一步")))
 
+(defvar brave-search-api-key (auth-source-pick-first-password
+                              :host "api.brave.com"
+                              :user "brave")
+  "API key for accessing the Brave Search API.")
+
+(defun brave-search-query (query)
+  "Perform a web search using the Brave Search API with the given QUERY."
+  (let ((url-request-method "GET")
+        (url-request-extra-headers `(("X-Subscription-Token" . ,brave-search-api-key)))
+        (url (format "https://api.search.brave.com/res/v1/web/search?q=%s" (url-encode-url query))))
+    (with-current-buffer (url-retrieve-synchronously url)
+      (goto-char (point-min))
+      (when (re-search-forward "^$" nil 'move)
+        (let ((json-object-type 'hash-table)) ; Use hash-table for JSON parsing
+          (json-parse-string (buffer-substring-no-properties (point) (point-max))))))))
+
 (provide 'lib-gpt)
 ;;; lib-gpt.el ends here
