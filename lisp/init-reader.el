@@ -51,18 +51,29 @@
                             :host "api.openai.com"
                             :user "apikey")
              gptel-default-mode 'org-mode
-             gptel-model "gpt-4o"
+             gptel-model 'gpt-4o
              gptel-stream t
              gptel-host "api.openai.com"
              ;; gptel-proxy "socks://127.0.0.1:7891"
              gptel-proxy ""
              gptel-directives (get-gptel-directives)
-             gptel-temperature 0.7)
+             gptel-temperature 0.7
+             gptel-tools (list
+                          (gptel-make-tool
+                           :function #'brave-search-query
+                           :name "brave_search"
+                           :description "Perform a web search using the Brave Search API"
+                           :args (list '(:name "query"
+                                               :type "string"
+                                               :description "The search query string"))
+                           :category "web")))
+
     (gptel-make-gemini "Gemini"
       :key (auth-source-pick-first-password
             :host "api.gemini.com"
             :user "gemini")
       :stream t)
+
     (gptel-make-openai "DeepSeek"
       :host "api.deepseek.com"
       :endpoint "/chat/completions"
@@ -71,6 +82,7 @@
             :host "api.deepseek.com"
             :user "deepseek")
       :models '(deepseek-chat deepseek-reasoner))
+
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))
       (:hook gptel-auto-scroll))
@@ -98,18 +110,6 @@
              '((display-buffer-reuse-window display-buffer-in-direction)
                (direction . bottom)
                (window-height . 0.4))
-             ;; Commenting out this code requires turning on auth-source-pass-enable.
-             ;; gt-chatgpt-key
-             ;; (lambda ()
-             ;;   (if-let* ((auth-info (car (auth-source-search
-             ;;                              :host "api.openai.com"
-             ;;                              :user "apikey"
-             ;;                              :require '(:secret))))
-             ;;             (secret (plist-get auth-info :secret)))
-             ;;       (if (functionp secret)
-             ;;           (encode-coding-string (funcall secret) 'utf-8)
-             ;;         secret)
-             ;;     (user-error "No `gptel-api-key' found in the auth source")))
              gt-preset-translators
              `((default . ,(gt-translator
                             :taker (list (gt-taker :pick nil :if 'selection)

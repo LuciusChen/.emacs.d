@@ -44,6 +44,7 @@
     (global-corfu-mode)
     (:option corfu-cycle t
              corfu-auto t
+             corfu-count 5
              corfu-quit-no-match 'separator)
     (:with-mode prog-mode (:hook corfu-mode))
     (:with-mode corfu
