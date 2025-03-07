@@ -80,95 +80,20 @@
           (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
           "(provide 'org-version)\n")))
      :pin nil)
-    nov
-    sis
-    plz
-    avy
-    mpv
-    cape
-    deft
-    ebib
-    citar
-    wgrep
-    setup
-    eglot-java
-    corfu
-    vundo
-    forge
-    verb
-    elfeed
-    popper
-    embark
-    bibtex
-    dimmer
-    vertico
-    diredfl
-    separedit
-    cdlatex
-    pyvenv
-    consult
-    mmm-mode
-    ox-hugo
-    scratch
-    diff-hl
-    company
-    goggles
-    flymake
-    web-mode
-    js2-mode
-    move-dup
-    diminish
-    doom-modeline
-    git-link
-    webpaste
-    apheleia
-    mastodon
-    pdf-tools
-    ox-pandoc
-    macrostep
-    json-mode
-    orderless
-    kind-icon
-    git-modes
-    git-blamed
-    nerd-icons
-    org-modern
-    ace-pinyin
-    marginalia
-    org-remark
-    elfeed-tube
-    org-roam-ui
-    rainbow-mode
-    prettier-js
-    projectile
-    consult-dir
-    dirvish
-    swift-mode
-    org-sliced-images
-    vterm
-    vterm-toggle
-    treesit-auto
-    org-cliplink
-    markdown-mode
-    consult-eglot
-    mode-line-bell
-    embark-consult
-    elfeed-tube-mpv
-    typescript-mode
-    nerd-icons-dired
-    command-log-mode
-    browse-kill-ring
-    rainbow-delimiters
-    default-text-scale
-    language-detection
-    nerd-icons-corfu
-    nerd-icons-completion
-    whitespace-cleanup-mode
-    speed-type
-    password-store-otp
-    password-store
-    meow-tree-sitter
-    go-translate
+    nov sis plz avy mpv cape deft ebib citar wgrep setup eglot-java
+    corfu vundo forge verb elfeed popper embark bibtex dimmer vertico
+    diredfl separedit cdlatex pyvenv consult mmm-mode ox-hugo scratch
+    diff-hl company goggles flymake web-mode js2-mode move-dup diminish
+    doom-modeline git-link webpaste apheleia mastodon pdf-tools ox-pandoc
+    macrostep json-mode orderless kind-icon git-modes git-blamed nerd-icons
+    org-modern ace-pinyin marginalia org-remark elfeed-tube org-roam-ui
+    rainbow-mode prettier-js projectile consult-dir dirvish swift-mode
+    org-sliced-images vterm vterm-toggle treesit-auto org-cliplink
+    markdown-mode consult-eglot mode-line-bell embark-consult speed-type
+    elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
+    browse-kill-ring rainbow-delimiters default-text-scale language-detection
+    nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
+    password-store-otp password-store meow-tree-sitter go-translate
     eshell-syntax-highlighting
     (emt :host github :repo "roife/emt")
     (dape :host github :repo "svaante/dape")

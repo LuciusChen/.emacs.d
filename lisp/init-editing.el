@@ -25,27 +25,7 @@
            create-lockfiles nil
            scroll-preserve-screen-position 'always
            truncate-partial-width-windows nil
-           history-length 1000)
-  ;; Better fringe symbol
-  (define-fringe-bitmap 'right-curly-arrow
-    [#b00000000
-     #b00000110
-     #b00001100
-     #b00011000
-     #b00110000
-     #b00011000
-     #b00001100
-     #b00000110])
-
-  (define-fringe-bitmap 'left-curly-arrow
-    [#b00000000
-     #b01100000
-     #b00110000
-     #b00011000
-     #b00001100
-     #b00011000
-     #b00110000
-     #b01100000]))
+           history-length 1000))
 
 (setup (:with-hook after-init-hook
          (:hook electric-pair-mode)

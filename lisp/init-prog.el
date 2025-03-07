@@ -114,7 +114,6 @@
 (setup sql (:when-loaded (sql-set-product 'mysql)))
 
 (setup projectile
-  (:defer (:require projectile))
   (:when-loaded
     (projectile-mode +1)
     (:option projectile-project-search-path '("~/IdeaProjects/"))))
