@@ -10,6 +10,27 @@
 ;; Don't scale font on trackpad pinch!
 (global-unset-key (kbd "<pinch>"))
 
+;; Better fringe symbol
+(define-fringe-bitmap 'right-curly-arrow
+  [#b00000000
+   #b00000110
+   #b00001100
+   #b00011000
+   #b00110000
+   #b00011000
+   #b00001100
+   #b00000110])
+
+(define-fringe-bitmap 'left-curly-arrow
+  [#b00000000
+   #b01100000
+   #b00110000
+   #b00011000
+   #b00001100
+   #b00011000
+   #b00110000
+   #b01100000])
+
 (setup window
   (:also-load lib-window)
   (:global "C-x |" split-window-horizontally-instead
