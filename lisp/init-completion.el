@@ -109,18 +109,9 @@
       (:hook eglot-ensure))
     (:option eglot-events-buffer-size 0
              eglot-events-buffer-config '(:size 0 :format full)) ;; 取消 eglot log
-    (dolist (item (list
-                   (cons 'my-html-mode '("vscode-html-language-server" "--stdio"))
-                   ;; https://github.com/joaotavora/eglot/discussions/1184
-                   ;; 只支持 *.vue 文件内 find references，不支持 *.js。 （VSCode 验证）
-                   (cons '(vue-mode vue-ts-mode typescript-ts-mode typescript-mode)
-                         `("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options)))
-                   (cons 'js-mode '("typescript-language-server" "--stdio"))
-                   ;; 由 eglot-java 接管
-                   ;; https://github.com/joaotavora/eglot/discussions/1185
-                   ;; (cons 'java-ts-mode 'jdtls-command-contact)
-                   ))
-      (add-to-list 'eglot-server-programs item))
+    (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
+    (add-to-list 'eglot-server-programs '((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
+    (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
 
 ;; 若提示 [eglot] (warning) Could not find required eclipse.jdt.ls files (build required?)
@@ -130,19 +121,18 @@
     (:hook eglot-java-mode))
   (:when-loaded
     (:also-load lib-eglot)
-    (:option
-     eglot-java-server-install-dir jdtls-install-dir
-     eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
-     eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir "/config_mac_arm/")
-     eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
-                                   "-Xmx8G"
-                                   ;; "-XX:+UseG1GC"
-                                   "-XX:+UseZGC"
-                                   "-XX:+UseStringDeduplication"
-                                   ;; "-XX:FreqInlineSize=325"
-                                   ;; "-XX:MaxInlineLevel=9"
-                                   "-XX:+UseCompressedOops")
-     eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
+    (:option eglot-java-server-install-dir jdtls-install-dir
+             eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
+             eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir "/config_mac_arm/")
+             eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
+                                           "-Xmx8G"
+                                           ;; "-XX:+UseG1GC"
+                                           "-XX:+UseZGC"
+                                           "-XX:+UseStringDeduplication"
+                                           ;; "-XX:FreqInlineSize=325"
+                                           ;; "-XX:MaxInlineLevel=9"
+                                           "-XX:+UseCompressedOops")
+             eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster
 ;; Download the executable file from the address above and place it in your exec-path.
