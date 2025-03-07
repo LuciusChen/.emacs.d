@@ -501,6 +501,7 @@
              org-catch-invisible-edits 'show-and-error
              org-special-ctrl-a/e t
              org-insert-heading-respect-content t
+             org-modern-table-vertical 0
              org-modern-table-horizontal 0.2
              org-modern-checkbox nil
              org-ellipsis "[+]")
