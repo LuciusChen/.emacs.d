@@ -68,20 +68,20 @@
                                                :description "The search query string"))
                            :category "web")))
 
-    (gptel-make-gemini "Gemini"
-      :key (auth-source-pick-first-password
-            :host "api.gemini.com"
-            :user "gemini")
-      :stream t)
+    ;; (gptel-make-gemini "Gemini"
+    ;;   :key (auth-source-pick-first-password
+    ;;         :host "api.gemini.com"
+    ;;         :user "gemini")
+    ;;   :stream t)
 
-    (gptel-make-openai "DeepSeek"
-      :host "api.deepseek.com"
-      :endpoint "/chat/completions"
-      :stream t
-      :key (auth-source-pick-first-password
-            :host "api.deepseek.com"
-            :user "deepseek")
-      :models '(deepseek-chat deepseek-reasoner))
+    ;; (gptel-make-openai "DeepSeek"
+    ;;   :host "api.deepseek.com"
+    ;;   :endpoint "/chat/completions"
+    ;;   :stream t
+    ;;   :key (auth-source-pick-first-password
+    ;;         :host "api.deepseek.com"
+    ;;         :user "deepseek")
+    ;;   :models '(deepseek-chat deepseek-reasoner))
 
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))

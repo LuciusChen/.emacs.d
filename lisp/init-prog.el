@@ -114,6 +114,7 @@
 (setup sql (:when-loaded (sql-set-product 'mysql)))
 
 (setup projectile
+  (:defer (:require projectile))
   (:when-loaded
     (projectile-mode +1)
     (:option projectile-project-search-path '("~/IdeaProjects/"))))
@@ -125,7 +126,8 @@
              ;; emacs@30 feature
              flymake-show-diagnostics-at-end-of-line t
              flymake-fringe-indicator-position 'right-fringe)
-    (:with-mode prog-mode (:hook flymake-mode))))
+    (:with-mode prog-mode (:hook flymake-mode))
+    (:with-mode emacs-lisp-mode (:hook (lambda()(flymake-mode -1))))))
 
 (setup js
   (:also-load lib-js)

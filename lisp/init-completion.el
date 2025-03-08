@@ -77,7 +77,8 @@
     (yas-global-mode)
     (:option yas-keymap-disable-hook
              (lambda () (and (frame-live-p corfu--frame)
-                             (frame-visible-p corfu--frame))))))
+                             (frame-visible-p corfu--frame)))
+             yas-verbosity 0)))
 
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 
@@ -110,7 +111,7 @@
     (:option eglot-events-buffer-size 0
              eglot-events-buffer-config '(:size 0 :format full)) ;; 取消 eglot log
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
-    (add-to-list 'eglot-server-programs '((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
+    (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
 
