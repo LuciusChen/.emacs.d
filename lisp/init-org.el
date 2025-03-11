@@ -116,10 +116,10 @@
     (:option denote-directory (expand-file-name "denote" *org-path*)
              denote-journal-extras-directory (expand-file-name "daily" denote-directory)
              denote-save-buffers nil
-             ;; denote-known-keywords '("emacs" "philosophy" "politics" "economics")
+             denote-known-keywords '("emacs" "private")
              denote-infer-keywords t
              denote-sort-keywords t
-             denote-prompts '(title file-type)
+             denote-prompts '(title file-type keywords)
              denote-journal-extras-title-format 'day-date-month-year
              denote-excluded-directories-regexp nil
              denote-excluded-keywords-regexp nil
@@ -142,29 +142,32 @@
                 (insert (concat "* " date-headline "\n"))
                 date-headline)))))
 
-      (:option org-capture-templates `(("i" "inbox" entry  (file "agenda/inbox.org")
+      (:option org-capture-templates `(("a" "Agenda")
+                                       ("ai" "inbox" entry  (file "agenda/inbox.org")
                                         ,(concat "* TODO %?\n%U"))
-                                       ("n" "note" entry (file "agenda/note.org")
+                                       ("an" "note" entry (file "agenda/note.org")
                                         "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
                                        ;; templates for journal
-                                       ("w" "Weather" entry
+                                       ("j" "Journal")
+                                       ("jw" "Weather" entry
                                         (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
                                         "%(fetch-weather-data)\n")
-                                       ("d" "Default" entry
+                                       ("jd" "Default" entry
                                         (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
                                         "%<%H:%M> %?\n")
-                                       ("p" "Prod" entry
+                                       ("jp" "Prod" entry
                                         (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
                                         "%<%H:%M> %? :prod:\n")
-                                       ("r" "Read" entry
+                                       ("jr" "Read" entry
                                         (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
                                         "* What I read? :read:\n** %?\n")
-                                       ("f" "Fleeting Notes" entry
+                                       ("jf" "Fleeting Notes" entry
                                         (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
                                         "* Notes :note:\n** %?\n")
-                                       ("t" "Tasks" entry
+                                       ("jt" "Tasks" entry
                                         (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
                                         "Tasks :task:\n")))
+      ;; 拉起 org 的时候已经加载了 lib-org
       (:with-hook org-after-todo-state-change-hook (:hook org-copy-todo-to-today)))))
 
 (setup org-clock
@@ -174,18 +177,17 @@
            "C-c o i" org-clock-in
            "C-c o o" org-clock-out)
   (:when-loaded
-    (:option
-     org-clock-persist t
-     org-clock-in-resume t
-     ;; Save clock data and notes in the LOGBOOK drawer
-     org-clock-into-drawer t
-     ;; Save state changes in the LOGBOOK drawer
-     org-log-into-drawer t
-     ;; Removes clocked tasks with 0:00 duration
-     org-clock-out-remove-zero-time-clocks t
-     ;; Show clock sums as hours and minutes, not "n days" etc.
-     org-time-clocksum-format
-     '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
+    (:option org-clock-persist t
+             org-clock-in-resume t
+             ;; Save clock data and notes in the LOGBOOK drawer
+             org-clock-into-drawer t
+             ;; Save state changes in the LOGBOOK drawer
+             org-log-into-drawer t
+             ;; Removes clocked tasks with 0:00 duration
+             org-clock-out-remove-zero-time-clocks t
+             ;; Show clock sums as hours and minutes, not "n days" etc.
+             org-time-clocksum-format
+             '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
     (org-clock-persistence-insinuate)))
 
 (setup ox-latex

@@ -45,7 +45,7 @@ IGNORE is a placeholder for any arguments passed to this function."
          (directory (expand-file-name "daily" denote-directory))
          (today-file (find-today-journal-file directory date-string)))
     (unless today-file
-      (org-capture nil "t")
+      (org-capture nil "jt")
       (setq today-file (find-today-journal-file directory date-string)))
     today-file))
 
