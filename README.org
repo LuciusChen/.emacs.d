@@ -1,5 +1,6 @@
 * .emacs.d
 [[file:assets/screenshot_1.jpg]]
+[[file:assets/screenshot_2.jpg]]
 ** 包管理工具
 *** [[https://git.sr.ht/~pkal/setup][setup]]
 特点就是简单可定制，其中需要注意的是 =:bind-into= 有一些问题，详见 [[https://git.sr.ht/~pkal/setup/commit/30c03935774e7c34cc4de87dcf1f88ea09c190a1][~pkal/setup: Deprecate passing a map to :bind-into - sourcehut git]]，要避免这个问题其实可以采用下面的写法。
