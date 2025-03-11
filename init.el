@@ -94,7 +94,7 @@
     browse-kill-ring rainbow-delimiters default-text-scale language-detection
     nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
     password-store-otp password-store meow-tree-sitter go-translate
-    eshell-syntax-highlighting
+    eshell-syntax-highlighting denote
     (emt :host github :repo "roife/emt")
     (dape :host github :repo "svaante/dape")
     (meow :host github :repo "meow-edit/meow")

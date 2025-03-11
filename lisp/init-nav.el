@@ -5,6 +5,7 @@
 (setup files
   (:option  auto-save-default nil
             make-backup-files nil
+            enable-local-variables :all
             ;; emacs@31 feature
             trusted-content '("~/.emacs.d/")))
 
