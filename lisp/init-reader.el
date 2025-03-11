@@ -94,13 +94,6 @@
                    "C-c s s" gt-do-setup
                    "C-c s p" gt-do-speak))
   (:when-loaded
-
-    (cl-defmethod gt-text :around ((taker gt-taker) translator)
-      "Extend the original gt-text method to handle pdf-view-mode."
-      (if (eq major-mode 'pdf-view-mode)
-          (gt-text-at-point nil 'pdf-view-mode)
-        (cl-call-next-method)))
-
     (:option gt-langs '(en zh)
              gt-chatgpt-model "gpt-3.5-turbo"
              gt-chatgpt-user-prompt-template
