@@ -73,8 +73,7 @@
       (:hook org-indent-mode)
       (:hook (lambda () (setq truncate-lines nil))))
     (:with-hook org-after-todo-state-change-hook
-      (:hook log-todo-next-creation-date)
-      (:hook org-roam-copy-todo-to-today))))
+      (:hook log-todo-next-creation-date))))
 
 (setup ob-core
   (:load-after org)
@@ -103,6 +102,70 @@
                 ,(concat "* TODO %?\n%U"))
                ("n" "note" entry (file "agenda/note.org")
                 "* %? :NOTE:\n%U\n%a\n" :clock-resume t)))))
+
+(setup denote
+  (:defer (:require denote))
+  (:when-loaded
+    (:global "C-c n n" denote
+             "C-c n d" denote-sort-dired
+             "C-c n l" denote-link
+             "C-c n L" denote-add-links
+             "C-c n b" denote-backlinks
+             "C-c n r" denote-rename-file
+             "C-c n R" denote-rename-file-using-front-matter)
+    (:option denote-directory (expand-file-name "denote" *org-path*)
+             denote-journal-extras-directory (expand-file-name "daily" denote-directory)
+             denote-save-buffers nil
+             ;; denote-known-keywords '("emacs" "philosophy" "politics" "economics")
+             denote-infer-keywords t
+             denote-sort-keywords t
+             denote-prompts '(title file-type)
+             denote-journal-extras-title-format 'day-date-month-year
+             denote-excluded-directories-regexp nil
+             denote-excluded-keywords-regexp nil
+             denote-rename-confirmations '(rewrite-front-matter modify-file-name)
+             denote-date-prompt-use-org-read-date t
+             denote-backlinks-show-context t)
+
+    (denote-rename-buffer-mode 1)
+
+    (:after org-capture
+      (defun +get-today-heading ()
+        "Return today's date as a headline in the format 'Sat, 08 Mar 2025', creating it if necessary."
+        (let ((date-headline (format-time-string "%a, %d %b %Y")))
+          (save-excursion
+            (goto-char (point-min))
+            (if (re-search-forward (concat "^\\* " (regexp-quote date-headline)) nil t)
+                date-headline
+              (progn
+                (goto-char (point-max))
+                (insert (concat "* " date-headline "\n"))
+                date-headline)))))
+
+      (:option org-capture-templates `(("i" "inbox" entry  (file "agenda/inbox.org")
+                                        ,(concat "* TODO %?\n%U"))
+                                       ("n" "note" entry (file "agenda/note.org")
+                                        "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
+                                       ;; templates for journal
+                                       ("w" "Weather" entry
+                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                                        "%(fetch-weather-data)\n")
+                                       ("d" "Default" entry
+                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                                        "%<%H:%M> %?\n")
+                                       ("p" "Prod" entry
+                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                                        "%<%H:%M> %? :prod:\n")
+                                       ("r" "Read" entry
+                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                                        "* What I read? :read:\n** %?\n")
+                                       ("f" "Fleeting Notes" entry
+                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                                        "* Notes :note:\n** %?\n")
+                                       ("t" "Tasks" entry
+                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                                        "Tasks :task:\n")))
+      (:with-hook org-after-todo-state-change-hook (:hook org-copy-todo-to-today)))))
 
 (setup org-clock
   (:load-after org)
@@ -389,6 +452,7 @@
     ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
     (:advice org-roam-node-read--to-candidate :override +org-roam-node-read--to-candidate)
     (org-roam-db-autosync-enable)
+    ;; (:with-hook org-after-todo-state-change-hook (:hook org-roam-copy-todo-to-today))
     (:after embark
       (:also-load lib-org-embark)
       (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))

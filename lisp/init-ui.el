@@ -158,6 +158,7 @@
              tab-bar-close-button-show nil
              tab-bar-new-tab-to 'rightmost
              tab-bar-tab-hints t
+             tab-bar-show 1
              tab-bar-new-tab-choice "*scratch*"
              tab-bar-select-tab-modifiers '(super)
              tab-bar-tab-name-truncated-max 20

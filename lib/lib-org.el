@@ -31,6 +31,47 @@ IGNORE is a placeholder for any arguments passed to this function."
       (unless (equal (file-truename today-file)
                      (file-truename (buffer-file-name)))
         (org-refile nil nil (list "Tasks" today-file nil pos))))))
+
+(defun find-today-journal-file (directory date-string)
+  "Find today's journal file in DIRECTORY that matches DATE-STRING."
+  (let ((regex (format "%s__journal\\.org$" (regexp-quote date-string))))
+    (seq-find (lambda (file)
+                (string-match-p regex (downcase file)))
+              (directory-files directory t))))
+
+(defun find-or-create-today-journal-file ()
+  "Find today's journal file, or create it using org-capture if it doesn't exist."
+  (let* ((date-string (downcase (format-time-string "%A-%d-%B-%Y" (current-time))))
+         (directory (expand-file-name "daily" denote-directory))
+         (today-file (find-today-journal-file directory date-string)))
+    (unless today-file
+      (org-capture nil "t")
+      (setq today-file (find-today-journal-file directory date-string)))
+    today-file))
+
+(defun org-copy-todo-to-today ()
+  "Refile DONE or CANCELLED TODO items to today's journal file."
+  (interactive)
+  (when (and (or (equal org-state "DONE")
+                 (equal org-state "CANCELLED"))
+             (not (org-find-property "STYLE")))
+    (let ((org-refile-keep t)
+          (org-after-refile-insert-hook #'save-buffer)
+          today-file pos)
+      (save-window-excursion
+        (setq today-file (find-or-create-today-journal-file))
+        (with-current-buffer (find-file-noselect today-file)
+          (goto-char (point-min))
+          (setq pos (or (when (re-search-forward "^\\*+ Tasks" nil t)
+                          (point))
+                        (progn
+                          (goto-char (point-max))
+                          (insert "** Tasks\n")
+                          (point))))))
+      (unless (equal (file-truename today-file)
+                     (file-truename (buffer-file-name)))
+        (org-refile nil nil (list "Tasks" today-file nil pos))))))
+
 ;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
 ;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
 (defun dired-copy-images-links ()
