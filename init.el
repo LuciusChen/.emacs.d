@@ -28,9 +28,9 @@
                           "Segoe UI Emoji"
                           "Symbola"))
 (defconst *default-font* "MonoLisa Lucius 14")
-(defconst *org-font* "PragmataPro 14")
-(defconst *term-default-font* "PragmataPro Mono Liga 14")
-(defconst *prog-font* "MonoLisa Lucius 13")
+(defconst *org-font* "Aporetic Serif Mono 14")
+(defconst *term-default-font* "Aporetic Serif Mono 14")
+(defconst *prog-font* "Aporetic Serif Mono 14")
 (defconst *zh-default-font* "LXGW WenKai")
 (defconst *jp-default-font* "Noto Sans Javanese")
 (defconst *symbol-default-font* "Symbols Nerd Font Mono")
@@ -88,19 +88,20 @@
     macrostep json-mode orderless kind-icon git-modes git-blamed nerd-icons
     org-modern ace-pinyin marginalia org-remark elfeed-tube org-roam-ui
     rainbow-mode prettier-js projectile consult-dir dirvish swift-mode
-    org-sliced-images vterm vterm-toggle treesit-auto org-cliplink
+    org-sliced-images vterm vterm-toggle org-cliplink language-detection
     markdown-mode consult-eglot mode-line-bell embark-consult speed-type
     elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
-    browse-kill-ring rainbow-delimiters default-text-scale language-detection
+    browse-kill-ring rainbow-delimiters default-text-scale denote dape
     nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
     password-store-otp password-store meow-tree-sitter go-translate
-    eshell-syntax-highlighting denote
+    eshell-syntax-highlighting
     (emt :host github :repo "roife/emt")
-    (dape :host github :repo "svaante/dape")
+    (md :host github :repo "eki3z/md")
     (meow :host github :repo "meow-edit/meow")
     (gptel :host github :repo "karthink/gptel")
     (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
     (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
+    (treesit-auto :host github :repo "LuciusChen/treesit-auto")
     (org-roam :host github :repo "org-roam/org-roam")
     (telega :host github :repo "LuciusChen/telega.el");; :branch "diy")
     ;; (telega :host github :repo "zevlg/telega.el")
@@ -109,11 +110,10 @@
     (indent-bars :host github :repo "jdtsmith/indent-bars")
     (consult-mu :host github :repo "armindarvish/consult-mu")
     (eglot-booster :host github :repo "jdtsmith/eglot-booster")
-    (modus-themes :host github :repo "LuciusChen/modus-themes")
     (aider :host github :repo "tninja/aider.el" :files ("aider.el"))
-    (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
-    (ready-player :host github :repo "xenodium/ready-player" :files (:defaults "*.el"))))
+    (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
+    (color-theme-sanityinc-tomorrow :host github :repo "LuciusChen/color-theme-sanityinc-tomorrow")))
 
 (dolist (e *use-package-list*) (straight-use-package e))
 (setq vc-follow-symlinks t)

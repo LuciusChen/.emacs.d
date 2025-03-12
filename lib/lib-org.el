@@ -185,6 +185,32 @@ If DEST, a buffer, is provided, insert the markup there."
           (goto-char next))))
     (pop-to-buffer buff)
     (goto-char (point-min))))
+
+(defun +get-today-heading ()
+  "Return today's date as a headline in the format 'Sat, 08 Mar 2025', creating it if necessary."
+  (let ((date-headline (format-time-string "%a, %d %b %Y")))
+    (save-excursion
+      (goto-char (point-min))
+      (if (re-search-forward (concat "^\\* " (regexp-quote date-headline)) nil t)
+          date-headline
+        (progn
+          (goto-char (point-max))
+          (insert (concat "* " date-headline "\n"))
+          date-headline)))))
+
+(defun update-alist (alist-symbol rep-alist)
+  "Update the alist specified by ALIST-SYMBOL with entries from REP-ALIST.
+If a key from REP-ALIST is present in the alist referred to by ALIST-SYMBOL,
+its value will be updated. If the key is not present, the entry will be added."
+  (let ((alist (symbol-value alist-symbol)))
+    (dolist (rep rep-alist)
+      (let ((key (car rep))
+            (value (cdr rep)))
+        (if (assoc key alist)
+            (setcdr (assoc key alist) value)
+          (setq alist (cons rep alist)))))
+    (set alist-symbol alist)))
+
 (provide 'lib-org)
 ;;;; provide
 ;;; lib-org.el ends here.
