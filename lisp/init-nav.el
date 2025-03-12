@@ -30,27 +30,6 @@
   (:defer
    (:option bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
 
-;; (setup project
-;;   (defun +project-shell ()
-;;     "Start an inferior shell in the current project's root directory.
-;; If a buffer already exists for running a shell in the project's root,
-;; switch to it.  Otherwise, create a new shell buffer.
-;; With \\[universal-argument] prefix arg, create a new inferior shell buffer even
-;; if one already exists."
-;;     (interactive)
-;;     (require 'comint)
-;;     (project-other-window-command)
-;;     (let* ((default-directory (project-root (project-current t)))
-;;            (default-project-shell-name (project-prefixed-buffer-name "shell"))
-;;            (shell-buffer (get-buffer default-project-shell-name)))
-;;       (if (and shell-buffer (not current-prefix-arg))
-;;           (if (comint-check-proc shell-buffer)
-;;               (pop-to-buffer shell-buffer (bound-and-true-p display-comint-buffer-action))
-;;             (vterm shell-buffer))
-;;         (vterm (generate-new-buffer-name default-project-shell-name)))))
-
-;;   (:advice project-shell :override #'+project-shell))
-
 (setup dirvish
   (:defer (:require dirvish))
   (:when-loaded
@@ -84,12 +63,6 @@
              "M-e"  dirvish-emerge-menu
              "M-j"  dirvish-fd-jump))
     (:with-mode dirvish-directory-view-mode (:hook diredfl-mode))))
-
-(setup ready-player
-  (:defer (:require ready-player))
-  (:when-loaded
-    (ready-player-add-to-auto-mode-alist)
-    (add-to-list 'ready-player-supported-audio "m4r")))
 
 (provide 'init-nav)
 ;;; init-nav.el ends here

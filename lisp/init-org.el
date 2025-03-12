@@ -98,9 +98,10 @@
   (:when-loaded
     (:option org-capture-bookmark nil
              org-capture-templates
-             `(("i" "inbox" entry  (file "agenda/inbox.org")
+             `(("a" "Agenda")
+               ("ai" "inbox" entry  (file "agenda/inbox.org")
                 ,(concat "* TODO %?\n%U"))
-               ("n" "note" entry (file "agenda/note.org")
+               ("an" "note" entry (file "agenda/note.org")
                 "* %? :NOTE:\n%U\n%a\n" :clock-resume t)))))
 
 (setup denote
@@ -130,43 +131,26 @@
     (denote-rename-buffer-mode 1)
 
     (:after org-capture
-      (defun +get-today-heading ()
-        "Return today's date as a headline in the format 'Sat, 08 Mar 2025', creating it if necessary."
-        (let ((date-headline (format-time-string "%a, %d %b %Y")))
-          (save-excursion
-            (goto-char (point-min))
-            (if (re-search-forward (concat "^\\* " (regexp-quote date-headline)) nil t)
-                date-headline
-              (progn
-                (goto-char (point-max))
-                (insert (concat "* " date-headline "\n"))
-                date-headline)))))
-
-      (:option org-capture-templates `(("a" "Agenda")
-                                       ("ai" "inbox" entry  (file "agenda/inbox.org")
-                                        ,(concat "* TODO %?\n%U"))
-                                       ("an" "note" entry (file "agenda/note.org")
-                                        "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
-                                       ;; templates for journal
-                                       ("j" "Journal")
-                                       ("jw" "Weather" entry
-                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
-                                        "%(fetch-weather-data)\n")
-                                       ("jd" "Default" entry
-                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
-                                        "%<%H:%M> %?\n")
-                                       ("jp" "Prod" entry
-                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
-                                        "%<%H:%M> %? :prod:\n")
-                                       ("jr" "Read" entry
-                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
-                                        "* What I read? :read:\n** %?\n")
-                                       ("jf" "Fleeting Notes" entry
-                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
-                                        "* Notes :note:\n** %?\n")
-                                       ("jt" "Tasks" entry
-                                        (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
-                                        "Tasks :task:\n")))
+      (update-alist 'org-capture-templates
+                    '(("j" "Journal")
+                      ("jw" "Weather" entry
+                       (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                       "%(fetch-weather-data)\n")
+                      ("jd" "Default" entry
+                       (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                       "%<%H:%M> %?\n")
+                      ("jp" "Prod" entry
+                       (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                       "%<%H:%M> %? :prod:\n")
+                      ("jr" "Read" entry
+                       (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                       "* What I read? :read:\n** %?\n")
+                      ("jf" "Fleeting Notes" entry
+                       (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                       "* Notes :note:\n** %?\n")
+                      ("jt" "Tasks" entry
+                       (file+headline denote-journal-extras-path-to-new-or-existing-entry +get-today-heading)
+                       "Tasks :task:\n")))
       ;; 拉起 org 的时候已经加载了 lib-org
       (:with-hook org-after-todo-state-change-hook (:hook org-copy-todo-to-today)))))
 

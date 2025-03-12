@@ -31,7 +31,7 @@
   (:with-mode json-ts-mode (:file-match "\\.json\\'"))
   (:with-mode dockerfile-ts-mode (:file-match "\\.Dockerfile\\'"))
   (:with-mode prisma-ts-mode (:file-match "\\.prisma\\'"))
-  (:with-mode gfm-mode (:file-match "\\.md\\'")))
+  (:with-mode markdown-ts-mode (:file-match "\\.md\\'")))
 
 (setup display-fill-column-indicator (:hook-into prog-mode))
 (setup display-line-numbers (:hook-into prog-mode))
