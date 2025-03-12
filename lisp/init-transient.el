@@ -25,8 +25,6 @@
       :info-manual "Journal menu"
       ["Arguments"
        ("-j" "Journal"            "journal.org")
-       ("-t" "Today"              "today")
-       ("-y" "Yesterday"          "yesterday")
        ("-d" "Clear archive log"  "delete")]
       ["Commands"
        ("RET" "Journal files switch"   journal-options)]
