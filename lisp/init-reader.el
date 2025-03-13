@@ -171,6 +171,37 @@
     ;;                                "--ytdl-raw-options-append=proxy=http://127.0.0.1:7890"))
     (elfeed-tube-setup)))
 
+(setup ebib
+  (:load-after bibtex)
+  (:when-loaded
+    (:also-load lib-org)
+    (:option ebib-default-directory bibtex-file-path
+             ebib-bib-search-dirs `(,bibtex-file-path)
+             ebib-file-search-dirs `(,(concat bibtex-file-path "files/"))
+             ebib-notes-directory bibtex-notes-path
+             ebib-reading-list-file (concat *org-path* "/agenda/inbox.org")
+             ebib-bibtex-dialect bibtex-dialect
+             ebib-file-associations '(("pdf" . "open"))
+             ebib-index-default-sort '("timestamp" . descend)
+             ebib-reading-list-project-marker "PROJECT"
+             ;; 笔记模板
+             ebib-notes-template ":PROPERTIES:\n:ID: %i\n:ROAM_REFS: @%k\n:END:\n#+title: %t\n#+description: %d\n#+date: %s\n%%?\n"
+             ebib-notes-template-specifiers '((?k . ebib-create-key)
+                                              (?i . ebib-create-id)
+                                              (?t . ebib-create-org-title)
+                                              (?d . ebib-create-org-description)
+                                              (?l . ebib-create-org-link)
+                                              (?s . ebib-create-org-time-stamp))
+             ;; 读书列表模板
+             ebib-reading-list-template "* %M %T\n:PROPERTIES:\n%K\n:END:\n%F\n%S\n"
+             ebib-reading-list-template-specifiers '((?M . ebib-reading-list-project-marker)
+                                                     (?T . ebib-create-org-title)
+                                                     (?K . ebib-reading-list-create-org-identifier)
+                                                     (?F . ebib-create-org-file-link)
+                                                     (?S . ebib-create-org-stamp-inactive))
+             ebib-preload-bib-files bibtex-files
+             ebib-use-timestamp t)))
+
 (setup md-ts-mode
   (:with-hook md-ts-mode-hook
     (:require md-toc)
