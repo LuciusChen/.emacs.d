@@ -14,21 +14,21 @@
            (dirty (not
                    (string= "" (string-trim (shell-command-to-string "git status --porcelain")))))
            (dirty-info (if dirty " 🖉" " ✔")))
-      (concat (propertize "⎇ " 'face 'modus-themes-fg-green-warmer)
-              (propertize branch 'face 'modus-themes-fg-magenta-warmer)
+      (concat (propertize "⎇ " 'face 'success)
+              (propertize branch 'face 'warning)
               (propertize dirty-info 'face
-                          (if dirty 'modus-themes-fg-red 'modus-themes-fg-green))))))
+                          (if dirty 'error 'success))))))
 
 (defun eshell-prompt-multiline ()
   "Eshell Multiline Git prompt."
   (let ((separator (propertize " | " 'face 'font-lock-comment-face))
         (hr (propertize (concat "\n" (make-string (/ (window-total-width) 2) ?─) "\n") 'face 'font-lock-comment-face))
-        (dir (propertize (format "%s" (abbreviate-file-name (eshell/pwd))) 'face 'modus-themes-fg-yellow-warmer))
+        (dir (propertize (format "%s" (abbreviate-file-name (eshell/pwd))) 'face 'eshell-prompt))
         (git-info (eshell-git-info))
         (time (propertize (format-time-string "%H:%M:%S") 'face 'font-lock-comment-face))
         (sign (if (= (user-uid) 0)
-                  (propertize "\n#" 'face 'modus-themes-fg-blue-intense)
-                (propertize "\n$" 'face 'modus-themes-fg-red-warmer))))
+                  (propertize "\n#" 'face 'success)
+                (propertize "\n$" 'face 'error))))
     (concat hr dir
             (when git-info (concat separator git-info))
             separator time sign " ")))

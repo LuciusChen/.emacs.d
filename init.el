@@ -89,12 +89,12 @@
     org-modern ace-pinyin marginalia org-remark elfeed-tube org-roam-ui
     rainbow-mode prettier-js projectile consult-dir dirvish swift-mode
     org-sliced-images vterm vterm-toggle org-cliplink language-detection
-    markdown-mode consult-eglot mode-line-bell embark-consult speed-type
+    markdown-mode mode-line-bell embark-consult speed-type go-translate
     elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
     browse-kill-ring rainbow-delimiters default-text-scale denote dape
     nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
-    password-store-otp password-store meow-tree-sitter go-translate
-    eshell-syntax-highlighting
+    password-store-otp password-store eshell-syntax-highlighting
+    meow-tree-sitter
     (emt :host github :repo "roife/emt")
     (md :host github :repo "eki3z/md")
     (meow :host github :repo "meow-edit/meow")
