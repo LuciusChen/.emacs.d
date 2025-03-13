@@ -55,9 +55,15 @@ The files are located in the directory specified by `file-path-prefix`."
   (let ((files (directory-files directory t "__journal\\.org$"))
         (deleted-files '()))
     (dolist (file files)
-      (when (zerop (nth 7 (file-attributes file)))  ; Check if the file size is zero
-        (delete-file file)
-        (push file deleted-files)))
+      (let* ((tree (with-temp-buffer
+                     (insert-file-contents file)
+                     (org-element-parse-buffer)))
+             (headlines (org-element-map tree 'headline 'identity))
+             (buffer (find-buffer-visiting file)))
+        (when (zerop (length headlines))
+          (push file deleted-files)
+          (delete-file file)
+          (when buffer (kill-buffer buffer)))))
     (when deleted-files
       (message "Deleted archived daily log files: %s" (string-join (nreverse deleted-files) ", ")))))
 
