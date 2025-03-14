@@ -96,7 +96,6 @@
     password-store-otp password-store eshell-syntax-highlighting
     meow-tree-sitter
     (emt :host github :repo "roife/emt")
-    (md :host github :repo "eki3z/md")
     (meow :host github :repo "meow-edit/meow")
     (gptel :host github :repo "karthink/gptel")
     (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
@@ -113,7 +112,7 @@
     (aider :host github :repo "tninja/aider.el" :files ("aider.el"))
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
-    (color-theme-sanityinc-tomorrow :host github :repo "LuciusChen/color-theme-sanityinc-tomorrow")))
+    (rose-pine :host github :repo "LuciusChen/rose-pine")))
 
 (dolist (e *use-package-list*) (straight-use-package e))
 (setq vc-follow-symlinks t)

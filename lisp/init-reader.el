@@ -202,11 +202,6 @@
              ebib-preload-bib-files bibtex-files
              ebib-use-timestamp t)))
 
-(setup md-ts-mode
-  (:with-hook md-ts-mode-hook
-    (:require md-toc)
-    (:hook md-toc-mode)))
-
 (setup elfeed-tube-mpv
   (:load-after elfeed)
   (:with-map elfeed-show-mode-map
