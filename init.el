@@ -88,13 +88,13 @@
     macrostep json-mode orderless kind-icon git-modes git-blamed nerd-icons
     org-modern ace-pinyin marginalia org-remark elfeed-tube org-roam-ui
     rainbow-mode prettier-js projectile consult-dir dirvish swift-mode
-    org-sliced-images vterm vterm-toggle org-cliplink language-detection
+    vterm vterm-toggle org-cliplink language-detection meow-tree-sitter
     markdown-mode mode-line-bell embark-consult speed-type go-translate
     elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
     browse-kill-ring rainbow-delimiters default-text-scale denote dape
     nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
     password-store-otp password-store eshell-syntax-highlighting
-    meow-tree-sitter
+    (image-slicing :host github :repo "ginqi7/image-slicing")
     (emt :host github :repo "roife/emt")
     (meow :host github :repo "meow-edit/meow")
     (gptel :host github :repo "karthink/gptel")
