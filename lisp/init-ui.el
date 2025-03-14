@@ -65,15 +65,15 @@
     ;; first-time startup on Emacs > 26.3.
     (:option custom-safe-themes t
              ;; If you don't customize it, this is the theme you get.
-             custom-enabled-themes '(sanityinc-tomorrow-night)
-             light-theme 'sanityinc-tomorrow-day
-             dark-theme 'sanityinc-tomorrow-night)
+             custom-enabled-themes '(rose-pine-night)
+             light-theme 'rose-pine-day
+             dark-theme 'rose-pine-night)
     (:with-hook window-setup-hook
       (:hook reapply-themes)
       (:hook opacity-dark-theme)
       (:hook set-dividers-and-fringe-color))
-    (:hooks after-init-hook reapply-themes
-            after-make-frame-functions opacity-dark-theme)))
+    (:with-hook after-make-frame-functions (:hook opacity-dark-theme))
+    (:with-hook after-init-hook (:hook reapply-themes))))
 
 (setup hl-line
   (:option hl-line-range-function
@@ -88,6 +88,7 @@
             server-after-make-frame-hook +setup-fonts)
     (:with-mode (vterm-mode eshell-mode) (:set-font *term-default-font*))
     (:with-mode (latex-mode prog-mode nxml-mode) (:set-font *prog-font*))
+    (:with-mode nov-mode (:set-font (replace-regexp-in-string "14" "16" *default-font*)))
     (:with-mode org-mode (:set-font *org-font*))
     (:advice face-at-point :around #'+suggest-other-faces)))
 

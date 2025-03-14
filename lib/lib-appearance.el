@@ -69,7 +69,7 @@ This function only works in a graphical interface.  The FRAME argument is
 optional and is used to specify which frame's opacity to change."
   (if (display-graphic-p)
       (if (eq (frame-parameter nil 'background-mode) 'dark)
-          (set-opacity 60))
+          (set-opacity 75))
     (message "Non-graphical interface")))
 
 (provide 'lib-appearance)
