@@ -9,7 +9,7 @@
 ;; Make mouse wheel / trackpad scrolling less jerky
 (setup mwheel
   (:option mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control)))))
-;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control))))
+
 (setup (:with-feature nil)
   (:global "<wheel-right>" 'ignore
            "<wheel-left>" 'ignore
