@@ -89,7 +89,7 @@
     (:with-mode (vterm-mode eshell-mode) (:set-font *term-default-font*))
     (:with-mode (latex-mode prog-mode nxml-mode) (:set-font *prog-font*))
     (:with-mode nov-mode (:set-font (replace-regexp-in-string "14" "16" *default-font*)))
-    (:with-mode org-mode (:set-font *org-font*))
+    (:with-mode (org-mode ebib-index-mode ebib-entry-mode) (:set-font *org-font*))
     (:advice face-at-point :around #'+suggest-other-faces)))
 
 (setup popup-frames (:defer (:require popup-frames)))
@@ -157,6 +157,7 @@
     (:also-load lib-tabbar)
     (:option tab-bar-separator ""
              tab-bar-close-button-show nil
+             tab-bar-new-button-show nil
              tab-bar-new-tab-to 'rightmost
              tab-bar-tab-hints t
              tab-bar-show 1
