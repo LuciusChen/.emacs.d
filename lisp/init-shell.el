@@ -48,6 +48,7 @@
     (:also-load lib-eshell)
     (:option eshell-prompt-function 'eshell-prompt-multiline
              eshell-highlight-prompt nil
+             eshell-banner-message ""
              eshell-cmpl-ignore-case t)
     (:with-map eshell-mode-map
       (:bind "C-l"  thanos/eshell-clear

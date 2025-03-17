@@ -158,6 +158,8 @@
 (push '(horizontal-scroll-bars) default-frame-alist)
 (push '(undecorated-round . t) default-frame-alist)
 
+(setq initial-frame-alist '((width . 100) (height . 40)))
+
 (setq tool-bar-mode nil
       scroll-bar-mode nil)
 
