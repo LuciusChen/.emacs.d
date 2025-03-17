@@ -544,24 +544,6 @@
      `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)" 1 'org-checkbox-done-text prepend))
      'append)))
 
-(setup deft
-  (:defer (:require deft))
-  (:when-loaded
-    (:also-load lib-deft)
-    (:option
-     deft-extensions '("md" "tex" "org" "conf")
-     deft-directory (concat *org-path* "/notes")
-     deft-recursive t
-     deft-strip-summary-regexp
-     (concat "\\("
-             "[\n\t]" ;; blank
-             "\\|^#\\+[[:alpha:]_]+:.*$" ;; org-mode metadata
-             "\\|^#\s[-]*$" ;; org-mode metadata
-             "\\|^:PROPERTIES:\n\\(.+\n\\)+:END:\n"
-             "\\)"))
-    (:advice deft-parse-title :override #'+deft-parse-title)
-    (:global [f7] deft)))
-
 (setup ox-hugo
   (:load-after ox)
   (:when-loaded
