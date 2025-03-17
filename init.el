@@ -80,18 +80,18 @@
           (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
           "(provide 'org-version)\n")))
      :pin nil)
-    nov sis plz avy mpv cape deft ebib citar wgrep setup eglot-java
+    nov sis plz avy mpv cape ebib citar wgrep setup eglot-java nerd-icons
     corfu vundo forge verb elfeed popper embark bibtex dimmer vertico
     diredfl separedit cdlatex pyvenv consult mmm-mode ox-hugo scratch
     diff-hl company goggles flymake web-mode js2-mode move-dup diminish
     doom-modeline git-link webpaste apheleia mastodon pdf-tools ox-pandoc
-    macrostep json-mode orderless kind-icon git-modes git-blamed nerd-icons
+    macrostep json-mode orderless kind-icon git-modes git-blamed dape
     org-modern ace-pinyin marginalia org-remark elfeed-tube org-roam-ui
     rainbow-mode prettier-js projectile consult-dir dirvish swift-mode
     vterm vterm-toggle org-cliplink language-detection meow-tree-sitter
     markdown-mode mode-line-bell embark-consult speed-type go-translate
     elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
-    browse-kill-ring rainbow-delimiters default-text-scale denote dape
+    browse-kill-ring rainbow-delimiters default-text-scale denote
     nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
     password-store-otp password-store eshell-syntax-highlighting
     (image-slicing :host github :repo "ginqi7/image-slicing")
