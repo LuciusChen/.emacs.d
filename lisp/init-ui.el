@@ -54,6 +54,7 @@
            dashboard-image-width 400
            dashboard-image-height 169
            dashboard-title "Happy hacking, lucius - Emacs ♥ you")
+  (:face dashboard-title-face ((t (:inherit font-lock-constant-face :height 1.5 :italic t :family "Departure Mono"))))
   (dashboard-create-hook))
 
 (setup custom
