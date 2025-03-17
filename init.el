@@ -110,6 +110,8 @@
     (consult-mu :host github :repo "armindarvish/consult-mu")
     (eglot-booster :host github :repo "jdtsmith/eglot-booster")
     (aider :host github :repo "tninja/aider.el" :files ("aider.el"))
+    (denote-org :host github :repo "protesilaos/denote-org")
+    (denote-journal :host github :repo "protesilaos/denote-journal")
     ;; (beancount-mode :host github :repo "beancount/beancount-mode")
     (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
     (rose-pine :host github :repo "LuciusChen/rose-pine")))

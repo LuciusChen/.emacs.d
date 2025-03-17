@@ -44,6 +44,7 @@
     (global-corfu-mode)
     (:option corfu-cycle t
              corfu-auto t
+             corfu-auto-prefix 2
              corfu-count 5
              corfu-quit-no-match 'separator)
     (:with-mode prog-mode (:hook corfu-mode))
@@ -72,7 +73,7 @@
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
 (setup yasnippet
-  (:load-after corfu)
+  (:defer (:require yasnippet))
   (:when-loaded
     (yas-global-mode)
     (:option yas-keymap-disable-hook
