@@ -163,8 +163,9 @@
 (setup mastodon
   (:when-loaded
     (:also-load lib-mastodon)
-    (:with-map mastodon-mode-map
-      (:bind "a" mastodon-detect-and-translate))
+    (:after go-translate
+      (:with-map mastodon-mode-map
+        (:bind "a" mastodon-detect-and-translate)))
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
              mastodon-tl--show-avatars t)))

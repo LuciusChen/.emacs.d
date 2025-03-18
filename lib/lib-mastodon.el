@@ -32,33 +32,32 @@
 
 (defun mastodon-translate-text (bounds-fn)
   "Translate text using BOUNDS-FN to find the bounds in the current buffer."
-  (let ((bounds (funcall bounds-fn)))
-    (if bounds
-        (gt-start (gt-translator :taker (list (gt-taker :pick (lambda (&rest _) bounds) :langs '(en zh))
-                                              (gt-taker :pick (lambda (&rest _) bounds) :langs '(ja zh))
-                                              (gt-taker :pick (lambda (&rest _) bounds) :langs '(fr zh))
-                                              (gt-taker :pick (lambda (&rest _) bounds) :langs '(de zh)))
-                                 :engines (gt-chatgpt-engine)
-                                 :render (gt-overlay-render :type 'after
-                                                            :rfmt "\n--- Translation ---\n%s"
-                                                            :sface nil
-                                                            :rface '(:foreground "grey"))))
-      (message "No text content to translate."))))
+  (funcall bounds-fn))
+
+(cl-defmethod gt-thing-at-point ((_ (eql 'xxx)) (_ (eql 'mastodon-mode)))
+  (let (bds)
+    (cond
+     ;; Check if the current line is a toot
+     ((get-text-property (point) 'item-json)
+      (message "Toot detected at point.")
+      (mastodon-translate-text #'find-toot-text-bounds))
+     ;; Otherwise, assume we are dealing with a profile
+     ((mastodon-tl--profile-buffer-p)
+      (message "Profile detected.")
+      (mastodon-translate-text #'find-profile-note-bounds))
+     (t
+      (user-error "Not in a recognizable Mastodon buffer")))))
 
 (defun mastodon-detect-and-translate ()
   "Detect the content type under the cursor and translate it using `go-translate`."
   (interactive)
-  (cond
-   ;; Check if the current line is a toot
-   ((get-text-property (point) 'item-json)
-    (message "Toot detected at point.")
-    (mastodon-translate-text #'find-toot-text-bounds))
-   ;; Otherwise, assume we are dealing with a profile
-   ((mastodon-tl--profile-buffer-p)
-    (message "Profile detected.")
-    (mastodon-translate-text #'find-profile-note-bounds))
-   (t
-    (user-error "Not in a recognizable Mastodon buffer"))))
+  (gt-start
+   (gt-translator :taker (list (gt-taker :text 'xxx :langs '(zh en ja fr de)))
+                  :engines (gt-chatgpt-engine)
+                  :render (gt-overlay-render :type 'after
+                                             :rfmt "\n%s"
+                                             :sface nil
+                                             :rface '(:inherit font-lock-comment-face)))))
 
 (provide 'lib-mastodon)
 ;;; lib-mastodon.el ends here
