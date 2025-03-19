@@ -49,7 +49,8 @@ The default LENGTH is 16."
              (password ""))
         (dotimes (_ length password)
           (setq password (concat password (string (elt chars (random (length chars)))))))
-        (message "Generated password: %s" password)
+        (kill-new password)
+        (message "Generated password: %s (Copied to clipboard)" password)
         password))
 
     (:advice password-store-insert :override +password-store-insert)))
