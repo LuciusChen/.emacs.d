@@ -106,7 +106,7 @@
 (setup denote
   (:defer (:require denote))
   (:when-loaded
-    (:global "C-c n n" denote
+    (:global "C-c n n" denote-open-or-create
              "C-c n d" denote-sort-dired
              "C-c n l" denote-link
              "C-c n L" denote-add-links
@@ -153,8 +153,7 @@
                        (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
                        "Tasks :task:\n")))
       ;; 拉起 org 的时候已经加载了 lib-org
-      (:with-hook org-after-todo-state-change-hook (:hook org-copy-todo-to-today)))
-    ))
+      (:with-hook org-after-todo-state-change-hook (:hook org-copy-todo-to-today)))))
 
 (setup org-clock
   (:load-after org)
