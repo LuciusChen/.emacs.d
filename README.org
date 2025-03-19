@@ -7,20 +7,21 @@
 #+begin_src elisp
 (:with-map xxx-map (:bind "C-c x t" xxxx))
 #+end_src
-** 字体
+** UI
+*** 字体
 主要使 [[https://www.monolisa.dev/][MonoLisa]]，需要对齐的 =mode= 下使用 [[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro]] 或者 [[https://github.com/protesilaos/aporetic][aporetic]]，中文字体使用[[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]，选择 [[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]] 全覆盖 CJK 字符集作为 fallback 字体。（还可以通过强制 org-table 使用等宽字体，参考 [[https://github.com/alphapapa/unpackaged.el?tab=readme-ov-file#force-monospace-face-in-tables][Force monospace face in tables]]。）
 
 其中不同 =mode= 使用不同的字体，是通过自定义的 setup =:set-font= 关键字进行设置。
 #+begin_src emacs-lisp
 (:with-mode org-mode (:set-font "PragmataPro"))
 #+end_src
-*** 特殊字体
+**** 特殊字体
 需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。（由于 Symbola 和 nerd-icons 所需字体有一些重复，所以需要先安装 Symbola 再安装 nerd-icons 所需字体。）
-** Themes
-[[https://github.com/LuciusChen/modus-themes][LuciusChen/modus-themes]] forked from [[https://github.com/protesilaos/modus-themes][protesilaos/modus-themes]]，颜色方案参考了 [[https://uicolors.app/browse/tailwind-colors][tailwind-colors]]。
+*** Themes
+目前使用的是 [[https://github.com/LuciusChen/rose-pine/tree/main][GitHub - LuciusChen/rose-pine]]，Dashboard 使用的是 [[https://github.com/LuciusChen/dashboard][GitHub - LuciusChen/dashboard: A minimalistic dashboard for Emacs]]。
 
 透明以及毛玻璃效果可以参考下面两个 patch
-- [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]] （master 的 ef6ffbdc79645e719d3b5ef23c9200405c58c61e 之后 patch 不能正确 apply，参考我修改过的 [[https://github.com/LuciusChen/.emacs.d/blob/bbcb432caee0c66a42100acf6e5322c4bf128ba8/patches/ns-alpha-background.patch][ns-alpha-background.patch]]。）
+- [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]] （master 的 ef6ffbdc79645e719d3b5ef23c9200405c58c61e 之后 patch 不能正确 apply，​+参考我修改过的 [[https://github.com/LuciusChen/.emacs.d/blob/bbcb432caee0c66a42100acf6e5322c4bf128ba8/patches/ns-alpha-background.patch][ns-alpha-background.patch]]+​，效果不太好，已不再用。）
 - [[https://github.com/jaaasonSun/homebrew-emacs-plus/blob/master/patches/emacs-29/blur.patch]]
 
 例如添加透明 patch，需要在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@30.rb= 中添加 =local_patch "ns-alpha-background", sha: "eae9abd14c2d00315806116e0eaba09510e98738b420d6e40a9d7d97d9437b81"= 并把 ns-alpha-background.patch 文件放在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-30=  下。

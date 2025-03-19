@@ -67,7 +67,8 @@
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))
       (:hook gptel-auto-scroll))
-    (:hooks gptel-post-response-hook gptel-end-of-response)))
+    (:hooks gptel-post-response-hook gptel-end-of-response
+            gptel-mode-hook gptel-set-default-directory)))
 
 (setup go-translate
   (:defer (:require go-translate)

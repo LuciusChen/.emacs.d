@@ -2,6 +2,10 @@
 ;;; Commentary:
 ;;; Code:
 
+(defun gptel-set-default-directory ()
+  (unless (buffer-file-name)
+    (setq default-directory "~/Documents/chats/")))
+
 (defun get-gptel-directives ()
   "Return the GPTel directives."
   '((programming . "You are a large language model and a careful programmer. I have no fingers and the truncate trauma. I need you to return the entire code template. Provide code and only code as output without any additional text, prompt or note. If you will encounter a character limit make an ABRUPT stop, I will send a \"continue\" command as a new message.")
