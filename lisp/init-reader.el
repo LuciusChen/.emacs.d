@@ -58,30 +58,11 @@
              gptel-proxy ""
              gptel-directives (get-gptel-directives)
              gptel-temperature 0.7
-             gptel-tools (list
-                          (gptel-make-tool
-                           :function #'brave-search-query
-                           :name "brave_search"
-                           :description "Perform a web search using the Brave Search API"
-                           :args (list '(:name "query"
-                                               :type "string"
-                                               :description "The search query string"))
-                           :category "web")))
+             gptel-tools +gptel-tools)
 
-    ;; (gptel-make-gemini "Gemini"
-    ;;   :key (auth-source-pick-first-password
-    ;;         :host "api.gemini.com"
-    ;;         :user "gemini")
-    ;;   :stream t)
-
-    ;; (gptel-make-openai "DeepSeek"
-    ;;   :host "api.deepseek.com"
-    ;;   :endpoint "/chat/completions"
-    ;;   :stream t
-    ;;   :key (auth-source-pick-first-password
-    ;;         :host "api.deepseek.com"
-    ;;         :user "deepseek")
-    ;;   :models '(deepseek-chat deepseek-reasoner))
+    ;; (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
+    ;; (gptel-make-openai "DeepSeek" :host "api.deepseek.com" :endpoint "/chat/completions" :stream t :key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
+    ;;                    :models '(deepseek-chat deepseek-reasoner))
 
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))

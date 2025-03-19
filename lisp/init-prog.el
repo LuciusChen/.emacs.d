@@ -241,7 +241,7 @@
 
 (setup webpaste
   (:defer (:require webpaste)
-          (:option webpaste-provider-priority '("paste.mozilla.org" "dpaste.org"))))
+          (:option webpaste-provider-priority '("paste.rs" "dpaste.org"))))
 
 (setup uniline (:defer (:require uniline)))
 
