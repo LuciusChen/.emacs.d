@@ -17,6 +17,19 @@
     (:also-load image-slicing)
     (:option
      org-directory *org-path*
+     ;; emphasis
+     org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:]"
+                                      "-[:space:].,:!?;'\")}\\[[:nonascii:]"
+                                      "[:space:]"
+                                      "."
+                                      1)
+     org-match-substring-regexp (concat
+                                 "\\([0-9a-zA-Zα-γΑ-Ω]\\)\\([_^]\\)\\("
+                                 "\\(?:" (org-create-multibrace-regexp "{" "}" org-match-sexp-depth) "\\)"
+                                 "\\|"
+                                 "\\(?:" (org-create-multibrace-regexp "(" ")" org-match-sexp-depth) "\\)"
+                                 "\\|"
+                                 "\\(?:\\*\\|[+-]?[[:alnum:].,\\]*[[:alnum:]]\\)\\)")
      org-image-actual-width nil
      ;; remove org-src content indent
      org-edit-src-content-indentation 0
@@ -72,7 +85,10 @@
       (:hook org-indent-mode)
       (:hook (lambda () (setq truncate-lines nil))))
     (:with-hook org-after-todo-state-change-hook
-      (:hook log-todo-next-creation-date))))
+      (:hook log-todo-next-creation-date))
+    (+org-emphasize-bindings)
+    (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+    (org-element-update-syntax)))
 
 (setup ob-core
   (:load-after org)
