@@ -120,7 +120,9 @@ Use a negative argument to create a backward selection."
    '("u" . meow-undo)
    '("U" . vundo)
    '("V" . meow-visit)
-   '("w" . meow-mark-word-or-chinese)
+   (if *IS-MAC*
+       '("w" . meow-mark-word-or-chinese)
+     '("w" . meow-mark-word))
    '("W" . meow-mark-symbol)
    '("x" . meow-line)
    '("X" . meow-goto-line)
@@ -135,8 +137,6 @@ Use a negative argument to create a backward selection."
          (telega-chat-mode . normal)))
     (add-to-list 'meow-mode-state-list state)))
 
-;; MacOS 上防止进入 insert mode 覆盖要切换的中文状态
-;; (defun sis--respect-focus-in-handler ())
 ;; sis-global-respect-mode 使得 meow-reverse 无效
 (defun sis-meow-reverse ()
   "Just exchange point and mark.
