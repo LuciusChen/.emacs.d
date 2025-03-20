@@ -179,6 +179,7 @@ enum: %S"
                         :type "string"
                         :description "The search query string"))
     :category "web")
+
    (gptel-make-tool
     :function #'pmx--gptel-eval
     :name "elisp_eval"

@@ -211,6 +211,28 @@ its value will be updated. If the key is not present, the entry will be added."
           (setq alist (cons rep alist)))))
     (set alist-symbol alist)))
 
+(defun +org-emphasize-below-point (&optional char)
+  "Emphasize region with CHAR.
+
+If there's no region, marks the closest sexp first."
+  (interactive)
+  (unless (region-active-p)
+    (backward-sexp)
+    (mark-sexp))
+  (org-emphasize char))
+
+(defun +org-emphasize-bindings ()
+  (dolist (binding '(("s-i b" ?*)
+                     ("s-i i" ?/)
+                     ("s-i u" ?_)
+                     ("s-i v" ?=)
+                     ("s-i c" ?~)
+                     ("s-i s" ?+)))
+    (let ((key (car binding))
+          (char (cadr binding)))
+      (define-key org-mode-map (kbd key)
+                  `(lambda () (interactive) (+org-emphasize-below-point ,char))))))
+
 (provide 'lib-org)
 ;;;; provide
 ;;; lib-org.el ends here.
