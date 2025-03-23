@@ -4,14 +4,13 @@
 
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
-  (:global
-   "C-c L"     org-store-link
-   "C-c C-o"   org-open-at-point
-   "C-M-<up>"  org-up-element
-   ;; 一般这个函数都是在 org 启动后调用，如果 org 没有启动则会报错。
-   ;; Wrong type argument: commandp, dired-copy-images-links
-   "C-c n m"   dired-copy-images-links
-   "C-c b"     org-cite-insert)
+  (:global "C-c L"     org-store-link
+           "C-c C-o"   org-open-at-point
+           "C-M-<up>"  org-up-element
+           ;; 一般这个函数都是在 org 启动后调用，如果 org 没有启动则会报错。
+           ;; Wrong type argument: commandp, dired-copy-images-links
+           "C-c n m"   dired-copy-images-links
+           "C-c b"     org-cite-insert)
   (:when-loaded
     (:also-load lib-org)
     (:also-load image-slicing)
@@ -528,7 +527,7 @@
                "Beautify Org Checkbox Symbol"
                (push '("[ ]" . "☐") prettify-symbols-alist)
                (push '("[X]" . "☑" ) prettify-symbols-alist)
-               (push '("[-]" . "❍" ) prettify-symbols-alist)
+               (push '("[-]" . #("□–" 0 2 (composition ((2))))) prettify-symbols-alist)
                (prettify-symbols-mode))))
     (:option org-modern-star 'replace
              org-modern-replace-stars "❑❍❑❍❑❍"
@@ -548,18 +547,22 @@
       '((t (:foreground unspecified :inherit org-todo)))
       "Face for the text part of an unchecked org-mode checkbox.")
 
-    (font-lock-add-keywords
-     'org-mode
-     `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?: \\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)" 1 'org-checkbox-todo-text prepend))
-     'append)
-
     (defface org-checkbox-done-text
       '((t (:foreground unspecified :inherit org-done :strike-through t)))
       "Face for the text part of a checked org-mode checkbox.")
 
+    (defface org-checkbox-partial-text
+      '((t (:foreground unspecified :inherit org-todo)))
+      "Face for the text part of a partially checked org-mode checkbox.")
+
     (font-lock-add-keywords
      'org-mode
-     `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[\\(?:X\\|\\([0-9]+\\)/\\2\\)\\][^\n]*\n\\)" 1 'org-checkbox-done-text prepend))
+     `(("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[ \\][^\n]*\n\\)"
+        1 'org-checkbox-todo-text prepend)
+       ("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[X\\][^\n]*\n\\)"
+        1 'org-checkbox-done-text prepend)
+       ("^[ \t]*\\(?:[-+*]\\|[0-9]+[).]\\)[ \t]+\\(\\(?:\\[@\\(?:start:\\)?[0-9]+\\][ \t]*\\)?\\[-\\][^\n]*\n\\)"
+        1 'org-checkbox-partial-text prepend))
      'append)))
 
 (setup ox-hugo
