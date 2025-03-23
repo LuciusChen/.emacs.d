@@ -61,7 +61,7 @@ The files are located in the directory specified by `file-path-prefix`."
              (headlines (org-element-map tree 'headline 'identity))
              (buffer (find-buffer-visiting file)))
         (when (zerop (length headlines))
-          (push file deleted-files)
+          (push (file-name-nondirectory file) deleted-files)
           (delete-file file)
           (when buffer (kill-buffer buffer)))))
     (when deleted-files
