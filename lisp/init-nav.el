@@ -41,7 +41,9 @@
                ("e" "~/.emacs.d/" "Emacs")
                ("p" "~/IdeaProjects/" "Projects"))
              dirvish--debouncing-delay 2
+             dirvish-side-width 50
              dirvish-attributes '(file-time file-size collapse subtree-state vc-state)
+             dirvish-side-attributes '(vc-state collapse)
              delete-by-moving-to-trash t
              dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
              dirvish-mode-line-height 15
