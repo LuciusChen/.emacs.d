@@ -144,6 +144,7 @@
 (setup denote-journal
   (:load-after denote)
   (:when-loaded
+    (:also-load lib-weather)
     (:option denote-journal-directory (expand-file-name "daily" denote-directory)
              denote-journal-title-format 'day-date-month-year)
     (:after org-capture
@@ -376,88 +377,6 @@
       (:also-load org-habit)
       (let ((agenda-sorting-strategy (assoc 'agenda org-agenda-sorting-strategy)))
         (setcdr agenda-sorting-strategy (remove 'habit-down (cdr agenda-sorting-strategy)))))))
-
-(setup org-roam
-  (:load-after org)
-  (:when-loaded
-    (:global   "C-c n l"     org-roam-buffer-toggle
-               "C-c n f"     org-roam-node-find
-               "C-c n i"     org-roam-node-insert
-               "C-c n j"     org-roam-dailies-capture-today
-               "C-c n I"     org-roam-node-insert-immediate
-               "C-x <up>"    org-move-subtree-up
-               "C-x <down>"  org-move-subtree-down
-               "C-c r r"     +org-roam-rg-search)
-    (:option
-     org-roam-directory (file-truename *org-path*)
-     org-roam-database-connector 'sqlite-builtin
-     org-roam-db-location (concat *org-path* "/org.db")
-     org-roam-db-gc-threshold most-positive-fixnum
-     org-roam-completion-everywhere t
-     org-roam-capture-templates
-     '(
-       ;; #+OPTIONS: toc:nil 为了导出 .md 的格式更加符合使用
-       ("d" "default" plain
-        "# ------------------------------------------------------------------------------
-#+title: ${title}
-#+AUTHOR: Lucius Chen
-#+EMAIL: chenyh572@gmail.com
-#+STARTUP: content showstars indent inlineimages hideblocks
-#+OPTIONS: toc:nil
-# ------------------------------------------------------------------------------"
-        :if-new (file "main/%<%Y%m%d%H%M%S>-${slug}.org")
-        :unnarrowed t))
-     org-roam-dailies-capture-templates
-     ;; %<%H:%M> 为24小时制，%<%I:%M %p> 为12小时制
-     '(
-       ("d" "Default" entry "** %<%H:%M> %?"
-        :if-new (file+head+olp
-                 "%<%Y-%m-%d>.org"
-                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>")))
-       ("w" "Weather" entry "${fetch-weather-data}"
-        :if-new (file+head+olp
-                 "%<%Y-%m-%d>.org"
-                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>")))
-       ("e" "Diet" entry "*** %?"
-        :if-new (file+head+olp
-                 "%<%Y-%m-%d>.org"
-                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>" "Food Journal :food:")))
-       ("r" "Read" entry "*** %?"
-        :if-new (file+head+olp
-                 "%<%Y-%m-%d>.org"
-                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>" "What I read? :read:")))
-       ("t" "Tasks" entry "*** %?"
-        :if-new (file+head+olp
-                 "%<%Y-%m-%d>.org"
-                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>" "Tasks :task:")))
-       ("f" "Fleeting Notes" entry "*** %?"
-        :if-new (file+head+olp
-                 "%<%Y-%m-%d>.org"
-                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>" "Notes :note:")))
-       ("p" "Prod" entry "** %<%H:%M> %? :prod:"
-        :if-new (file+head+olp
-                 "%<%Y-%m-%d>.org"
-                 "#+title: %<%a, %d %b %Y>\n#+ARCHIVE: journal.org::\n"
-                 ("%<%a, %d %b %Y>"))))
-     org-src-fontify-natively t
-     ;; Hierachy for title nodes
-     org-roam-node-display-template
-     (concat "${type:10} ${doom-hierarchy:120} "
-             (propertize "${tags:*}" 'face 'org-tag)))
-    (:also-load lib-org-roam)
-    ;; 解决 org-roam-node-find 时，内容局限于 buffer 宽度。
-    (:advice org-roam-node-read--to-candidate :override +org-roam-node-read--to-candidate)
-    (org-roam-db-autosync-enable)
-    ;; (:with-hook org-after-todo-state-change-hook (:hook org-roam-copy-todo-to-today))
-    (:after embark
-      (:also-load lib-org-embark)
-      (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
 
 (setup bibtex
   (:load-after org)
