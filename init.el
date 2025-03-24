@@ -80,21 +80,21 @@
           (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
           "(provide 'org-version)\n")))
      :pin nil)
-    nov sis plz avy mpv cape ebib citar wgrep setup eglot-java nerd-icons
+    nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
     corfu vundo forge verb elfeed popper embark bibtex dimmer vertico
     diredfl separedit cdlatex pyvenv consult mmm-mode ox-hugo scratch
     diff-hl company goggles flymake web-mode js2-mode move-dup diminish
     doom-modeline git-link webpaste apheleia mastodon pdf-tools ox-pandoc
     macrostep json-mode orderless kind-icon git-modes git-blamed dape
-    org-modern ace-pinyin marginalia org-remark elfeed-tube org-roam-ui
-    rainbow-mode prettier-js projectile consult-dir dirvish swift-mode
+    org-modern ace-pinyin marginalia org-remark elfeed-tube citar-denote
+    denote-org denote-journal denote-markdown rainbow-mode prettier-js
     vterm vterm-toggle org-cliplink language-detection meow-tree-sitter
     markdown-mode mode-line-bell embark-consult speed-type go-translate
     elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
     browse-kill-ring rainbow-delimiters default-text-scale denote
     nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
     password-store-otp password-store eshell-syntax-highlighting
-    denote-org denote-journal denote-markdown citar-denote
+    projectile consult-dir dirvish swift-mode
     (image-slicing :host github :repo "ginqi7/image-slicing")
     (emt :host github :repo "roife/emt")
     (meow :host github :repo "meow-edit/meow")
@@ -102,7 +102,6 @@
     (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
     (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
     (treesit-auto :host github :repo "LuciusChen/treesit-auto")
-    (org-roam :host github :repo "org-roam/org-roam")
     (telega :host github :repo "LuciusChen/telega.el")
     (md :host github :repo "eki3z/md")
     ;; (telega :host github :repo "zevlg/telega.el")
