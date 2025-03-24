@@ -11,27 +11,6 @@ IGNORE is a placeholder for any arguments passed to this function."
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 
-;; Copy Done To-Dos to Today
-(defun org-roam-copy-todo-to-today ()
-  "Refile DONE or CANCELLED TODO items to today's org-roam daily file."
-  (interactive)
-  (when (and (or (equal org-state "DONE")
-                 (equal org-state "CANCELLED"))
-             (not (org-find-property "STYLE")))
-    (let ((org-refile-keep t) ;; Set this to nil to delete the original!
-          (org-after-refile-insert-hook #'save-buffer)
-          today-file
-          pos)
-      (save-window-excursion
-        (org-roam-dailies-capture-today t "t")
-        (setq today-file (buffer-file-name))
-        (setq pos (point)))
-
-      ;; Only refile if the target file is different than the current file
-      (unless (equal (file-truename today-file)
-                     (file-truename (buffer-file-name)))
-        (org-refile nil nil (list "Tasks" today-file nil pos))))))
-
 (defun find-today-journal-file (directory date-string)
   "Find today's journal file in DIRECTORY that matches DATE-STRING."
   (let ((regex (format "%s__journal\\.org$" (regexp-quote date-string))))
@@ -113,29 +92,53 @@ IGNORE is a placeholder for any arguments passed to this function."
        t)))
   (message "Saving org-agenda-files buffers... done"))
 
-(defun ebib-create-key (key _db)
-  "Return the KEY in DB for the Org mode note."
-  (format "%s" key))
+;; 导出特定文件夹下所有内容到 hugo
+(defun ox-hugo/export-all (&optional org-files-root-dir dont-recurse)
+  "Export all Org files (including nested) under ORG-FILES-ROOT-DIR.
 
-(defun ebib-create-id (_key _db)
-  "Create an ID for the Org mode note."
-  (org-id-new))
+  All valid post subtrees in all Org files are exported using
+  `org-hugo-export-wim-to-md'.
 
-(defun ebib-create-org-time-stamp (_key _db)
-  "Create timestamp for the Org mode note."
-  (format "%s" (with-temp-buffer (org-insert-time-stamp nil))))
+  If optional arg ORG-FILES-ROOT-DIR is nil, all Org files in
+  current buffer's directory are exported.
 
-;; 替换官方的 ebib-reading-list-todo-marker
-(defcustom ebib-reading-list-project-marker "PROJECT"
-  "Marker for reading list items that are still open."
-  :group 'ebib-reading-list
-  :type '(string :tag "Project marker"))
+  If optional arg DONT-RECURSE is nil, all Org files in
+  ORG-FILES-ROOT-DIR in all subdirectories are exported. Else, only
+  the Org files directly present in the current directory are
+  exported.  If this function is called interactively with
+  \\[universal-argument] prefix, DONT-RECURSE is set to non-nil.
 
-;; 获取 [%Y-%m-%d %a %H:%M] 格式的时间戳
-(defun ebib-create-org-stamp-inactive (_key _db)
-  "Create inactive timestamp for the Org mode note."
-  (let ((org-time-stamp-custom-formats org-time-stamp-custom-formats))
-    (format "%s" (with-temp-buffer (org-time-stamp-inactive nil)))))
+  Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
+  (interactive)
+  ;; (org-transclusion-mode 1)
+  (let* ((org-files-root-dir (or org-files-root-dir default-directory))
+         (dont-recurse (or dont-recurse (and current-prefix-arg t)))
+         (search-path (file-name-as-directory (expand-file-name org-files-root-dir)))
+         (org-files (if dont-recurse
+                        (directory-files search-path :full "\.org$")
+                      (directory-files-recursively search-path "\.org$")))
+         (num-files (length org-files))
+         (cnt 1))
+    (if (= 0 num-files)
+        (message (format "No Org files found in %s" search-path))
+      (progn
+        (message (format (if dont-recurse
+                             "[ox-hugo/export-all] Exporting %d files from %S .."
+                           "[ox-hugo/export-all] Exporting %d files recursively from %S ..")
+                         num-files search-path))
+        (dolist (org-file org-files)
+          (with-current-buffer (find-file-noselect org-file)
+            (message (format "[ox-hugo/export-all file %d/%d] Exporting %s" cnt num-files org-file))
+            (org-hugo-export-wim-to-md :all-subtrees)
+            (setq cnt (1+ cnt))))
+        ;; (org-transclusion-mode -1)
+        (message "Done!")))))
+
+(defun +org-refile-anywhere (&optional goto default-buffer rfloc msg)
+  "A version of `org-refile' which allows refiling to any subtree."
+  (interactive "P")
+  (let ((org-refile-target-verify-function))
+    (org-refile goto default-buffer rfloc msg)))
 
 (defun +org-latex-preview-reload ()
   "Clear the LaTeX preview cache and refresh LaTeX previews in the current buffer."
