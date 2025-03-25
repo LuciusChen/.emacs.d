@@ -165,7 +165,7 @@
                       ("jf" "Fleeting Notes" entry
                        (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
                        "* Notes :note:\n** %?\n")
-                      ("jt" "Tasks" entry
+                      ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
                        (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
                        "Tasks :task:\n")))
       ;; 拉起 org 的时候已经加载了 lib-org
