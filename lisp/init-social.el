@@ -69,23 +69,23 @@
      telega-symbol-forward (nerd-icons-octicon "nf-oct-cross_reference")
      telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
-     ;; palettes
+     ;; palettes 根据使用主题的配色去置换
      telega-builtin-palettes-alist '((light
-                                      ((:outline "#d32f2f") (:foreground "#c62828"))
-                                      ((:outline "#f57c00") (:foreground "#ef6c00"))
-                                      ((:outline "#8e24aa") (:foreground "#7b1fa2"))
-                                      ((:outline "#388e3c") (:foreground "#2e7d32"))
-                                      ((:outline "#0288d1") (:foreground "#0277bd"))
-                                      ((:outline "#1976d2") (:foreground "#1565c0"))
-                                      ((:outline "#d81b60") (:foreground "#c2185b")))
+                                      ((:outline "#b4637a") (:foreground "#b4637a"))
+                                      ((:outline "#ea9d34") (:foreground "#ea9d34"))
+                                      ((:outline "#907aa9") (:foreground "#907aa9"))
+                                      ((:outline "#568D68") (:foreground "#568D68"))
+                                      ((:outline "#286983") (:foreground "#286983"))
+                                      ((:outline "#56949f") (:foreground "#56949f"))
+                                      ((:outline "#d7827e") (:foreground "#d7827e")))
                                      (dark
-                                      ((:outline "#ef9a9a") (:foreground "#e57373"))
-                                      ((:outline "#ffe0b2") (:foreground "#ffcc80"))
-                                      ((:outline "#ce93d8") (:foreground "#ba68c8"))
-                                      ((:outline "#a5d6a7") (:foreground "#81c784"))
-                                      ((:outline "#b2ebf2") (:foreground "#80deea"))
-                                      ((:outline "#90caf9") (:foreground "#64b5f6"))
-                                      ((:outline "#f8bbd0") (:foreground "#f48fb1"))))
+                                      ((:outline "#eb6f92") (:foreground "#eb6f92"))
+                                      ((:outline "#f6c177") (:foreground "#f6c177"))
+                                      ((:outline "#b294bb") (:foreground "#b294bb"))
+                                      ((:outline "#95b1ac") (:foreground "#95b1ac"))
+                                      ((:outline "#81a2be") (:foreground "#81a2be"))
+                                      ((:outline "#9ccfd8") (:foreground "#9ccfd8"))
+                                      ((:outline "#ebbcba") (:foreground "#ebbcba"))))
 
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
