@@ -44,24 +44,21 @@
     (when (and (<= frame-alpha-lower-limit value) (>= 100 value))
       (modify-frame-parameters frame (list (cons 'alpha-background value))))))
 
-(defun light ()
-  "Activate a light color theme."
+(defun apply-theme (theme opacity)
+  "Apply THEME and set window OPACITY."
   (interactive)
   (when custom-enabled-themes
     (disable-theme (car custom-enabled-themes)))
-  (setq custom-enabled-themes (list light-theme))
+  (setq custom-enabled-themes (list theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (when window-system (set-opacity 100)))
+  (when window-system (set-opacity opacity)))
 
-(defun dark ()
-  "Activate a dark color theme."
-  (interactive)
-  (disable-theme (car custom-enabled-themes))
-  (setq custom-enabled-themes (list dark-theme))
-  (reapply-themes)
-  (set-dividers-and-fringe-color)
-  (when window-system (set-opacity 60)))
+(defun apply-theme-based-on-appearance (&rest _)
+  "Apply a theme based on the current macOS system appearance."
+  (if (eq ns-system-appearance 'light)
+      (apply-theme light-theme 100)
+    (apply-theme dark-theme 75)))
 
 (defun opacity-dark-theme (&rest frame)
   "Set the opacity of the FRAME to 60% if the background mode is dark.
