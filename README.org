@@ -1,6 +1,10 @@
 * .emacs.d
 [[file:assets/screenshot_1.jpg]]
 [[file:assets/screenshot_2.jpg]]
+** Emacs 编译
+使用脚本 =~/.emacs.d/sh/emacs_setup.sh= 安装，对于 =~/.emacs.d/patches/= 当中的 patch，如果和 emacs-plus 维护的 patch 同名，则覆盖并修改 =sha= 值，否则则是作为 =user_patch= 维护进 =emacs-plus@31.rb=。
+
+执行 =./emacs_setup.sh= 即可，增加参数 =mps= 则是安装 =feature/igc= 分支。
 ** 包管理工具
 *** [[https://git.sr.ht/~pkal/setup][setup]]
 特点就是简单可定制，其中需要注意的是 =:bind-into= 有一些问题，详见 [[https://git.sr.ht/~pkal/setup/commit/30c03935774e7c34cc4de87dcf1f88ea09c190a1][~pkal/setup: Deprecate passing a map to :bind-into - sourcehut git]]，要避免这个问题其实可以采用下面的写法。
@@ -25,6 +29,8 @@
 - [[https://github.com/jaaasonSun/homebrew-emacs-plus/blob/master/patches/emacs-29/blur.patch]]
 
 例如添加透明 patch，需要在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@30.rb= 中添加 =local_patch "ns-alpha-background", sha: "eae9abd14c2d00315806116e0eaba09510e98738b420d6e40a9d7d97d9437b81"= 并把 ns-alpha-background.patch 文件放在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-30=  下。
+**** Switch
+在 MacOS 下利用 =ns-system-appearance-change-functions= 跟随系统切换 light/dark theme，非 Macos 下默认 dark theme。手动切换 =M-:= 执行 =(apply-theme light-theme 100)= 即可，第二个参数为透明度。
 ** .authinfo
 这一块全部存入 pass 后开启 =auth-source-pass-enable= 自动读取，其中自建的 gitlab 的 =machine= 值必须是 =192.168.1.220:9081/api/v4= 格式，不能存入 pass。因此我换了名字存入 pass，写了函数自动读取写入 =.authinfo= 中，自动化这个配置过程。
 ** Reader

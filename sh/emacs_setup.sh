@@ -81,11 +81,19 @@ INSERTION_POINT="round-undecorated-frame"
 inject_patches() {
   local inserted=false
   local existing_user_patches=()
+  local existing_non_user_patches=()
 
   # Read all existing user-defined patches from the formula
   while read -r line; do
     if [[ $line =~ local_patch\ \"([^\"]+)\".*#\ user_patch ]]; then
       existing_user_patches+=("${BASH_REMATCH[1]}")
+    fi
+  done < <(grep "local_patch" "$FORMULA_PATH")
+
+  # Read all existing non-user-defined patches from the formula
+  while read -r line; do
+    if [[ $line =~ local_patch\ \"([^\"]+)\" ]] && [[ ! $line =~ \#\ user_patch ]]; then
+      existing_non_user_patches+=("${BASH_REMATCH[1]}")
     fi
   done < <(grep "local_patch" "$FORMULA_PATH")
 
@@ -106,7 +114,11 @@ inject_patches() {
     local sha
     sha=$(shasum -a 256 "$patch" | awk '{ print $1 }')
 
-    if ! grep -q "local_patch \"$patch_name\"" "$FORMULA_PATH"; then
+    if grep -q "local_patch \"$patch_name\"" "$FORMULA_PATH" && ! grep -q "local_patch \"$patch_name\".*# user_patch" "$FORMULA_PATH"; then
+      # Update SHA for non-user patches if they exist in user patches
+      sed -i '' "s|local_patch \"$patch_name\", sha: \".*\"|local_patch \"$patch_name\", sha: \"$sha\"|" "$FORMULA_PATH"
+      echo "Updated SHA for existing non-user patch $patch_name in the formula."
+    elif ! grep -q "local_patch \"$patch_name\"" "$FORMULA_PATH"; then
       sed -i '' "/$INSERTION_POINT/a\\
   local_patch \"$patch_name\", sha: \"$sha\" # user_patch
 " "$FORMULA_PATH"
