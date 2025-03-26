@@ -2,7 +2,7 @@
 [[file:assets/screenshot_1.jpg]]
 [[file:assets/screenshot_2.jpg]]
 ** Emacs 编译
-使用脚本 =~/.emacs.d/sh/emacs_setup.sh= 安装，对于 =~/.emacs.d/patches/= 当中的 patch，如果和 emacs-plus 维护的 patch 同名，则覆盖并修改 =sha= 值，否则则是作为 =user_patch= 维护进 =emacs-plus@31.rb=。
+使用脚本 [[./sh/emacs_setup.sh][emacs_setup.sh]] 安装，对于 [[./patches/][patches]] 当中的 patch，如果和 emacs-plus 维护的 patch 同名，则覆盖并修改 =sha= 值，否则则是作为 =user_patch= 维护进 =emacs-plus@31.rb=。
 
 执行 =./emacs_setup.sh= 即可，增加参数 =mps= 则是安装 =feature/igc= 分支。
 ** 包管理工具
@@ -107,7 +107,7 @@ npm install -g @volar/vue-language-server
 npm install -g typescript-language-server
 #+end_src
 ** Magit
-有时候会在 IDEA 中修改代码，然后切换到 Emacs 用 Magit 进行 git 操作, [[~/.emacs.d/sh/magit.sh][magit.sh]] 可以自动化这个过程。在 IDEA 当中如下配置，并可以为此绑定一个快捷键。
+有时候会在 IDEA 中修改代码，然后切换到 Emacs 用 Magit 进行 git 操作, [[./sh/magit.sh][magit.sh]] 可以自动化这个过程。在 IDEA 当中如下配置，并可以为此绑定一个快捷键。
 [[file:assets/idea-magit.jpg]]
 ** Social
 *** Telega
