@@ -1,6 +1,4 @@
 * .emacs.d
-[[file:assets/screenshot_1.jpg]]
-[[file:assets/screenshot_2.jpg]]
 ** Emacs 编译
 使用脚本 [[./sh/emacs_setup.sh][emacs_setup.sh]] 安装，对于 [[./patches/][patches]] 当中的 patch，如果和 emacs-plus 维护的 patch 同名，则覆盖并修改 =sha= 值，否则则是作为 =user_patch= 维护进 =emacs-plus@31.rb=。
 
