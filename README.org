@@ -105,7 +105,7 @@ npm install -g @volar/vue-language-server
 npm install -g typescript-language-server
 #+end_src
 ** Magit
-有时候会在 IDEA 中修改代码，然后切换到 Emacs 用 Magit 进行 git 操作, [[./sh/magit.sh][magit.sh]] 可以自动化这个过程。在 IDEA 当中如下配置，并可以为此绑定一个快捷键。
+有时候会在 IDEA 中修改代码，然后切换到 Emacs 用 Magit 进行 git 操作, [[./sh/magit.sh][magit.sh]] 可以自动化这个过程。在 IDEA 当中如下配置，并可以为此绑定一个快捷键。（宏参考 [[https://www.jetbrains.com/help/idea/built-in-macros.html][Built-in IDE macros | IntelliJ IDEA Documentation]]）
 [[file:assets/idea-magit.jpg]]
 ** Social
 *** Telega
