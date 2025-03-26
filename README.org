@@ -81,7 +81,7 @@ img.org-latex.org-latex-inline.medium-zoom-image {
 
 #+RESULTS:
 [[file:assets/lamport-clocks-algorithm.svg]]
-*** 输入法自动切换
+** 输入法自动切换
 +使用的是 [[https://github.com/laishulu/emacs-smart-input-source][laishulu/emacs-smart-input-source]] + [[https://github.com/laishulu/macism][laishulu/macism]]，但是会有一些问题，切换时会反复横跳，以及切换到英文输入法。需要将其中的 =select()= 方法的部分修改一下，我 fork 的版本在这 [[https://github.com/LuciusChen/macism][LuciusChen/macism]]，可以自行编译替换。+
 
 2024-10-19: [[https://github.com/laishulu/macism][laishulu/macism]] 已经合并 PR。
@@ -106,6 +106,9 @@ sudo npm install -g typescript
 npm install -g @volar/vue-language-server
 npm install -g typescript-language-server
 #+end_src
+** Magit
+有时候会在 IDEA 中修改代码，然后切换到 Emacs 用 Magit 进行 git 操作, [[~/.emacs.d/sh/magit.sh][magit.sh]] 可以自动化这个过程。在 IDEA 当中如下配置，并可以为此绑定一个快捷键。
+[[file:assets/idea-magit.jpg]]
 ** Social
 *** Telega
 针对 UI 做了一些修改
@@ -188,5 +191,5 @@ sudo cp -rf tgs2png /opt/local/bin
 高亮消息中的代码块
 *** mastodon
 因为 Twitter 被 Elon Musk 收购后不太喜欢，尝试转向 mastodon 平台，Emacs 当中也有相应的客户端：[[https://codeberg.org/martianh/mastodon.el][martianh/mastodon.el]]，相对 X 的以 follow 为中心，mastodon 更像是 tag 为中心去关注话题，因此不同的语言很多，非常需要翻译。这里的翻译也是通过 [[https://github.com/lorniu/go-translate][lorniu/go-translate]] 自定义了获取 toots 的 bounds 传入 =go-taker= 的 =:pick= 参数进行翻译，也补全了 profile 的翻译（原作者提供的 lingva.el 好像没有针对这个）。
-*** Rollback emacs-plus with Homebrew
+** Rollback emacs-plus with Homebrew
 =$ HOMEBREW_EMACS_PLUS_31_REVISION=6abea4d98d1d964c68a78cb9b5321071da851654 brew install emacs-plus@31 [OPTIONS]=
