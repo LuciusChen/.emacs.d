@@ -144,23 +144,7 @@ npm install -g typescript-language-server
 #+ATTR_ORG: :width 800
 [[file:assets/SCR-20240122-ppqy.png]]
 **** Building TDLib
-~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。
-
-#+begin_src shell
-xcode-select --install
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install gperf cmake openssl
-git clone https://github.com/tdlib/td.git
-cd td
-rm -rf build
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ -DCMAKE_INSTALL_PREFIX:PATH=/usr/local ..
-cmake --build . --target install
-cd ..
-cd ..
-ls -l /usr/local
-#+end_src
+~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。安装的命令现在写了个 [[./sh/tdlib.sh][tdlib.sh]] 方便编译安装。
 
 如果报错 ~"user-error: TDLib is not installed into "/usr/local". Set ‘telega-server-libs-prefix’ to the TDLib installion path"~​，则可以通过 ~M-: (setq telega-server-libs-prefix “/path/to/tdlib/install/path”) RET~ 然后 ~M-x telega-server-build RET~ 重新构建。
 **** Animated Stickers
