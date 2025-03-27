@@ -59,5 +59,37 @@
                                              :sface nil
                                              :rface '(:inherit font-lock-comment-face)))))
 
+(defun +mastodon-toot-at-url (&optional url)
+  "Return JSON toot object at URL.
+If URL is nil, return JSON toot object at point."
+  (if url
+      (let* ((search (format "%s/api/v2/search" mastodon-instance-url))
+             (params `(("q" . ,url)
+                       ("resolve" . "t"))) ; webfinger
+             (response (mastodon-http--get-json search params :silent)))
+        (car (alist-get 'statuses response)))
+    (mastodon-toot--base-toot-or-item-json)))
+
+(defun +mastodon-org-copy-toot-content (&optional url)
+  "Copy the current toot's content as Org Mode.
+Use pandoc to convert.
+
+When called with \\[universal-argument], prompt for a URL."
+  (interactive (list
+                (when current-prefix-arg
+                  (read-string "URL: "))))
+
+  (let ((toot (my-mastodon-toot-at-url url)))
+    (with-temp-buffer
+      (insert (alist-get 'content toot))
+      (call-process-region nil nil "pandoc" t t nil "-f" "html" "-t" "org")
+      (kill-new
+       (concat
+        (org-link-make-string
+         (alist-get 'url toot)
+         (concat "@" (alist-get 'acct (alist-get 'account toot))))
+        ":\n\n#+begin_quote\n"
+        (string-trim (buffer-string)) "\n#+end_quote\n"))
+      (message "Copied."))))
 (provide 'lib-mastodon)
 ;;; lib-mastodon.el ends here

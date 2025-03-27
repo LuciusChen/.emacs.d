@@ -2,6 +2,12 @@
 ;;; Commentary:
 ;;; Code:
 
+(defun +org-latex-preview-reload ()
+  "Clear the LaTeX preview cache and refresh LaTeX previews in the current buffer."
+  (interactive)
+  (call-interactively 'org-latex-preview-clear-cache)
+  (org-latex-preview 'buffer))
+
 (defun ebib-create-key (key _db)
   "Return the KEY in DB for the Org mode note."
   (format "%s" key))

@@ -201,4 +201,60 @@ if one already exists."
       (:also-load lib-org-embark)
       (add-to-list 'embark-keymap-alist '(org-roam-node . embark-org-roam-map)))))
 
+(setup org-latex-preview
+  (:load-after org)
+  (:when-loaded
+    (:option org-latex-preview-process-default 'dvisvgm
+             org-latex-preview-numbered t
+             org-latex-preview-live t
+             org-startup-with-latex-preview t
+             org-latex-preview-preamble
+             "\\documentclass{article}
+            [DEFAULT-PACKAGES]
+            [PACKAGES]
+            \\usepackage{xcolor}
+            \\usephysicsmodule{ab,ab.braket,diagmat,xmat}%
+            \\DeclareUnicodeCharacter{2212}{-}"
+             org-latex-packages-alist '(;; hook right arrow with text above and below
+                                        ;; https://tex.stackexchange.com/questions/186896/xhookrightarrow-and-xmapsto
+                                        ("" "svg" t)
+                                        ("" "svg-extract" t)
+
+                                        ("" "mathtools" t)
+                                        ("" "amsmath" t)
+                                        ("" "amssymb" t)
+                                        ;; for mapsfrom
+                                        ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
+                                        ("" "stmaryrd" t)
+                                        ("" "mathrsfs" t)
+                                        ("" "tikz" t)
+                                        ("" "tikz-cd" t)
+                                        ;; ("" "quiver" t)
+                                        ;; see https://castel.dev/post/lecture-notes-2/
+                                        ("" "import" t)
+                                        ("" "xifthen" t)
+                                        ("" "pdfpages" t)
+                                        ("" "transparent" t)
+                                        ;; algorithm
+                                        ;; https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused
+                                        ("ruled,linesnumbered" "algorithm2e" t)
+                                        ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
+                                        ;; ("" "algpseudocode" t)
+                                        ;; for chinese preview
+                                        ("fontset=LXGW WenKai,UTF8" "ctex" t)
+                                        ))
+    ;; Increase preview width
+    (plist-put org-latex-preview-appearance-options :page-width 0.8)
+    ;; disable org-latex-preview-auto-mode in gptel buffer
+    (defun my-org-latex-preview-auto-mode-setup ()
+      (if (string-match-p "ChatGPT" (buffer-name))
+          (org-latex-preview-auto-mode -1)
+        (org-latex-preview-auto-mode 1)))
+    ;; Turn on auto-mode, it's built into Org and much faster/more featured than
+    ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
+    (:hooks org-mode-hook my-org-latex-preview-auto-mode-setup
+            ;; Block C-n and C-p from opening up previews when using auto-mode
+            org-latex-preview-auto-ignored-commands next-line
+            org-latex-preview-auto-ignored-commands previous-line)))
+
 ;;; init.el ends here

@@ -114,6 +114,9 @@
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
     (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
+    ;; ignore lsp formatting provider, format with apheleia.
+    (add-to-list 'eglot-ignored-server-capabilities :documentFormattingProvider)
+    (add-to-list 'eglot-ignored-server-capabilities :documentRangeFormattingProvider)
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
 
 ;; 若提示 [eglot] (warning) Could not find required eclipse.jdt.ls files (build required?)
