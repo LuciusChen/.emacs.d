@@ -54,66 +54,40 @@
 
 ;; install packages
 (defvar *use-package-list*
-  '(
-    ;; https://github.com/tecosaur/org-latex-preview-todos
-    (org
-     :fork (:host nil
-                  :repo "https://git.tecosaur.net/tec/org-mode.git"
-                  :branch "dev"
-                  :remote "tecosaur")
-     :files (:defaults "etc")
-     :build t
-     :pre-build
-     (with-temp-file "org-version.el"
-       (require 'lisp-mnt)
-       (let ((version
-              (with-temp-buffer
-                (insert-file-contents "lisp/org.el")
-                (lm-header "version")))
-             (git-version
-              (string-trim
-               (with-temp-buffer
-                 (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
-                 (buffer-string)))))
-         (insert
-          (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
-          (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
-          "(provide 'org-version)\n")))
-     :pin nil)
-    nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
-    corfu vundo forge verb elfeed popper embark bibtex dimmer vertico
-    diredfl separedit cdlatex pyvenv consult mmm-mode ox-hugo scratch
-    diff-hl company goggles flymake web-mode js2-mode move-dup diminish
-    doom-modeline git-link webpaste apheleia mastodon pdf-tools ox-pandoc
-    macrostep json-mode orderless kind-icon git-modes git-blamed dape
-    org-modern ace-pinyin marginalia org-remark elfeed-tube citar-denote
-    denote-org denote-journal denote-markdown rainbow-mode prettier-js
-    vterm vterm-toggle org-cliplink language-detection meow-tree-sitter
-    markdown-mode mode-line-bell embark-consult speed-type go-translate
-    elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
-    browse-kill-ring rainbow-delimiters default-text-scale denote
-    nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
-    password-store-otp password-store eshell-syntax-highlighting
-    projectile consult-dir dirvish swift-mode
-    (image-slicing :host github :repo "ginqi7/image-slicing")
-    (emt :host github :repo "roife/emt")
-    (meow :host github :repo "meow-edit/meow")
-    (gptel :host github :repo "karthink/gptel")
-    (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
-    (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
-    (treesit-auto :host github :repo "LuciusChen/treesit-auto")
-    (telega :host github :repo "LuciusChen/telega.el")
-    (md :host github :repo "eki3z/md")
-    ;; (telega :host github :repo "zevlg/telega.el")
-    (yasnippet :host github :repo "joaotavora/yasnippet")
-    (dashboard :host github :repo "LuciusChen/dashboard")
-    (indent-bars :host github :repo "jdtsmith/indent-bars")
-    (consult-mu :host github :repo "armindarvish/consult-mu")
-    (eglot-booster :host github :repo "jdtsmith/eglot-booster")
-    (aider :host github :repo "tninja/aider.el" :files ("aider.el"))
-    ;; (beancount-mode :host github :repo "beancount/beancount-mode")
-    (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
-    (rose-pine :host github :repo "LuciusChen/rose-pine")))
+  '(nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
+        corfu vundo forge verb elfeed popper embark bibtex dimmer vertico
+        diredfl separedit cdlatex pyvenv consult mmm-mode ox-hugo scratch
+        diff-hl company goggles flymake web-mode js2-mode move-dup diminish
+        doom-modeline git-link webpaste apheleia mastodon pdf-tools ox-pandoc
+        macrostep json-mode orderless kind-icon git-modes git-blamed dape
+        org-modern ace-pinyin marginalia org-remark elfeed-tube citar-denote
+        denote-org denote-journal denote-markdown rainbow-mode prettier-js
+        vterm vterm-toggle org-cliplink language-detection meow-tree-sitter
+        markdown-mode mode-line-bell embark-consult speed-type go-translate
+        elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
+        browse-kill-ring rainbow-delimiters default-text-scale denote
+        nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
+        password-store-otp password-store eshell-syntax-highlighting
+        projectile consult-dir dirvish swift-mode
+        (image-slicing :host github :repo "ginqi7/image-slicing")
+        (emt :host github :repo "roife/emt")
+        (meow :host github :repo "meow-edit/meow")
+        (gptel :host github :repo "karthink/gptel")
+        (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
+        (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
+        (treesit-auto :host github :repo "LuciusChen/treesit-auto")
+        (telega :host github :repo "LuciusChen/telega.el")
+        (md :host github :repo "eki3z/md")
+        ;; (telega :host github :repo "zevlg/telega.el")
+        (yasnippet :host github :repo "joaotavora/yasnippet")
+        (dashboard :host github :repo "LuciusChen/dashboard")
+        (indent-bars :host github :repo "jdtsmith/indent-bars")
+        (consult-mu :host github :repo "armindarvish/consult-mu")
+        (eglot-booster :host github :repo "jdtsmith/eglot-booster")
+        (aider :host github :repo "tninja/aider.el" :files ("aider.el"))
+        ;; (beancount-mode :host github :repo "beancount/beancount-mode")
+        (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
+        (rose-pine :host github :repo "LuciusChen/rose-pine")))
 
 (dolist (e *use-package-list*) (straight-use-package e))
 (setq vc-follow-symlinks t)

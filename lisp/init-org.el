@@ -148,26 +148,27 @@
     (:option denote-journal-directory (expand-file-name "daily" denote-directory)
              denote-journal-title-format 'day-date-month-year)
     (:after org-capture
-      (update-alist 'org-capture-templates
-                    '(("j" "Journal")
-                      ("jw" "Weather" entry
-                       (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-                       "%(fetch-weather-data)\n")
-                      ("jd" "Default" entry
-                       (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-                       "%<%H:%M> %?\n")
-                      ("jp" "Prod" entry
-                       (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-                       "%<%H:%M> %? :prod:\n")
-                      ("jr" "Read" entry
-                       (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-                       "* What I read? :read:\n** %?\n")
-                      ("jf" "Fleeting Notes" entry
-                       (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-                       "* Notes :note:\n** %?\n")
-                      ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
-                       (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-                       "Tasks :task:\n")))
+      (update-alist
+       'org-capture-templates
+       '(("j" "Journal")
+         ("jw" "Weather" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          "%(fetch-weather-data)\n")
+         ("jd" "Default" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          "%<%H:%M> %?\n")
+         ("jp" "Prod" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          "%<%H:%M> %? :prod:\n")
+         ("jr" "Read" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          "* What I read? :read:\n** %?\n")
+         ("jf" "Fleeting Notes" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          "* Notes :note:\n** %?\n")
+         ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          "Tasks :task:\n")))
       ;; 拉起 org 的时候已经加载了 lib-org
       (:with-hook org-after-todo-state-change-hook (:hook org-copy-todo-to-today)))))
 
@@ -194,66 +195,68 @@
 (setup ox-latex
   (:load-after org)
   (:when-loaded
-    (:option org-latex-listings 'minted
-             org-latex-pdf-process '("latexmk -xelatex -quiet -shell-escape -f -output-directory=%o %f")
-             org-preview-latex-default-process 'dvisvgm)
-    (add-to-list 'org-latex-packages-alist '("cache=false" "minted" t))))
+    (:option
+     org-latex-pdf-process '("latexmk -f -xelatex -shell-escape -output-directory=%o %F")
+     org-preview-latex-default-process 'dvisvgm
+     org-preview-latex-process-alist
+     '((dvisvgm :programs
+                ("xelatex" "dvisvgm")
+                :description "xdv > svg"
+                :message "you need to install the programs: xelatex and dvisvgm."
+                :use-xcolor t
+                :image-input-type "xdv"
+                :image-output-type "svg"
+                :image-size-adjust (1.7 . 1.5)
+                :latex-compiler
+                ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
+                :image-converter
+                ("dvisvgm %f -e -n -b min -c %S -o %O"))
+       (imagemagick :programs
+                    ("xelatex" "convert")
+                    :description "pdf > png"
+                    :message "you need to install the programs: xelatex and imagemagick."
+                    :use-xcolor t
+                    :image-input-type "pdf"
+                    :image-output-type "png"
+                    :image-size-adjust (1.0 . 1.0)
+                    :latex-compiler
+                    ("xelatex -interaction nonstopmode -output-directory %o %f")
+                    :image-converter
+                    ("convert -density %D -trim -antialias %f -quality 100 %O")))
+     org-format-latex-options '(:foreground default :background "Transparent" :scale 1.5 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+                                            ("begin" "$1" "$" "$$" "\\(" "\\["))
+     org-latex-listings 'minted
+     org-latex-minted-options '(("breaklines")
+                                ("bgcolor" "bg"))
+     org-latex-compiler "xelatex"
+     org-latex-packages-alist
+     '(;; hook right arrow with text above and below
+       ;; https://tex.stackexchange.com/questions/186896/xhookrightarrow-and-xmapsto
+       ("" "svg" t)
+       ("" "svg-extract" t)
 
-(setup org-latex-preview
-  (:load-after org)
-  (:when-loaded
-    (:option org-latex-preview-process-default 'dvisvgm
-             org-latex-preview-numbered t
-             org-latex-preview-live t
-             org-startup-with-latex-preview t
-             org-latex-preview-preamble
-             "\\documentclass{article}
-            [DEFAULT-PACKAGES]
-            [PACKAGES]
-            \\usepackage{xcolor}
-            \\usephysicsmodule{ab,ab.braket,diagmat,xmat}%
-            \\DeclareUnicodeCharacter{2212}{-}"
-             org-latex-packages-alist '(;; hook right arrow with text above and below
-                                        ;; https://tex.stackexchange.com/questions/186896/xhookrightarrow-and-xmapsto
-                                        ("" "svg" t)
-                                        ("" "svg-extract" t)
-
-                                        ("" "mathtools" t)
-                                        ("" "amsmath" t)
-                                        ("" "amssymb" t)
-                                        ;; for mapsfrom
-                                        ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
-                                        ("" "stmaryrd" t)
-                                        ("" "mathrsfs" t)
-                                        ("" "tikz" t)
-                                        ("" "tikz-cd" t)
-                                        ;; ("" "quiver" t)
-                                        ;; see https://castel.dev/post/lecture-notes-2/
-                                        ("" "import" t)
-                                        ("" "xifthen" t)
-                                        ("" "pdfpages" t)
-                                        ("" "transparent" t)
-                                        ;; algorithm
-                                        ;; https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused
-                                        ("ruled,linesnumbered" "algorithm2e" t)
-                                        ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
-                                        ;; ("" "algpseudocode" t)
-                                        ;; for chinese preview
-                                        ("fontset=LXGW WenKai,UTF8" "ctex" t)
-                                        ))
-    ;; Increase preview width
-    (plist-put org-latex-preview-appearance-options :page-width 0.8)
-    ;; disable org-latex-preview-auto-mode in gptel buffer
-    (defun my-org-latex-preview-auto-mode-setup ()
-      (if (string-match-p "ChatGPT" (buffer-name))
-          (org-latex-preview-auto-mode -1)
-        (org-latex-preview-auto-mode 1)))
-    ;; Turn on auto-mode, it's built into Org and much faster/more featured than
-    ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
-    (:hooks org-mode-hook my-org-latex-preview-auto-mode-setup
-            ;; Block C-n and C-p from opening up previews when using auto-mode
-            org-latex-preview-auto-ignored-commands next-line
-            org-latex-preview-auto-ignored-commands previous-line)))
+       ("" "mathtools" t)
+       ("" "amsmath" t)
+       ("" "amssymb" t)
+       ;; for mapsfrom
+       ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
+       ("" "stmaryrd" t)
+       ("" "mathrsfs" t)
+       ("" "tikz" t)
+       ("" "tikz-cd" t)
+       ;; ("" "quiver" t)
+       ;; see https://castel.dev/post/lecture-notes-2/
+       ("" "import" t)
+       ("" "xifthen" t)
+       ("" "pdfpages" t)
+       ("" "transparent" t)
+       ;; algorithm
+       ;; https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused
+       ("ruled,linesnumbered" "algorithm2e" t)
+       ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
+       ;; ("" "algpseudocode" t)
+       ;; for chinese preview
+       ("fontset=LXGW WenKai,UTF8" "ctex" t)))))
 
 (setup org-agenda
   (:global "C-c a" org-agenda)

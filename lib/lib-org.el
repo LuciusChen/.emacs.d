@@ -140,12 +140,6 @@ IGNORE is a placeholder for any arguments passed to this function."
   (let ((org-refile-target-verify-function))
     (org-refile goto default-buffer rfloc msg)))
 
-(defun +org-latex-preview-reload ()
-  "Clear the LaTeX preview cache and refresh LaTeX previews in the current buffer."
-  (interactive)
-  (call-interactively 'org-latex-preview-clear-cache)
-  (org-latex-preview 'buffer))
-
 (defun +eww-to-org (&optional dest)
   "Render the current eww buffer using org markup.
 If DEST, a buffer, is provided, insert the markup there."

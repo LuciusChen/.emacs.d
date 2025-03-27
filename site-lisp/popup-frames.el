@@ -66,7 +66,7 @@ the command is executed.  Otherwise, the frame will remain open."
   (add-hook 'org-capture-after-finalize-hook #'popup-frame-delete))
 
 (when (require 'org-roam nil 'noerror)
-  (popup-frame-define org-roam-dailies-capture-today "capture-popup"))
+  (popup-frame-define org-capture "capture-popup"))
 
 (when (require 'password-store nil 'noerror)
   (popup-frame-define password-store-copy "minimal-popup" 'delete-frame))
@@ -94,7 +94,7 @@ only the translated content."
     "Save a bookmark from clipboard to a selected Org heading in a specified Org file.
 The title is extracted from the page at the URL in the clipboard."
     (interactive)
-    (let ((org-file (concat *org-path* "/main/20220506185941-Pinboard.org"))  ;; Replace with your file path
+    (let ((org-file (concat *org-path* "/denote/20250326T180517--pinboard__collection.org"))  ;; Replace with your file path
           (url (current-kill 0))  ;; Get the URL from the clipboard
           (title nil))  ;; Initialize title
       (org-cliplink-retrieve-title
