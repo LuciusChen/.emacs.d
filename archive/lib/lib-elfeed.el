@@ -20,5 +20,12 @@
      :props '(:immediate-finish nil)
      :templates templates)))
 
+(cl-defun +menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+  "Create an `org-roam-node' from elfeed ENTRY."
+  (interactive)
+  (let ((url (elfeed-entry-link entry))
+        (title (elfeed-entry-title entry)))
+    (+org-roam-capture-ref :url url :title title)))
+
 (provide 'lib-elfeed)
 ;;; lib-elfeed.el ends here
