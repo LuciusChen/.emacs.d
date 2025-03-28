@@ -206,7 +206,7 @@
                 :use-xcolor t
                 :image-input-type "xdv"
                 :image-output-type "svg"
-                :image-size-adjust (1.7 . 1.5)
+                :image-size-adjust (1.5 . 1.2)
                 :latex-compiler
                 ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
                 :image-converter

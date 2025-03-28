@@ -65,9 +65,6 @@ the command is executed.  Otherwise, the frame will remain open."
   (popup-frame-define org-capture "capture-popup")
   (add-hook 'org-capture-after-finalize-hook #'popup-frame-delete))
 
-(when (require 'org-roam nil 'noerror)
-  (popup-frame-define org-capture "capture-popup"))
-
 (when (require 'password-store nil 'noerror)
   (popup-frame-define password-store-copy "minimal-popup" 'delete-frame))
 

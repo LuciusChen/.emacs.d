@@ -44,18 +44,17 @@
       (add-to-list 'default-frame-alist border)
       (add-to-list 'initial-frame-alist border))))
 
-(setup dashboard
-  (:option dashboard-latitude 32.09703
-           dashboard-longitude 118.77969
-           dashboard-path-max-length 75
-           dashboard-use-fahrenheit nil
-           dashboard-min-left-padding 10
-           dashboard-image-file "~/.emacs.d/assets/bitmap.png"
-           dashboard-image-width 400
-           dashboard-image-height 169
-           dashboard-title "Happy hacking, lucius - Emacs ♥ you")
-  (:face dashboard-title-face ((t (:inherit font-lock-constant-face :height 1.5 :italic t :family "Departure Mono"))))
-  (dashboard-create-hook))
+(setup panel
+  (:option panel-latitude 32.09703
+           panel-longitude 118.77969
+           panel-path-max-length 35
+           panel-min-left-padding 10
+           panel-image-file "~/.emacs.d/assets/bitmap.png"
+           panel-image-width 400
+           panel-image-height 169
+           panel-title "Happy hacking, lucius - Emacs ♥ you")
+  (:face panel-title-face ((t (:inherit font-lock-constant-face :height 1.5 :italic t :family "Departure Mono"))))
+  (panel-create-hook))
 
 (setup custom
   (:when-loaded

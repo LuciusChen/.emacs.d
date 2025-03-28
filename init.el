@@ -80,7 +80,7 @@
         (md :host github :repo "eki3z/md")
         ;; (telega :host github :repo "zevlg/telega.el")
         (yasnippet :host github :repo "joaotavora/yasnippet")
-        (dashboard :host github :repo "LuciusChen/dashboard")
+        (panel :host github :repo "LuciusChen/panel")
         (indent-bars :host github :repo "jdtsmith/indent-bars")
         (consult-mu :host github :repo "armindarvish/consult-mu")
         (eglot-booster :host github :repo "jdtsmith/eglot-booster")
