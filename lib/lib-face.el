@@ -2,16 +2,20 @@
 ;;; Commentary:
 ;;; Code:
 
+(defun set-face-like-default (face)
+  "Set FACE attributes to match the default face."
+  (set-face-attribute face nil
+                      :family (face-attribute 'default :family)
+                      :height (face-attribute 'default :height)
+                      :weight (face-attribute 'default :weight)
+                      :slant (face-attribute 'default :slant)))
+
 (defun +setup-fonts ()
   "Setup fonts."
   ;; Setting the default
   (set-face-attribute 'default nil :font *default-font* :weight 'normal)
-
-  (set-face-attribute 'fixed-pitch-serif nil
-                      :family (face-attribute 'default :family)
-                      :height (face-attribute 'default :height)
-                      :weight (face-attribute 'default :weight)
-                      :slant (face-attribute 'default :slant))
+  (set-face-like-default 'fixed-pitch-serif)
+  (set-face-like-default 'variable-pitch)
 
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
