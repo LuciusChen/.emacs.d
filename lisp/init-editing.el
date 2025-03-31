@@ -80,12 +80,12 @@
                                     (?l  . line)
                                     (?b  . buffer)
                                     (?p  . paragraph)))
+  (meow-normal-define-key (cons "\\" wrap-keymap))
   (:hooks meow-insert-mode-hook
           (lambda ()
             (if meow-insert-mode
                 (run-hooks 'meow-entering-insert-mode-hook)
-              (run-hooks 'meow-leaving-insert-mode-hook))))
-  (meow-normal-define-key (cons "\\" wrap-keymap)))
+              (run-hooks 'meow-leaving-insert-mode-hook)))))
 
 (setup meow-tree-sitter
   (:defer (:require meow-tree-sitter))
