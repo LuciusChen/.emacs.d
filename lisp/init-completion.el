@@ -4,16 +4,14 @@
 (setup orderless
   (:defer (:require orderless))
   (:when-loaded
-    (:also-load lib-orderless)
     (:option completion-styles '(orderless flex)
              completion-category-defaults nil
              completion-ignore-case t
              ;; https://github.com/minad/corfu/issues/136
              ;; eglot 会更改 completion-category-defaults 这个变量。
              ;; 需要通过修改 completion-category-overrides 改为 orderless
-             completion-category-overrides '((file (styles +vertico-basic-remote orderless+basic))
+             completion-category-overrides '((file (styles partial-completion basic))
                                              (eglot (styles . (orderless flex))))
-             orderless-style-dispatchers '(+vertico-orderless-dispatch)
              orderless-component-separator "[ &]")
     ;; pinyinlib.el 用于匹配简体/繁体汉字拼音首字母
     (add-to-list 'orderless-matching-styles
@@ -21,13 +19,14 @@
                    (orderless-regexp
                     (pinyinlib-build-regexp-string str))))
 
-    ;; Remote file completion
-    (add-to-list
-     'completion-styles-alist
-     '(+vertico-basic-remote
-       +vertico-basic-remote-try-completion
-       +vertico-basic-remote-all-completions
-       "Use basic completion on remote files only"))
+    ;; https://github.com/oantolin/orderless/issues/111#issuecomment-1098763842
+    (defun orderless+basic-all (str table pred point)
+      (or (orderless-all-completions str table pred point)
+          (completion-basic-all-completions str table pred point)))
+
+    (defun orderless+basic-try (str table pred point)
+      (or (completion-basic-try-completion str table pred point)
+          (orderless-try-completion str table pred point)))
 
     (add-to-list 'completion-styles-alist
                  '(orderless+basic
