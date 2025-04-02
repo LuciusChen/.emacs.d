@@ -95,10 +95,12 @@
   (:defer (:require sis))
   (:when-loaded
     (:option sis-english-source "com.apple.keylayout.ABC"
+             ;; 用了 emacs-mac 提取的 patch 中的 mac-input-source 方法来切换
              ;; sis-external-ism "macism"
              sis-inline-tighten-head-rule nil
              sis-default-cursor-color "#cf7fa7"
-             sis-other-cursor-color "orange")
+             sis-other-cursor-color "orange"
+             sis-context-hooks '(meow-insert-enter-hook))
     (:hooks meow-insert-exit-hook sis-set-english)
     (if *IS-MAC*
         (sis-ism-lazyman-config
@@ -113,7 +115,6 @@
     (sis-global-context-mode t)
     ;; enable the /inline english/ mode for all buffers
     ;; (sis-global-inline-mode t)
-    (add-to-list 'sis-context-hooks 'meow-insert-enter-hook)
     ;; org title 处切换 Rime，telega 聊天时切换 Rime。
     ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。
     (add-to-list 'sis-context-detectors
