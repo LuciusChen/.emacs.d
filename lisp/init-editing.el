@@ -126,12 +126,20 @@
                                   (string-match-p "*new toot*" (buffer-name))))
                      'other)))
 
-    (defun +meow-focus-change-function ()
-      (if (frame-focus-state)
-          (sis-set-english)
-        (meow-insert-exit)))
+    (add-function :after after-focus-change-function
+                  (lambda ()
+                    (if (frame-focus-state)
+                        (sis-set-english)
+                      (meow-insert-exit))))
 
-    (add-function :after after-focus-change-function '+meow-focus-change-function)))
+    (define-advice sis--auto-refresh-timer-function
+        (:around (orig) toggle-override-map)
+      (funcall orig)
+      (pcase sis--current
+        ('english
+         (setq sis--prefix-override-map-enable nil))
+        ('other
+         (setq sis--prefix-override-map-enable t))))))
 
 (setup auto-space
   (:defer (:require auto-space))
