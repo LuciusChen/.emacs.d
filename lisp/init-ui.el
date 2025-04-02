@@ -69,14 +69,16 @@
              light-theme 'rose-pine-day
              dark-theme 'rose-pine-night)
 
-    (when *IS-MAC* (apply-theme-based-on-appearance))
+    (when *IS-MAC*
+      (apply-theme-based-on-appearance)
+      (:with-hook ns-system-appearance-change-functions
+        (:hook apply-theme-based-on-appearance)))
 
     (:with-hook window-setup-hook
       (:hook reapply-themes)
       (:hook opacity-dark-theme)
       (:hook set-dividers-and-fringe-color))
-    (:with-hook ns-system-appearance-change-functions
-      (:hook apply-theme-based-on-appearance))
+
     (:with-hook after-make-frame-functions (:hook opacity-dark-theme))
     (:with-hook after-init-hook (:hook reapply-themes))))
 
