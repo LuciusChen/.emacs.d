@@ -102,7 +102,7 @@
              sis-other-cursor-color "orange"
              sis-context-hooks '(meow-insert-enter-hook))
     (:hooks meow-insert-exit-hook sis-set-english)
-    (if *IS-MAC*
+    (if *is-mac*
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
          "im.rime.inputmethod.Squirrel.Hans")

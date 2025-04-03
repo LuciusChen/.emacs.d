@@ -8,8 +8,8 @@
 (setq warning-minimum-level :emergency)
 
 (defconst *spell-check-support-enabled* nil ) ;; Enable with t if you prefer
-(defconst *IS-MAC* (eq system-type 'darwin))
-(defconst *IS-LINUX* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst *is-mac* (eq system-type 'darwin))
+(defconst *is-linux* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
 (defconst *org-path* "~/Library/CloudStorage/Dropbox/org")
 (defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst *emoji-fonts* '("Apple Color Emoji"
@@ -54,7 +54,7 @@
 ;; load module settings
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (require 'init-setup)
-(when *IS-MAC* (require 'init-mac))
+(when *is-mac* (require 'init-mac))
 ;; ==== put your code below this line! ====
 ;; emacs -Q -l ~/.emacs.d/init-minimum.el
 ;;; init-minimum.el ends here

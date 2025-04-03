@@ -21,7 +21,7 @@
        "d" telega-chat-remove-member
        "h" telega-notifications-history
        "x" telega-chatbuf-thread-cancel))
-    (if *IS-MAC*
+    (if *is-mac*
         (:with-map telega-msg-button-map
           (:bind
            "C" +telega-save-file-to-clipboard
@@ -145,7 +145,7 @@
     (global-telega-mnz-mode 1)
 
     ;; Linux settings
-    (when *IS-LINUX*
+    (when *is-linux*
       (setq telega-root-show-avatars nil)
       (setq telega-user-show-avatars nil)
       (setq telega-chat-show-avatars nil)
@@ -155,7 +155,7 @@
                                            :type (:@type "proxyTypeSocks5"
                                                          :username "" :password "")))))
     ;; Opening files using external programs
-    (if *IS-MAC*
+    (if *is-mac*
         (progn
           (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
           (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open)))))

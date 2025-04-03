@@ -69,7 +69,7 @@
              light-theme 'rose-pine-day
              dark-theme 'rose-pine-night)
 
-    (when *IS-MAC*
+    (when *is-mac*
       (apply-theme-based-on-appearance)
       (:with-hook ns-system-appearance-change-functions
         (:hook apply-theme-based-on-appearance)))

@@ -18,8 +18,8 @@
   (message "Your Emacs is old, and some functionality in this config will be disabled. Please upgrade if possible."))
 ;; Enable with t if you prefer
 (defconst *spell-check-support-enabled* nil )
-(defconst *IS-MAC* (eq system-type 'darwin))
-(defconst *IS-LINUX* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst *is-mac* (eq system-type 'darwin))
+(defconst *is-linux* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
 (defconst *org-path* "~/Library/CloudStorage/Dropbox/org")
 (defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst *emoji-fonts* '("Apple Color Emoji"
@@ -74,7 +74,6 @@
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
         (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
-        (uniline :host github :repo "LuciusChen/uniline" :branch "lucius")
         (treesit-auto :host github :repo "LuciusChen/treesit-auto")
         (telega :host github :repo "LuciusChen/telega.el")
         (md :host github :repo "eki3z/md")
@@ -97,7 +96,7 @@
 
 (require 'init-setup)
 (require 'init-auth)
-(when *IS-MAC* (require 'init-mac))
+(when *is-mac* (require 'init-mac))
 (require 'init-ui)
 
 (require 'init-editing)
