@@ -243,7 +243,5 @@
   (:defer (:require webpaste)
           (:option webpaste-provider-priority '("paste.rs" "dpaste.org"))))
 
-(setup uniline (:defer (:require uniline)))
-
 (provide 'init-prog)
 ;;; init-prog.el ends here
