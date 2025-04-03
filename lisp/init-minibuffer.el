@@ -111,9 +111,16 @@
   (:defer (:require embark))
   (:when-loaded
     (:also-load embark-consult)
+
+    (defun +embark-open-in-finder (file)
+      "Open FILE in macOS Finder."
+      (interactive "fFile: ")
+      (shell-command (format "open -R %s" (shell-quote-argument (expand-file-name file)))))
+
     (:global "C-c ." embark-act
              "M-n"   embark-next-symbol
              "M-p"   embark-previous-symbol)
+    (:with-map embark-file-map (:bind "o" +embark-open-in-finder))
     (:option embark-indicators '(embark-minimal-indicator
                                  embark-highlight-indicator
                                  embark-isearch-highlight-indicator)
