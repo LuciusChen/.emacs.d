@@ -114,11 +114,6 @@ npm install -g typescript-language-server
 针对 UI 做了一些修改
 [[https://github.com/LuciusChen/telega.el][GitHub - LuciusChen/telega.el: GNU Emacs telegram client (unofficial)]]
 
-- +修改了 msg-heading 的背景，只保留用户名所在行的背景+​（移到👆🏻上面 forkd 的主题中去了），只保留用户名长度的背景。
-- +修改了按钮的样式+ （移到👆🏻上面 forkd 的主题中去了）
-- +回复样式修改字体颜色为绿色且 =| In reply to:= 变为 | ➦:+ （已在 commit 93fedce 实现）
-- +回复行中用户名过长，则省略以显示更多的「被回复」内容。+
-- +转发样式修改字体颜色为黄色且 ~| Forward from:~ 变为 | ➥:+ （已在 commit 93fedce 实现）
 - 去除关于 bot 命令补全的断言。原本只能在与 bot 的私聊中使用 ~/~ 进行补全，修改后可以在群聊中使用 ~/~ 进行补全（作者原话指出这样会 controversial and even dangerous）。
 - 修改 Specific Quote 以及正文中包含的 Quote 的样式，用 ~❝~ 标识，并在每行前插入空格对齐。
 - 修改 reactions 图标为字符而非 emoji 以及其颜色
@@ -126,25 +121,9 @@ npm install -g typescript-language-server
 - 去除 ~telega-root~ 顶部空行
 - 修改 code blocks 样式，替换 codeblock 符号为 nerd-icons 对应语言的 icons，没有则显示 codeblock 符号。codeblock 头部增加背景填充整行，最后一行代码也填充整行。
 - 重新排布了 edited-date、消息查看数量、回复数量、转发数量的位置，兼容 =telega-ins--message-date-and-status= 为 =non-nil= 的情况。并且对于消息同一个人发的尽量合并到一个 header 下。
-- +由于上一条的改动，多条消息都会在一个 header 下，因此在 no-header 的消息上方增加了 25% 行高的行距。+
 - 以上 nerd-icons 修改在终端同样有效
 - 去掉 notification 的 dbus 依赖，改为数量显示在 tab-bar 当中，同时被查看过的会从 =telega-notifications-history= 中删除。
 
-#+CAPTION: telega_collection
-#+ATTR_ORG: :width 600
-[[file:assets/telega-collection.png]]
-
-#+CAPTION: telega_reply_username
-#+ATTR_ORG: :width 600
-[[file:assets/telega_reply_username.png]]
-
-#+CAPTION: SCR-20240123-napd
-#+ATTR_ORG: :width 800
-[[file:assets/SCR-20240125-oqao.png]]
-
-#+CAPTION: SCR-20240122-ppqy
-#+ATTR_ORG: :width 800
-[[file:assets/SCR-20240122-ppqy.png]]
 **** Building TDLib
 ~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。安装的命令现在写了个 [[./sh/tdlib.sh][tdlib.sh]] 方便编译安装。
 
@@ -175,5 +154,3 @@ sudo cp -rf tgs2png /opt/local/bin
 高亮消息中的代码块
 *** mastodon
 因为 Twitter 被 Elon Musk 收购后不太喜欢，尝试转向 mastodon 平台，Emacs 当中也有相应的客户端：[[https://codeberg.org/martianh/mastodon.el][martianh/mastodon.el]]，相对 X 的以 follow 为中心，mastodon 更像是 tag 为中心去关注话题，因此不同的语言很多，非常需要翻译。这里的翻译也是通过 [[https://github.com/lorniu/go-translate][lorniu/go-translate]] 自定义了获取 toots 的 bounds 传入 =go-taker= 的 =:pick= 参数进行翻译，也补全了 profile 的翻译（原作者提供的 lingva.el 好像没有针对这个）。
-** Rollback emacs-plus with Homebrew
-=$ HOMEBREW_EMACS_PLUS_31_REVISION=6abea4d98d1d964c68a78cb9b5321071da851654 brew install emacs-plus@31 [OPTIONS]=
