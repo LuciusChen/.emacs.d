@@ -77,7 +77,7 @@ Use a negative argument to create a backward selection."
    '("1" . meow-expand-1)
    '("-" . negative-argument)
    '("/" . find-file)
-   (if *IS-MAC*
+   (if *is-mac*
        '(";" . sis-meow-reverse)
      '(";" . meow-reverse))
    '("," . meow-inner-of-thing)
@@ -120,7 +120,7 @@ Use a negative argument to create a backward selection."
    '("u" . meow-undo)
    '("U" . vundo)
    '("V" . meow-visit)
-   (if *IS-MAC*
+   (if *is-mac*
        '("w" . meow-mark-word-or-chinese)
      '("w" . meow-mark-word))
    '("W" . meow-mark-symbol)

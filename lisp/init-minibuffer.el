@@ -120,7 +120,7 @@
     (:global "C-c ." embark-act
              "M-n"   embark-next-symbol
              "M-p"   embark-previous-symbol)
-    (:with-map embark-file-map (when *IS-MAC* (:bind "o" +embark-open-in-finder)))
+    (:with-map embark-file-map (when *is-mac* (:bind "o" +embark-open-in-finder)))
     (:option embark-indicators '(embark-minimal-indicator
                                  embark-highlight-indicator
                                  embark-isearch-highlight-indicator)
