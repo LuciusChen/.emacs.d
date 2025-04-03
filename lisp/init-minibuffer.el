@@ -115,12 +115,12 @@
     (defun +embark-open-in-finder (file)
       "Open FILE in macOS Finder."
       (interactive "fFile: ")
-      (shell-command (format "open -R %s" (shell-quote-argument (expand-file-name file)))))
+      (shell-command (format "open -R %s && osascript -e 'tell application \"Finder\" to activate'" (shell-quote-argument (expand-file-name file)))))
 
     (:global "C-c ." embark-act
              "M-n"   embark-next-symbol
              "M-p"   embark-previous-symbol)
-    (:with-map embark-file-map (:bind "o" +embark-open-in-finder))
+    (:with-map embark-file-map (when *IS-MAC* (:bind "o" +embark-open-in-finder)))
     (:option embark-indicators '(embark-minimal-indicator
                                  embark-highlight-indicator
                                  embark-isearch-highlight-indicator)
