@@ -41,12 +41,12 @@
   "Open FILE."
   (find-file file))
 
-(defvar thanos/aliases
+(defvar +aliases
   '((ll . "ls -lah")
     (bupg . "brew upgrade")
     (clear . clear-scrollback)))
 
-(defun thanos/set-eshell-aliases (aliases)
+(defun +set-eshell-aliases (aliases)
   "Set ALIASES as eshell aliases."
   ;; Remove aliases file
   (when (and eshell-aliases-file
@@ -92,7 +92,7 @@ Stole from aweshell"
       (rename-buffer (format "*eshell %s*" current-dir-name) t))))
 
 ;; Rebinds
-(defun thanos/eshell-clear ()
+(defun +eshell-clear ()
   "Interactive call for clear-scrollback."
   (interactive)
   (eshell/clear-scrollback))

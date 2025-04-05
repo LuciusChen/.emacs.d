@@ -44,6 +44,7 @@
 (defvar *use-package-list*
   '(
     setup
+    (emt :host github :repo "roife/emt")
     ;; ==== Put the packages related to the code below this line! ====
     ))
 
