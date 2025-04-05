@@ -46,6 +46,7 @@
   (:global [f9] eshell)
   (:when-loaded
     (:also-load lib-eshell)
+    (:also-load nerd-icons)
     (:option eshell-prompt-function 'eshell-prompt-multiline
              eshell-highlight-prompt nil
              eshell-banner-message ""
