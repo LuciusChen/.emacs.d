@@ -13,11 +13,12 @@
                      (string-trim branch-raw)))
            (dirty (not
                    (string= "" (string-trim (shell-command-to-string "git status --porcelain")))))
-           (dirty-info (if dirty " 🖉" " ✔")))
-      (concat (propertize "⎇ " 'face 'success)
+           (dirty-info (if dirty
+                           (format " %s" (substring-no-properties (nerd-icons-faicon "nf-fa-edit")))
+                         (format " %s" (substring-no-properties (nerd-icons-faicon "nf-fa-check_square_o"))))))
+      (concat (propertize (concat (substring-no-properties (nerd-icons-faicon "nf-fa-git_alt")) " ") 'face 'success)
               (propertize branch 'face 'warning)
-              (propertize dirty-info 'face
-                          (if dirty 'error 'success))))))
+              (propertize dirty-info 'face (if dirty 'error 'success))))))
 
 (defun eshell-prompt-multiline ()
   "Eshell Multiline Git prompt."
@@ -25,10 +26,12 @@
         (hr (propertize (concat "\n" (make-string (/ (window-total-width) 2) ?─) "\n") 'face 'font-lock-comment-face))
         (dir (propertize (format "%s" (abbreviate-file-name (eshell/pwd))) 'face 'eshell-prompt))
         (git-info (eshell-git-info))
-        (time (propertize (format-time-string "%H:%M:%S") 'face 'font-lock-comment-face))
+        (time (propertize (concat (substring-no-properties (nerd-icons-faicon "nf-fa-clock"))
+                                  " "
+                                  (format-time-string "%H:%M:%S")) 'face 'font-lock-comment-face))
         (sign (if (= (user-uid) 0)
-                  (propertize "\n#" 'face 'success)
-                (propertize "\n$" 'face 'error))))
+                  (propertize (concat "\n" (substring-no-properties (nerd-icons-faicon "nf-fa-hashtag"))) 'face 'success)
+                (propertize (concat "\n" (substring-no-properties (nerd-icons-faicon "nf-fae-bigger"))) 'face 'error))))
     (concat hr dir
             (when git-info (concat separator git-info))
             separator time sign " ")))

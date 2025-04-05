@@ -63,6 +63,25 @@
     ;; (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
     ;; (gptel-make-openai "DeepSeek" :host "api.deepseek.com" :endpoint "/chat/completions" :stream t :key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
     ;;                    :models '(deepseek-chat deepseek-reasoner))
+    (gptel-make-openai "OpenRouter"
+      :host "openrouter.ai"
+      :endpoint "/api/v1/chat/completions"
+      :key (auth-source-pick-first-password :host "api.openrouter.ai" :user "openrouter")
+      :models '(deepseek/deepseek-chat
+                deepseek/deepseek-r1
+                qwen/qwen-turbo
+                qwen/qwen-plus
+                qwen/qwen-max
+                openai/chatgpt-4o-latest
+                openai/o1
+                openai/o3-mini-high
+                anthropic/claude-3.7-sonnet:thinking
+                anthropic/claude-3.7-sonnet
+                anthropic/claude-3-opus
+                google/gemini-2.0-pro-exp-02-05:free
+                google/gemini-2.0-flash-thinking-exp:free
+                google/gemini-2.0-flash-001)
+      :stream t)
 
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))
