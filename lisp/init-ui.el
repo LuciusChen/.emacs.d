@@ -92,7 +92,8 @@
   (setup faces
     (:also-load lib-face)
     (:hooks window-setup-hook +setup-fonts
-            server-after-make-frame-hook +setup-fonts)
+            server-after-make-frame-hook +setup-fonts
+            default-text-scale-mode-hook +setup-fonts)
     (:with-mode (vterm-mode eshell-mode) (:set-font *term-default-font*))
     (:with-mode (latex-mode prog-mode nxml-mode magit-status-mode magit-diff-mode diff-mode) (:set-font *prog-font*))
     (:with-mode nov-mode (:set-font (replace-regexp-in-string "14" "16" *default-font*)))
