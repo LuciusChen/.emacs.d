@@ -52,12 +52,12 @@
              eshell-banner-message ""
              eshell-cmpl-ignore-case t)
     (:with-map eshell-mode-map
-      (:bind "C-l"  thanos/eshell-clear
+      (:bind "C-l"  +eshell-clear
              "<tab>" completion-at-point
              "C-c l" +consult-eshell-history))
     (:with-mode eshell-mode
       (:hook (lambda ()
-               (thanos/set-eshell-aliases thanos/aliases)
+               (+set-eshell-aliases +aliases)
                (display-line-numbers-mode -1)
                (eshell-cmpl-mode -1)))
       (:hooks eshell-directory-change-hook +sync-dir-in-buffer-name))))

@@ -44,7 +44,6 @@
     (:option corfu-cycle t
              corfu-auto t
              corfu-auto-prefix 2
-             corfu-count 5
              corfu-quit-no-match 'separator)
     (:with-mode prog-mode (:hook corfu-mode))
     (:with-mode corfu
@@ -68,6 +67,7 @@
 (setup cape
   (:load-after corfu)
   (:when-loaded
+    (add-to-list 'completion-at-point-functions #'cape-history)
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
