@@ -47,7 +47,20 @@
       (set-fontset-font "fontset-default" 'han font nil 'append)))
   ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
-  (set-fontset-font t '(#xE000 . #xF8FF) *symbol-default-font*)
+  ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
+  (let ((ranges '((#xE5FA . #xE6B7)   ;; Seti-UI + Custom
+                  (#xE700 . #xE8EF)   ;; Devicons
+                  (#xED00 . #xF2FF)   ;; Font Awesome
+                  (#xE200 . #xE2A9)   ;; Font Awesome Extension
+                  (#xF0001 . #xF1AF0) ;; Material Design Icons
+                  (#xE300 . #xE3E3)   ;; Weather
+                  (#xF400 . #xF533)   ;; Octicons
+                  (#x2665 . #x2665)   ;; Octicons
+                  (#x26A1 . #x26A1)   ;; Octicons
+                  (#xE000 . #xE00A)   ;; Pomicons
+                  (#xEA60 . #xEC1E))));; Codicons
+    (dolist (range ranges)
+      (set-fontset-font t range *symbol-default-font*)))
   ;; Set font for specific characters
   ;; (set-fontset-font nil ?❤ "Symbols Nerd Font Mono")
 
