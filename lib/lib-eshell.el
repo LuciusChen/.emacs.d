@@ -14,8 +14,8 @@
            (dirty (not
                    (string= "" (string-trim (shell-command-to-string "git status --porcelain")))))
            (dirty-info (if dirty
-                           (format " %s" (substring-no-properties (nerd-icons-faicon "nf-fa-edit")))
-                         (format " %s" (substring-no-properties (nerd-icons-faicon "nf-fa-check_square_o"))))))
+                           (format " %s" (substring-no-properties (nerd-icons-mdicon "nf-md-file_edit")))
+                         (format " %s" (substring-no-properties (nerd-icons-faicon "nf-fa-check_to_slot"))))))
       (concat (propertize (concat (substring-no-properties (nerd-icons-faicon "nf-fa-git_alt")) " ") 'face 'success)
               (propertize branch 'face 'warning)
               (propertize dirty-info 'face (if dirty 'error 'success))))))

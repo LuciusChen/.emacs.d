@@ -66,7 +66,7 @@
      telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
      telega-symbol-reply (nerd-icons-faicon "nf-fa-reply")
      telega-symbol-reply-quote (nerd-icons-faicon "nf-fa-reply_all")
-     telega-symbol-forward (nerd-icons-octicon "nf-oct-cross_reference")
+     telega-symbol-forward (nerd-icons-faicon "nf-fa-mail_forward")
      telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
      ;; palettes 根据使用主题的配色去置换
