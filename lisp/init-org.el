@@ -138,7 +138,15 @@
              denote-excluded-keywords-regexp nil
              denote-rename-confirmations '(rewrite-front-matter modify-file-name)
              denote-date-prompt-use-org-read-date t
-             denote-backlinks-show-context t)
+             denote-backlinks-show-context t
+             denote-org-front-matter
+             "#+title:      %s
+#+date:       %s
+#+filetags:   %s
+#+identifier: %s
+#+signature:  %s
+#+startup: indent
+\n")
     (denote-rename-buffer-mode 1)))
 
 (setup denote-journal

@@ -75,7 +75,7 @@
 (defun pmx--gptel-featurep (feature)
   "Return non-nil if FEATURE is loaded or available.
 User might not have FEATURE loaded if it is an autoload etc."
-  (if-let ((feature-symbol (intern-soft feature)))
+  (if-let* ((feature-symbol (intern-soft feature)))
       (when (featurep feature-symbol)
         feature)
     (find-library-name feature)))
@@ -88,7 +88,7 @@ User might not have FEATURE loaded if it is an autoload etc."
 
 (defun pmx--gptel-library-source (library-name)
   "Return the source code of LIBRARY-NAME as a string."
-  (if-let ((library (find-library-name library-name)))
+  (if-let* ((library (find-library-name library-name)))
       (with-temp-buffer
         (progn
           (insert-file-contents library)
@@ -132,23 +132,23 @@ Returns the source code as a string, or nil if the definition is not found."
   (string-join (orderless-filter prefix obarray #'boundp) "\n"))
 
 (defun pmx--gptel-function-source (symbol)
-  (when-let ((symbol (intern-soft symbol)))
+  (when-let* ((symbol (intern-soft symbol)))
     (pmx--gptel-source symbol)))
 
 (defun pmx--gptel-variable-source (symbol)
-  (when-let ((symbol (intern-soft symbol)))
+  (when-let* ((symbol (intern-soft symbol)))
     (pmx--gptel-source symbol 'defvar)))
 
 (defun pmx--gptel-function-documentation (symbol)
-  (when-let ((symbol (intern-soft symbol)))
+  (when-let* ((symbol (intern-soft symbol)))
     (documentation symbol)))
 
 (defun pmx--gptel-variable-documentation (symbol)
-  (when-let ((symbol (intern-soft symbol)))
+  (when-let* ((symbol (intern-soft symbol)))
     (custom-variable-documentation symbol)))
 
 (defun pmx--gptel-variable-global-value (symbol)
-  (when-let ((symbol (intern-soft symbol)))
+  (when-let* ((symbol (intern-soft symbol)))
     (default-value symbol)))
 
 (defun pmx--gptel-eval (expression)

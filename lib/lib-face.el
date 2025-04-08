@@ -47,6 +47,7 @@
       (set-fontset-font "fontset-default" 'han font nil 'append)))
   ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
+  ;; 不知道为什么会有一些字符不被覆盖，目前只能这么写了。 2025-04-07
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (let ((ranges '((#xE5FA . #xE6B7)   ;; Seti-UI + Custom
                   (#xE700 . #xE8EF)   ;; Devicons
@@ -100,6 +101,20 @@
         (prog1 (apply func args)
           (global-hl-line-mode 1)))
     (apply func args)))
+
+;; 用于检查 unicode 是否被字体覆盖
+(defun check-symbols-nerd-font-mono-coverage (unicode)
+  "Check if 'Symbols Nerd Font Mono' covers the specified UNICODE character."
+  (interactive "sEnter Unicode (e.g., 0F11E7): ")
+  (let ((font-family "Symbols Nerd Font Mono")
+        (char (string-to-number unicode 16))
+        (buffer (get-buffer-create "*Font Check*")))
+    (with-current-buffer buffer
+      (erase-buffer)
+      (insert (format "Checking coverage for Unicode %s in font: %s\n\n" unicode font-family))
+      (insert (propertize (string char)
+                          'face `(:family ,font-family :height 200)))
+      (display-buffer buffer))))
 
 (provide 'lib-face)
 ;;; lib-face.el ends here
