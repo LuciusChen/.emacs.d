@@ -70,10 +70,6 @@
     (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'prettier)
     (setf (alist-get 'js-ts-mode         apheleia-mode-alist) 'prettier)))
 
-(setup highlight-matching-tag
-  (:load-after web-mode)
-  (:when-loaded (highlight-matching-tag 1)))
-
 (setup mmm-mode
   (:with-mode prog-mode (:require mmm-mode))
   (:when-loaded
