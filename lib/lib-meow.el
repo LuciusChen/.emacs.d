@@ -2,26 +2,44 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun meow-mark-word-or-chinese (n)
-  "Mark current word under cursor, handling both English and Chinese text.
+(defun meow-mark-thing (thing type &optional backward regexp-format)
+  "Make expandable selection of THING, with TYPE and forward/BACKWARD direction.
 
-This function uses EMT's segmentation for Chinese and default behavior for English.
-The selection will be expandable with `meow-next-word' and `meow-back-word'.
-The selected word will be added to `regexp-search-ring' and highlighted.
+THING is a symbol usable by `forward-thing', which see.
 
-Use a negative argument to create a backward selection."
+TYPE is a symbol. Usual values are `word' or `line'.
+
+The selection will be made in the \\='forward\\=' direction unless BACKWARD is
+non-nil.
+
+When REGEXP-FORMAT is non-nil and a string, the content of the selection will be
+quoted to regexp, then pushed into `regexp-search-ring' which will be read by
+`meow-search' and other commands. In this case, REGEXP-FORMAT is used as a
+format-string to format the regexp-quoted selection content (which is passed as
+a string to `format'). Further matches of this formatted search will be
+highlighted in the buffer."
   (interactive "p")
   ;; Ensure that EMT is loaded
   (emt-ensure)
-  (let* ((direction (if (< n 0) 'backward 'forward))
+  (let* ((direction (if backward 'backward 'forward))
          (bounds (emt--get-bounds-at-point
                   (emt--move-by-word-decide-bounds-direction direction)))
          (beg (car bounds))
          (end (cdr bounds)))
     (if (eq beg end)
-        ;; Use default Meow for English words
-        (meow-mark-thing meow-word-thing 'word (< n 0) "\\<%s\\>")
-      ;; Use EMT segmentation for Chinese
+        ;; Default behavior for non-CJK text
+        (let* ((bounds (bounds-of-thing-at-point thing))
+               (beg (car bounds))
+               (end (cdr bounds)))
+          (when beg
+            (thread-first
+              (meow--make-selection (cons 'expand type) beg end)
+              (meow--select backward))
+            (when (stringp regexp-format)
+              (let ((search (format regexp-format (regexp-quote (buffer-substring-no-properties beg end)))))
+                (meow--push-search search)
+                (meow--highlight-regexp-in-buffer search)))))
+      ;; Use EMT segmentation for CJK text
       (let* ((text (buffer-substring-no-properties beg end))
              (segments (append (emt-split text) nil))
              (pos (- (point) beg))
@@ -36,9 +54,65 @@ Use a negative argument to create a backward selection."
                  (segment-text (buffer-substring-no-properties seg-beg seg-end))
                  (regexp (regexp-quote segment-text)))
             (let ((selection (meow--make-selection (cons 'expand 'word) seg-beg seg-end)))
-              (meow--select selection (< n 0))
+              (meow--select selection backward)
               (meow--push-search regexp)
               (meow--highlight-regexp-in-buffer regexp))))))))
+
+(defun meow-next-thing (thing type n &optional include-syntax)
+  "Create non-expandable selection of TYPE to the end of the next Nth THING.
+
+If N is negative, select to the beginning of the previous Nth thing instead."
+  (unless (equal type (cdr (meow--selection-type)))
+    (meow--cancel-selection))
+  (unless include-syntax
+    (setq include-syntax
+          (let ((thing-include-syntax
+                 (or (alist-get thing meow-next-thing-include-syntax)
+                     '("" ""))))
+            (if (> n 0)
+                (car thing-include-syntax)
+              (cadr thing-include-syntax)))))
+  (let* ((expand (equal (cons 'expand type) (meow--selection-type)))
+         (_ (when expand
+              (if (< n 0) (meow--direction-backward)
+                (meow--direction-forward))))
+         (new-type (if expand (cons 'expand type) (cons 'select type)))
+         (m (point))
+         (p (save-mark-and-excursion
+              (if (and (fboundp 'emt--move-by-word) (looking-at-p "\\cc"))
+                  ;; Use EMT for CJK words
+                  (emt--move-by-word (if (> n 0) 'forward 'backward))
+                ;; Fallback to original behavior
+                (forward-thing thing n))
+              (unless (= (point) m)
+                (point)))))
+    (when p
+      (thread-first
+        (meow--make-selection
+         new-type
+         (meow--fix-thing-selection-mark thing p m include-syntax)
+         p
+         expand)
+        (meow--select))
+      (meow--maybe-highlight-num-positions
+       (cons (apply-partially #'meow--backward-thing-1 thing)
+             (apply-partially #'meow--forward-thing-1 thing))))))
+
+(defun meow--forward-thing-1 (thing)
+  (let ((pos (point)))
+    (if (and (fboundp 'emt--move-by-word) (looking-at-p "\\cc"))
+        (emt--move-by-word 'forward)
+      (forward-thing thing 1))
+    (when (not (= pos (point)))
+      (meow--hack-cursor-pos (point)))))
+
+(defun meow--backward-thing-1 (thing)
+  (let ((pos (point)))
+    (if (and (fboundp 'emt--move-by-word) (looking-at-p "\\cc"))
+        (emt--move-by-word 'backward)
+      (forward-thing thing -1))
+    (when (not (= pos (point)))
+      (point))))
 
 (defun meow-setup ()
   "Meow setup."
@@ -120,9 +194,7 @@ Use a negative argument to create a backward selection."
    '("u" . meow-undo)
    '("U" . vundo)
    '("V" . meow-visit)
-   (if *is-mac*
-       '("w" . meow-mark-word-or-chinese)
-     '("w" . meow-mark-word))
+   '("w" . meow-mark-word)
    '("W" . meow-mark-symbol)
    '("x" . meow-line)
    '("X" . meow-goto-line)
