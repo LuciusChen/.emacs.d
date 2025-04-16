@@ -70,7 +70,10 @@
           (lambda ()
             (if meow-insert-mode
                 (run-hooks 'meow-entering-insert-mode-hook)
-              (run-hooks 'meow-leaving-insert-mode-hook)))))
+              (run-hooks 'meow-leaving-insert-mode-hook))))
+  (when *is-mac*
+    (:advice meow-mark-thing :override meow-mark-thing-cjk)
+    (:advice meow-next-thing :override meow-next-thing-cjk)))
 
 (setup meow-tree-sitter
   (:defer (:require meow-tree-sitter))
