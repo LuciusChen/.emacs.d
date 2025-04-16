@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun meow-mark-thing (thing type &optional backward regexp-format)
+(defun meow-mark-thing-cjk (thing type &optional backward regexp-format)
   "Make expandable selection of THING, with TYPE and forward/BACKWARD direction.
 
 THING is a symbol usable by `forward-thing', which see.
@@ -58,7 +58,7 @@ highlighted in the buffer."
               (meow--push-search regexp)
               (meow--highlight-regexp-in-buffer regexp))))))))
 
-(defun meow-next-thing (thing type n &optional include-syntax)
+(defun meow-next-thing-cjk (thing type n &optional include-syntax)
   "Create non-expandable selection of TYPE to the end of the next Nth THING.
 
 If N is negative, select to the beginning of the previous Nth thing instead."
@@ -95,10 +95,10 @@ If N is negative, select to the beginning of the previous Nth thing instead."
          expand)
         (meow--select))
       (meow--maybe-highlight-num-positions
-       (cons (apply-partially #'meow--backward-thing-1 thing)
-             (apply-partially #'meow--forward-thing-1 thing))))))
+       (cons (apply-partially #'meow--backward-thing-1-cjk thing)
+             (apply-partially #'meow--forward-thing-1-cjk thing))))))
 
-(defun meow--forward-thing-1 (thing)
+(defun meow--forward-thing-1-cjk (thing)
   (let ((pos (point)))
     (if (and (fboundp 'emt--move-by-word) (looking-at-p "\\cc"))
         (emt--move-by-word 'forward)
@@ -106,7 +106,7 @@ If N is negative, select to the beginning of the previous Nth thing instead."
     (when (not (= pos (point)))
       (meow--hack-cursor-pos (point)))))
 
-(defun meow--backward-thing-1 (thing)
+(defun meow--backward-thing-1-cjk (thing)
   (let ((pos (point)))
     (if (and (fboundp 'emt--move-by-word) (looking-at-p "\\cc"))
         (emt--move-by-word 'backward)
