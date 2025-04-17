@@ -170,7 +170,7 @@
           "%<%H:%M> %? :prod:\n")
          ("jr" "Read" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* What I read? :read:\n** %?\n")
+          "* What I Consume? :read:\n** %?\n")
          ("jf" "Fleeting Notes" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
           "* Notes :note:\n** %?\n")
