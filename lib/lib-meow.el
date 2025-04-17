@@ -79,10 +79,12 @@ If N is negative, select to the beginning of the previous Nth thing instead."
          (new-type (if expand (cons 'expand type) (cons 'select type)))
          (m (point))
          (p (save-mark-and-excursion
-              (if (and (fboundp 'emt--move-by-word) (looking-at-p "\\cc"))
-                  ;; Use EMT for CJK words
-                  (emt--move-by-word (if (> n 0) 'forward 'backward))
-                ;; Fallback to original behavior
+              (if (and (eq thing 'word) (eq system-type 'darwin))
+                  (progn
+                    (emt-ensure) ;; Ensure EMT is loaded
+                    (if (> n 0)
+                        (emt-forward-word n)
+                      (emt-backward-word (- n))))
                 (forward-thing thing n))
               (unless (= (point) m)
                 (point)))))
