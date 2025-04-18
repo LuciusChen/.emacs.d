@@ -21,9 +21,8 @@ highlighted in the buffer."
   (interactive "p")
   ;; Ensure that EMT is loaded
   (emt-ensure)
-  (let ((direction (if backward 'backward 'forward))
-        (cjk-regex "[\u4E00-\u9FFF\u3400-\u4DBF\u3040-\u309F\u30A0-\u30FF]"))
-    (if (or (eq type 'symbol) (not (looking-at cjk-regex)))
+  (let ((direction (if backward 'backward 'forward)))
+    (if (or (eq type 'symbol) (not (looking-at-p "\\cc")))
         (meow--select-noncjk thing type backward regexp-format)
       (meow--select-cjk direction backward))))
 
