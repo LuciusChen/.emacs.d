@@ -170,7 +170,7 @@
           "%<%H:%M> %? :prod:\n")
          ("jr" "Media Consumption - Book, Film, TV, Podcast etc." entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* What I Consume? :read:\n** %?\n")
+          "* What I Consume? :consume:\n** %?\n")
          ("jf" "Fleeting Notes" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
           "* Notes :note:\n** %?\n")
