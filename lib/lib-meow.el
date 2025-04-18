@@ -107,7 +107,7 @@ If N is negative, select to the beginning of the previous Nth thing instead."
 
 (defun meow--forward-thing-1-cjk (thing)
   (let ((pos (point)))
-    (if (and (eq thing 'word) (emt-mode))
+    (if (and (eq thing 'word))
         (emt-forward-word 1)
       (forward-thing thing 1))
     (when (not (= pos (point)))
@@ -115,7 +115,7 @@ If N is negative, select to the beginning of the previous Nth thing instead."
 
 (defun meow--backward-thing-1-cjk (thing)
   (let ((pos (point)))
-    (if (and (eq thing 'word) (emt-mode))
+    (if (and (eq thing 'word))
         (emt-backward-word 1)
       (forward-thing thing -1))
     (when (not (= pos (point)))
