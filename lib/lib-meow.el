@@ -21,45 +21,48 @@ highlighted in the buffer."
   (interactive "p")
   ;; Ensure that EMT is loaded
   (emt-ensure)
-  (let* ((direction (if backward 'backward 'forward))
-         (bounds (if (eq type 'symbol)
-                     ;; Use default behavior for symbols
-                     (bounds-of-thing-at-point 'symbol)
-                   ;; Use EMT for word segmentation
-                   (emt--get-bounds-at-point
-                    (emt--move-by-word-decide-bounds-direction direction))))
+  (let ((direction (if backward 'backward 'forward))
+        (cjk-regex "[\u4E00-\u9FFF\u3400-\u4DBF\u3040-\u309F\u30A0-\u30FF]"))
+    (if (or (eq type 'symbol) (not (looking-at cjk-regex)))
+        (meow--select-noncjk thing type backward regexp-format)
+      (meow--select-cjk direction backward))))
+
+(defun meow--select-noncjk (thing type backward regexp-format)
+  "Select non-CJK text based on THING, TYPE, and BACKWARD direction."
+  (let* ((bounds (bounds-of-thing-at-point thing))
          (beg (car bounds))
          (end (cdr bounds)))
-    (if (or (eq beg end) (eq type 'symbol))
-        ;; Default behavior for non-CJK text or symbols
-        (let ((bounds (bounds-of-thing-at-point thing)))
-          (when bounds
-            (let ((beg (car bounds))
-                  (end (cdr bounds)))
-              (thread-first
-                (meow--make-selection (cons 'expand type) beg end)
-                (meow--select backward))
-              (when (stringp regexp-format)
-                (let ((search (format regexp-format (regexp-quote (buffer-substring-no-properties beg end)))))
-                  (meow--push-search search)
-                  (meow--highlight-regexp-in-buffer search))))))
-      ;; Use EMT segmentation for CJK word
-      (let* ((text (buffer-substring-no-properties beg end))
-             (segments (emt-split text))
-             (pos (- (point) beg))
-             (segment-bounds
-              (cl-find-if (lambda (bound)
-                            (and (>= pos (car bound)) (< pos (cdr bound))))
-                          segments)))
-        (when segment-bounds
-          (let* ((seg-beg (+ beg (car segment-bounds)))
-                 (seg-end (+ beg (cdr segment-bounds)))
-                 (segment-text (buffer-substring-no-properties seg-beg seg-end))
-                 (regexp (regexp-quote segment-text)))
-            (let ((selection (meow--make-selection (cons 'expand 'word) seg-beg seg-end)))
-              (meow--select selection backward)
-              (meow--push-search regexp)
-              (meow--highlight-regexp-in-buffer regexp))))))))
+    (when beg
+      (thread-first
+        (meow--make-selection (cons 'expand type) beg end)
+        (meow--select backward))
+      (when (stringp regexp-format)
+        (let ((search (format regexp-format (regexp-quote (buffer-substring-no-properties beg end)))))
+          (meow--push-search search)
+          (meow--highlight-regexp-in-buffer search))))))
+
+(defun meow--select-cjk (direction backward)
+  "Select CJK text based on DIRECTION and BACKWARD direction."
+  (let* ((bounds (emt--get-bounds-at-point
+                  (emt--move-by-word-decide-bounds-direction direction)))
+         (beg (car bounds))
+         (end (cdr bounds))
+         (text (buffer-substring-no-properties beg end))
+         (segments (append (emt-split text) nil))
+         (pos (- (point) beg))
+         (segment-bounds (car segments)))
+    (dolist (bound segments)
+      (when (and (>= pos (car bound)) (< pos (cdr bound)))
+        (setq segment-bounds bound)))
+    (when segment-bounds
+      (let* ((seg-beg (+ beg (car segment-bounds)))
+             (seg-end (+ beg (cdr segment-bounds)))
+             (segment-text (buffer-substring-no-properties seg-beg seg-end))
+             (regexp (regexp-quote segment-text)))
+        (let ((selection (meow--make-selection (cons 'expand 'word) seg-beg seg-end)))
+          (meow--select selection backward)
+          (meow--push-search regexp)
+          (meow--highlight-regexp-in-buffer regexp))))))
 
 (defun meow-next-thing-cjk (thing type n &optional include-syntax)
   "Create non-expandable selection of TYPE to the end of the next Nth THING.
