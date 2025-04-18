@@ -22,32 +22,35 @@ highlighted in the buffer."
   ;; Ensure that EMT is loaded
   (emt-ensure)
   (let* ((direction (if backward 'backward 'forward))
-         (bounds (emt--get-bounds-at-point
-                  (emt--move-by-word-decide-bounds-direction direction)))
+         (bounds (if (eq type 'symbol)
+                     ;; Use default behavior for symbols
+                     (bounds-of-thing-at-point 'symbol)
+                   ;; Use EMT for word segmentation
+                   (emt--get-bounds-at-point
+                    (emt--move-by-word-decide-bounds-direction direction))))
          (beg (car bounds))
          (end (cdr bounds)))
-    (if (eq beg end)
-        ;; Default behavior for non-CJK text
-        (let* ((bounds (bounds-of-thing-at-point thing))
-               (beg (car bounds))
-               (end (cdr bounds)))
-          (when beg
-            (thread-first
-              (meow--make-selection (cons 'expand type) beg end)
-              (meow--select backward))
-            (when (stringp regexp-format)
-              (let ((search (format regexp-format (regexp-quote (buffer-substring-no-properties beg end)))))
-                (meow--push-search search)
-                (meow--highlight-regexp-in-buffer search)))))
-      ;; Use EMT segmentation for CJK text
+    (if (or (eq beg end) (eq type 'symbol))
+        ;; Default behavior for non-CJK text or symbols
+        (let ((bounds (bounds-of-thing-at-point thing)))
+          (when bounds
+            (let ((beg (car bounds))
+                  (end (cdr bounds)))
+              (thread-first
+                (meow--make-selection (cons 'expand type) beg end)
+                (meow--select backward))
+              (when (stringp regexp-format)
+                (let ((search (format regexp-format (regexp-quote (buffer-substring-no-properties beg end)))))
+                  (meow--push-search search)
+                  (meow--highlight-regexp-in-buffer search))))))
+      ;; Use EMT segmentation for CJK word
       (let* ((text (buffer-substring-no-properties beg end))
-             (segments (append (emt-split text) nil))
+             (segments (emt-split text))
              (pos (- (point) beg))
-             (segment-bounds (car segments)))
-        ;; Find the correct segment
-        (dolist (bound segments)
-          (when (and (>= pos (car bound)) (< pos (cdr bound)))
-            (setq segment-bounds bound)))
+             (segment-bounds
+              (cl-find-if (lambda (bound)
+                            (and (>= pos (car bound)) (< pos (cdr bound))))
+                          segments)))
         (when segment-bounds
           (let* ((seg-beg (+ beg (car segment-bounds)))
                  (seg-end (+ beg (cdr segment-bounds)))
