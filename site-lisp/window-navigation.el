@@ -1,4 +1,4 @@
-;;; window-navigation.el --- Numbered window shortcuts
+;;; window-navigation.el --- Numbered window shortcuts -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2006-2007, 2013, 2015 Nikolaj Schumacher <bugs * nschum , de>
 ;;

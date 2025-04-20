@@ -65,13 +65,13 @@
      ;; HOLD(h/!)      ; 离开时添加变更信息
      ;; HOLD(h@/!)     ; 进入时添加笔记，离开时添加变更信息
      org-todo-keywords
-     (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
-             (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c/!)")
-             (sequence "WAITING(w/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c/!)")))
+     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
+       (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c/!)")
+       (sequence "WAITING(w/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c/!)"))
      org-todo-repeat-to-state "NEXT"
      org-todo-keyword-faces
-     (quote (("NEXT" :inherit warning)
-             ("PROJECT" :inherit font-lock-string-face)))
+     '(("NEXT" :inherit warning)
+       ("PROJECT" :inherit font-lock-string-face))
      ;; Exclude DONE state tasks from refile targets
      org-refile-target-verify-function (lambda ()
                                          (not (member
@@ -169,15 +169,15 @@
          ("jp" "Prod" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
           "%<%H:%M> %? :prod:\n")
-         ("jr" "Media Consumption - Book, Film, TV, Podcast etc." entry
+         ("jc" "Media Consumption - Book, Film, TV, Podcast etc." entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* What I Consume? :consume:\n** %?\n")
-         ("jf" "Fleeting Notes" entry
+          "* %? :consume:\n")
+         ("jn" "Fleeting Notes" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* Notes :note:\n** %?\n")
+          "* %? :note:\n")
          ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "Tasks :task:\n"))))))
+          "Tasks\n"))))))
 
 (setup org-clock
   (:load-after org)
