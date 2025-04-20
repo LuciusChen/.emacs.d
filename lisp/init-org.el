@@ -84,7 +84,8 @@
       (:hook org-indent-mode)
       (:hook (lambda () (setq truncate-lines nil))))
     (:with-hook org-after-todo-state-change-hook
-      (:hook log-todo-next-creation-date))
+      (:hook log-todo-next-creation-date)
+      (:hook org-copy-todo-to-today))
     (+org-emphasize-bindings)
     (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
     (org-element-update-syntax)))
@@ -176,9 +177,7 @@
           "* Notes :note:\n** %?\n")
          ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "Tasks :task:\n")))
-      ;; 拉起 org 的时候已经加载了 lib-org
-      (:with-hook org-after-todo-state-change-hook (:hook org-copy-todo-to-today)))))
+          "Tasks :task:\n"))))))
 
 (setup org-clock
   (:load-after org)
