@@ -161,20 +161,20 @@
        'org-capture-templates
        '(("j" "Journal")
          ("jw" "Weather" entry
-          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
           "%(fetch-weather-data)\n")
          ("jd" "Default" entry
-          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
           "%<%H:%M> %?\n")
          ("jp" "Prod" entry
-          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
+          (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
           "%<%H:%M> %? :prod:\n")
          ("jc" "Media Consumption - Book, Film, TV, Podcast etc." entry
-          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* What I Consume? :consume:\n** %?\n")
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(add-date-and-subheading "What I Consume? :consume:")))
+          "** %?\n")
          ("jn" "Fleeting Notes" entry
-          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* Notes :note:\n** %?\n")
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(add-date-and-subheading "Notes :note:")))
+          "** %?\n")
          ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
           "Tasks\n"))))))
