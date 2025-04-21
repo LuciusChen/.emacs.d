@@ -171,10 +171,10 @@
           "%<%H:%M> %? :prod:\n")
          ("jc" "Media Consumption - Book, Film, TV, Podcast etc." entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* %? :consume:\n")
+          "* What I Consume? :consume:\n** %?\n")
          ("jn" "Fleeting Notes" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "* %? :note:\n")
+          "* Notes :note:\n** %?\n")
          ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
           (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
           "Tasks\n"))))))
