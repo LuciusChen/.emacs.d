@@ -41,11 +41,11 @@ IGNORE is a placeholder for any arguments passed to this function."
         (setq today-file (find-or-create-today-journal-file))
         (with-current-buffer (find-file-noselect today-file)
           (goto-char (point-min))
-          (setq pos (or (when (re-search-forward "^\\*+ Tasks" nil t)
+          (setq pos (or (when (re-search-forward "^\\*+ Tasks :task:" nil t)
                           (point))
                         (progn
                           (goto-char (point-max))
-                          (insert "** Tasks\n")
+                          (insert "** Tasks :task:\n")
                           (point))))))
       (unless (equal (file-truename today-file)
                      (file-truename (buffer-file-name)))

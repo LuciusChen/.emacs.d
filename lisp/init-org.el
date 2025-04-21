@@ -176,8 +176,8 @@
           (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(add-date-and-subheading "Notes :note:")))
           "** %?\n")
          ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
-          (file+headline denote-journal-path-to-new-or-existing-entry +get-today-heading)
-          "Tasks\n"))))))
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(add-date-and-subheading "Tasks :task:")))
+          "** TODO %?\n  %i\n"))))))
 
 (setup org-clock
   (:load-after org)
