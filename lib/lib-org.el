@@ -183,7 +183,7 @@ If DEST, a buffer, is provided, insert the markup there."
     (pop-to-buffer buff)
     (goto-char (point-min))))
 
-(defun +get-today-heading ()
+(defun get-today-heading ()
   "Return today's date as a headline in the format 'Sat, 08 Mar 2025', creating it if necessary."
   (let ((date-headline (format-time-string "%a, %d %b %Y")))
     (save-excursion
@@ -194,6 +194,24 @@ If DEST, a buffer, is provided, insert the markup there."
           (goto-char (point-max))
           (insert (concat "* " date-headline "\n"))
           date-headline)))))
+
+(defun add-date-and-subheading (subheading)
+  "Ensure today's date as a headline and SUBHEADING under it in the buffer.
+Return a list containing the date headline and the SUBHEADING.
+
+This function searches for today's date formatted as 'Sat, 08 Mar 2025'.
+If it doesn't exist, it creates it. Then, it ensures that the specified
+SUBHEADING exists under today's date, adding it if necessary."
+  (let ((date-headline (format-time-string "%a, %d %b %Y")))
+    (save-excursion
+      (goto-char (point-min))
+      (if (re-search-forward (concat "^\\* " (regexp-quote date-headline)) nil t)
+          (unless (re-search-forward (concat "^\\*\\* " (regexp-quote subheading)) nil t)
+            (goto-char (point-max))
+            (insert (concat "** " subheading "\n")))
+        (goto-char (point-max))
+        (insert (concat "* " date-headline "\n** " subheading "\n")))
+      (list date-headline subheading))))
 
 (defun update-alist (alist-symbol rep-alist)
   "Update the alist specified by ALIST-SYMBOL with entries from REP-ALIST.
