@@ -195,7 +195,7 @@ If DEST, a buffer, is provided, insert the markup there."
           (insert (concat "* " date-headline "\n"))
           date-headline)))))
 
-(defun add-date-and-subheading (subheading)
+(defun get-today-heading-with-subheading (subheading)
   "Ensure today's date as a headline and SUBHEADING under it in the buffer.
 Return a list containing the date headline and the SUBHEADING.
 
@@ -212,6 +212,27 @@ SUBHEADING exists under today's date, adding it if necessary."
         (goto-char (point-max))
         (insert (concat "* " date-headline "\n** " subheading "\n")))
       (list date-headline subheading))))
+
+(defun org-sort-second-level-entries-by-time ()
+  "Sort second-level Org entries, placing entries without time first, then by time."
+  (interactive)
+  (when (derived-mode-p 'org-mode)
+    (save-excursion
+      ;; Select the entire buffer to process all entries
+      (goto-char (point-min))
+      (push-mark (point-max) nil t)
+      ;; Map over all second-level entries to sort them
+      (org-map-entries
+       (lambda ()
+         (when (= (org-current-level) 2)
+           ;; Sort the entries under the current second-level entry
+           (org-sort-entries nil ?f
+                             (lambda ()
+                               (let ((headline (org-get-heading t t t t)))
+                                 (if (string-match "\\([0-9]+:[0-9]+\\)" headline)
+                                     (match-string 1 headline)
+                                   ""))))))
+       "LEVEL=2"))))
 
 (defun update-alist (alist-symbol rep-alist)
   "Update the alist specified by ALIST-SYMBOL with entries from REP-ALIST.
