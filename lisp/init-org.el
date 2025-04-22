@@ -165,7 +165,7 @@
           "%(fetch-weather-data)\n")
          ("jd" "Default" entry
           (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
-          "%<%H:%M> %?\n" :before-finalize org-sort-second-level-entries-by-time)
+          "%<%H:%M> %?\n")
          ("jp" "Prod" entry
           (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
           "%<%H:%M> %? :prod:\n")
@@ -175,9 +175,10 @@
          ("jn" "Fleeting Notes" entry
           (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
           "** %?\n")
-         ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
+         ("jt" "Tasks - copying to journal upon TODO completion or cancellation" plain
           (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
-          "** TODO %?\n  %i\n"))))))
+          :after-finalize org-sort-second-level-entries-by-time))))
+    (:with-hook org-capture-before-finalize-hook (:hook org-sort-second-level-entries-by-time))))
 
 (setup org-clock
   (:load-after org)
