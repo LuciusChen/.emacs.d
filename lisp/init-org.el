@@ -165,18 +165,18 @@
           "%(fetch-weather-data)\n")
          ("jd" "Default" entry
           (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
-          "%<%H:%M> %?\n")
+          "%<%H:%M> %?\n" :before-finalize org-sort-second-level-entries-by-time)
          ("jp" "Prod" entry
           (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
           "%<%H:%M> %? :prod:\n")
          ("jc" "Media Consumption - Book, Film, TV, Podcast etc." entry
-          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(add-date-and-subheading "What I Consume? :consume:")))
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "What I Consume? :consume:")))
           "** %?\n")
          ("jn" "Fleeting Notes" entry
-          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(add-date-and-subheading "Notes :note:")))
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
           "** %?\n")
          ("jt" "Tasks - copying to journal upon TODO completion or cancellation" entry
-          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(add-date-and-subheading "Tasks :task:")))
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
           "** TODO %?\n  %i\n"))))))
 
 (setup org-clock
