@@ -11,45 +11,34 @@ IGNORE is a placeholder for any arguments passed to this function."
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
 
-(defun find-today-journal-file (directory date-string)
+(defun find-today-journal-file ()
   "Find today's journal file in DIRECTORY that matches DATE-STRING."
-  (let ((regex (format "%s__journal\\.org$" (regexp-quote date-string))))
+  (let ((regex (format "%s__journal\\.org$" (regexp-quote (downcase (format-time-string "%A-%d-%B-%Y" (current-time)))))))
     (seq-find (lambda (file)
                 (string-match-p regex (downcase file)))
-              (directory-files directory t))))
-
-(defun find-or-create-today-journal-file ()
-  "Find today's journal file, or create it using org-capture if it doesn't exist."
-  (let* ((date-string (downcase (format-time-string "%A-%d-%B-%Y" (current-time))))
-         (directory (expand-file-name "daily" denote-directory))
-         (today-file (find-today-journal-file directory date-string)))
-    (unless today-file
-      (org-capture nil "jt")
-      (setq today-file (find-today-journal-file directory date-string)))
-    today-file))
+              (directory-files (expand-file-name "daily" denote-directory) t))))
 
 (defun org-copy-todo-to-today ()
-  "Refile DONE or CANCELLED TODO items to today's journal file."
+  "Refile DONE or CANCELLED TODO items to today's org-roam daily file."
   (interactive)
   (when (and (or (equal org-state "DONE")
                  (equal org-state "CANCELLED"))
              (not (org-find-property "STYLE")))
-    (let ((org-refile-keep t)
+    (let ((org-refile-keep t) ;; Set this to nil to delete the original!
           (org-after-refile-insert-hook #'save-buffer)
-          today-file pos)
+          today-file
+          pos
+          tasks-pos)
       (save-window-excursion
-        (setq today-file (find-or-create-today-journal-file))
+        (org-capture t "jt")
+        (setq today-file (find-today-journal-file))
+        ;; Find the position of the "Tasks" heading
         (with-current-buffer (find-file-noselect today-file)
           (goto-char (point-min))
-          (setq pos (or (when (re-search-forward "^\\*+ Tasks :task:" nil t)
-                          (point))
-                        (progn
-                          (goto-char (point-max))
-                          (insert "** Tasks :task:\n")
-                          (point))))))
-      (unless (equal (file-truename today-file)
-                     (file-truename (buffer-file-name)))
-        (org-refile nil nil (list "Tasks" today-file nil pos))))))
+          (setq tasks-pos (search-forward-regexp "^\\*+ Tasks" nil t))
+          (setq pos (point))))
+
+      (org-refile nil nil (list "Tasks" today-file nil tasks-pos)))))
 
 ;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
 ;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
