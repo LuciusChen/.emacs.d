@@ -176,8 +176,7 @@
           (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
           "** %?\n")
          ("jt" "Tasks - copying to journal upon TODO completion or cancellation" plain
-          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
-          :after-finalize org-sort-second-level-entries-by-time))))
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))))))
     (:with-hook org-capture-before-finalize-hook (:hook org-sort-second-level-entries-by-time))))
 
 (setup org-clock
