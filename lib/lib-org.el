@@ -38,7 +38,8 @@ IGNORE is a placeholder for any arguments passed to this function."
           (setq tasks-pos (search-forward-regexp "^\\*+ Tasks" nil t))
           (setq pos (point))))
 
-      (org-refile nil nil (list "Tasks" today-file nil tasks-pos)))))
+      (org-refile nil nil (list "Tasks" today-file nil tasks-pos))
+      (org-sort-second-level-entries-by-time today-file))))
 
 ;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
 ;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
@@ -202,26 +203,34 @@ SUBHEADING exists under today's date, adding it if necessary."
         (insert (concat "* " date-headline "\n** " subheading "\n")))
       (list date-headline subheading))))
 
-(defun org-sort-second-level-entries-by-time ()
-  "Sort second-level Org entries, placing entries without time first, then by time."
-  (interactive)
-  (when (derived-mode-p 'org-mode)
-    (save-excursion
-      ;; Select the entire buffer to process all entries
-      (goto-char (point-min))
-      (push-mark (point-max) nil t)
-      ;; Map over all second-level entries to sort them
-      (org-map-entries
-       (lambda ()
-         (when (= (org-current-level) 2)
-           ;; Sort the entries under the current second-level entry
-           (org-sort-entries nil ?f
-                             (lambda ()
-                               (let ((headline (org-get-heading t t t t)))
-                                 (if (string-match "\\([0-9]+:[0-9]+\\)" headline)
-                                     (match-string 1 headline)
-                                   ""))))))
-       "LEVEL=2"))))
+(defun org-sort-second-level-entries-by-time (&optional file-path)
+  "Sort second-level Org entries, placing entries without time first, then by time.
+If FILE-PATH is non-nil, sort entries in that file. Otherwise, sort in the current buffer."
+  (interactive "fOrg file (leave empty to use current buffer): ")
+  (let ((buffer (if (and file-path (not (string-empty-p file-path)))
+                    (find-file-noselect file-path)
+                  (current-buffer))))
+    (with-current-buffer buffer
+      (when (derived-mode-p 'org-mode)
+        (save-excursion
+          ;; Select the entire buffer to process all entries
+          (goto-char (point-min))
+          (push-mark (point-max) nil t)
+          ;; Map over all second-level entries to sort them
+          (org-map-entries
+           (lambda ()
+             (when (= (org-current-level) 2)
+               ;; Sort the entries under the current second-level entry
+               (org-sort-entries nil ?f
+                                 (lambda ()
+                                   (let ((headline (org-get-heading t t t t)))
+                                     (if (string-match "\\([0-9]+:[0-9]+\\)" headline)
+                                         (match-string 1 headline)
+                                       ""))))))
+           "LEVEL=2"))
+        ;; Save the buffer if it was a file
+        (when (and file-path (not (string-empty-p file-path)))
+          (save-buffer))))))
 
 (defun update-alist (alist-symbol rep-alist)
   "Update the alist specified by ALIST-SYMBOL with entries from REP-ALIST.
