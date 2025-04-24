@@ -108,17 +108,6 @@
                                  (verb . t)
                                  (latex . t)))))
 
-(setup org-capture
-  (:global "C-c c" org-capture)
-  (:when-loaded
-    (:option org-capture-bookmark nil
-             org-capture-templates
-             `(("a" "Agenda")
-               ("ai" "inbox" entry  (file "agenda/inbox.org")
-                ,(concat "* TODO %?\n%U"))
-               ("an" "note" entry (file "agenda/note.org")
-                "* %? :NOTE:\n%U\n%a\n" :clock-resume t)))))
-
 (setup denote
   (:defer (:require denote))
   (:when-loaded
@@ -156,28 +145,34 @@
     (:also-load lib-weather)
     (:option denote-journal-directory (expand-file-name "daily" denote-directory)
              denote-journal-title-format 'day-date-month-year)
+    (:global "C-c c" org-capture)
     (:after org-capture
       (update-alist
        'org-capture-templates
-       '(("j" "Journal")
-         ("jw" "Weather" entry
+       '(("a" "Tasks             || copying to journal upon TODO completion or cancellation" plain
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
+          "" :kill-buffer t)
+         ("w" "Weather           ||" entry
           (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
           "%(fetch-weather-data)\n")
-         ("jd" "Default" entry
-          (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
-          "%<%H:%M> %?\n" :kill-buffer t)
-         ("jp" "Prod" entry
-          (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
-          "%<%H:%M> %? :prod:\n" :kill-buffer t)
-         ("jc" "Media Consumption - Book, Film, TV, Podcast etc." entry
+         ("c" "Media Consumption || Book, Film, TV, Podcast etc." entry
           (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "What I Consume? :consume:")))
           "** %?\n" :kill-buffer t)
-         ("jn" "Fleeting Notes" entry
+         ("f" "Fleeting Notes    ||" entry
           (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
           "** %?\n" :kill-buffer t)
-         ("jt" "Tasks - copying to journal upon TODO completion or cancellation" plain
+         ("n" "Notes with source ||" entry
+          (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
+          "** %?\n%U\n%a\n" :kill-buffer t)
+         ("t" "Tasks             || org-agenda" plain
           (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
-          :kill-buffer t)))
+          "*** TODO %?" :kill-buffer t)
+         ("p" "Prod              ||" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
+          "%<%H:%M> %? :prod:\n" :kill-buffer t)
+         ("d" "Default           ||" entry
+          (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
+          "%<%H:%M> %?\n" :kill-buffer t)))
       (:with-hook org-capture-before-finalize-hook (:hook org-sort-second-level-entries-by-time)))))
 
 (setup org-clock

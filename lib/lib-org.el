@@ -30,7 +30,7 @@ IGNORE is a placeholder for any arguments passed to this function."
           pos
           tasks-pos)
       (save-window-excursion
-        (org-capture t "jt")
+        (org-capture t "a")
         (setq today-file (find-today-journal-file))
         ;; Find the position of the "Tasks" heading
         (with-current-buffer (find-file-noselect today-file)
