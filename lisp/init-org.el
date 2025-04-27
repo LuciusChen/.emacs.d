@@ -163,6 +163,9 @@
                  ("f" "Fleeting Notes    ||" entry
                   (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
                   "** %?\n" :kill-buffer t)
+                 ("i" "Interesting Finds ||" entry
+                  (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Interesting Finds? :finds:")))
+                  "** %?\n" :kill-buffer t)
                  ("c" "Media Consumption || Book, Film, TV, Podcast etc." entry
                   (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "What I Consume? :consume:")))
                   "** %?\n" :kill-buffer t)

@@ -179,6 +179,9 @@
     (:bind "C-c C-f"  elfeed-tube-mpv-follow-mode
            "C-c C-w"  elfeed-tube-mpv-where)))
 
+(setup markdown-mode
+  (:option markdown-command "pandoc --standalone --css=GTD.css"))
+
 (setup md
   (:defer (:require md))
   (:when-loaded
