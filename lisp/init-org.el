@@ -271,7 +271,7 @@
      ;; 时间显示为两位数(9:30 -> 09:30)
      org-agenda-time-leading-zero t
      ;; 过滤掉 dynamic
-     org-agenda-hide-tags-regexp (regexp-opt '("dynamic"))
+     ;; org-agenda-hide-tags-regexp (regexp-opt '("dynamic"))
      org-agenda-files (file-expand-wildcards (concat *org-path* "/agenda/*.org"))
      org-agenda-compact-blocks t
      org-agenda-sticky t

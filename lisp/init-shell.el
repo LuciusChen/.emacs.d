@@ -60,7 +60,13 @@
                (+set-eshell-aliases +aliases)
                (display-line-numbers-mode -1)
                (eshell-cmpl-mode -1)))
-      (:hooks eshell-directory-change-hook +sync-dir-in-buffer-name))))
+      (:hooks eshell-directory-change-hook +sync-dir-in-buffer-name))
+    ))
+
+(setup eshell
+  (:with-hook eshell-load-hook
+    (:hook eat-eshell-mode)
+    (:hook eat-eshell-visual-command-mode)))
 
 (setup eshell-syntax-highlighting
   (:load-after esh-mode)

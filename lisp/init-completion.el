@@ -106,7 +106,7 @@
   (:defer (:require eglot))
   (:when-loaded
     (:also-load lib-eglot)
-    (:with-mode (python-ts-mode js-ts-mode typescript-mode vue-mode latex-mode)
+    (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
       (:hook eglot-ensure))
     (:option eglot-events-buffer-size 0
              eglot-events-buffer-config '(:size 0 :format full)) ;; 取消 eglot log
