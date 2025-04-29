@@ -97,6 +97,7 @@
     (:with-mode (vterm-mode eshell-mode) (:set-font *term-default-font*))
     (:with-mode (latex-mode prog-mode nxml-mode magit-status-mode magit-diff-mode diff-mode) (:set-font *prog-font*))
     (:with-mode nov-mode (:set-font (replace-regexp-in-string "14" "16" *default-font*)))
+    (:with-mode dired-mode (:set-font (replace-regexp-in-string "14" "12" *org-font*)))
     (:with-mode (org-mode ebib-index-mode ebib-entry-mode) (:set-font *org-font*))
     (:advice face-at-point :around #'+suggest-other-faces)))
 

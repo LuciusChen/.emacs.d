@@ -257,4 +257,44 @@ if one already exists."
             org-latex-preview-auto-ignored-commands next-line
             org-latex-preview-auto-ignored-commands previous-line)))
 
+(setup vterm-toggle
+  (:global [f8] vterm-toggle)
+  (:when-loaded
+    (:with-map vterm-mode-map
+      (:bind [f8] vterm-toggle
+             [(control return)] vterm-toggle-insert-cd))
+    (:option vterm-toggle-cd-auto-create-buffer nil)
+    (defvar vterm-compile-buffer nil)
+    (defun vterm-compile ()
+      "Compile the program including the current buffer in `vterm'."
+      (interactive)
+      (setq compile-command (compilation-read-command compile-command))
+      (let ((vterm-toggle-use-dedicated-buffer t)
+            (vterm-toggle--vterm-dedicated-buffer (if (vterm-toggle--get-window)
+                                                      (vterm-toggle-hide)
+                                                    vterm-compile-buffer)))
+        (with-current-buffer (vterm-toggle-cd)
+          (setq vterm-compile-buffer (current-buffer))
+          (rename-buffer "*vterm compilation*")
+          (compilation-shell-minor-mode 1)
+          (vterm-send-M-w)
+          (vterm-send-string compile-command t))))))
+
+(setup vterm
+  (:load-after vterm-toggle)
+  (:when-loaded
+
+    (defun vterm-send-C-k-and-kill ()
+      "Send `C-k' to libvterm, and put content in kill-ring."
+      (interactive)
+      (kill-ring-save (point) (vterm-end-of-line))
+      (vterm-send-key "k" nil nil t))
+
+    (:with-map vterm-mode-map
+      (:bind "C-y" vterm-yank
+             "M-y" vterm-yank-pop
+             "C-k" vterm-send-C-k-and-kill))
+    (:option vterm-shell "zsh"
+             vterm-always-compile-module t)))
+
 ;;; init.el ends here

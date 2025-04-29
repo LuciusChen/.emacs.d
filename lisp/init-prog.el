@@ -239,5 +239,35 @@
   (:defer (:require webpaste)
           (:option webpaste-provider-priority '("paste.rs" "dpaste.org"))))
 
+(setup eshell
+  (:global [f9] eshell)
+  (:when-loaded
+    (:require eshell)
+    (:also-load esh-mode)
+    (:also-load lib-eshell)
+    (:also-load nerd-icons)
+    (:option eshell-prompt-function 'eshell-prompt-multiline
+             eshell-highlight-prompt nil
+             eshell-banner-message ""
+             eshell-cmpl-ignore-case t)
+    (:with-map eshell-mode-map
+      (:bind "C-l"  +eshell-clear
+             "<tab>" completion-at-point
+             "C-c l" +consult-eshell-history))
+    (:with-mode eshell-mode
+      (:hook (lambda ()
+               (+set-eshell-aliases +aliases)
+               (display-line-numbers-mode -1)
+               (eshell-cmpl-mode -1)))
+      (:hooks eshell-directory-change-hook +sync-dir-in-buffer-name))
+    (add-hook 'eshell-load-hook (lambda () (message "Eshell loaded"))))
+  (:with-hook eshell-load-hook
+    (:hook eat-eshell-mode)
+    (:hook eat-eshell-visual-command-mode)))
+
+(setup eshell-syntax-highlighting
+  (:load-after esh-mode)
+  (:when-loaded (eshell-syntax-highlighting-global-mode +1)))
+
 (provide 'init-prog)
 ;;; init-prog.el ends here

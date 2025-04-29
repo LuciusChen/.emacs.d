@@ -110,7 +110,6 @@
 (require 'init-org)
 (require 'init-reader)
 
-(require 'init-shell)
 (require 'init-social)
 (require 'init-mu4e)
 
