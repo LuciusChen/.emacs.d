@@ -42,9 +42,11 @@
     (:option vterm-shell "zsh"
              vterm-always-compile-module t)))
 
-(setup esh-mode
+(setup eshell
   (:global [f9] eshell)
   (:when-loaded
+    (:require eshell)
+    (:also-load esh-mode)
     (:also-load lib-eshell)
     (:also-load nerd-icons)
     (:option eshell-prompt-function 'eshell-prompt-multiline
@@ -61,9 +63,7 @@
                (display-line-numbers-mode -1)
                (eshell-cmpl-mode -1)))
       (:hooks eshell-directory-change-hook +sync-dir-in-buffer-name))
-    ))
-
-(setup eshell
+    (add-hook 'eshell-load-hook (lambda () (message "Eshell loaded"))))
   (:with-hook eshell-load-hook
     (:hook eat-eshell-mode)
     (:hook eat-eshell-visual-command-mode)))
