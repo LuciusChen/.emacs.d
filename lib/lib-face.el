@@ -30,10 +30,9 @@
                    t
                    'unicode
                    (font-spec :family font
-                              :size
-                              (cond ((eq system-type 'darwin) 12)
-                                    ((eq system-type 'gnu/linux) 12)
-                                    ((eq system-type 'windows-nt) 12)))
+                              :size (cond ((eq system-type 'darwin) 12)
+                                          ((eq system-type 'gnu/linux) 12)
+                                          ((eq system-type 'windows-nt) 12)))
                    nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
@@ -49,17 +48,17 @@
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
   ;; 不知道为什么会有一些字符不被覆盖，目前只能这么写了。 2025-04-07
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
-  (let ((ranges '((#xE5FA . #xE6B7)   ;; Seti-UI + Custom
-                  (#xE700 . #xE8EF)   ;; Devicons
-                  (#xED00 . #xF2FF)   ;; Font Awesome
-                  (#xE200 . #xE2A9)   ;; Font Awesome Extension
-                  (#xF0001 . #xF1AF0) ;; Material Design Icons
-                  (#xE300 . #xE3E3)   ;; Weather
-                  (#xF400 . #xF533)   ;; Octicons
-                  (#x2665 . #x2665)   ;; Octicons
-                  (#x26A1 . #x26A1)   ;; Octicons
-                  (#xE000 . #xE00A)   ;; Pomicons
-                  (#xEA60 . #xEC1E))));; Codicons
+  (let ((ranges '((#xE5FA . #xE6B7)    ;; Seti-UI + Custom
+                  (#xE700 . #xE8EF)    ;; Devicons
+                  (#xED00 . #xF2FF)    ;; Font Awesome
+                  (#xE200 . #xE2A9)    ;; Font Awesome Extension
+                  (#xF0001 . #xF1AF0)  ;; Material Design Icons
+                  (#xE300 . #xE3E3)    ;; Weather
+                  (#xF400 . #xF533)    ;; Octicons
+                  (#x2665 . #x2665)    ;; Octicons
+                  (#x26A1 . #x26A1)    ;; Octicons
+                  (#xE000 . #xE00A)    ;; Pomicons
+                  (#xEA60 . #xEC1E)))) ;; Codicons
     (dolist (range ranges)
       (set-fontset-font t range *symbol-default-font*)))
   ;; Set font for specific characters
@@ -91,12 +90,13 @@
 
 (defun +suggest-other-faces (func &rest args)
   "Temporarily disable `global-hl-line-mode' while executing FUNC with ARGS."
-  (if global-hl-line-mode
-      (progn
-        (global-hl-line-mode -1)
-        (prog1 (apply func args)
-          (global-hl-line-mode 1)))
-    (apply func args)))
+  (let ((was-hl-line-mode-enabled global-hl-line-mode))
+    (when was-hl-line-mode-enabled
+      (global-hl-line-mode -1))
+    (unwind-protect
+        (apply func args)
+      (when was-hl-line-mode-enabled
+        (global-hl-line-mode 1)))))
 
 ;; 用于检查 unicode 是否被字体覆盖
 (defun check-symbols-nerd-font-mono-coverage (unicode)
