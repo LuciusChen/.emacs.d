@@ -1,0 +1,13 @@
+diff --git a/src/nsterm.m b/src/nsterm.m
+index 5514a693c86..89664ad3f4d 100644
+--- a/src/nsterm.m
++++ b/src/nsterm.m
+@@ -9728,7 +9728,7 @@ - (id)accessibilityAttributeValue:(NSString *)attribute
+   NSTRACE ("[EmacsWindow accessibilityAttributeValue:]");
+ 
+   if ([attribute isEqualToString:NSAccessibilityRoleAttribute])
+-    return NSAccessibilityTextFieldRole;
++    return NSAccessibilityWindowRole;
+ 
+   if ([attribute isEqualToString:NSAccessibilitySelectedTextAttribute]
+       && curbuf && ! NILP (BVAR (curbuf, mark_active)))
