@@ -109,14 +109,23 @@
     (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
       (:hook eglot-ensure))
     (:option eglot-events-buffer-size 0
-             eglot-events-buffer-config '(:size 0 :format full)) ;; 取消 eglot log
+             eglot-events-buffer-config '(:size 0 :format full) ;; 取消 eglot log
+             ;; ignore lsp formatting provider, format with apheleia.
+             eglot-ignored-server-capabilities '(:documentFormattingProvider
+                                                 :documentRangeFormattingProvider))
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
     (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
-    ;; ignore lsp formatting provider, format with apheleia.
-    (add-to-list 'eglot-ignored-server-capabilities :documentFormattingProvider)
-    (add-to-list 'eglot-ignored-server-capabilities :documentRangeFormattingProvider)
-    (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)))
+    (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+    ;; https://github.com/joaotavora/eglot/discussions/898
+    (add-hook 'eglot-managed-mode-hook
+              (lambda ()
+                ;; Show flymake diagnostics first.
+                (setq eldoc-documentation-functions
+                      (cons #'flymake-eldoc-function
+                            (remove #'flymake-eldoc-function eldoc-documentation-functions)))
+                ;; Show all eldoc feedback.
+                (setq eldoc-documentation-strategy #'eldoc-documentation-compose)))))
 
 ;; 若提示 [eglot] (warning) Could not find required eclipse.jdt.ls files (build required?)
 ;; 则需要执行 eglot-java-upgrade-lsp-server

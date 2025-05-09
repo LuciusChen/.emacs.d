@@ -2,16 +2,19 @@
 
 # Function to print usage
 usage() {
-  echo "Usage: $0 [normal|mps]"
-  echo "  normal: Install the normal version of emacs-plus@31 (default)"
-  echo "  mps: Install the MPS version of emacs-plus@31"
+  echo "Usage: $0 [normal|mps] [30|31]"
+  echo "  normal: Install the normal version (default)"
+  echo "  mps: Install the MPS version"
+  echo "  30: Install emacs-plus@30"
+  echo "  31: Install emacs-plus@31 (default)"
   exit 1
 }
 
-# Set default version type
+# Set default version type and emacs version
 VERSION_TYPE="normal"
+EMACS_VERSION="31"
 
-# Check if the user provided an argument and if it's valid
+# Check if the user provided arguments and if they're valid
 if [ -n "$1" ]; then
   if [ "$1" = "normal" ] || [ "$1" = "mps" ]; then
     VERSION_TYPE=$1
@@ -20,12 +23,20 @@ if [ -n "$1" ]; then
   fi
 fi
 
+if [ -n "$2" ]; then
+  if [ "$2" = "30" ] || [ "$2" = "31" ]; then
+    EMACS_VERSION=$2
+  else
+    usage
+  fi
+fi
+
 # Uninstall first
-if brew list --versions emacs-plus@31 > /dev/null 2>&1; then
-  echo "Uninstalling existing emacs-plus@31..."
-  brew uninstall emacs-plus@31
+if brew list --versions emacs-plus@$EMACS_VERSION > /dev/null 2>&1; then
+  echo "Uninstalling existing emacs-plus@$EMACS_VERSION..."
+  brew uninstall emacs-plus@$EMACS_VERSION
 else
-  echo "emacs-plus@31 is not installed. Skipping uninstall step."
+  echo "emacs-plus@$EMACS_VERSION is not installed. Skipping uninstall step."
 fi
 
 # Navigate to the repository and pull the latest changes
@@ -33,9 +44,9 @@ cd /opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus || exit
 git pull
 
 # Define the path to the formula and patches
-FORMULA_PATH="/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@31.rb"
-PATCH_DIR="$HOME/.emacs.d/patches"
-TARGET_PATCH_DIR="/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-31"
+FORMULA_PATH="/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@$EMACS_VERSION.rb"
+PATCH_DIR="$HOME/.emacs.d/patches/emacs-$EMACS_VERSION"
+TARGET_PATCH_DIR="/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-$EMACS_VERSION"
 
 # Copy the original formula for backup
 cp "$FORMULA_PATH" "${FORMULA_PATH}.bak"
@@ -141,7 +152,7 @@ inject_patches() {
 # Call the function to inject patches
 inject_patches
 
-# Install emacs-plus@31 with specified options
-brew install emacs-plus@31 --with-savchenkovaleriy-big-sur-icon --with-xwidgets
+# Install emacs-plus with specified options
+brew install emacs-plus@$EMACS_VERSION --with-savchenkovaleriy-big-sur-icon --with-xwidgets
 
-osascript -e 'tell application "Finder" to make alias file to posix file "/opt/homebrew/opt/emacs-plus@31/Emacs.app" at posix file "/Applications" with properties {name:"Emacs.app"}'
+osascript -e "tell application \"Finder\" to make alias file to posix file \"/opt/homebrew/opt/emacs-plus@$EMACS_VERSION/Emacs.app\" at posix file \"/Applications\" with properties {name:\"Emacs.app\"}"
