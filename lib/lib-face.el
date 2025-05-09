@@ -67,26 +67,38 @@
   (set-fontset-font t 'javanese *jp-default-font*))
 
 ;; https://github.com/mickeynp/ligature.el/issues/8
-(defconst ligatures-alist
-  '("<--" "<---" "<<-" "<-" "<->" "->" "->>" "-->" "--->"
-    "<!--" "-<<" "-<" "-<-" "->-" ">-" ">>-" "<-->" "<--->"
-    "<---->" "<==" "<===" "<<=" "<=" "<=>" "=>" "=>>" "==>"
-    "===>" "<!---" "=<<" "=<" "=<=" "=>=" ">=" ">>=" "<==>"
-    "<===>" "<====>" "<-------" "------->" "<======>" "<~~"
-    "<~" "~>" "~~>" "\\/" "/\\" "==" "!=" "/=" "~=" "<>"
-    "===" "!==" "=/=" "=!=" ":=" ":-" ":+" "<*" "<*>" "*>"
-    "<|" "<|>" "|>" "+:" "-:" "=:" "::" ":::" "<." "<.>"
-    ".>" "(*" "*)" ":>" "++" "+++" "|-" "-|"))
-
-(sort ligatures-alist (lambda (x y) (> (length x) (length y))))
-
-(dolist (pat ligatures-alist)
-  (set-char-table-range composition-function-table
-                        (aref pat 0)
-                        (nconc (char-table-range composition-function-table (aref pat 0))
-                               (list (vector (regexp-quote pat)
-                                             0
-                                             'compose-gstring-for-graphic)))))
+(defun configure-ligatures ()
+  "Configure ligatures for the current buffer."
+  (let ((ligatures-alist
+         '("!!" "!=" "!==" "!!!" "!≡" "!≡≡" "!>" "!=<" "#("
+           "#_" "#{" "#?" "#>" "##" "#_(" "%=" "%>" "%>%" "%<%"
+           "&%" "&&" "&*" "&+" "&-" "&/" "&=" "&&&" "&>" "$>"
+           "***" "*=" "*/" "*>" "++" "+++" "+=" "+>" "++=" "--"
+           "-<" "-<<" "-=" "->" "->>" "---" "-->" "-+-" "-\\/"
+           "-|>" "-<|" ".." "..." "..<" ".>" ".~" ".=" "/*" "//"
+           "/>" "/=" "/==" "///" "/**" ":::" "::" ":=" ":≡" ":>"
+           ":=>" ":(" ":-(" ":)" ":-)" ":/" ":\\" ":3" ":D" ":P"
+           ":>:" ":<:" "<$>" "<*" "<*>" "<+>" "<-" "<<" "<<<" "<<="
+           "<=" "<=>" "<>" "<|>" "<<-" "<|" "<=<" "<~" "<~~" "<<~"
+           "<$" "<+" "<!>" "<@>" "<#>" "<%>" "<^>" "<&>" "<?>" "<.>"
+           "</>" "<\\>" "<\">" "<:>" "<~>" "<**>" "<<^" "<!" "<@"
+           "<#" "<%" "<^" "<&" "<?" "<." "</" "<\\" "<\"" "<:" "<->"
+           "<!--" "<--" "<~<" "<==>" "<|-" "<<|" "<-<" "<-->" "<<=="
+           "<==" "=<<" "==" "===" "==>" "=>" "=~" "=>>" "=/=" "=~="
+           "==>>" "≡≡" "≡≡≡" "≡:≡" ">-" ">=" ">>" ">>-" ">>=" ">>>"
+           ">=>" ">>^" ">>|" ">!=" ">->" "??" "?~" "?=" "?>" "???"
+           "?." "^=" "^." "^?" "^.." "^<<" "^>>" "^>" "\\\\" "\\>"
+           "\\/-" "@>" "|=" "||" "|>" "|||" "|+|" "|->" "|-->" "|=>"
+           "|==>" "|>-" "|<<" "||>" "|>>" "|-" "||-" "~=" "~>" "~~>"
+           "~>>" "[[" "]]" "\">" "_|_")))
+    (sort ligatures-alist (lambda (x y) (> (length x) (length y))))
+    (dolist (pat ligatures-alist)
+      (set-char-table-range composition-function-table
+                            (aref pat 0)
+                            (nconc (char-table-range composition-function-table (aref pat 0))
+                                   (list (vector (regexp-quote pat)
+                                                 0
+                                                 'compose-gstring-for-graphic)))))))
 
 (defun +suggest-other-faces (func &rest args)
   "Temporarily disable `global-hl-line-mode' while executing FUNC with ARGS."

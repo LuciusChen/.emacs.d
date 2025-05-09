@@ -91,6 +91,7 @@
 (when window-system
   (setup faces
     (:also-load lib-face)
+    (configure-ligatures)
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts
             default-text-scale-mode-hook +setup-fonts)
