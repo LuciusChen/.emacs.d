@@ -81,6 +81,7 @@
         (yasnippet :host github :repo "joaotavora/yasnippet")
         (panel :host github :repo "LuciusChen/panel")
         (indent-bars :host github :repo "jdtsmith/indent-bars")
+	(too-wide-minibuffer-mode :host github :repo "hron/too-wide-minibuffer-mode")
         (consult-mu :host github :repo "armindarvish/consult-mu")
         (eglot-booster :host github :repo "jdtsmith/eglot-booster")
         ;; (beancount-mode :host github :repo "beancount/beancount-mode")
