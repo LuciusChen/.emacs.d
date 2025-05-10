@@ -31,6 +31,12 @@ if [ -n "$2" ]; then
   fi
 fi
 
+# Ensure MPS is only used with version 31
+if [ "$VERSION_TYPE" = "mps" ] && [ "$EMACS_VERSION" != "31" ]; then
+  echo "The MPS version is only supported with Emacs 31."
+  exit 1
+fi
+
 # Uninstall first
 if brew list --versions emacs-plus@$EMACS_VERSION > /dev/null 2>&1; then
   echo "Uninstalling existing emacs-plus@$EMACS_VERSION..."

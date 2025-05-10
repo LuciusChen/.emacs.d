@@ -91,7 +91,7 @@
 (when window-system
   (setup faces
     (:also-load lib-face)
-    (configure-ligatures)
+    ;; (configure-ligatures)
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts
             default-text-scale-mode-hook +setup-fonts)
@@ -113,7 +113,12 @@
     (add-to-list 'dimmer-exclusion-predicates '+display-non-graphic-p)
     (:advice frame-set-background-mode :after (lambda (&rest args) (dimmer-process-all)))))
 
-(setup nerd-icons (:defer (:require nerd-icons)))
+(setup nerd-icons
+  (:defer (:require nerd-icons))
+  (:when-loaded
+    (when (and (display-graphic-p)
+               (not (find-font (font-spec :name nerd-icons-font-family))))
+      (nerd-icons-install-fonts t))))
 
 (setup window-navigation
   (:defer (:require window-navigation))

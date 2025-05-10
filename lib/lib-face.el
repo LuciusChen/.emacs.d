@@ -19,6 +19,10 @@
 
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
+  (cl-loop for font in *symbol-font*
+           when (find-font (font-spec :name font))
+           return (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
+
   ;; "Emacs 28 now has 'emoji . before, emoji is part of 'symbol"
   ;; 根据上面这句话应该写成 'emoji 就可以了，但是由于 Emoji 本身
   ;; 分布比较散，所以还是先设置 'unicode 后再设置 CJK 比较靠谱。
@@ -26,14 +30,7 @@
   ;; https://emacs-china.org/t/emacs/15676/34
   (cl-loop for font in *emoji-fonts*
            when (find-font (font-spec :name font))
-           return (set-fontset-font
-                   t
-                   'unicode
-                   (font-spec :family font
-                              :size (cond ((eq system-type 'darwin) 12)
-                                          ((eq system-type 'gnu/linux) 12)
-                                          ((eq system-type 'windows-nt) 12)))
-                   nil 'prepend))
+           return (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
@@ -60,11 +57,7 @@
                   (#xE000 . #xE00A)    ;; Pomicons
                   (#xEA60 . #xEC1E)))) ;; Codicons
     (dolist (range ranges)
-      (set-fontset-font t range *symbol-default-font*)))
-  ;; Set font for specific characters
-  ;; (set-fontset-font nil ?❤ "Symbols Nerd Font Mono")
-
-  (set-fontset-font t 'javanese *jp-default-font*))
+      (set-fontset-font t range *nerd-icons-font*))))
 
 ;; https://github.com/mickeynp/ligature.el/issues/8
 (defun configure-ligatures ()
