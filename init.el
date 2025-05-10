@@ -22,18 +22,20 @@
 (defconst *is-linux* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
 (defconst *org-path* "~/Library/CloudStorage/Dropbox/org")
 (defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
-(defconst *emoji-fonts* '("Apple Color Emoji"
-                          "Noto Color Emoji"
-                          "Noto Emoji"
-                          "Segoe UI Emoji"
-                          "Symbola"))
 (defconst *default-font* "MonoLisa Lucius 14")
 (defconst *org-font* "Aporetic Serif Mono 14")
 (defconst *term-default-font* "Aporetic Serif Mono 14")
 (defconst *prog-font* "Aporetic Serif Mono 14")
 (defconst *zh-default-font* "LXGW WenKai")
-(defconst *jp-default-font* "Noto Sans Javanese")
-(defconst *symbol-default-font* "Symbols Nerd Font Mono")
+(defconst *nerd-icons-font* "Symbols Nerd Font Mono")
+(defconst *emoji-fonts* '("Apple Color Emoji"
+                          "Noto Color Emoji"
+                          "Noto Emoji"
+                          "Segoe UI Emoji"))
+(defconst *symbol-font* '("Apple Symbols"
+                          "Segoe UI Symbol"
+                          "Symbola"
+                          "Symbol"))
 
 ;; Install straight.el
 ;; branch develop

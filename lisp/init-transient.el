@@ -65,7 +65,8 @@
        ["diagnostic"
         ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
         ("N" "jump-to-prev-diagnostic" flymake-goto-prev-error)
-        ("l" "list-diagnostics"        consult-flymake)]
+        ("l" "list-diagnostics"        consult-flymake)
+        ("s" "show-buffer-diagnostics" flymake-show-buffer-diagnostics)]
        ["Navigate"
         ("m" "consult-mark" consult-mark)]])
 
