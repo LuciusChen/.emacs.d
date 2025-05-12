@@ -7,11 +7,6 @@
     (:option completion-styles '(orderless basic)
              completion-category-defaults nil
              completion-ignore-case t
-             ;; https://github.com/minad/corfu/issues/136
-             ;; eglot 会更改 completion-category-defaults 这个变量。
-             ;; 需要通过修改 completion-category-overrides 改为 orderless
-             completion-category-overrides '((file (styles partial-completion basic))
-                                             (eglot (styles . (orderless flex))))
              orderless-component-separator "[ &]")
 
     ;; https://github.com/oantolin/orderless/issues/111#issuecomment-1098763842
