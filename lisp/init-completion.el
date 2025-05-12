@@ -4,7 +4,7 @@
 (setup orderless
   (:defer (:require orderless))
   (:when-loaded
-    (:option completion-styles '(orderless flex)
+    (:option completion-styles '(orderless basic)
              completion-category-defaults nil
              completion-ignore-case t
              ;; https://github.com/minad/corfu/issues/136
@@ -13,11 +13,6 @@
              completion-category-overrides '((file (styles partial-completion basic))
                                              (eglot (styles . (orderless flex))))
              orderless-component-separator "[ &]")
-    ;; pinyinlib.el 用于匹配简体/繁体汉字拼音首字母
-    (add-to-list 'orderless-matching-styles
-                 (lambda (str)
-                   (orderless-regexp
-                    (pinyinlib-build-regexp-string str))))
 
     ;; https://github.com/oantolin/orderless/issues/111#issuecomment-1098763842
     (defun orderless+basic-all (str table pred point)
@@ -33,6 +28,15 @@
                    orderless+basic-try
                    orderless+basic-all
                    "Unholy mix of Orderless and Basic."))))
+
+;; pinyinlib.el 用于匹配简体/繁体汉字拼音首字母
+(setup pinyinlib
+  (:load-after orderless)
+  (:when-loaded
+    (add-to-list 'orderless-matching-styles
+                 (lambda (str)
+                   (orderless-regexp
+                    (pinyinlib-build-regexp-string str))))))
 
 (setup corfu
   (:defer (:require corfu))
