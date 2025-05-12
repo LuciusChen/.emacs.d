@@ -6,8 +6,7 @@
   (:when-loaded
     (:option completion-styles '(orderless basic)
              completion-category-defaults nil
-             completion-ignore-case t
-             orderless-component-separator "[ &]")
+             completion-ignore-case t)
 
     ;; https://github.com/oantolin/orderless/issues/111#issuecomment-1098763842
     (defun orderless+basic-all (str table pred point)
