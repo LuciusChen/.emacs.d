@@ -28,9 +28,11 @@
   ;; 分布比较散，所以还是先设置 'unicode 后再设置 CJK 比较靠谱。
   ;; 特例：'emoji 就会导致 ⛈️ fallback 到 ⛈
   ;; https://emacs-china.org/t/emacs/15676/34
+  ;;
+  ;; 另外 emoji 的尺寸会导致 corfu candidates 显示不全，因此要缩小。
   (cl-loop for font in *emoji-fonts*
            when (find-font (font-spec :name font))
-           return (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))
+           return (set-fontset-font t 'emoji (font-spec :family font :size 12) nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))

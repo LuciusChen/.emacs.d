@@ -116,14 +116,14 @@
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
     ;; https://github.com/joaotavora/eglot/discussions/898
-    (add-hook 'eglot-managed-mode-hook
-              (lambda ()
-                ;; Show flymake diagnostics first.
-                (setq eldoc-documentation-functions
-                      (cons #'flymake-eldoc-function
-                            (remove #'flymake-eldoc-function eldoc-documentation-functions)))
-                ;; Show all eldoc feedback.
-                (setq eldoc-documentation-strategy #'eldoc-documentation-compose)))))
+    (:with-hook eglot-managed-mode-hook
+      (:hook (lambda ()
+               ;; Show flymake diagnostics first.
+               (setq eldoc-documentation-functions
+                     (cons #'flymake-eldoc-function
+                           (remove #'flymake-eldoc-function eldoc-documentation-functions)))
+               ;; Show all eldoc feedback.
+               (setq eldoc-documentation-strategy #'eldoc-documentation-compose))))))
 
 ;; 若提示 [eglot] (warning) Could not find required eclipse.jdt.ls files (build required?)
 ;; 则需要执行 eglot-java-upgrade-lsp-server
