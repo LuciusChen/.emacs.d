@@ -110,7 +110,7 @@ Stole from aweshell"
          (command (consult--read history
                                  :prompt "Command: "
                                  :initial input)))
-    (setf (buffer-substring start-pos end-pos) command)
+    (setf (buffer-substring-no-properties start-pos end-pos) command)
     (end-of-line)))
 
 (defun consult-switch-to-eshell-buffer ()

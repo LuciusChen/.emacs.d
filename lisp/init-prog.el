@@ -240,7 +240,7 @@
           (:option webpaste-provider-priority '("paste.rs" "dpaste.org"))))
 
 (setup eshell
-  (:global [f9] eshell)
+  (:global [f8] eshell)
   (:when-loaded
     (:require eshell)
     (:also-load esh-mode)
