@@ -57,7 +57,7 @@
 ;; install packages
 (defvar *use-package-list*
   '(nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
-        corfu vundo forge verb elfeed popper embark bibtex dimmer vertico
+        corfu forge verb elfeed popper embark bibtex dimmer vertico
         diredfl separedit cdlatex pyvenv consult mmm-mode ox-hugo scratch
         diff-hl company goggles flymake web-mode js2-mode move-dup diminish
         doom-modeline git-link webpaste apheleia mastodon pdf-tools ox-pandoc
