@@ -199,7 +199,7 @@ If N is negative, select to the beginning of the previous Nth thing instead."
    '("s" . meow-kill)
    '("t" . meow-till)
    '("u" . meow-undo)
-   '("U" . vundo)
+   '("U" . meow-undo-in-selection)
    '("V" . meow-visit)
    '("w" . meow-mark-word)
    '("W" . meow-mark-symbol)

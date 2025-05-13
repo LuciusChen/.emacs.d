@@ -181,10 +181,6 @@
   (global-whitespace-cleanup-mode)
   (diminish 'whitespace-cleanup-mode))
 
-(setup vundo
-  (:option vundo--window-max-height 5
-           vundo-roll-back-on-quit t))
-
 (setup imenu
   (:when-loaded
     (:with-mode emacs-lisp-mode
