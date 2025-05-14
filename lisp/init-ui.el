@@ -194,5 +194,11 @@
     (:advice telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
     (:advice telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)))
 
+(setup too-wide-minibuffer-mode
+  (:defer (:require too-wide-minibuffer-mode))
+  (:when-loaded
+    (:option too-wide-minibuffer-max-width 200
+             minibuffer-follows-selected-frame nil)))
+
 (provide 'init-ui)
 ;;; init-ui.el ends here
