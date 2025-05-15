@@ -58,19 +58,19 @@
 (defvar *use-package-list*
   '(nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
         corfu forge verb elfeed popper embark bibtex dimmer vertico
-        diredfl separedit cdlatex pyvenv consult mmm-mode ox-hugo scratch
-        diff-hl company goggles flymake web-mode js2-mode move-dup diminish
-        doom-modeline git-link webpaste apheleia mastodon pdf-tools ox-pandoc
-        macrostep json-mode orderless kind-icon git-modes git-blamed dape
-        org-modern ace-pinyin marginalia org-remark elfeed-tube citar-denote
-        denote-org denote-journal denote-markdown rainbow-mode prettier-js
-        vterm vterm-toggle org-cliplink language-detection meow-tree-sitter
-        markdown-mode mode-line-bell embark-consult speed-type go-translate
-        elfeed-tube-mpv typescript-mode nerd-icons-dired command-log-mode
+        diredfl separedit cdlatex pyvenv consult mmm-mode scratch
+        diff-hl company goggles flymake web-mode js2-mode move-dup
+        doom-modeline git-link webpaste apheleia mastodon pdf-tools
+        macrostep json-mode orderless kind-icon git-modes git-blamed
+        org-modern ace-pinyin marginalia org-remark elfeed-tube dape
+        denote-org denote-journal denote-markdown rainbow-mode ox-hugo
+        org-cliplink language-detection meow-tree-sitter ox-pandoc
+        markdown-mode mode-line-bell embark-consult speed-type diminish
+        elfeed-tube-mpv typescript-mode nerd-icons-dired go-translate
         browse-kill-ring rainbow-delimiters default-text-scale denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         password-store-otp password-store eshell-syntax-highlighting
-        projectile consult-dir dirvish swift-mode eat
+        projectile consult-dir dirvish eat citar-denote command-log-mode
         (image-slicing :host github :repo "ginqi7/image-slicing")
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
