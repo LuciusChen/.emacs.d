@@ -110,5 +110,16 @@ Returns:
                                [,(file-truename java-debug-jar)])))))
       contact)))
 
+;; https://github.com/joaotavora/eglot/issues/1296
+;; related to (setq flymake-no-changes-timeout nil)
+(cl-defmethod eglot-handle-notification :after
+  (_server (_method (eql textDocument/publishDiagnostics)) &key uri
+           &allow-other-keys)
+  (when-let ((buffer (find-buffer-visiting (eglot-uri-to-path uri))))
+    (with-current-buffer buffer
+      (if (and (eq nil flymake-no-changes-timeout)
+               (not (buffer-modified-p)))
+          (flymake-start t)))))
+
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here

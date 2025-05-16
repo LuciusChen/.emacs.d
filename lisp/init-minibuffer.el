@@ -81,6 +81,7 @@
              "M-g p" consult-project-buffer
              "M-g y" consult-flymake
              "M-g m" consult-global-mark
+             "M-g a" consult-org-agenda
              ;; brew install fd
              "M-g d" consult-fd
              [remap switch-to-buffer] consult-buffer

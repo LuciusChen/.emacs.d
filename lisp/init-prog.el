@@ -118,7 +118,9 @@
 (setup flymake
   (:defer (:require flymake))
   (:when-loaded
-    (:option flymake-no-changes-timeout 0.5
+    ;; 注意：当 `flymake-no-changes-timeout` 被设置为 nil 时，
+    ;; 需要实现 `eglot-handle-notification` 的 `:after` 方法。
+    (:option flymake-no-changes-timeout nil
              ;; emacs@30 feature
              flymake-show-diagnostics-at-end-of-line t
              flymake-fringe-indicator-position 'right-fringe)
