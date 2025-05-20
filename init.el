@@ -76,7 +76,6 @@
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
         (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
-        (treesit-auto :host github :repo "LuciusChen/treesit-auto")
         (telega :host github :repo "LuciusChen/telega.el")
         (md :host github :repo "eki3z/md")
         ;; (telega :host github :repo "zevlg/telega.el")

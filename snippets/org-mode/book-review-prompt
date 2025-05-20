@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: book review prompt
+# key: <book
+# --
+请为《读书》杂志写一篇读书随笔。
+
+评论对象：$1
+字数限制：$2
+
+风格参照先前约定。
