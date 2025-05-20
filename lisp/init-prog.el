@@ -173,12 +173,42 @@
   ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)
   (:hooks xref-after-jump-hook +xref-quit-window))
 
-(setup treesit-auto
-  (:defer (:require treesit-auto))
-  (:when-loaded
-    (:option treesit-auto-install 'prompt)
-    (treesit-auto-add-to-auto-mode-alist '(bash bibtex cmake commonlisp css dockerfile html java javascript json latex make lua org python rust ruby sql toml typescript typst vue yaml))
-    (global-treesit-auto-mode)))
+(setup treesit
+  (:option treesit-language-source-alist
+           '((rust            . ("https://github.com/tree-sitter/tree-sitter-rust"))
+             (toml            . ("https://github.com/tree-sitter/tree-sitter-toml"))
+             (haskell         . ("https://github.com/tree-sitter/tree-sitter-haskell"))
+             (bibtex          .  ("https://github.com/latex-lsp/tree-sitter-bibtex"))
+             (cmake           . ("https://github.com/uyha/tree-sitter-cmake"))
+             (css             . ("https://github.com/tree-sitter/tree-sitter-css"))
+             (dockerfile      . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+             (html            . ("https://github.com/tree-sitter/tree-sitter-html"))
+             (java            . ("https://github.com/tree-sitter/tree-sitter-java"))
+             (javascript      . ("https://github.com/tree-sitter/tree-sitter-javascript"))
+             (jsdoc           . ("https://github.com/tree-sitter/tree-sitter-jsdoc"))
+             (json            . ("https://github.com/tree-sitter/tree-sitter-json"))
+             (latex           . ("https://github.com/latex-lsp/tree-sitter-latex"))
+             (make            . ("https://github.com/tree-sitter-grammars/tree-sitter-make"))
+             (lua             . ("https://github.com/tree-sitter-grammars/tree-sitter-lua"))
+             (org             . ("https://github.com/milisims/tree-sitter-org"))
+             (python          . ("https://github.com/tree-sitter/tree-sitter-python"))
+             (sql             . ("https://github.com/DerekStride/tree-sitter-sql"))
+             (typescript      . ("https://github.com/tree-sitter/tree-sitter-typescript"))
+             (tsx             . ("https://github.com/tree-sitter/tree-sitter-typescript"))
+             (typst           . ("https://github.com/uben0/tree-sitter-typst"))
+             (vue             . ("https://github.com/tree-sitter-grammars/tree-sitter-vue"))
+             (yaml            . ("https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
+             (markdown        . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"))
+             (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"))))
+
+  (defun +treesit-install-all-languages ()
+    "Install all languages specified by `treesit-language-source-alist'."
+    (interactive)
+    (let ((languages (mapcar 'car treesit-language-source-alist)))
+      (dolist (lang languages)
+        (treesit-install-language-grammar lang)
+        (message "`%s' parser was installed." lang)
+        (sit-for 0.75)))))
 
 (setup indent-bars
   (:with-mode (java-ts-mode python-ts-mode vue-mode typescript-mode typescript-ts-mode js-mode)
