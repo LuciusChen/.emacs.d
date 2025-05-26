@@ -198,8 +198,8 @@
              (typst           . ("https://github.com/uben0/tree-sitter-typst"))
              (vue             . ("https://github.com/tree-sitter-grammars/tree-sitter-vue"))
              (yaml            . ("https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
-             (markdown        . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"))
-             (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"))))
+             (markdown        . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+             (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))
 
   (defun +treesit-install-all-languages ()
     "Install all languages specified by `treesit-language-source-alist'."
