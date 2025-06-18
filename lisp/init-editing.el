@@ -207,7 +207,33 @@
 (setup goggles
   (:hook-into prog-mode)
   (:hook-into text-mode)
-  (:option goggles-pulse t))
+  (:option goggles-pulse t)
+
+  (defun +goggles--post-command ()
+    "Highlight change after command."
+    (when goggles--changes
+      (let ((start most-positive-fixnum)
+            (end 0)
+            (pulse-delay goggles-pulse-delay)
+            (pulse-iterations goggles-pulse-iterations)
+            (pulse-flag goggles-pulse))
+        (dolist (change goggles--changes)
+          (when (and (marker-position (car change))
+                     (marker-position (cdr change)))
+            (setq start (min start (marker-position (car change)))
+                  end (max end (marker-position (cdr change)))))
+          (set-marker (car change) nil)
+          (set-marker (cdr change) nil))
+        (unless (or (= start most-positive-fixnum) (= end 0))
+          (pulse-momentary-highlight-region
+           start end
+           (cond
+            ((> goggles--delta 0) 'goggles-added)
+            ((< goggles--delta 0) 'goggles-removed)
+            (t 'goggles-changed))))
+        (setq goggles--changes nil
+              goggles--delta 0))))
+  (:advice goggles--post-command :override #'+goggles--post-command))
 
 (setup speed-type (:defer (:require speed-type)))
 

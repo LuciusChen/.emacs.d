@@ -69,5 +69,13 @@ optional and is used to specify which frame's opacity to change."
           (set-opacity 75))
     (message "Non-graphical interface")))
 
+(defun light ()
+  (interactive)
+  (apply-theme light-theme 100))
+
+(defun dark ()
+  (interactive)
+  (apply-theme dark-theme 75))
+
 (provide 'lib-appearance)
 ;;; lib-appearance.el ends here
