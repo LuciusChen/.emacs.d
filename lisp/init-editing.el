@@ -94,7 +94,7 @@
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
          "im.rime.inputmethod.Squirrel.Hans")
-      (sis-ism-lazyman-config "1" "2" 'fcitx))
+      (sis-ism-lazyman-config "1" "2" 'fcitx5))
     ;; enable the /cursor color/ mode
     (sis-global-cursor-color-mode t)
     ;; enable the /respect/ mode
