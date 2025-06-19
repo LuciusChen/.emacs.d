@@ -8,21 +8,28 @@
 (setq warning-minimum-level :emergency)
 
 (defconst *spell-check-support-enabled* nil ) ;; Enable with t if you prefer
+(defconst *spell-check-support-enabled* nil )
 (defconst *is-mac* (eq system-type 'darwin))
 (defconst *is-linux* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
-(defconst *org-path* "~/Library/CloudStorage/Dropbox/org")
+(defconst *org-path*
+  (cond (*is-mac* "~/Library/CloudStorage/Dropbox/org")
+        (*is-linux* "~/Dropbox/org")))
 (defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
+(defconst *font-size* (if *is-mac* 14 12))
+(defconst *default-font* (format "MonoLisa Lucius %d" *font-size*))
+(defconst *org-font* (format "Aporetic Serif Mono %d" *font-size*))
+(defconst *term-default-font* (format "Aporetic Serif Mono %d" *font-size*))
+(defconst *prog-font* (format "Aporetic Serif Mono %d" *font-size*))
+(defconst *zh-default-font* "LXGW WenKai")
+(defconst *nerd-icons-font* "Symbols Nerd Font Mono")
 (defconst *emoji-fonts* '("Apple Color Emoji"
                           "Noto Color Emoji"
                           "Noto Emoji"
-                          "Segoe UI Emoji"
-                          "Symbola"))
-(defconst *default-font* "JetBrains Mono 14")
-(defconst *pro-font* "iosevka")
-(defconst *term-default-font* "iosevkaTerm Nerd Font Mono 14")
-(defconst *zh-default-font* "LXGW WenKai")
-(defconst *jp-default-font* "Noto Sans Javanese")
-(defconst *symbol-default-font* "Symbols Nerd Font Mono")
+                          "Segoe UI Emoji"))
+(defconst *symbol-font* '("Apple Symbols"
+                          "Segoe UI Symbol"
+                          "Symbola"
+                          "Symbol"))
 
 ;; Install straight.el
 ;; branch develop
