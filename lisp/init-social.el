@@ -37,6 +37,7 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (:option
+     telega-emoji-use-images nil
      telega-notifications-mode 1
      telega-notifications-msg-temex '(and (not outgoing)
                                           (not (chat (or (type channel))))
