@@ -38,12 +38,6 @@
            "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))
            "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
 
-(setup frame
-  (:when-loaded
-    (let ((border '(internal-border-width . 12)))
-      (add-to-list 'default-frame-alist border)
-      (add-to-list 'initial-frame-alist border))))
-
 (setup panel
   (:option panel-latitude 32.09703
            panel-longitude 118.77969

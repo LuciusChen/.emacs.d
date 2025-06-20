@@ -117,7 +117,7 @@ Returns:
 (cl-defmethod eglot-handle-notification :after
   (_server (_method (eql textDocument/publishDiagnostics)) &key uri
            &allow-other-keys)
-  (when-let ((buffer (find-buffer-visiting (eglot-uri-to-path uri))))
+  (when-let* ((buffer (find-buffer-visiting (eglot-uri-to-path uri))))
     (with-current-buffer buffer
       (if (and (eq nil flymake-no-changes-timeout)
                (not (buffer-modified-p)))
