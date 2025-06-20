@@ -70,10 +70,10 @@
 
     (:with-hook window-setup-hook
       (:hook reapply-themes)
-      (:hook opacity-dark-theme)
+      (if *is-mac* (:hook opacity-dark-theme))
       (:hook set-dividers-and-fringe-color))
 
-    (:with-hook after-make-frame-functions (:hook opacity-dark-theme))
+    (if *is-mac* (:with-hook after-make-frame-functions (:hook opacity-dark-theme)))
     (:with-hook after-init-hook (:hook reapply-themes))))
 
 (setup hl-line
