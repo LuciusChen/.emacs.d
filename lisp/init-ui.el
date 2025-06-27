@@ -98,15 +98,6 @@
 
 (setup popup-frames (:defer (:require popup-frames)))
 
-(setup dimmer
-  (:defer (dimmer-mode t))
-  (:when-loaded
-    (setq-default dimmer-fraction 0.5)
-    (defun +display-non-graphic-p ()
-      (not (display-graphic-p)))
-    (add-to-list 'dimmer-exclusion-predicates '+display-non-graphic-p)
-    (:advice frame-set-background-mode :after (lambda (&rest args) (dimmer-process-all)))))
-
 (setup nerd-icons
   (:defer (:require nerd-icons))
   (:when-loaded
