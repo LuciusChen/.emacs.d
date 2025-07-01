@@ -19,6 +19,7 @@
       (:bind
        "p" telega-chatbuf-filter-search
        "d" telega-chat-remove-member
+       "m" telega-describe-chat-members
        "h" telega-notifications-history
        "x" telega-chatbuf-thread-cancel))
     (if *is-mac*
