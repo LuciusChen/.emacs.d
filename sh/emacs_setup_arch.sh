@@ -22,7 +22,7 @@ cd ~/emacs && git pull
 --with-gpm=no \
 --with-imagemagick \
 --with-modules \
---with-native-compilation \
+--with-native-compilation=aot \
 --with-pgtk \
 --with-tree-sitter \
 --without-pop \
