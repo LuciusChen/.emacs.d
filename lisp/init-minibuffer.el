@@ -118,10 +118,23 @@
       (interactive "fFile: ")
       (shell-command (format "open -R %s && osascript -e 'tell application \"Finder\" to activate'" (shell-quote-argument (expand-file-name file)))))
 
+    (defun sudo-find-file (file)
+      "Open FILE as root."
+      (interactive "FOpen file as root: ")
+      (when (file-writable-p file)
+        (user-error "File is user writeable, aborting sudo"))
+      (find-file (if (file-remote-p file)
+                     (concat "/" (file-remote-p file 'method) ":"
+                             (file-remote-p file 'user) "@" (file-remote-p file 'host)
+                             "|sudo:root@"
+                             (file-remote-p file 'host) ":" (file-remote-p file 'localname))
+                   (concat "/sudo:root@localhost:" file))))
+
     (:global "C-c ." embark-act
              "M-n"   embark-next-symbol
              "M-p"   embark-previous-symbol)
-    (:with-map embark-file-map (when *is-mac* (:bind "o" +embark-open-in-finder)))
+    (:with-map embark-file-map (if *is-mac* (:bind "o" +embark-open-in-finder)
+                                 (:bind "S" sudo-find-file)))
     (:option embark-indicators '(embark-minimal-indicator
                                  embark-highlight-indicator
                                  embark-isearch-highlight-indicator)
