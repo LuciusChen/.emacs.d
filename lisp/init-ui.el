@@ -152,8 +152,9 @@
 (setup tab-bar
   (:defer (:require tab-bar))
   (:when-loaded
-    (:global "s-t" tab-bar-new-tab
-             "s-w" tab-bar-close-tab)
+    (:global "C-c r t" tab-bar-new-tab
+             "C-c r w" tab-bar-close-tab
+             "C-c r s" tab-bar-switch-to-tab)
     (:also-load lib-tabbar)
     (:option tab-bar-separator ""
              tab-bar-close-button-show nil
