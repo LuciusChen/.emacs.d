@@ -4,7 +4,7 @@
 set -e
 
 # Change to the directory containing the Emacs source code
-cd ~/emacs && git pull
+cd ~/emacs && git checkout feature/igc && git pull
 
 # Run autogen.sh to prepare the build system
 ./autogen.sh
@@ -26,6 +26,7 @@ cd ~/emacs && git pull
 --with-pgtk \
 --with-tree-sitter \
 --without-pop \
+--with-mps=yes \
 --prefix=/usr/local
 
 # Compile the project using all available CPU cores
