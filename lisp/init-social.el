@@ -134,6 +134,9 @@
         (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))
        -1001031857103
        (5296957089                   ; @nichi_matrix_bot
+        (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
+       -1001179606678
+       (5296957089                   ; @nichi_matrix_bot
         (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))))
     ;; ignore messages from blocked senders (users or chats)
     (add-hook 'telega-msg-ignore-predicates
