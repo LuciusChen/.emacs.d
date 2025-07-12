@@ -23,7 +23,6 @@
       (when gls (setq insert-directory-program gls)))
     (:with-mode dired-mode (:hook diff-hl-dired-mode
                                   dired-hide-details-mode
-                                  nerd-icons-dired-mode
                                   diredfl-mode))))
 
 (setup bookmark
@@ -42,7 +41,7 @@
                ("p" "~/IdeaProjects/" "Projects"))
              dirvish--debouncing-delay 2
              dirvish-side-width 50
-             dirvish-attributes '(file-time file-size collapse subtree-state vc-state)
+             dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state)
              dirvish-side-attributes '(vc-state collapse)
              delete-by-moving-to-trash t
              dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
