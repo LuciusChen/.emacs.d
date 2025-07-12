@@ -69,11 +69,11 @@
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
         org-cliplink language-detection meow-tree-sitter ox-pandoc
         markdown-mode mode-line-bell embark-consult speed-type diminish
-        elfeed-tube-mpv typescript-mode nerd-icons-dired go-translate
+        elfeed-tube-mpv typescript-mode go-translate command-log-mode
         browse-kill-ring rainbow-delimiters default-text-scale denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         password-store-otp password-store eshell-syntax-highlighting
-        projectile consult-dir dirvish eat citar-denote command-log-mode
+        projectile consult-dir dirvish eat citar-denote
         (image-slicing :host github :repo "ginqi7/image-slicing")
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
