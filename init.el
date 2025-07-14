@@ -25,7 +25,7 @@
         (*is-linux* "~/Dropbox/org")))
 (defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst *font-size* (if *is-mac* 14 12))
-(defconst *default-font* (format "MonoLisa Lucius %d" *font-size*))
+(defconst *default-font* (format (if *is-mac* "MonoLisa Lucius %d" "Aporetic Serif Mono %d") *font-size*))
 (defconst *org-font* (format "Aporetic Serif Mono %d" *font-size*))
 (defconst *term-default-font* (format "Aporetic Serif Mono %d" *font-size*))
 (defconst *prog-font* (format "Aporetic Serif Mono %d" *font-size*))
