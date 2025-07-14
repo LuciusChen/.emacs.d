@@ -1,0 +1,82 @@
+pkgname="emacs-pgtk-igc"
+pkgver=31.0.50.179656
+pkgrel=1
+pkgdesc="GNU Emacs. Development branch, with PGTK and IGC enabled."
+arch=('x86_64')
+url="http://www.gnu.org/software/emacs/"
+license=('GPL3')
+depends=('gnutls' 'libxml2' 'jansson' 'harfbuzz' 'mps' 'libgccjit' 'gtk3' 'tree-sitter' 'alsa-lib')
+makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi')
+provides=('emacs')
+conflicts=('emacs')
+replaces=('emacs')
+source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git#branch=feature/igc")
+# If Savannah fails, use Github's mirror
+# source=("emacs::git+https://github.com/emacs-mirror/emacs.git#branch=feature/igc")
+
+options=(!strip)
+b2sums=("SKIP")
+
+export LD=/usr/bin/mold
+export CC="sccache gcc"
+export CXX="sccache g++"
+export LDFLAGS+=" -L/usr/lib"
+export CPPFLAGS+=" -I/usr/include"
+export CFLAGS+=" -I/usr/include"
+
+pkgver() {
+  cd "$srcdir/emacs"
+  local version
+  version=$(awk -F',' '/AC_INIT/{gsub("[ \\[\\]]","",$2); print $2}' configure.ac)
+  printf "%s.%s" "$version" "$(git rev-list --count HEAD)"
+}
+
+prepare() {
+  cd "$srcdir/emacs"
+  [[ -x configure ]] || (./autogen.sh git && ./autogen.sh autoconf)
+}
+
+build() {
+  cd "$srcdir/emacs"
+
+  ./configure --prefix=/usr \
+              --sysconfdir=/etc \
+              --libexecdir=/usr/lib \
+              --localstatedir=/var \
+              --mandir=/usr/share/man \
+              --with-modules \
+              --with-dbus \
+              --with-gif \
+              --with-jpeg \
+              --with-png \
+              --with-rsvg \
+              --with-tiff \
+              --with-xft \
+              --with-xpm \
+              --with-gpm=no \
+              --with-imagemagick \
+              --with-tree-sitter \
+              --without-m17n-flt \
+              --without-gconf \
+              --without-gsettings \
+              --enable-link-time-optimization \
+              --with-native-compilation \
+              --with-pgtk \
+              --with-mps=yes \
+              --without-xaw3d \
+              --with-sound=alsa \
+              --without-compress-install \
+              --program-transform-name='s/\([ec]tags\)/\1.emacs/'
+
+  mold -run make NATIVE_FULL_AOT=1 -j$(nproc)
+
+  cd "$srcdir/emacs/lisp"
+  make autoloads
+  cd ../
+}
+
+package() {
+  cd "$srcdir/emacs"
+  make DESTDIR="$pkgdir/" install
+  find "$pkgdir"/usr/share/emacs/ | xargs chown root:root
+}
