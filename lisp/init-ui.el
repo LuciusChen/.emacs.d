@@ -47,7 +47,6 @@
            panel-image-width 400
            panel-image-height 169
            panel-title "Happy hacking, lucius - Emacs ♥ you")
-  (:face panel-title-face ((t (:inherit font-lock-constant-face :height 1.5 :italic t :family "Aporetic Serif Mono"))))
   (panel-create-hook))
 
 (setup custom
@@ -89,11 +88,12 @@
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts
             default-text-scale-mode-hook +setup-fonts)
-    (:with-mode (vterm-mode eshell-mode) (:set-font *term-default-font*))
-    (:with-mode (latex-mode prog-mode nxml-mode magit-status-mode magit-diff-mode diff-mode) (:set-font *prog-font*))
-    (:with-mode nov-mode (:set-font (replace-regexp-in-string "14" "16" *default-font*)))
-    (:with-mode dired-mode (:set-font *org-font*))
-    (:with-mode (org-mode ebib-index-mode ebib-entry-mode) (:set-font *org-font*))
+    (when *is-mac*
+      (:with-mode (vterm-mode eshell-mode) (:set-font *term-default-font*))
+      (:with-mode (latex-mode prog-mode nxml-mode magit-status-mode magit-diff-mode diff-mode) (:set-font *prog-font*))
+      (:with-mode nov-mode (:set-font (replace-regexp-in-string "14" "16" *default-font*)))
+      (:with-mode dired-mode (:set-font *org-font*))
+      (:with-mode (org-mode ebib-index-mode ebib-entry-mode) (:set-font *org-font*)))
     (:advice face-at-point :around #'+suggest-other-faces)))
 
 (setup popup-frames (:defer (:require popup-frames)))
@@ -122,7 +122,8 @@ its value will be updated. If the key is not present, the entry will be added."
                                                ("discord" nerd-icons-faicon "nf-fa-discord")
                                                ("JetBrains" nerd-icons-devicon "nf-dev-jetbrains")
                                                ("go" nerd-icons-devicon "nf-dev-go")
-                                               ("mpv" nerd-icons-flicon "nf-linux-mpv")))
+                                               ("mpv" nerd-icons-flicon "nf-linux-mpv")
+                                               ("electron" nerd-icons-devicon "nf-dev-electron")))
     (when (and (display-graphic-p)
                (not (find-font (font-spec :name nerd-icons-font-family))))
       (nerd-icons-install-fonts t))))
