@@ -47,7 +47,7 @@
            panel-image-width 400
            panel-image-height 169
            panel-title "Happy hacking, lucius - Emacs ♥ you")
-  (:face panel-title-face ((t (:inherit font-lock-constant-face :height 1.5 :italic t :family "Departure Mono"))))
+  (:face panel-title-face ((t (:inherit font-lock-constant-face :height 1.5 :italic t :family "Aporetic Serif Mono"))))
   (panel-create-hook))
 
 (setup custom
