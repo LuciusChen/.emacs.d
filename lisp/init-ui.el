@@ -96,8 +96,6 @@
       (:with-mode (org-mode ebib-index-mode ebib-entry-mode) (:set-font *org-font*)))
     (:advice face-at-point :around #'+suggest-other-faces)))
 
-(setup popup-frames (:defer (:require popup-frames)))
-
 (setup nerd-icons
   (:defer (:require nerd-icons))
   (:when-loaded
