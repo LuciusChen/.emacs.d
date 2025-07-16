@@ -114,7 +114,7 @@ its value will be updated. If the key is not present, the entry will be added."
 
     (update-alist 'nerd-icons-dir-icon-alist '(("hypr" nerd-icons-flicon "nf-linux-hyprland")
                                                ("kitty" nerd-icons-devicon "nf-dev-terminal")
-                                               ("gtk" nerd-icons-flicon "nf-linux-gtk")
+                                               ("^gtk-.*" nerd-icons-flicon "nf-linux-gtk")
                                                ("inkscape" nerd-icons-flicon "nf-linux-inkscape")
                                                ("vlc" nerd-icons-mdicon "nf-md-vlc")
                                                ("discord" nerd-icons-faicon "nf-fa-discord")

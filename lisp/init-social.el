@@ -153,15 +153,12 @@
     (global-telega-mnz-mode 1)
 
     ;; Linux settings
-    ;; (when *is-linux*
-    ;;   (setq telega-root-show-avatars nil)
-    ;;   (setq telega-user-show-avatars nil)
-    ;;   (setq telega-chat-show-avatars nil)
-    ;;   (setq telega-proxies (list '(:server "127.0.0.1"
-    ;;                                        :port 7890
-    ;;                                        :enable t
-    ;;                                        :type (:@type "proxyTypeSocks5"
-    ;;                                                      :username "" :password "")))))
+    (when *is-linux*
+      (setq telega-proxies (list '(:server "127.0.0.1"
+                                           :port 7897
+                                           :enable t
+                                           :type (:@type "proxyTypeSocks5"
+                                                         :username "" :password "")))))
     ;; Opening files using external programs
     (if *is-mac*
         (progn
