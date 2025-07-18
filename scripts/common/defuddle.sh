@@ -65,7 +65,7 @@ if [ ! -s "$MD_TEMP_FILE" ]; then
 fi
 
 # Convert Markdown to org format using pandoc
-"$PANDOC_PATH" -f markdown -t org "$MD_TEMP_FILE" -o "$ORG_TEMP_FILE"
+"$PANDOC_PATH" --wrap=none -f markdown -t org "$MD_TEMP_FILE" -o "$ORG_TEMP_FILE"
 
 # Check the org content for completeness
 if [ ! -s "$ORG_TEMP_FILE" ]; then
