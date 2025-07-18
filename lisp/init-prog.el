@@ -28,6 +28,7 @@
               (:file-match "\\.mts\\'")
               (:file-match "\\.cjs\\'")
               (:file-match "\\.ts\\'"))
+  (:with-mode jsonc-mode (:file-match "\\.jsonc\\'"))
   (:with-mode json-ts-mode (:file-match "\\.json\\'"))
   (:with-mode dockerfile-ts-mode (:file-match "\\.Dockerfile\\'"))
   (:with-mode prisma-ts-mode (:file-match "\\.prisma\\'"))

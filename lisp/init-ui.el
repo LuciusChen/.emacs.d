@@ -112,10 +112,12 @@ its value will be updated. If the key is not present, the entry will be added."
               (setq alist (cons rep alist)))))
         (set alist-symbol alist)))
 
+    (update-alist 'nerd-icons-extension-icon-alist '(("jsonc" nerd-icons-codicon "nf-cod-settings" :face nerd-icons-yellow)))
+    (update-alist 'nerd-icons-mode-icon-alist '((jsonc-mode nerd-icons-codicon "nf-cod-settings" :face nerd-icons-yellow)))
     (update-alist 'nerd-icons-dir-icon-alist '(("hypr" nerd-icons-flicon "nf-linux-hyprland")
                                                ("kitty" nerd-icons-devicon "nf-dev-terminal")
                                                ("^gtk-.*" nerd-icons-flicon "nf-linux-gtk")
-                                               ("inkscape" nerd-icons-flicon "nf-linux-inkscape")
+                                               ("inkscape" nerd-icons-devicon "nf-dev-inkscape")
                                                ("vlc" nerd-icons-mdicon "nf-md-vlc")
                                                ("discord" nerd-icons-faicon "nf-fa-discord")
                                                ("JetBrains" nerd-icons-devicon "nf-dev-jetbrains")
