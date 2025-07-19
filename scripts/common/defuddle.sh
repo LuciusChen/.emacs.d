@@ -106,10 +106,20 @@ if [ -n "$AUTHOR" ] || [ -n "$DESCRIPTION" ] || [ -n "$SOURCE" ]; then
   [ -n "$SOURCE" ] && ORG_HEADER+=":source: $SOURCE\n"
 fi
 
-# Save the org content to the specified directory
-OUTPUT_DIR="$HOME/Library/CloudStorage/Dropbox/org/denote/clipping/"
+# Determine output directory based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  OUTPUT_DIR="$HOME/Library/CloudStorage/Dropbox/org/denote/clipping/"
+else
+  # Assume Linux
+  OUTPUT_DIR="$HOME/Dropbox/org/denote/clipping/"
+fi
+
 mkdir -p "$OUTPUT_DIR"  # Create directory if it doesn't exist
-FILENAME="${OUTPUT_DIR}${TITLE}__clipping.org"
+
+# Save the org content to the specified directory with a timestamp prefix
+TIMESTAMP=$(date +"%Y%m%dT%H%M%S")
+FILENAME="${OUTPUT_DIR}${TIMESTAMP}--${TITLE}__clipping.org"
 {
   echo -e "$ORG_HEADER"
   cat "$ORG_TEMP_FILE"
