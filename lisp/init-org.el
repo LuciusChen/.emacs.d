@@ -82,6 +82,7 @@
     (:with-mode org-mode
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
+      (:hook visual-line-mode)
       (:hook (lambda () (setq truncate-lines nil))))
     (:with-hook org-after-todo-state-change-hook
       (:hook log-todo-next-creation-date)
