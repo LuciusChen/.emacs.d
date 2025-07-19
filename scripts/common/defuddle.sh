@@ -4,10 +4,33 @@
 DEFUDDLE_PATH=$(command -v defuddle)
 PANDOC_PATH=$(command -v pandoc)
 
-# Check if defuddle-cli is installed
-if ! [ -x "$DEFUDDLE_PATH" ]; then
-  echo "defuddle-cli is not installed. Please install it first."
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Check if npm or pnpm is installed
+if ! command_exists npm && ! command_exists pnpm; then
+  echo "Neither npm nor pnpm is installed. Please install one of them first."
   exit 1
+fi
+
+# Install defuddle-cli if not already installed
+if ! [ -x "$DEFUDDLE_PATH" ]; then
+  if command_exists pnpm; then
+    echo "Installing defuddle-cli using pnpm..."
+    pnpm add -g defuddle-cli
+  elif command_exists npm; then
+    echo "Installing defuddle-cli using npm..."
+    npm install -g defuddle-cli
+  fi
+
+  # Recheck the installation
+  DEFUDDLE_PATH=$(command -v defuddle)
+  if ! [ -x "$DEFUDDLE_PATH" ]; then
+    echo "Failed to install defuddle-cli. Please check for errors."
+    exit 1
+  fi
 fi
 
 # Check if pandoc is installed
