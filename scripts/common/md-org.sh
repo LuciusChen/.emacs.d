@@ -29,9 +29,9 @@ if [ ! -s "$ORG_TEMP_FILE" ]; then
 fi
 
 # Extract metadata from the YAML front matter
-TITLE=$(sed -n 's/^title: *\(.*\)/\1/p' "$INPUT_MD_FILE")
-AUTHOR=$(sed -n 's/^author: *\(.*\)/\1/p' "$INPUT_MD_FILE")
-DESCRIPTION=$(sed -n 's/^description: *\(.*\)/\1/p' "$INPUT_MD_FILE")
+TITLE=$(sed -n 's/^title:[[:space:]]*"\(.*\)"/\1/p' "$INPUT_MD_FILE")
+AUTHOR=$(sed -n 's/^author:[[:space:]]*"\(.*\)"/\1/p' "$INPUT_MD_FILE")
+DESCRIPTION=$(sed -n 's/^description:[[:space:]]*"\(.*\)"/\1/p' "$INPUT_MD_FILE")
 
 # Determine output directory based on OS
 if [[ "$OSTYPE" == "darwin"* ]]; then
