@@ -29,7 +29,7 @@
 (defconst *org-font* (format "Aporetic Serif Mono %d" *font-size*))
 (defconst *term-default-font* (format "Aporetic Serif Mono %d" *font-size*))
 (defconst *prog-font* (format "Aporetic Serif Mono %d" *font-size*))
-(defconst *zh-default-font* "LXGW WenKai")
+(defconst *zh-default-font* "LXGW WenKai Screen")
 (defconst *nerd-icons-font* "Symbols Nerd Font Mono")
 (defconst *emoji-fonts* '("Apple Color Emoji"
                           "Noto Color Emoji"
