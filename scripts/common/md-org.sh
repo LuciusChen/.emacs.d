@@ -28,6 +28,11 @@ if [ ! -s "$ORG_TEMP_FILE" ]; then
   exit 1
 fi
 
+# Extract metadata from the YAML front matter
+TITLE=$(sed -n 's/^title: *\(.*\)/\1/p' "$INPUT_MD_FILE")
+AUTHOR=$(sed -n 's/^author: *\(.*\)/\1/p' "$INPUT_MD_FILE")
+DESCRIPTION=$(sed -n 's/^description: *\(.*\)/\1/p' "$INPUT_MD_FILE")
+
 # Determine output directory based on OS
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # macOS
@@ -39,8 +44,16 @@ fi
 
 mkdir -p "$OUTPUT_DIR"  # Create directory if it doesn't exist
 
-# Save the org content to the specified directory with the same base name
+# Prepare Org file header
+ORG_HEADER="#+title: $TITLE\n"
+[ -n "$AUTHOR" ] && ORG_HEADER+=":author: $AUTHOR\n"
+[ -n "$DESCRIPTION" ] && ORG_HEADER+=":description: $DESCRIPTION\n"
+
+# Add the header to the Org file
 FILENAME="${OUTPUT_DIR}${BASENAME}.org"
-mv "$ORG_TEMP_FILE" "$FILENAME"
+{
+  echo -e "$ORG_HEADER"
+  cat "$ORG_TEMP_FILE"
+} > "$FILENAME"
 
 echo "Content saved to $FILENAME"
