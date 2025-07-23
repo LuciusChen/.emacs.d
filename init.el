@@ -73,7 +73,7 @@
         browse-kill-ring rainbow-delimiters default-text-scale denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         password-store-otp password-store eshell-syntax-highlighting
-        projectile consult-dir dirvish eat citar-denote
+        projectile consult-dir dirvish eat citar-denote org-download
         (image-slicing :host github :repo "ginqi7/image-slicing")
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
