@@ -178,6 +178,14 @@
                   "" :kill-buffer t)))
       (:with-hook org-capture-before-finalize-hook (:hook org-sort-second-level-entries-by-time)))))
 
+(setup org-download
+  (:load-after org)
+  (:when-loaded
+    (:with-mode (org-mode dired-mode) (:hook org-download-enable))
+    (:option org-download-image-dir (concat *org-path* "/denote/assets/")
+             org-download-screenshot-method (if *is-mac* "screencapture -i %s" "grim -g \"$(slurp)\" %s")
+             org-download-heading-lvl nil)))
+
 (setup org-clock
   (:load-after org)
   (:global "C-c o j" org-clock-goto
