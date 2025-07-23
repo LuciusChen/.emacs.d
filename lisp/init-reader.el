@@ -92,9 +92,9 @@
 
 (setup gt
   (:defer (:require gt)
-          (:global "C-c s g" gt-do-translate
-                   "C-c s s" gt-do-setup
-                   "C-c s p" gt-do-speak))
+          (:global "C-c s g" gt-translate
+                   "C-c s s" gt-setup
+                   "C-c s p" gt-speak))
   (:when-loaded
     (:option gt-langs '(en zh)
              gt-chatgpt-model "gpt-3.5-turbo"
