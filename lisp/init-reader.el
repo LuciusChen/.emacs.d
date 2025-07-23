@@ -90,8 +90,8 @@
     (:hooks gptel-post-response-hook gptel-end-of-response
             gptel-mode-hook gptel-set-default-directory)))
 
-(setup go-translate
-  (:defer (:require go-translate)
+(setup gt
+  (:defer (:require gt)
           (:global "C-c s g" gt-do-translate
                    "C-c s s" gt-do-setup
                    "C-c s p" gt-do-speak))
