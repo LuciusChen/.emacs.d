@@ -11,10 +11,11 @@
 
 (setup org-download
   (:load-after org)
-  (:option org-download-image-dir "~/Pictures/"
-           org-download-screenshot-method (if *is-mac* "screencapture -i %s" "grim -g \"$(slurp)\" %s")
-           org-download-heading-lvl nil)
-  (:with-mode dired-mode (:hook org-download-enable)
-              org-mode (:hook org-download-enable)))
+  (:when-loaded
+    (:with-mode (org-mode dired-mode) (:hook org-download-enable))
+    (:option org-download-image-dir (concat *org-path* "/denote/assets/")
+             org-download-screenshot-method (if *is-mac* "screencapture -i %s" "grim -g \"$(slurp)\" %s")
+             org-download-heading-lvl nil)))
+
 (provide 'init-local)
 ;;; init-local.el ends here
