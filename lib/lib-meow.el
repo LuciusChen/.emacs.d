@@ -34,7 +34,7 @@ highlighted in the buffer."
     (when beg
       (thread-first
         (meow--make-selection (cons 'expand type) beg end)
-        (meow--select backward))
+        (meow--select t backward))
       (when (stringp regexp-format)
         (let ((search (format regexp-format (regexp-quote (buffer-substring-no-properties beg end)))))
           (meow--push-search search)
@@ -59,7 +59,7 @@ highlighted in the buffer."
              (segment-text (buffer-substring-no-properties seg-beg seg-end))
              (regexp (regexp-quote segment-text)))
         (let ((selection (meow--make-selection (cons 'expand 'word) seg-beg seg-end)))
-          (meow--select selection backward)
+          (meow--select selection t backward)
           (meow--push-search regexp)
           (meow--highlight-regexp-in-buffer regexp))))))
 
@@ -100,7 +100,7 @@ If N is negative, select to the beginning of the previous Nth thing instead."
          (meow--fix-thing-selection-mark thing p m include-syntax)
          p
          expand)
-        (meow--select))
+        (meow--select t))
       (meow--maybe-highlight-num-positions
        (cons (apply-partially #'meow--backward-thing-1-cjk thing)
              (apply-partially #'meow--forward-thing-1-cjk thing))))))
