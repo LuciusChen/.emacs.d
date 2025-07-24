@@ -23,7 +23,6 @@
            ;; display-fill-column-indicator-character ?\u2502
            case-fold-search t
            create-lockfiles nil
-           scroll-preserve-screen-position 'always
            truncate-partial-width-windows nil
            history-length 1000))
 
