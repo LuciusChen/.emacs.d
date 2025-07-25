@@ -24,7 +24,7 @@
   (cond (*is-mac* "~/Library/CloudStorage/Dropbox/org")
         (*is-linux* "~/Dropbox/org")))
 (defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
-(defconst *font-size* (if *is-mac* 14 12))
+(defconst *font-size* (if *is-mac* 14 13))
 (defconst *default-font* (format (if *is-mac* "MonoLisa Lucius %d" "PragmataPro Liga %d") *font-size*))
 (defconst *org-font* (format "Aporetic Serif Mono %d" *font-size*))
 (defconst *term-default-font* (format "Aporetic Serif Mono %d" *font-size*))
