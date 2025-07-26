@@ -49,7 +49,7 @@
       (user-error "Not in a recognizable Mastodon buffer")))))
 
 (defun mastodon-detect-and-translate ()
-  "Detect the content type under the cursor and translate it using `go-translate`."
+  "Detect the content type under the cursor and translate it using `gt`."
   (interactive)
   (gt-start
    (gt-translator :taker (list (gt-taker :text 'xxx :langs '(zh en ja fr de)))
@@ -79,7 +79,7 @@ When called with \\[universal-argument], prompt for a URL."
                 (when current-prefix-arg
                   (read-string "URL: "))))
 
-  (let ((toot (my-mastodon-toot-at-url url)))
+  (let ((toot (+mastodon-toot-at-url url)))
     (with-temp-buffer
       (insert (alist-get 'content toot))
       (call-process-region nil nil "pandoc" t t nil "-f" "html" "-t" "org")
