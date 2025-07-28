@@ -53,7 +53,7 @@
   (interactive)
   (gt-start
    (gt-translator :taker (list (gt-taker :text 'xxx :langs '(zh en ja fr de)))
-                  :engines (gt-chatgpt-engine)
+                  :engines (gt-deepl-engine)
                   :render (gt-overlay-render :type 'after
                                              :rfmt "\n%s"
                                              :sface nil
