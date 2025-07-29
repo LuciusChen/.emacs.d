@@ -1,15 +1,26 @@
-pkgname="emacs-pgtk-igc"
-_branch="feature/igc" # <- "feature/igc" or "master"
-pkgver=31.0.50.179656
+# ----------------- Configuration Section -----------------
+_branch="feature/igc" # <- "master" or "feature/igc"
+# ---------------------------------------------------------
+
+if [[ "$_branch" == "master" ]]; then
+  pkgname="emacs-pgtk"
+  provides=('emacs' 'emacs-pgtk')
+  conflicts=('emacs' 'emacs-pgtk-igc')
+else
+  pkgname="emacs-pgtk-igc"
+  provides=('emacs' 'emacs-pgtk-igc')
+  conflicts=('emacs' 'emacs-pgtk')
+fi
+
+pkgver=0.0.0
 pkgrel=1
-pkgdesc="GNU Emacs. Development branch, with PGTK and IGC enabled."
+pkgdesc="GNU Emacs. Branch: $_branch. With PGTK support."
 arch=('x86_64')
 url="http://www.gnu.org/software/emacs/"
 license=('GPL3')
 depends=('gnutls' 'libxml2' 'jansson' 'harfbuzz' 'mps' 'libgccjit' 'gtk3' 'tree-sitter' 'alsa-lib')
+optdepends=('libnotify: for desktop notification support')
 makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi')
-provides=('emacs')
-conflicts=('emacs')
 replaces=('emacs')
 source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
 # If Savannah fails, use Github's mirror
@@ -32,47 +43,34 @@ pkgver() {
   printf "%s.%s" "$version" "$(git rev-list --count HEAD)"
 }
 
-# --------------------- MODIFICATION 2: Change prepare() ---------------------
 prepare() {
   cd "$srcdir/emacs"
   git fetch --all --prune
   git checkout "$_branch"
   git reset --hard "origin/$_branch"
-
+  git clean -fdx
   [[ -x configure ]] || (./autogen.sh git && ./autogen.sh autoconf)
 }
-
 build() {
   cd "$srcdir/emacs"
 
-  ./configure --prefix=/usr \
-              --sysconfdir=/etc \
-              --libexecdir=/usr/lib \
-              --localstatedir=/var \
-              --mandir=/usr/share/man \
-              --with-modules \
-              --with-dbus \
-              --with-gif \
-              --with-jpeg \
-              --with-png \
-              --with-rsvg \
-              --with-tiff \
-              --with-xft \
-              --with-xpm \
-              --with-gpm=no \
-              --with-imagemagick \
-              --with-tree-sitter \
-              --without-m17n-flt \
-              --without-gconf \
-              --without-gsettings \
-              --enable-link-time-optimization \
-              --with-native-compilation \
-              --with-pgtk \
-              --with-mps=yes \
-              --without-xaw3d \
-              --with-sound=alsa \
-              --without-compress-install \
-              --program-transform-name='s/\([ec]tags\)/\1.emacs/'
+  local _conf_flags=(
+    --prefix=/usr --sysconfdir=/etc --libexecdir=/usr/lib --localstatedir=/var
+    --mandir=/usr/share/man --with-modules --with-dbus --with-gif --with-jpeg
+    --with-png --with-rsvg --with-tiff --with-xft --with-xpm --with-gpm=no
+    --with-imagemagick --with-tree-sitter --without-m17n-flt --without-gconf
+    --without-gsettings --enable-link-time-optimization --with-native-compilation
+    --with-pgtk --without-xaw3d --with-sound=alsa --without-compress-install
+    --program-transform-name='s/\([ec]tags\)/\1.emacs/'
+  )
+
+  if [[ "$_branch" == "master" ]]; then
+    _conf_flags+=(--with-mps=no)
+  else
+    _conf_flags+=(--with-mps=yes)
+  fi
+
+  ./configure "${_conf_flags[@]}"
 
   mold -run make NATIVE_FULL_AOT=1 -j$(nproc)
 
@@ -84,5 +82,5 @@ build() {
 package() {
   cd "$srcdir/emacs"
   make DESTDIR="$pkgdir/" install
-  find "$pkgdir"/usr/share/emacs/ | xargs chown root:root
+  # find "$pkgdir"/usr/share/emacs/ | xargs chown root:root
 }
