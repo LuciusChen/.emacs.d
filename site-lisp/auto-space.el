@@ -97,9 +97,8 @@
         (advice-add 'yank :around #'auto-space-yank-advice)
         (advice-add 'yank-pop :around #'auto-space-yank-advice)
         (add-hook 'post-self-insert-hook 'add-space-between-chinese-and-english))
-    (progn
-      (advice-remove 'yank #'auto-space-yank-advice)
-      (advice-remove 'yank-pop #'auto-space-yank-advice)
-      (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english))))
+    (advice-remove 'yank #'auto-space-yank-advice)
+    (advice-remove 'yank-pop #'auto-space-yank-advice)
+    (remove-hook 'post-self-insert-hook 'add-space-between-chinese-and-english)))
 (provide 'auto-space)
 ;;; auto-space.el ends here
