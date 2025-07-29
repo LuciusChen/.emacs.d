@@ -50,7 +50,6 @@
     (:option gptel-default-mode 'org-mode
              gptel-model 'openai/gpt-4o
              gptel-stream t
-             gptel-host "api.openrouter.ai"
              gptel-backend (gptel-make-openai "OpenRouter"
                              :host "openrouter.ai"
                              :endpoint "/api/v1/chat/completions"
@@ -94,9 +93,12 @@
                    "C-c s p" gt-speak))
   (:when-loaded
     (:option gt-langs '(en zh)
-             gt-chatgpt-model "gpt-3.5-turbo"
+             gt-chatgpt-host "https://api.deepseek.com"
+             gt-chatgpt-path "/chat/completions"
+             gt-chatgpt-key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
+             gt-chatgpt-model "deepseek-chat"
              gt-chatgpt-user-prompt-template
-             "Please translate the following text into %s, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n%s"
+             "Please translate the following text into {{lang}}, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n{{text}}"
              gt-buffer-render-follow-p t
              gt-buffer-render-window-config
              '((display-buffer-reuse-window display-buffer-in-direction)
