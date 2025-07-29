@@ -102,11 +102,10 @@ belongs as a list."
               (progn
                 (search-forward (car org-tree) nil t)
                 (setq org-tree (cdr org-tree)))
-            (progn
-              (goto-char (point-max))
-              (newline)
-              (org-insert-struct org-tree)
-              (setq org-tree nil)))))
+            (goto-char (point-max))
+            (newline)
+            (org-insert-struct org-tree)
+            (setq org-tree nil))))
       (newline)
       (org-yank)
       (when (not (eq this-buffer buffer))
