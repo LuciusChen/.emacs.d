@@ -1,4 +1,5 @@
 pkgname="emacs-pgtk-igc"
+_branch="feature/igc" # <- "feature/igc" or "master"
 pkgver=31.0.50.179656
 pkgrel=1
 pkgdesc="GNU Emacs. Development branch, with PGTK and IGC enabled."
@@ -10,9 +11,9 @@ makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi')
 provides=('emacs')
 conflicts=('emacs')
 replaces=('emacs')
-source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git#branch=feature/igc")
+source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
 # If Savannah fails, use Github's mirror
-# source=("emacs::git+https://github.com/emacs-mirror/emacs.git#branch=feature/igc")
+# source=("emacs::git+https://github.com/emacs-mirror/emacs.git")
 
 options=(!strip)
 b2sums=("SKIP")
@@ -31,8 +32,13 @@ pkgver() {
   printf "%s.%s" "$version" "$(git rev-list --count HEAD)"
 }
 
+# --------------------- MODIFICATION 2: Change prepare() ---------------------
 prepare() {
   cd "$srcdir/emacs"
+  git fetch --all --prune
+  git checkout "$_branch"
+  git reset --hard "origin/$_branch"
+
   [[ -x configure ]] || (./autogen.sh git && ./autogen.sh autoconf)
 }
 
