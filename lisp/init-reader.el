@@ -47,10 +47,7 @@
   (:when-loaded
     (:also-load lib-gpt)
     (:also-load org)
-    (:option gptel-api-key (auth-source-pick-first-password
-                            :host "api.openrouter.ai"
-                            :user "openrouter")
-             gptel-default-mode 'org-mode
+    (:option gptel-default-mode 'org-mode
              gptel-model 'openai/gpt-4o
              gptel-stream t
              gptel-host "api.openrouter.ai"
