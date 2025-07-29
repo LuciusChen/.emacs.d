@@ -48,14 +48,34 @@
     (:also-load lib-gpt)
     (:also-load org)
     (:option gptel-api-key (auth-source-pick-first-password
-                            :host "api.openai.com"
-                            :user "apikey")
+                            :host "api.openrouter.ai"
+                            :user "openrouter")
              gptel-default-mode 'org-mode
-             gptel-model 'gpt-4o
+             gptel-model 'openai/gpt-4o
              gptel-stream t
-             gptel-host "api.openai.com"
-             ;; gptel-proxy "socks://127.0.0.1:7891"
-             gptel-proxy ""
+             gptel-host "api.openrouter.ai"
+             gptel-backend (gptel-make-openai "OpenRouter"
+                             :host "openrouter.ai"
+                             :endpoint "/api/v1/chat/completions"
+                             :key (auth-source-pick-first-password :host "api.openrouter.ai" :user "openrouter")
+                             :models '(deepseek/deepseek-chat
+                                       deepseek/deepseek-r1
+                                       qwen/qwen-turbo
+                                       qwen/qwen-plus
+                                       qwen/qwen-max
+                                       openai/chatgpt-4o-latest
+                                       openai/o1
+                                       openai/gpt-4o
+                                       openai/o3-mini-high
+                                       anthropic/claude-3.7-sonnet:thinking
+                                       anthropic/claude-3.7-sonnet
+                                       anthropic/claude-3-opus
+                                       google/gemini-2.5-pro-exp-03-25:free
+                                       google/gemini-2.5-pro-preview-03-25
+                                       google/gemini-2.0-flash-thinking-exp:free
+                                       google/gemini-2.0-flash-001)
+                             :stream t)
+             gptel-proxy (if *is-mac* "" "socks://127.0.0.1:7897")
              gptel-directives (get-gptel-directives)
              gptel-temperature 0.7
              gptel-tools +gptel-tools)
@@ -63,26 +83,6 @@
     ;; (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
     ;; (gptel-make-openai "DeepSeek" :host "api.deepseek.com" :endpoint "/chat/completions" :stream t :key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
     ;;                    :models '(deepseek-chat deepseek-reasoner))
-    (gptel-make-openai "OpenRouter"
-      :host "openrouter.ai"
-      :endpoint "/api/v1/chat/completions"
-      :key (auth-source-pick-first-password :host "api.openrouter.ai" :user "openrouter")
-      :models '(deepseek/deepseek-chat
-                deepseek/deepseek-r1
-                qwen/qwen-turbo
-                qwen/qwen-plus
-                qwen/qwen-max
-                openai/chatgpt-4o-latest
-                openai/o1
-                openai/o3-mini-high
-                anthropic/claude-3.7-sonnet:thinking
-                anthropic/claude-3.7-sonnet
-                anthropic/claude-3-opus
-                google/gemini-2.5-pro-exp-03-25:free
-                google/gemini-2.5-pro-preview-03-25
-                google/gemini-2.0-flash-thinking-exp:free
-                google/gemini-2.0-flash-001)
-      :stream t)
 
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))
@@ -146,7 +146,13 @@
                                                 :engines (gt-google-engine)
                                                 :render (gt-overlay-render :type 'after
                                                                            :rfmt "(%s)"
-                                                                           :rface '(:foreground "grey"))))))))
+                                                                           :rface '(:foreground "grey"))))))
+    (when *is-linux*
+      (:option gt-tts-native-engine 'espeak-ng)
+      (cl-defmethod gt-speech ((engine (eql 'espeak-ng)) text lang &optional play-fn)
+        ;; 调用 espeak-ng 命令来朗读文本
+        (let ((command (format "espeak-ng -v %s \"%s\"" lang text)))
+          (start-process-shell-command "espeak-ng" nil command))))))
 
 (setup elfeed
   (:global "C-x w" elfeed)
