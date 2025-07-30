@@ -95,7 +95,7 @@
     (:option gt-langs '(en zh)
              gt-chatgpt-host "https://api.deepseek.com"
              gt-chatgpt-path "/chat/completions"
-             gt-chatgpt-key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
+             gt-chatgpt-key '(auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
              gt-chatgpt-model "deepseek-chat"
              gt-chatgpt-user-prompt-template
              "Please translate the following text into {{lang}}, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n{{text}}"
