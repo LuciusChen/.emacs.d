@@ -53,7 +53,7 @@
              gptel-backend (gptel-make-openai "OpenRouter"
                              :host "openrouter.ai"
                              :endpoint "/api/v1/chat/completions"
-                             :key (auth-source-pick-first-password :host "api.openrouter.ai" :user "openrouter")
+                             :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
                              :models '(deepseek/deepseek-chat
                                        deepseek/deepseek-r1
                                        qwen/qwen-turbo
