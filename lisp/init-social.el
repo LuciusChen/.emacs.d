@@ -173,6 +173,7 @@
         (:bind "a" mastodon-detect-and-translate)))
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
-             mastodon-tl--show-avatars t)))
+             mastodon-tl--show-avatars t)
+    (:advice mastodon-detect-and-translate :before #'mastodon-tl-fold-post-toggle)))
 (provide 'init-social)
 ;;; init-social.el ends here
