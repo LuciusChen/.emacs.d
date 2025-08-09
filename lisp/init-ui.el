@@ -38,17 +38,6 @@
            "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))
            "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
 
-(setup panel
-  (:option panel-latitude 32.09703
-           panel-longitude 118.77969
-           panel-path-max-length 35
-           panel-min-left-padding 10
-           panel-image-file "~/.emacs.d/assets/bitmap.png"
-           panel-image-width 400
-           panel-image-height 169
-           panel-title "Happy hacking, lucius - Emacs ♥ you")
-  (panel-create-hook))
-
 (setup custom
   (:when-loaded
     (:also-load lib-appearance)
@@ -60,20 +49,23 @@
              ;; If you don't customize it, this is the theme you get.
              custom-enabled-themes '(rose-pine-night)
              light-theme 'rose-pine-day
-             dark-theme 'rose-pine-night)
+             dark-theme 'rose-pine-night)))
 
-    (when *is-mac*
-      (apply-theme-based-on-appearance)
-      (:with-hook ns-system-appearance-change-functions
-        (:hook apply-theme-based-on-appearance)))
+(setup startup
+  (when *is-mac*
+    (apply-theme-based-on-appearance)
+    (:with-hook ns-system-appearance-change-functions
+      (:hook apply-theme-based-on-appearance)))
 
-    (:with-hook window-setup-hook
-      (:hook reapply-themes)
-      (:hook opacity-dark-theme)
-      (:hook set-dividers-and-fringe-color))
+  (:with-hook window-setup-hook
+    (:hook reapply-themes)
+    (:hook set-dividers-and-fringe-color)
+    (when window-system (:hook opacity-dark-theme)))
 
-    (:with-hook after-make-frame-functions (:hook opacity-dark-theme))
-    (:with-hook after-init-hook (:hook reapply-themes))))
+  (:with-hook after-make-frame-functions (:hook opacity-dark-theme)))
+
+(setup frame
+  (:with-hook after-init-hook (:hook reapply-themes)))
 
 (setup hl-line
   (:option hl-line-range-function
@@ -82,6 +74,17 @@
   (global-hl-line-mode))
 
 (when window-system
+  (setup panel
+    (:option panel-latitude 32.09703
+             panel-longitude 118.77969
+             panel-path-max-length 35
+             panel-min-left-padding 10
+             panel-image-file "~/.emacs.d/assets/bitmap.png"
+             panel-image-width 400
+             panel-image-height 169
+             panel-title "Happy hacking, lucius - Emacs ♥ you")
+    (panel-create-hook))
+
   (setup faces
     (:also-load lib-face)
     ;; (configure-ligatures)
