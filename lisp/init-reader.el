@@ -60,16 +60,12 @@
                                        qwen/qwen-plus
                                        qwen/qwen-max
                                        openai/chatgpt-4o-latest
-                                       openai/o1
                                        openai/gpt-4o
-                                       openai/o3-mini-high
                                        anthropic/claude-3.7-sonnet:thinking
                                        anthropic/claude-3.7-sonnet
-                                       anthropic/claude-3-opus
+                                       anthropic/claude-4
                                        google/gemini-2.5-pro-exp-03-25:free
-                                       google/gemini-2.5-pro-preview-03-25
-                                       google/gemini-2.0-flash-thinking-exp:free
-                                       google/gemini-2.0-flash-001)
+                                       google/gemini-2.5-pro-preview-03-25)
                              :stream t)
              gptel-proxy (if *is-mac* "" "socks://127.0.0.1:7897")
              gptel-directives (get-gptel-directives)

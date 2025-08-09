@@ -152,6 +152,7 @@ its value will be updated. If the key is not present, the entry will be added."
              ("\\*xref\\*$")
              ("\\*chatgpt\\*$")
              ("\\*vterm\\*$")
+             ("\\*compilation\\*$")
              ("\\*eshell\\*$")
              ("\\*Org Select\\*$")
              ("\\*Telega User\\*$")
