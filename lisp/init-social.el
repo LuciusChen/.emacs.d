@@ -174,6 +174,13 @@
     (:option mastodon-instance-url "https://mastodon.social"
              mastodon-active-user "Lucius_Chen"
              mastodon-tl--show-avatars t)
-    (:advice mastodon-detect-and-translate :before #'mastodon-tl-fold-post-toggle)))
+    (defun mastodon-detect-and-toggle-if-folded ()
+      "Toggle fold status if the toot at point is folded."
+      (when (mastodon-tl--property 'toot-folded :no-move)
+        (mastodon-tl-fold-post-toggle)))
+
+    (advice-add 'mastodon-detect-and-translate :before #'mastodon-detect-and-toggle-if-folded)
+    ;; (:advice mastodon-detect-and-translate :before #'mastodon-tl-fold-post-toggle)
+    ))
 (provide 'init-social)
 ;;; init-social.el ends here
