@@ -122,9 +122,9 @@
     ;; 注意：当 `flymake-no-changes-timeout` 被设置为 nil 时，
     ;; 需要实现 `eglot-handle-notification` 的 `:after` 方法。
     (:option flymake-no-changes-timeout nil
-             ;; emacs@30 feature
-             flymake-show-diagnostics-at-end-of-line t
              flymake-fringe-indicator-position 'right-fringe)
+    (when (version<= "31" emacs-version)
+      (:option flymake-show-diagnostics-at-end-of-line t))
     (:with-mode prog-mode (:hook flymake-mode))
     (:with-mode emacs-lisp-mode (:hook (lambda()(flymake-mode -1))))))
 
