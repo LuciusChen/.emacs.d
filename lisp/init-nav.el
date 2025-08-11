@@ -5,9 +5,9 @@
 (setup files
   (:option  auto-save-default nil
             make-backup-files nil
-            enable-local-variables :all
-            ;; emacs@31 feature
-            trusted-content '("~/.emacs.d/")))
+            enable-local-variables :all)
+  (when (version<= "31" emacs-version)
+    (:option trusted-content '("~/.emacs.d/"))))
 
 (setup dired
   (:defer (:require dired))
