@@ -92,6 +92,8 @@
     ;; (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
     ;; (gptel-make-openai "DeepSeek" :host "api.deepseek.com" :endpoint "/chat/completions" :stream t :key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
     ;;                    :models '(deepseek-chat deepseek-reasoner))
+    ;; (gptel-make-openai "vercel-gateway" :host "ai-gateway.vercel.sh" :endpoint "/v1/chat/completions" :stream t :key (auth-source-pick-first-password :host "ai-gateway.vercel" :user "vercel")
+    ;;                    :models '(openai/gpt-4o openai/gpt-5))
 
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))
