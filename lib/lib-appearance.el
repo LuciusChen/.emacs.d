@@ -52,7 +52,7 @@
   (setq custom-enabled-themes (list theme))
   (reapply-themes)
   (set-dividers-and-fringe-color)
-  (when (and window-system *is-mac*) (set-opacity opacity)))
+  (when (and window-system) (set-opacity opacity)))
 
 (defun apply-theme-based-on-appearance (&rest _)
   "Apply a theme based on the current macOS system appearance."
