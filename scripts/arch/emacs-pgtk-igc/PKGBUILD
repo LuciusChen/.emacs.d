@@ -59,7 +59,7 @@ build() {
     --mandir=/usr/share/man --with-modules --with-dbus --with-gif --with-jpeg
     --with-png --with-rsvg --with-tiff --with-xft --with-xpm --with-gpm=no
     --with-imagemagick --with-tree-sitter --without-m17n-flt --without-gconf
-    --without-gsettings --enable-link-time-optimization --with-native-compilation
+    --without-gsettings --enable-link-time-optimization --with-native-compilation=aot
     --with-pgtk --without-xaw3d --with-sound=alsa --without-compress-install
     --program-transform-name='s/\([ec]tags\)/\1.emacs/'
   )
