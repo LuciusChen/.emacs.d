@@ -92,7 +92,6 @@
             server-after-make-frame-hook +setup-fonts
             default-text-scale-mode-hook +setup-fonts)
     (:with-mode org-mode (:set-font *org-font*))
-    (:with-mode (telega-root-mode telega-chat-mode) (:set-font *telega-font*))
     (:advice face-at-point :around #'+suggest-other-faces)))
 
 (setup nerd-icons
@@ -111,19 +110,6 @@ its value will be updated. If the key is not present, the entry will be added."
               (setq alist (cons rep alist)))))
         (set alist-symbol alist)))
 
-    ;; merged https://github.com/rainstormstudio/nerd-icons.el/pull/114
-    ;; (update-alist 'nerd-icons-extension-icon-alist '(("jsonc" nerd-icons-codicon "nf-cod-settings" :face nerd-icons-yellow)))
-    ;; (update-alist 'nerd-icons-mode-icon-alist '((jsonc-mode nerd-icons-codicon "nf-cod-settings" :face nerd-icons-yellow)))
-    ;; (update-alist 'nerd-icons-dir-icon-alist '(("hypr" nerd-icons-flicon "nf-linux-hyprland")
-    ;;                                            ("kitty" nerd-icons-devicon "nf-dev-terminal")
-    ;;                                            ("^gtk-.*" nerd-icons-flicon "nf-linux-gtk")
-    ;;                                            ("inkscape" nerd-icons-devicon "nf-dev-inkscape")
-    ;;                                            ("vlc" nerd-icons-mdicon "nf-md-vlc")
-    ;;                                            ("discord" nerd-icons-faicon "nf-fa-discord")
-    ;;                                            ("JetBrains" nerd-icons-devicon "nf-dev-jetbrains")
-    ;;                                            ("go" nerd-icons-devicon "nf-dev-go")
-    ;;                                            ("mpv" nerd-icons-flicon "nf-linux-mpv")
-    ;;                                            ("electron" nerd-icons-devicon "nf-dev-electron")))
     (when (and (display-graphic-p)
                (not (find-font (font-spec :name nerd-icons-font-family))))
       (nerd-icons-install-fonts t))))

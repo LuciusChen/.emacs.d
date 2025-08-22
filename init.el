@@ -27,7 +27,6 @@
 (defconst *font-size* (if *is-mac* 14 13))
 (defconst *default-font* (format "PragmataPro Mono %d" *font-size*))
 (defconst *org-font* (format "PragmataPro Liga %d" *font-size*))
-(defconst *telega-font* "MonoLisa Lucius")
 (defconst *zh-default-font* "LXGW WenKai Screen")
 (defconst *nerd-icons-font* "Symbols Nerd Font Mono")
 (defconst *emoji-fonts* '("Apple Color Emoji"
