@@ -91,12 +91,8 @@
     (:hooks window-setup-hook +setup-fonts
             server-after-make-frame-hook +setup-fonts
             default-text-scale-mode-hook +setup-fonts)
-    (when *is-mac*
-      (:with-mode (vterm-mode eshell-mode) (:set-font *term-default-font*))
-      (:with-mode (latex-mode prog-mode nxml-mode magit-status-mode magit-diff-mode diff-mode) (:set-font *prog-font*))
-      (:with-mode nov-mode (:set-font (replace-regexp-in-string "14" "16" *default-font*)))
-      (:with-mode dired-mode (:set-font *org-font*))
-      (:with-mode (org-mode ebib-index-mode ebib-entry-mode) (:set-font *org-font*)))
+    (:with-mode org-mode (:set-font *org-font*))
+    (:with-mode (telega-root-mode telega-chat-mode) (:set-font *telega-font*))
     (:advice face-at-point :around #'+suggest-other-faces)))
 
 (setup nerd-icons
