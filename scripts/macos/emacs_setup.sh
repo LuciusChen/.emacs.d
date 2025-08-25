@@ -2,7 +2,7 @@
 
 # Function to print usage
 usage() {
-  echo "Usage: $0 [normal|mps] [30|31]"
+  echo "Usage: $0 [HOMEBREW_EMACS_PLUS_31_REVISION=<commit>] [normal|mps] [30|31]"
   echo "  normal: Install the normal version (default)"
   echo "  mps: Install the MPS version"
   echo "  30: Install emacs-plus@30"
@@ -13,23 +13,28 @@ usage() {
 # Set default version type and emacs version
 VERSION_TYPE="normal"
 EMACS_VERSION="31"
+REVISION=""
 
-# Check if the user provided arguments and if they're valid
-if [ -n "$1" ]; then
-  if [ "$1" = "normal" ] || [ "$1" = "mps" ]; then
-    VERSION_TYPE=$1
-  else
-    usage
-  fi
-fi
-
-if [ -n "$2" ]; then
-  if [ "$2" = "30" ] || [ "$2" = "31" ]; then
-    EMACS_VERSION=$2
-  else
-    usage
-  fi
-fi
+# Process arguments
+for arg in "$@"; do
+  case $arg in
+    HOMEBREW_EMACS_PLUS_31_REVISION=*)
+      REVISION="${arg#*=}"
+      shift
+      ;;
+    normal|mps)
+      VERSION_TYPE=$arg
+      shift
+      ;;
+    30|31)
+      EMACS_VERSION=$arg
+      shift
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
 
 # Ensure MPS is only used with version 31
 if [ "$VERSION_TYPE" = "mps" ] && [ "$EMACS_VERSION" != "31" ]; then
@@ -159,6 +164,10 @@ inject_patches() {
 inject_patches
 
 # Install emacs-plus with specified options
-brew install emacs-plus@$EMACS_VERSION --with-savchenkovaleriy-big-sur-icon --with-xwidgets
+if [ -n "$REVISION" ]; then
+  HOMEBREW_EMACS_PLUS_31_REVISION=$REVISION brew install emacs-plus@$EMACS_VERSION --with-savchenkovaleriy-big-sur-icon --with-xwidgets
+else
+  brew install emacs-plus@$EMACS_VERSION --with-savchenkovaleriy-big-sur-icon --with-xwidgets
+fi
 
 osascript -e "tell application \"Finder\" to make alias file to posix file \"/opt/homebrew/opt/emacs-plus@$EMACS_VERSION/Emacs.app\" at posix file \"/Applications\" with properties {name:\"Emacs.app\"}"
