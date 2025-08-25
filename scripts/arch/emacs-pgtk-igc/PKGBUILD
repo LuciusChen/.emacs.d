@@ -1,5 +1,6 @@
 # ----------------- Configuration Section -----------------
 _branch="feature/igc" # <- "master" or "feature/igc"
+_commit="" # Leave empty if not needed
 # ---------------------------------------------------------
 
 if [[ "$_branch" == "master" ]]; then
@@ -48,6 +49,9 @@ prepare() {
   git fetch --all --prune
   git checkout "$_branch"
   git reset --hard "origin/$_branch"
+  if [[ -n "$_commit" ]]; then
+    git checkout "$_commit"
+  fi
   git clean -fdx
   [[ -x configure ]] || (./autogen.sh git && ./autogen.sh autoconf)
 }
