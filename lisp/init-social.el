@@ -116,7 +116,7 @@
      ;; chat-id 由 Room Settings -> Advanced -> Internal room ID 得来
      '(-1001773572820                ; @emacs_china
        (6332621450                   ; @yamatrix_bridge_bot
-        (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
+        (:chat-id "!RJop14SURbXkiNbXJVEcblueYoxsvL16NxF_LdnfIH8" :type :matrix))
        -1001478915941                ; @vimzh_real
        (5296957089                   ; @nichi_matrix_bot
         (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
