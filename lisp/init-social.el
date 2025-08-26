@@ -112,13 +112,10 @@
      ;;telega-bridge-bot
      telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
      telega-bridge-bot-bridge-info-plist
-     ;; @emacs_china
-     ;; telega 中在 Telega Root 对应的群组上 i 键查看
-     '(-1001773572820
-       ;; @matrix_t2bot
-       ;; 同样的方式查看 bot 信息获得
-       (420415423
-        ;; Room Settings -> Advanced -> Internal room ID
+     ;; telega 中在 Telega Root 对应的群组上 i 键查看 -1001773572820 和 6332621450
+     ;; chat-id 由 Room Settings -> Advanced -> Internal room ID 得来
+     '(-1001773572820                ; @emacs_china
+       (6332621450                   ; @yamatrix_bridge_bot
         (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
        -1001478915941                ; @vimzh_real
        (5296957089                   ; @nichi_matrix_bot
