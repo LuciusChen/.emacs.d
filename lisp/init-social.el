@@ -114,6 +114,7 @@
      telega-bridge-bot-bridge-info-plist
      ;; telega 中在 Telega Root 对应的群组上 i 键查看 -1001773572820 和 6332621450
      ;; chat-id 由 Room Settings -> Advanced -> Internal room ID 得来
+     ;; access token 是在 Help & About 当中
      '(-1001773572820                ; @emacs_china
        (6332621450                   ; @yamatrix_bridge_bot
         (:chat-id "!RJop14SURbXkiNbXJVEcblueYoxsvL16NxF_LdnfIH8" :type :matrix))
@@ -121,8 +122,8 @@
        (5296957089                   ; @nichi_matrix_bot
         (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
        -1001480067069                ; @keyboard_cn
-       (420415423                    ; @matrix_t2bot
-        (:chat-id "!EGzPXoyqkJdTByDCjD:mozilla.org" :type :matrix))
+       (6332621450                   ; @matrix_t2bot
+        (:chat-id "!JDky93zy3mmuljy6WwXNcsXIS2y1SbvDnwXjz7ZINsY" :type :matrix))
        -1001154313178                ; @coder_ot
        (6332621450                   ; @yamatrix_bridge_bot
         (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))

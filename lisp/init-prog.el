@@ -124,7 +124,7 @@
     (:option flymake-no-changes-timeout nil
              flymake-fringe-indicator-position 'right-fringe)
     (when (version<= "31" emacs-version)
-      (:option flymake-show-diagnostics-at-end-of-line t))
+      (:option flymake-show-diagnostics-at-end-of-line 'fancy))
     (:with-mode prog-mode (:hook flymake-mode))
     (:with-mode emacs-lisp-mode (:hook (lambda()(flymake-mode -1))))))
 
