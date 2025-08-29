@@ -114,7 +114,7 @@
      telega-bridge-bot-bridge-info-plist
      ;; telega 中在 Telega Root 对应的群组上 i 键查看 -1001773572820 和 6332621450
      ;; chat-id 由 Room Settings -> Advanced -> Internal room ID 得来
-     ;; access token 是在 Help & About 当中
+     ;; access token 是在 Help & About 当中，每次新设备加入似乎会自动刷新，因此需要更新 .password。
      '(-1001773572820                ; @emacs_china
        (6332621450                   ; @yamatrix_bridge_bot
         (:chat-id "!RJop14SURbXkiNbXJVEcblueYoxsvL16NxF_LdnfIH8" :type :matrix))
