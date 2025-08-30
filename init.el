@@ -59,7 +59,7 @@
 (defvar *use-package-list*
   '(nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
         corfu forge verb elfeed popper embark bibtex vertico
-        diredfl separedit cdlatex pyvenv consult mmm-mode scratch
+        diredfl cdlatex pyvenv consult mmm-mode scratch
         diff-hl company goggles flymake web-mode js2-mode move-dup
         doom-modeline git-link webpaste apheleia mastodon pdf-tools
         macrostep json-mode orderless kind-icon git-modes git-blamed
@@ -73,6 +73,7 @@
         password-store-otp password-store eshell-syntax-highlighting
         projectile consult-dir dirvish eat citar-denote
         (image-slicing :host github :repo "ginqi7/image-slicing")
+        (separedit :host github :repo "twlz0ne/separedit.el")
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
