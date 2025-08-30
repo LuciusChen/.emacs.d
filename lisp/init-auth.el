@@ -7,9 +7,9 @@
 (setup auth-source-pass
   (:load-after auth-source)
   (:when-loaded
-    (:option auth-source-pass-extra-query-keywords t   ; Enable extra query keywords for auth-source-pass
-             auth-source-save-behavior nil             ; Disable saving behavior for auth-source
-             epg-pinentry-mode 'loopback)              ; Set pinentry mode to loopback for GPG
+    (setopt auth-source-pass-extra-query-keywords t   ; Enable extra query keywords for auth-source-pass
+            auth-source-save-behavior nil             ; Disable saving behavior for auth-source
+            epg-pinentry-mode 'loopback)              ; Set pinentry mode to loopback for GPG
     (auth-source-pass-enable)                        ; Enable `auth-source-pass` to use pass for auth-source
     (setenv "GPG_AGENT_INFO" nil)))                  ; Unset GPG_AGENT_INFO environment variable
 
