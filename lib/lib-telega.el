@@ -22,13 +22,18 @@ NOTE: macOS only."
   (let ((file (telega-msg--content-file msg)))
     (unless file
       (user-error "No file associated with message"))
-    (telega-file--download file 32
+    (telega-file--download file
+      :priority 32
+      :update-callback
       (lambda (dfile)
         (telega-msg-redisplay msg)
         (message "Wait for downloading to finish…")
         (when (telega-file--downloaded-p dfile)
           (let* ((fpath (telega--tl-get dfile :local :path)))
-            (shell-command (format "osascript -e 'set the clipboard to POSIX file \"%s\"'" fpath))
+            (if *is-mac*
+                (shell-command (format "osascript -e 'set the clipboard to POSIX file \"%s\"'" fpath))
+              ;; for wayland
+              (shell-command (format "wl-copy < \"%s\"" fpath)))
             (message (format "File saved to clipboard: %s" fpath))))))))
 
 (defun +telega-msg-save-to-cloud-copyleft (msg)
@@ -39,7 +44,9 @@ NOTE: macOS only."
   (let ((file (telega-msg--content-file msg)))
     (unless file
       (user-error "No file associated with message"))
-    (telega-file--download file 32
+    (telega-file--download file
+      :priority 32
+      :update-callback
       (lambda (dfile)
         (telega-msg-redisplay msg)
         (when (telega-file--downloaded-p dfile)
@@ -52,7 +59,7 @@ NOTE: macOS only."
              (telega-chat-me)
              (list :@type "inputMessageDocument"
                    :document (telega-chatbuf--gen-input-file
-                              fpath 'Document)
+                                 fpath 'Document)
                    :caption (telega-fmt-text "#copyleft")
                    :disable_content_type_detection nil))
             (message (format "Saved to cloud: %s" fname))))))))

@@ -3,7 +3,7 @@
 ;;; Code:
 
 (setup beancount-mode
-  (:file-match "\\.beancount\\'")
+  (:match-file "\\.beancount\\'")
   (:with-mode beancount-mode (:hook corfu-mode)))
 
 (setup deft
