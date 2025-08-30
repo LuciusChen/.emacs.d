@@ -41,6 +41,10 @@
 (setup custom
   (:when-loaded
     (:also-load lib-appearance)
+    ;; Modifiers have to be specified in this order:
+    ;; A-C-H-M-S-s
+    ;; which is
+    ;; Alt-Control-Hyper-Meta-Shift-super
     (keymap-global-set "C-M-8" (lambda () (interactive) (+adjust-opacity nil -2)))
     (keymap-global-set "C-M-7" (lambda () (interactive) (+adjust-opacity nil 2)))
     ;; Don't prompt to confirm theme safety. This avoids problems with

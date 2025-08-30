@@ -39,7 +39,6 @@
                 language-detection)
     (telega-notifications-mode 1)
     (telega-autoplay-mode 1)
-    (setq telega-avatar-workaround-gaps-for '(return t))
     (setopt
      telega-emoji-use-images nil
      telega-notifications-msg-temex '(and (not outgoing)
@@ -53,7 +52,7 @@
      telega-chat-fill-column 90
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
-     ;; telega-avatar-workaround-gaps-for '(return t)
+     telega-avatar-workaround-gaps-for '(return t)
      ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
