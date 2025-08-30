@@ -3,67 +3,67 @@
 ;;; Code:
 
 (setup emacs
-  (:option case-fold-search t
-           create-lockfiles nil
-           scroll-preserve-screen-position 'always
-           truncate-partial-width-windows nil
-           history-length 1000
-           use-short-answers t
-           ;; Improve CJK wrapping
-           word-wrap-by-category t
-           read-process-output-max (* 1024 1024)
-           ;; Suppress GUI features
-           use-file-dialog nil
-           use-dialog-box nil
-           ;; Window size and features
-           window-resize-pixelwise t
-           frame-resize-pixelwise t
-           indicate-buffer-boundaries 'left
-           display-line-numbers-width 2
-           ;; display-fill-column-indicator-character ?\u2502
-           case-fold-search t
-           create-lockfiles nil
-           truncate-partial-width-windows nil
-           history-length 1000))
+  (setq-default case-fold-search t
+                create-lockfiles nil
+                scroll-preserve-screen-position 'always
+                truncate-partial-width-windows nil
+                history-length 1000
+                use-short-answers t
+                ;; Improve CJK wrapping
+                word-wrap-by-category t
+                read-process-output-max (* 1024 1024)
+                ;; Suppress GUI features
+                use-file-dialog nil
+                use-dialog-box nil
+                ;; Window size and features
+                window-resize-pixelwise t
+                frame-resize-pixelwise t
+                indicate-buffer-boundaries 'left
+                display-line-numbers-width 2
+                ;; display-fill-column-indicator-character ?\u2502
+                case-fold-search t
+                create-lockfiles nil
+                truncate-partial-width-windows nil
+                history-length 1000))
 
 (setup (:with-hook after-init-hook
          (:hook electric-pair-mode)
          (:hook delete-selection-mode)
          (:hook transient-mark-mode)))
 
-(setup indent (:option tab-always-indent 'complete))
-(setup mouse (:option mouse-yank-at-point t))
+(setup indent (setopt tab-always-indent 'complete))
+(setup mouse (setopt mouse-yank-at-point t))
 
 (setup paren
-  (:option show-paren-when-point-inside-paren t
-           show-paren-when-point-in-periphery t
-           show-paren-context-when-offscreen t
-           show-paren-delay 0.2
-           blink-matching-paren-highlight-offscreen t))
+  (setopt show-paren-when-point-inside-paren t
+          show-paren-when-point-in-periphery t
+          show-paren-context-when-offscreen t
+          show-paren-delay 0.2
+          blink-matching-paren-highlight-offscreen t))
 
 (setup simple
-  (:global "C-." set-mark-command
-           "C-x C-." pop-global-mark
-           ;; 从光标位置删除到行首第一个非空格字符。
-           "C-M-<backspace>" (lambda ()
-                               (interactive)
-                               (let ((prev-pos (point)))
-                                 (back-to-indentation)
-                                 (kill-region (point) prev-pos))))
-  (:option  indent-tabs-mode nil
-            save-interprogram-paste-before-kill t
-            set-mark-command-repeat-pop t))
+  (keymap-global-set "C-." 'set-mark-command)
+  (keymap-global-set "C-x C-." 'pop-global-mark)
+  ;; 从光标位置删除到行首第一个非空格字符。
+  (keymap-global-set "C-M-<backspace>" (lambda ()
+                                         (interactive)
+                                         (let ((prev-pos (point)))
+                                           (back-to-indentation)
+                                           (kill-region (point) prev-pos))))
+  (setopt indent-tabs-mode nil
+          save-interprogram-paste-before-kill t
+          set-mark-command-repeat-pop t))
 
 (setup meow
   (:also-load lib-meow)
   (:with-function meow-setup (:autoload-this))
   (meow-global-mode 1)
   (meow-setup)
-  (:option  wrap-keymap (let ((map (make-keymap)))
-                          (suppress-keymap map)
-                          (dolist (k '("(" "[" "{" "<"))
-                            (define-key map k #'insert-pair))
-                          map))
+  (setq wrap-keymap (let ((map (make-keymap)))
+                      (suppress-keymap map)
+                      (dolist (k '("(" "[" "{" "<"))
+                        (define-key map k #'insert-pair))
+                      map))
   (meow-normal-define-key (cons "\\" wrap-keymap))
   (:hooks meow-insert-mode-hook
           (lambda ()
@@ -81,13 +81,13 @@
 (setup sis
   (:defer (:require sis))
   (:when-loaded
-    (:option sis-english-source "com.apple.keylayout.ABC"
-             ;; 用了 emacs-mac 提取的 patch 中的 mac-input-source 方法来切换
-             ;; sis-external-ism "macism"
-             sis-inline-tighten-head-rule nil
-             sis-default-cursor-color "#cf7fa7"
-             sis-other-cursor-color "orange"
-             sis-context-hooks '(meow-insert-enter-hook))
+    (setq sis-english-source "com.apple.keylayout.ABC"
+          ;; 用了 emacs-mac 提取的 patch 中的 mac-input-source 方法来切换
+          ;; sis-external-ism "macism"
+          sis-inline-tighten-head-rule nil
+          sis-default-cursor-color "#cf7fa7"
+          sis-other-cursor-color "orange"
+          sis-context-hooks '(meow-insert-enter-hook))
     (:hooks meow-insert-exit-hook sis-set-english)
     (if *is-mac*
         (sis-ism-lazyman-config
@@ -140,18 +140,16 @@
      "C-g" browse-kill-ring-quit
      "M-n" browse-kill-ring-forward
      "M-p" browse-kill-ring-previous))
-  (:option browse-kill-ring-separator "\f"))
+  (setopt browse-kill-ring-separator "\f"))
 
 ;; Shift lines up and down with M-up and M-down. When paredit is enabled,
 ;; it will use those keybindings. For this reason, you might prefer to
 ;; use M-S-up and M-S-down, which will work even in lisp modes.
 (setup move-dup
-  (:global [M-up] move-dup-move-lines-up
-           [M-down] move-dup-move-lines-down
-           [M-S-up] move-dup-move-lines-up
-           [M-S-down] move-dup-move-lines-down
-           "C-c d" move-dup-duplicate-down
-           "C-c u" move-dup-duplicate-up))
+  (keymap-global-set "M-<up>"   'move-dup-move-lines-up)
+  (keymap-global-set "M-<down>" 'move-dup-move-lines-down)
+  (keymap-global-set "C-c d"    'move-dup-duplicate-down)
+  (keymap-global-set "C-c u"    'move-dup-duplicate-up))
 
 ;; 彩虹括号
 (setup rainbow-delimiters
@@ -173,7 +171,6 @@
            "C-S-<tab>" hs-global-cycle)))
 
 (setup whitespace-cleanup-mode
-  (:global [remap just-one-space] cycle-spacing)
   (setq-default show-trailing-whitespace nil)
   (:with-mode (prog-mode text-mode conf-mode)
     (:local-set show-trailing-whitespace t))
@@ -197,16 +194,16 @@
                            1)))))))
 
 (setup avy
-  (:global "C-;" avy-goto-word-or-subword-1
-           "C-:" avy-goto-char-in-line)
-  (:option avy-style 'de-bruijn)
+  (keymap-global-set "C-;" 'avy-goto-word-or-subword-1)
+  (keymap-global-set "C-:" 'avy-goto-char-in-line)
+  (setopt avy-style 'de-bruijn)
   (:defer (:require ace-pinyin)
           (ace-pinyin-global-mode +1)))
 
 (setup goggles
   (:hook-into prog-mode)
   (:hook-into text-mode)
-  (:option goggles-pulse t)
+  (setopt goggles-pulse t)
 
   (defun +goggles--post-command ()
     "Highlight change after command."
@@ -239,8 +236,8 @@
 (setup ultra-scroll
   (:defer (:require ultra-scroll))
   (:when-loaded
-    (:option scroll-conservatively 101 ; important!
-             scroll-margin 0)
+    (setq scroll-conservatively 101 ; important!
+          scroll-margin 0)
     (ultra-scroll-mode 1)))
 
 (provide 'init-editing)
