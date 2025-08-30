@@ -39,21 +39,21 @@
 (setup display-line-numbers (:hook-into prog-mode))
 
 (setup web-mode
-  (:option web-mode-markup-indent-offset 2
-           web-mode-code-indent-offset 2
-           web-mode-enable-current-column-highlight t))
+  (setopt web-mode-markup-indent-offset 2
+          web-mode-code-indent-offset 2
+          web-mode-enable-current-column-highlight t))
 
-(setup verb (:option verb-babel-timeout 60.0))
+(setup verb (setopt verb-babel-timeout 60.0))
 
 (setup python
-  (:option python-indent-guess-indent-offset t
-           python-indent-guess-indent-offset-verbose nil))
+  (setopt python-indent-guess-indent-offset t
+          python-indent-guess-indent-offset-verbose nil))
 
 (setup apheleia
   (:with-mode prog-mode (:require apheleia)
               (:hook apheleia-global-mode))
   (:when-loaded
-    (:global "C-c C-x C-f" apheleia-format-buffer)
+    (keymap-global-set "C-c C-x C-f" 'apheleia-format-buffer)
     ;; $ brew install isort black google-java-format stylua libxml2
     ;; $ npm install -g prettier
     (setf (alist-get 'google-java-format apheleia-formatters)
@@ -75,11 +75,11 @@
 (setup mmm-mode
   (:with-mode prog-mode (:require mmm-mode))
   (:when-loaded
-    (:option mmm-parse-when-idle t
-             mmm-global-classes nil
-             mmm-classes-alist nil
-             mmm-mode-ext-classes-alist nil
-             mmm-submode-decoration-level 0)
+    (setq mmm-global-classes nil
+          mmm-classes-alist nil)
+    (setopt mmm-parse-when-idle t
+            mmm-mode-ext-classes-alist nil
+            mmm-submode-decoration-level 0)
     (:hook-into nxml-mode)
     (mmm-add-classes
      '((nxml-sql-select :submode sql-mode
@@ -115,24 +115,24 @@
   (:defer (:require projectile))
   (:when-loaded
     (projectile-mode +1)
-    (:option projectile-project-search-path '("~/IdeaProjects/"))))
+    (setopt projectile-project-search-path '("~/IdeaProjects/"))))
 
 (setup flymake
   (:defer (:require flymake))
   (:when-loaded
     ;; 注意：当 `flymake-no-changes-timeout` 被设置为 nil 时，
     ;; 需要实现 `eglot-handle-notification` 的 `:after` 方法。
-    (:option flymake-no-changes-timeout nil
-             flymake-fringe-indicator-position 'right-fringe)
+    (setopt flymake-no-changes-timeout nil
+            flymake-fringe-indicator-position 'right-fringe)
     (when (version<= "31" emacs-version)
-      (:option flymake-show-diagnostics-at-end-of-line 'fancy))
+      (setopt flymake-show-diagnostics-at-end-of-line 'fancy))
     (:with-mode prog-mode (:hook flymake-mode))
     (:with-mode emacs-lisp-mode (:hook (lambda()(flymake-mode -1))))))
 
 (setup js
   (:also-load lib-js)
   (:when-loaded
-    (setq-default js-indent-level 2)
+    (setopt js-indent-level 2)
     (+major-mode-lighter 'js-mode "JS")
     (+major-mode-lighter 'js-jsx-mode "JSX")))
 
@@ -141,11 +141,9 @@
   (:when-loaded
     (:hooks js-mode-hook +enable-js2-checks-if-flymake-inactive
             js2-mode-hook +enable-js2-checks-if-flymake-inactive)
-    ;; Change some defaults: customize them to override
-    (setq-default js2-bounce-indent-p nil)
     ;; Disable js2 mode's syntax error highlighting by default...
-    (setq-default js2-mode-show-parse-errors nil
-                  js2-mode-show-strict-warnings nil)
+    (setopt js2-mode-show-parse-errors nil
+            js2-mode-show-strict-warnings nil)
     (js2-imenu-extras-setup)
     (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))
     (+major-mode-lighter 'js2-mode "JS2")
@@ -171,37 +169,37 @@
       (when xref-window
         (quit-window nil xref-window))))
 
-  (:option xref-auto-jump-to-first-xref 'move)
+  (setopt xref-auto-jump-to-first-xref 'move)
   ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)
   (:hooks xref-after-jump-hook +xref-quit-window))
 
 (setup treesit
-  (:option treesit-language-source-alist
-           '((rust            . ("https://github.com/tree-sitter/tree-sitter-rust"))
-             (toml            . ("https://github.com/tree-sitter/tree-sitter-toml"))
-             (haskell         . ("https://github.com/tree-sitter/tree-sitter-haskell"))
-             (bibtex          .  ("https://github.com/latex-lsp/tree-sitter-bibtex"))
-             (cmake           . ("https://github.com/uyha/tree-sitter-cmake"))
-             (css             . ("https://github.com/tree-sitter/tree-sitter-css"))
-             (dockerfile      . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
-             (html            . ("https://github.com/tree-sitter/tree-sitter-html"))
-             (java            . ("https://github.com/tree-sitter/tree-sitter-java"))
-             (javascript      . ("https://github.com/tree-sitter/tree-sitter-javascript"))
-             (jsdoc           . ("https://github.com/tree-sitter/tree-sitter-jsdoc"))
-             (json            . ("https://github.com/tree-sitter/tree-sitter-json"))
-             (latex           . ("https://github.com/latex-lsp/tree-sitter-latex"))
-             (make            . ("https://github.com/tree-sitter-grammars/tree-sitter-make"))
-             (lua             . ("https://github.com/tree-sitter-grammars/tree-sitter-lua"))
-             (org             . ("https://github.com/milisims/tree-sitter-org"))
-             (python          . ("https://github.com/tree-sitter/tree-sitter-python"))
-             (sql             . ("https://github.com/DerekStride/tree-sitter-sql"))
-             (typescript      . ("https://github.com/tree-sitter/tree-sitter-typescript"))
-             (tsx             . ("https://github.com/tree-sitter/tree-sitter-typescript"))
-             (typst           . ("https://github.com/uben0/tree-sitter-typst"))
-             (vue             . ("https://github.com/tree-sitter-grammars/tree-sitter-vue"))
-             (yaml            . ("https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
-             (markdown        . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
-             (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))
+  (setq treesit-language-source-alist
+        '((rust            . ("https://github.com/tree-sitter/tree-sitter-rust"))
+          (toml            . ("https://github.com/tree-sitter/tree-sitter-toml"))
+          (haskell         . ("https://github.com/tree-sitter/tree-sitter-haskell"))
+          (bibtex          .  ("https://github.com/latex-lsp/tree-sitter-bibtex"))
+          (cmake           . ("https://github.com/uyha/tree-sitter-cmake"))
+          (css             . ("https://github.com/tree-sitter/tree-sitter-css"))
+          (dockerfile      . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+          (html            . ("https://github.com/tree-sitter/tree-sitter-html"))
+          (java            . ("https://github.com/tree-sitter/tree-sitter-java"))
+          (javascript      . ("https://github.com/tree-sitter/tree-sitter-javascript"))
+          (jsdoc           . ("https://github.com/tree-sitter/tree-sitter-jsdoc"))
+          (json            . ("https://github.com/tree-sitter/tree-sitter-json"))
+          (latex           . ("https://github.com/latex-lsp/tree-sitter-latex"))
+          (make            . ("https://github.com/tree-sitter-grammars/tree-sitter-make"))
+          (lua             . ("https://github.com/tree-sitter-grammars/tree-sitter-lua"))
+          (org             . ("https://github.com/milisims/tree-sitter-org"))
+          (python          . ("https://github.com/tree-sitter/tree-sitter-python"))
+          (sql             . ("https://github.com/DerekStride/tree-sitter-sql"))
+          (typescript      . ("https://github.com/tree-sitter/tree-sitter-typescript"))
+          (tsx             . ("https://github.com/tree-sitter/tree-sitter-typescript"))
+          (typst           . ("https://github.com/uben0/tree-sitter-typst"))
+          (vue             . ("https://github.com/tree-sitter-grammars/tree-sitter-vue"))
+          (yaml            . ("https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
+          (markdown        . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+          (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))
 
   (defun +treesit-install-all-languages ()
     "Install all languages specified by `treesit-language-source-alist'."
@@ -217,21 +215,21 @@
     (:require indent-bars)
     (:hook indent-bars-mode))
   (:when-loaded
-    (:option indent-bars-color '(highlight :face-bg t :blend 0.15)
-             indent-bars-pattern "."
-             indent-bars-width-frac 0.1
-             indent-bars-pad-frac 0.1
-             indent-bars-zigzag nil
-             indent-bars-color-by-depth '(:regexp "outline-\\([0-9]+\\)" :blend 1) ; blend=1: blend with BG only
-             indent-bars-highlight-current-depth '(:blend 1 :width 0.5) ; pump up the BG blend on current
-             indent-bars-display-on-blank-lines t
-             ;; indent-bars-display-on-blank-lines nil
-             indent-bars-treesit-support t
-             indent-bars-no-descend-string t
-             indent-bars-prefer-character t
-             indent-bars-no-stipple-char ?\u2502
-             indent-bars-treesit-scope '((python function_definition class_definition for_statement
-                                                 if_statement with_statement while_statement)))))
+    (setopt indent-bars-color '(highlight :face-bg t :blend 0.15)
+            indent-bars-pattern "."
+            indent-bars-width-frac 0.1
+            indent-bars-pad-frac 0.1
+            indent-bars-zigzag nil
+            indent-bars-color-by-depth '(:regexp "outline-\\([0-9]+\\)" :blend 1) ; blend=1: blend with BG only
+            indent-bars-highlight-current-depth '(:blend 1 :width 0.5) ; pump up the BG blend on current
+            indent-bars-display-on-blank-lines t
+            ;; indent-bars-display-on-blank-lines nil
+            indent-bars-treesit-support t
+            indent-bars-no-descend-string t
+            indent-bars-prefer-character t
+            indent-bars-no-stipple-char ?\u2502
+            indent-bars-treesit-scope '((python function_definition class_definition for_statement
+                                                if_statement with_statement while_statement)))))
 
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
@@ -245,8 +243,8 @@
 (setup dape
   (:defer (:require dape))
   (:when-loaded
-    (:global "<f5>" dape)
-    (:option dape-buffer-window-arrangement 'right)
+    (keymap-global-set "<f5>" 'dape)
+    (setopt dape-buffer-window-arrangement 'right)
     ;; Save buffers on startup, useful for interpreted languages
     (:hook dape-start-hook (lambda () (save-some-buffers t t)))))
 
@@ -254,12 +252,12 @@
   (:defer (:require pyvenv))
   (:when-loaded
     (pyvenv-mode t)
-    (:option pyvenv-post-activate-hooks
-             (list (lambda ()
-                     (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3"))))
-             pyvenv-post-deactivate-hooks
-             (list (lambda ()
-                     (setq python-shell-interpreter "python3"))))))
+    (setq pyvenv-post-activate-hooks
+          (list (lambda ()
+                  (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3"))))
+          pyvenv-post-deactivate-hooks
+          (list (lambda ()
+                  (setq python-shell-interpreter "python3"))))))
 
 (setup separedit
   (:defer (:require separedit))
@@ -267,23 +265,23 @@
     (:with-map prog-mode-map (:bind "C-c '" separedit))
     (:with-map minibuffer-mode-map (:bind "C-c '" separedit))
     (:with-map help-mode-map (:bind "C-c '" separedit))
-    (:option separedit-default-mode 'org-mode)))
+    (setopt separedit-default-mode 'org-mode)))
 
 (setup webpaste
   (:defer (:require webpaste)
-          (:option webpaste-provider-priority '("paste.rs" "dpaste.org"))))
+          (setopt webpaste-provider-priority '("paste.rs" "dpaste.org"))))
 
 (setup eshell
-  (:global [f8] eshell)
+  (keymap-global-set "<f8>" 'eshell)
   (:when-loaded
     (:require eshell)
     (:also-load esh-mode)
     (:also-load lib-eshell)
     (:also-load nerd-icons)
-    (:option eshell-prompt-function 'eshell-prompt-multiline
-             eshell-highlight-prompt nil
-             eshell-banner-message ""
-             eshell-cmpl-ignore-case t)
+    (setopt eshell-prompt-function 'eshell-prompt-multiline
+            eshell-highlight-prompt nil
+            eshell-banner-message ""
+            eshell-cmpl-ignore-case t)
     (:with-map eshell-mode-map
       (:bind "C-l"  +eshell-clear
              "<tab>" completion-at-point
