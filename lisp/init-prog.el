@@ -150,7 +150,7 @@
     (+major-mode-lighter 'js2-jsx-mode "JSX2")))
 
 (setup xref
-  ;; 用 Popper 替代了 +xref-show-xrefs 以及 :option 配置
+  ;; 用 Popper 替代了 +xref-show-xrefs 以及 setopt 配置
   ;;
   ;;   (defun +xref-show-xrefs (fetcher display-action)
   ;;     "Display some Xref values produced by FETCHER using DISPLAY-ACTION.
