@@ -37,9 +37,9 @@
                 ;; then laguage could be detected automatically
                 ;; for code blocks without language explicitly specified.
                 language-detection)
-    (telega-notifications-mode 1)
-    (telega-autoplay-mode 1)
     (setopt
+     telega-autoplay-mode 1
+     telega-notifications-mode 1
      telega-emoji-use-images nil
      telega-notifications-msg-temex '(and (not outgoing)
                                           (not (chat (or (type channel))))
