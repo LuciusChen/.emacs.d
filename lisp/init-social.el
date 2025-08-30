@@ -178,6 +178,6 @@
       (when (mastodon-tl--property 'toot-folded :no-move)
         (mastodon-tl-fold-post-toggle)))
 
-    (:advice 'mastodon-detect-and-translate :before #'mastodon-detect-and-toggle-if-folded)))
+    (:advice mastodon-detect-and-translate :before #'mastodon-detect-and-toggle-if-folded)))
 (provide 'init-social)
 ;;; init-social.el ends here

@@ -30,8 +30,8 @@
 (setup org-remark
   (:load-after org)
   (:when-loaded
-    (:global "C-c i m" org-remark-mark)
-    (:option org-remark-notes-file-name #'org-remark-notes-file-name-function)
+    (keymap-global-set "C-c i m" 'org-remark-mark)
+    (setopt org-remark-notes-file-name #'org-remark-notes-file-name-function)
     (:with-map org-remark-mode-map
       (:bind "C-c i o" org-remark-open
              "C-c i ]" org-remark-view-next
@@ -47,47 +47,47 @@
   (:when-loaded
     (:also-load lib-gpt)
     (:also-load org)
-    (:option gptel-default-mode 'org-mode
-             gptel-model 'openai/gpt-4o
-             gptel-stream t
-             gptel-backend (gptel-make-openai "vercel-gateway"
-                             :host "ai-gateway.vercel.sh"
-                             :endpoint "/v1/chat/completions"
-                             :key (auth-source-pick-first-password :host "ai-gateway.vercel" :user "vercel")
-                             :models '(deepseek/deepseek-chat
-                                       deepseek/deepseek-r1
-                                       qwen/qwen-turbo
-                                       qwen/qwen-plus
-                                       qwen/qwen-max
-                                       openai/gpt-4o
-                                       openai/gpt-5
-                                       anthropic/claude-3.7-sonnet:thinking
-                                       anthropic/claude-3.7-sonnet
-                                       anthropic/claude-4
-                                       google/gemini-2.5-pro-exp-03-25:free
-                                       google/gemini-2.5-pro-preview-03-25)
-                             :stream t)
-             ;; gptel-backend (gptel-make-openai "OpenRouter"
-             ;;                 :host "openrouter.ai"
-             ;;                 :endpoint "/api/v1/chat/completions"
-             ;;                 :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
-             ;;                 :models '(deepseek/deepseek-chat
-             ;;                           deepseek/deepseek-r1
-             ;;                           qwen/qwen-turbo
-             ;;                           qwen/qwen-plus
-             ;;                           qwen/qwen-max
-             ;;                           openai/gpt-4o
-             ;;                           openai/gpt-5
-             ;;                           anthropic/claude-3.7-sonnet:thinking
-             ;;                           anthropic/claude-3.7-sonnet
-             ;;                           anthropic/claude-4
-             ;;                           google/gemini-2.5-pro-exp-03-25:free
-             ;;                           google/gemini-2.5-pro-preview-03-25)
-             ;;                 :stream t)
-             gptel-proxy (if *is-mac* "" "socks://127.0.0.1:7897")
-             gptel-directives (get-gptel-directives)
-             gptel-temperature 0.7
-             gptel-tools +gptel-tools)
+    (setopt gptel-default-mode 'org-mode
+            gptel-model 'openai/gpt-4o
+            gptel-stream t
+            gptel-backend (gptel-make-openai "vercel-gateway"
+                            :host "ai-gateway.vercel.sh"
+                            :endpoint "/v1/chat/completions"
+                            :key (auth-source-pick-first-password :host "ai-gateway.vercel" :user "vercel")
+                            :models '(deepseek/deepseek-chat
+                                      deepseek/deepseek-r1
+                                      qwen/qwen-turbo
+                                      qwen/qwen-plus
+                                      qwen/qwen-max
+                                      openai/gpt-4o
+                                      openai/gpt-5
+                                      anthropic/claude-3.7-sonnet:thinking
+                                      anthropic/claude-3.7-sonnet
+                                      anthropic/claude-4
+                                      google/gemini-2.5-pro-exp-03-25:free
+                                      google/gemini-2.5-pro-preview-03-25)
+                            :stream t)
+            ;; gptel-backend (gptel-make-openai "OpenRouter"
+            ;;                 :host "openrouter.ai"
+            ;;                 :endpoint "/api/v1/chat/completions"
+            ;;                 :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
+            ;;                 :models '(deepseek/deepseek-chat
+            ;;                           deepseek/deepseek-r1
+            ;;                           qwen/qwen-turbo
+            ;;                           qwen/qwen-plus
+            ;;                           qwen/qwen-max
+            ;;                           openai/gpt-4o
+            ;;                           openai/gpt-5
+            ;;                           anthropic/claude-3.7-sonnet:thinking
+            ;;                           anthropic/claude-3.7-sonnet
+            ;;                           anthropic/claude-4
+            ;;                           google/gemini-2.5-pro-exp-03-25:free
+            ;;                           google/gemini-2.5-pro-preview-03-25)
+            ;;                 :stream t)
+            gptel-proxy (if *is-mac* "" "socks://127.0.0.1:7897")
+            gptel-directives (get-gptel-directives)
+            gptel-temperature 0.7)
+    (setq gptel-tools +gptel-tools)
 
     ;; (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
     ;; (gptel-make-openai "DeepSeek" :host "api.deepseek.com" :endpoint "/chat/completions" :stream t :key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
@@ -103,64 +103,64 @@
 
 (setup gt
   (:defer (:require gt)
-          (:global "C-c s g" gt-translate
-                   "C-c s s" gt-setup
-                   "C-c s p" gt-speak))
+          (keymap-global-set "C-c s g" 'gt-translate)
+          (keymap-global-set "C-c s s" 'gt-setup)
+          (keymap-global-set "C-c s p" 'gt-speak))
   (:when-loaded
-    (:option gt-langs '(en zh)
-             gt-chatgpt-host "https://api.deepseek.com"
-             gt-chatgpt-path "/chat/completions"
-             gt-chatgpt-key '(auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
-             gt-chatgpt-model "deepseek-chat"
-             gt-chatgpt-user-prompt-template
-             "Please translate the following text into {{lang}}, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n{{text}}"
-             gt-buffer-render-follow-p t
-             gt-buffer-render-window-config
-             '((display-buffer-reuse-window display-buffer-in-direction)
-               (direction . bottom)
-               (window-height . 0.4))
-             gt-preset-translators
-             `((default . ,(gt-translator
-                            :taker (list (gt-taker :pick nil :if 'selection)
-                                         (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode))
-                                         (gt-taker :text 'word))
-                            :engines (list (gt-chatgpt-engine :if 'not-word)
-                                           (gt-google-engine :if 'word)
-                                           (gt-deepl-engine :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
-                                           (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
-                                           (gt-youdao-suggest-engine :if '(and word src:en)))
-                            :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode eww-mode helpful-mode devdocs-mode))
-                                           (gt-buffer-render))))
-               ;; gt-insert-render
-               (after-source-insert . ,(gt-translator
-                                        :taker (gt-taker :text 'buffer :pick 'paragraph)
-                                        :engines (gt-google-engine)
-                                        :render (gt-insert-render :type 'after)))
-               (replace-source-chat-insert . ,(gt-translator
-                                               :taker (gt-taker :text 'paragraph :pick nil)
-                                               :engines (gt-google-engine)
-                                               :render (gt-insert-render :type 'replace)))
-               (only-translate-rare-insert . ,(gt-translator
-                                               :taker (gt-taker :text 'paragraph
-                                                                :pick 'word
-                                                                :pick-pred (lambda (w) (length> w 6)))
-                                               :engines (gt-google-engine)
-                                               :render (gt-insert-render :type 'after
-                                                                         :rfmt " (%s)"
-                                                                         :rface '(:foreground "grey"))))
-               ;; gt-overlay-render
-               (after-source-overlay . ,(gt-translator
-                                         :taker (gt-taker :text 'buffer :pick 'paragraph)
-                                         :engines (gt-google-engine)
-                                         :render (gt-overlay-render :type 'after
-                                                                    :sface nil
-                                                                    :rface 'font-lock-doc-face)))
-               (only-translate-rare-overlay . ,(gt-translator
-                                                :taker (gt-taker :text 'buffer :pick 'word :pick-pred (lambda (w) (length> w 5)))
-                                                :engines (gt-google-engine)
-                                                :render (gt-overlay-render :type 'after
-                                                                           :rfmt "(%s)"
-                                                                           :rface '(:foreground "grey"))))))
+    (setopt gt-langs '(en zh)
+            gt-chatgpt-host "https://api.deepseek.com"
+            gt-chatgpt-path "/chat/completions"
+            gt-chatgpt-key '(auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
+            gt-chatgpt-model "deepseek-chat"
+            gt-chatgpt-user-prompt-template
+            "Please translate the following text into {{lang}}, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n{{text}}"
+            gt-buffer-render-follow-p t
+            gt-buffer-render-window-config
+            '((display-buffer-reuse-window display-buffer-in-direction)
+              (direction . bottom)
+              (window-height . 0.4)))
+    (setq gt-preset-translators
+          `((default . ,(gt-translator
+                         :taker (list (gt-taker :pick nil :if 'selection)
+                                      (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode))
+                                      (gt-taker :text 'word))
+                         :engines (list (gt-chatgpt-engine :if 'not-word)
+                                        (gt-google-engine :if 'word)
+                                        (gt-deepl-engine :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
+                                        (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
+                                        (gt-youdao-suggest-engine :if '(and word src:en)))
+                         :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode eww-mode helpful-mode devdocs-mode))
+                                        (gt-buffer-render))))
+            ;; gt-insert-render
+            (after-source-insert . ,(gt-translator
+                                     :taker (gt-taker :text 'buffer :pick 'paragraph)
+                                     :engines (gt-google-engine)
+                                     :render (gt-insert-render :type 'after)))
+            (replace-source-chat-insert . ,(gt-translator
+                                            :taker (gt-taker :text 'paragraph :pick nil)
+                                            :engines (gt-google-engine)
+                                            :render (gt-insert-render :type 'replace)))
+            (only-translate-rare-insert . ,(gt-translator
+                                            :taker (gt-taker :text 'paragraph
+                                                             :pick 'word
+                                                             :pick-pred (lambda (w) (length> w 6)))
+                                            :engines (gt-google-engine)
+                                            :render (gt-insert-render :type 'after
+                                                                      :rfmt " (%s)"
+                                                                      :rface '(:foreground "grey"))))
+            ;; gt-overlay-render
+            (after-source-overlay . ,(gt-translator
+                                      :taker (gt-taker :text 'buffer :pick 'paragraph)
+                                      :engines (gt-google-engine)
+                                      :render (gt-overlay-render :type 'after
+                                                                 :sface nil
+                                                                 :rface 'font-lock-doc-face)))
+            (only-translate-rare-overlay . ,(gt-translator
+                                             :taker (gt-taker :text 'buffer :pick 'word :pick-pred (lambda (w) (length> w 5)))
+                                             :engines (gt-google-engine)
+                                             :render (gt-overlay-render :type 'after
+                                                                        :rfmt "(%s)"
+                                                                        :rface '(:foreground "grey"))))))
     (when *is-linux*
       (:option gt-tts-native-engine 'espeak-ng)
       (cl-defmethod gt-speech ((engine (eql 'espeak-ng)) text lang &optional play-fn)
@@ -169,11 +169,11 @@
           (start-process-shell-command "espeak-ng" nil command))))))
 
 (setup elfeed
-  (:global "C-x w" elfeed)
+  (keymap-global-set "C-x w" 'elfeed)
   (:when-loaded
     (:also-load lib-elfeed)
-    (:option elfeed-feeds +elfeed-feeds
-             elfeed-search-print-entry-function #'+elfeed-search-print-entry--better-default)
+    (setopt elfeed-feeds +elfeed-feeds)
+    (setq elfeed-search-print-entry-function #'+elfeed-search-print-entry--better-default)
     (:with-map elfeed-show-mode-map
       (:bind "N" +menu-dwim--org-capture-elfeed-show
              "o" +open-link-with-mpv))
@@ -189,8 +189,8 @@
       (:bind "F" elfeed-tube-fetch
              [remap save-buffer] elfeed-tube-save)))
   (:when-loaded
-    ;; (:option mpv-default-options '("--http-proxy=http://127.0.0.1:7890"
-    ;;                                "--ytdl-raw-options-append=proxy=http://127.0.0.1:7890"))
+    (setopt mpv-default-options '("--http-proxy=http://127.0.0.1:7897"
+                                  "--ytdl-raw-options-append=proxy=http://127.0.0.1:7897"))
     (elfeed-tube-setup)))
 
 (setup elfeed-tube-mpv
@@ -200,7 +200,7 @@
            "C-c C-w"  elfeed-tube-mpv-where)))
 
 (setup markdown-mode
-  (:option markdown-command "pandoc --standalone --css=GTD.css"))
+  (setopt markdown-command "pandoc --standalone --css=GTD.css"))
 
 (setup md
   (:defer (:require md))
@@ -211,8 +211,8 @@
 (setup citar-denote
   (:load-after denote)
   (:when-loaded
-    (:option citar-denote-use-bib-keywords t
-             citar-denote-subdir "bib-notes")
+    (setopt citar-denote-use-bib-keywords t
+            citar-denote-subdir "bib-notes")
     (citar-denote-mode)))
 
 (provide 'init-reader)
