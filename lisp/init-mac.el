@@ -4,20 +4,20 @@
 
 ;; modify meta from ⌥ to ⌘
 (setup ns-win
-  (:option mac-command-modifier 'meta
-           mac-option-modifier 'super))
+  (setq mac-command-modifier 'meta
+        mac-option-modifier 'super))
 ;; Make mouse wheel / trackpad scrolling less jerky
 (setup mwheel
-  (:option mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control)))))
+  (setopt mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control)))))
 
 (setup (:with-feature nil)
-  (:global "<wheel-right>" 'ignore
-           "<wheel-left>" 'ignore
-           "<double-wheel-right>" 'ignore
-           "<double-wheel-left>" 'ignore
-           "<triple-wheel-right>" 'ignore
-           "<triple-wheel-left>" 'ignore)
-  (:global "M-`" 'ns-next-frame))
+  (keymap-global-set "<wheel-right>" 'ignore)
+  (keymap-global-set "<wheel-left>" 'ignore)
+  (keymap-global-set "<double-wheel-right>" 'ignore)
+  (keymap-global-set "<double-wheel-left>" 'ignore)
+  (keymap-global-set "<triple-wheel-right>" 'ignore)
+  (keymap-global-set "<triple-wheel-left>" 'ignore)
+  (keymap-global-set "M-`" 'ns-next-frame))
 
 (setup (:only-if (and (display-graphic-p)))
   (:require lib-env)
@@ -25,13 +25,13 @@
 
 (setup (:only-if (and (eq system-type 'darwin) (fboundp 'mac-input-source)))
   (:require lib-ime)
-  (:global "<f13>" 'toggle-ime))
+  (keymap-global-set "<f13>" 'toggle-ime))
 
 (setup emt
   (:defer (:require emt))
   (:when-loaded
-    (:global "M-f" emt-forward-word
-             "M-b" emt-backward-word)
+    (keymap-global-set "M-f" 'emt-forward-word)
+    (keymap-global-set "M-b" 'emt-backward-word)
     (emt-ensure)))
 
 (provide 'init-mac)
