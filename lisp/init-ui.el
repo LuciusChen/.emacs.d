@@ -4,7 +4,7 @@
 
 (setup tool-bar (:when-loaded (tool-bar-mode -1)))
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
-(setup tooltip (:when-loaded (:option tooltip-delay 2.5)))
+(setup tooltip (:when-loaded (setopt tooltip-delay 2.5)))
 ;; Change global font size easily
 (setup default-text-scale (:hook-into after-init))
 ;; Don't scale font on trackpad pinch!
@@ -41,15 +41,15 @@
 (setup custom
   (:when-loaded
     (:also-load lib-appearance)
-    (:global "M-C-8" (lambda () (interactive) (+adjust-opacity nil -2))
-             "M-C-7" (lambda () (interactive) (+adjust-opacity nil 2)))
+    (keymap-global-set "C-M-8" (lambda () (interactive) (+adjust-opacity nil -2)))
+    (keymap-global-set "C-M-7" (lambda () (interactive) (+adjust-opacity nil 2)))
     ;; Don't prompt to confirm theme safety. This avoids problems with
     ;; first-time startup on Emacs > 26.3.
-    (:option custom-safe-themes t
-             ;; If you don't customize it, this is the theme you get.
-             custom-enabled-themes '(rose-pine-night)
-             light-theme 'rose-pine-day
-             dark-theme 'rose-pine-night)))
+    (setopt custom-safe-themes t
+            ;; If you don't customize it, this is the theme you get.
+            custom-enabled-themes '(rose-pine-night))
+    (setq light-theme 'rose-pine-day
+          dark-theme 'rose-pine-night)))
 
 (setup startup
   (when *is-mac*
@@ -68,21 +68,21 @@
   (:with-hook after-init-hook (:hook reapply-themes)))
 
 (setup hl-line
-  (:option hl-line-range-function
-           (lambda () (cons (line-end-position)
-                            (line-beginning-position 2))))
+  (setq hl-line-range-function
+        (lambda () (cons (line-end-position)
+                         (line-beginning-position 2))))
   (global-hl-line-mode))
 
 (when window-system
   (setup panel
-    (:option panel-latitude 32.09703
-             panel-longitude 118.77969
-             panel-path-max-length 35
-             panel-min-left-padding 10
-             panel-image-file "~/.emacs.d/assets/bitmap.png"
-             panel-image-width 400
-             panel-image-height 169
-             panel-title "Happy hacking, lucius - Emacs ♥ you")
+    (setopt panel-latitude 32.09703
+            panel-longitude 118.77969
+            panel-path-max-length 35
+            panel-min-left-padding 10
+            panel-image-file "~/.emacs.d/assets/bitmap.png"
+            panel-image-width 400
+            panel-image-height 169
+            panel-title "Happy hacking, lucius - Emacs ♥ you")
     (panel-create-hook))
 
   (setup faces
@@ -122,29 +122,30 @@ its value will be updated. If the key is not present, the entry will be added."
   (:global "C-~"   popper-toggle
            "M-~"   popper-cycle
            "C-M-`" popper-toggle-type)
-  (:option popper-window-height (lambda (win)
-                                  (fit-window-to-buffer
-                                   win
-                                   (max 26 (floor (frame-height) 2))
-                                   26))
-           popper-reference-buffers
-           '(("\\*Messages\\*"
-              "Output\\*$"
-              "\\*Async Shell Command\\*"
-              help-mode
-              compilation-mode)
-             ("\\*Help\\*$")
-             ("\\*xref\\*$")
-             ("\\*chatgpt\\*$")
-             ("\\*vterm\\*$")
-             ("\\*compilation\\*$")
-             ("\\*eshell\\*$")
-             ("\\*Org Select\\*$")
-             ("\\*Telega User\\*$")
-             ("\\*Telegram Chat Info\\*$")
-             ("\\*Telegram Message Info\\*$")
-             ("\\*Telegram Sticker Set\\*$")
-             ("\\*Telegram Notification Messages\\*$")))
+  (setopt popper-window-height (lambda (win)
+                                 (fit-window-to-buffer
+                                  win
+                                  (max 26 (floor (frame-height) 2))
+                                  26))
+          popper-reference-buffers
+          '(("\\*Messages\\*"
+             "Output\\*$"
+             "\\*Async Shell Command\\*"
+             help-mode
+             compilation-mode)
+            ("\\*Help\\*$")
+            ("\\*xref\\*$")
+            ("\\*chatgpt\\*$")
+            ("\\*OpenRouter\\*$")
+            ("\\*vterm\\*$")
+            ("\\*compilation\\*$")
+            ("\\*eshell\\*$")
+            ("\\*Org Select\\*$")
+            ("\\*Telega User\\*$")
+            ("\\*Telegram Chat Info\\*$")
+            ("\\*Telegram Message Info\\*$")
+            ("\\*Telegram Sticker Set\\*$")
+            ("\\*Telegram Notification Messages\\*$")))
   (:defer (popper-mode +1)
           ;; (popper-echo-mode +1)
           (popper-tab-line-mode +1))
@@ -166,23 +167,23 @@ its value will be updated. If the key is not present, the entry will be added."
              "C-c r w" tab-bar-close-tab
              "C-c r s" tab-bar-switch-to-tab)
     (:also-load lib-tabbar)
-    (:option tab-bar-separator ""
-             tab-bar-close-button-show nil
-             tab-bar-new-button-show nil
-             tab-bar-new-tab-to 'rightmost
-             tab-bar-tab-hints t
-             tab-bar-show 1
-             tab-bar-new-tab-choice "*scratch*"
-             tab-bar-select-tab-modifiers '(super)
-             tab-bar-tab-name-truncated-max 20
-             tab-bar-auto-width nil
-             ;; Add spaces for tab-name
-             tab-bar-tab-name-function '+tab-bar-tab-name-function
-             tab-bar-tab-name-format-function '+tab-bar-tab-name-format-function
-             tab-bar-format '(tab-bar-format-tabs
-                              tab-bar-format-add-tab
-                              tab-bar-format-align-right
-                              +tab-bar-telega-icon))
+    (setq tab-bar-separator "")
+    (setopt tab-bar-close-button-show nil
+            tab-bar-new-button-show nil
+            tab-bar-new-tab-to 'rightmost
+            tab-bar-tab-hints t
+            tab-bar-show 1
+            tab-bar-new-tab-choice "*scratch*"
+            tab-bar-select-tab-modifiers '(super)
+            tab-bar-tab-name-truncated-max 20
+            tab-bar-auto-width nil
+            ;; Add spaces for tab-name
+            tab-bar-tab-name-function '+tab-bar-tab-name-function
+            tab-bar-tab-name-format-function '+tab-bar-tab-name-format-function
+            tab-bar-format '(tab-bar-format-tabs
+                             tab-bar-format-add-tab
+                             tab-bar-format-align-right
+                             +tab-bar-telega-icon))
     (:hooks telega-connection-state-hook +tab-bar-telega-icon-update
             telega-kill-hook +tab-bar-telega-icon-update)
     (:advice telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
@@ -193,8 +194,8 @@ its value will be updated. If the key is not present, the entry will be added."
 (setup too-wide-minibuffer-mode
   (:defer (:require too-wide-minibuffer-mode))
   (:when-loaded
-    (:option too-wide-minibuffer-max-width 200
-             minibuffer-follows-selected-frame nil)))
+    (setopt too-wide-minibuffer-max-width 200)
+    (setq minibuffer-follows-selected-frame nil)))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

@@ -8,12 +8,12 @@
   ;; 需要转成 defun，即 defalias。
   ;; defun 宏展开其实也是 defalias 包裹了一个 lambda。
   ;; (defalias 'telega-prefix-map telega-prefix-map)
-  ;; (:global "C-c t" 'telega-prefix-map)
+  ;; (keymap-global-set "C-c t" 'telega-prefix-map)
   ;;
   ;; @Eli
   ;; :bind-into 里面用 :ensure 规定了 func`，直接传的话就会给你加 #'。
   ;; 改成 (identity xxx-prefix-map) 即可
-  (:global "C-c t" (identity telega-prefix-map))
+  (keymap-global-set "C-c t" (identity telega-prefix-map))
   (:when-loaded
     (:with-map telega-prefix-map
       (:bind
@@ -37,9 +37,11 @@
                 ;; then laguage could be detected automatically
                 ;; for code blocks without language explicitly specified.
                 language-detection)
-    (:option
+    (telega-notifications-mode 1)
+    (telega-autoplay-mode 1)
+    (setq telega-avatar-workaround-gaps-for '(return t))
+    (setopt
      telega-emoji-use-images nil
-     telega-notifications-mode 1
      telega-notifications-msg-temex '(and (not outgoing)
                                           (not (chat (or (type channel))))
                                           (contains "dape\\|jdtls\\|eglot\\|meow\\|[eE]macs\\|telega\\|@Lucius_Chen"))
@@ -51,7 +53,7 @@
      telega-chat-fill-column 90
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
-     telega-avatar-workaround-gaps-for '(return t)
+     ;; telega-avatar-workaround-gaps-for '(return t)
      ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
@@ -88,11 +90,9 @@
                                       ((:outline "#81a2be") (:foreground "#81a2be"))
                                       ((:outline "#9ccfd8") (:foreground "#9ccfd8"))
                                       ((:outline "#ebbcba") (:foreground "#ebbcba"))))
-
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
-     telega-autoplay-mode 1
      telega-url-shorten-regexps
      ;; telega-url-shorten
      (list `(too-long-link
@@ -171,16 +171,14 @@
     (:after gt
       (:with-map mastodon-mode-map
         (:bind "a" mastodon-detect-and-translate)))
-    (:option mastodon-instance-url "https://mastodon.social"
-             mastodon-active-user "Lucius_Chen"
-             mastodon-tl--show-avatars t)
+    (setopt mastodon-instance-url "https://mastodon.social"
+            mastodon-active-user "Lucius_Chen"
+            mastodon-tl--show-avatars t)
     (defun mastodon-detect-and-toggle-if-folded ()
       "Toggle fold status if the toot at point is folded."
       (when (mastodon-tl--property 'toot-folded :no-move)
         (mastodon-tl-fold-post-toggle)))
 
-    (advice-add 'mastodon-detect-and-translate :before #'mastodon-detect-and-toggle-if-folded)
-    ;; (:advice mastodon-detect-and-translate :before #'mastodon-tl-fold-post-toggle)
-    ))
+    (:advice 'mastodon-detect-and-translate :before #'mastodon-detect-and-toggle-if-folded)))
 (provide 'init-social)
 ;;; init-social.el ends here
