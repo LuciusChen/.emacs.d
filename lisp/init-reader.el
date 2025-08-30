@@ -162,7 +162,7 @@
                                                                         :rfmt "(%s)"
                                                                         :rface '(:foreground "grey"))))))
     (when *is-linux*
-      (:option gt-tts-native-engine 'espeak-ng)
+      (setopt gt-tts-native-engine 'espeak-ng)
       (cl-defmethod gt-speech ((engine (eql 'espeak-ng)) text lang &optional play-fn)
         ;; 调用 espeak-ng 命令来朗读文本
         (let ((command (format "espeak-ng -v %s \"%s\"" lang text)))

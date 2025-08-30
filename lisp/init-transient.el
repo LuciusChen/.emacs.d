@@ -5,18 +5,18 @@
   (:defer (require 'transient))
   (:when-loaded
     (:also-load lib-transient)
-    (:global    "C-c e a" agenda-transient
-                "C-c e j" journal-transient
-                "C-c e e" emacs-access-transient
-                "C-c e g" gptel-menu
-                "C-c e p" prog-commands
-                "C-c e m" magit-commands
-                "C-c e u" uniline-transient
-                "C-c e d" dape-transient
-                "C-c e i" projectile-transient)
+    (keymap-global-set "C-c e a" 'agenda-transient)
+    (keymap-global-set "C-c e j" 'journal-transient)
+    (keymap-global-set "C-c e e" 'emacs-access-transient)
+    (keymap-global-set "C-c e g" 'gptel-menu)
+    (keymap-global-set "C-c e p" 'prog-commands)
+    (keymap-global-set "C-c e m" 'magit-commands)
+    (keymap-global-set "C-c e u" 'uniline-transient)
+    (keymap-global-set "C-c e d" 'dape-transient)
+    (keymap-global-set "C-c e i" 'projectile-transient)
     (:with-map transient-base-map
       (:bind "<escape>" transient-quit-one))
-    (:option transient-semantic-coloring t)
+    (setopt transient-semantic-coloring t)
 
     ;; org daily
     (transient-define-prefix journal-transient ()

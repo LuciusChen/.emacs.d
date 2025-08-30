@@ -1,6 +1,6 @@
 # ----------------- Configuration Section -----------------
 _branch="feature/igc" # <- "master" or "feature/igc"
-_commit="a0757e0ac05e6277d534c94792c1e5c2c3434399" # Leave empty if not needed
+_commit="" # Leave empty if not needed
 # ---------------------------------------------------------
 
 if [[ "$_branch" == "master" ]]; then
