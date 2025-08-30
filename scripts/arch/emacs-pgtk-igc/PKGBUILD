@@ -1,6 +1,6 @@
 # ----------------- Configuration Section -----------------
 _branch="feature/igc" # <- "master" or "feature/igc"
-_commit="" # Leave empty if not needed
+_commit="a0757e0ac05e6277d534c94792c1e5c2c3434399" # Leave empty if not needed
 # ---------------------------------------------------------
 
 if [[ "$_branch" == "master" ]]; then
@@ -23,9 +23,10 @@ depends=('gnutls' 'libxml2' 'jansson' 'harfbuzz' 'mps' 'libgccjit' 'gtk3' 'tree-
 optdepends=('libnotify: for desktop notification support')
 makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi')
 replaces=('emacs')
-source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
+# source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
 # If Savannah fails, use Github's mirror
-# source=("emacs::git+https://github.com/emacs-mirror/emacs.git")
+source=("emacs::git+https://github.com/emacs-mirror/emacs.git")
+# source=("emacs::git+https://github.com/LuciusChen/emacs.git")
 
 options=(!strip)
 b2sums=("SKIP")
