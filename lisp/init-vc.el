@@ -3,14 +3,14 @@
 ;;; Code:
 
 (setup ediff-wind
-  (:option ediff-split-window-function 'split-window-horizontally
-           ediff-window-setup-function 'ediff-setup-windows-plain))
+  (setopt ediff-split-window-function 'split-window-horizontally
+          ediff-window-setup-function 'ediff-setup-windows-plain))
 
 (setup autorevert
   (:defer (:require autorevert))
   (:when-loaded
-    (:option  global-auto-revert-non-file-buffers t
-              auto-revert-verbose nil)
+    (setopt  global-auto-revert-non-file-buffers t
+             auto-revert-verbose nil)
     (global-auto-revert-mode)
     ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
     (diminish 'auto-revert-mode)))
@@ -31,22 +31,21 @@
              "C-p"     magit-blob-previous))
     ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
     ;; quickly open magit on any one of your projects.
-    (:global [(meta f12)] magit-status
-             "C-x g" magit-status
-             "C-x M-g" magit-dispatch)
-    (:option magit-diff-refine-hunk t
-             ;; Don't autosave repo buffers. This is too magical, and saving can
-             ;; trigger a bunch of unwanted side-effects, like save hooks and
-             ;; formatters. Trust the user to know what they're doing.
-             magit-save-repository-buffers nil
-             ;; Don't display parent/related refs in commit buffers; they are rarely
-             ;; helpful and only add to runtime costs.
-             magit-revision-insert-related-refs nil
-             magit-blame-styles '((headings
-                                   (heading-format . "  %C %-18a%f %-80s  %H\n")
-                                   (show-message . t))
-                                  (highlight
-                                   (highlight-face . magit-blame-highlight))))
+    (keymap-global-set "C-x g" 'magit-status)
+    (keymap-global-set "C-x M-g" 'magit-dispatch)
+    (setopt magit-diff-refine-hunk t
+            ;; Don't autosave repo buffers. This is too magical, and saving can
+            ;; trigger a bunch of unwanted side-effects, like save hooks and
+            ;; formatters. Trust the user to know what they're doing.
+            magit-save-repository-buffers nil
+            ;; Don't display parent/related refs in commit buffers; they are rarely
+            ;; helpful and only add to runtime costs.
+            magit-revision-insert-related-refs nil
+            magit-blame-styles '((headings
+                                  (heading-format . "  %C %-18a%f %-80s  %H\n")
+                                  (show-message . t))
+                                 (highlight
+                                  (highlight-face . magit-blame-highlight))))
     (:advice magit-status :around #'magit-fullscreen)
     (:advice magit-mode-quit-window :after #'magit-restore-screen)
     ;; kill 因为 blob-next 和 blob-previous 产生的 buffer
@@ -65,7 +64,7 @@
     ;;   minute->m, hour->h, day->d, week->w, month->M, year->Y
     ;; Also reduce the author column width to 11 as the author name is being
     ;; abbreviated below.
-    (:option magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
+    (setopt magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
     (:advice magit-log-format-margin :filter-args #'+magit-log--abbreviate-author)))
 
 (setup forge
@@ -87,7 +86,7 @@
 (setup diff-hl
   (:defer (diff-hl-mode))
   (:when-loaded
-    (:option diff-hl-update-async t)
+    (setopt diff-hl-update-async t)
     (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
             magit-pre-refresh-hook diff-hl-magit-post-refresh
             prog-mode-hook diff-hl-mode
