@@ -33,10 +33,10 @@
 
 (setup window
   (:also-load lib-window)
-  (:global "C-x |" split-window-horizontally-instead
-           "C-x _" split-window-vertically-instead
-           "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally)))
-           "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
+  (keymap-global-set "C-x |" 'split-window-horizontally-instead)
+  (keymap-global-set "C-x _" 'split-window-vertically-instead)
+  (keymap-global-set "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally))))
+  (keymap-global-set "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
 
 (setup custom
   (:when-loaded
