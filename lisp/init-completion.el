@@ -4,9 +4,9 @@
 (setup orderless
   (:defer (:require orderless))
   (:when-loaded
-    (:option completion-styles '(orderless basic)
-             completion-category-defaults nil
-             completion-ignore-case t)
+    (setopt completion-styles '(orderless basic))
+    (setq completion-category-defaults nil
+          completion-ignore-case t)
 
     ;; https://github.com/oantolin/orderless/issues/111#issuecomment-1098763842
     (defun orderless+basic-all (str table pred point)
@@ -39,10 +39,10 @@
       ;; Using VS Code icons as an alternative
       (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
     (global-corfu-mode)
-    (:option corfu-cycle t
-             corfu-auto t
-             corfu-auto-prefix 2
-             corfu-quit-no-match 'separator)
+    (setopt corfu-cycle t
+            corfu-auto t
+            corfu-auto-prefix 2
+            corfu-quit-no-match 'separator)
     (:with-mode prog-mode (:hook corfu-mode))
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
@@ -73,10 +73,10 @@
   (:defer (:require yasnippet))
   (:when-loaded
     (yas-global-mode)
-    (:option yas-keymap-disable-hook
-             (lambda () (and (frame-live-p corfu--frame)
-                             (frame-visible-p corfu--frame)))
-             yas-verbosity 0)))
+    (setopt yas-keymap-disable-hook
+            (lambda () (and (frame-live-p corfu--frame)
+                            (frame-visible-p corfu--frame))))
+    (setq yas-verbosity 0)))
 
 ;; https://cestlaz.github.io/post/using-emacs-74-eglot/
 
@@ -106,11 +106,10 @@
     (:also-load lib-eglot)
     (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
       (:hook eglot-ensure))
-    (:option eglot-events-buffer-size 0
-             eglot-events-buffer-config '(:size 0 :format full) ;; 取消 eglot log
-             ;; ignore lsp formatting provider, format with apheleia.
-             eglot-ignored-server-capabilities '(:documentFormattingProvider
-                                                 :documentRangeFormattingProvider))
+    (setopt eglot-events-buffer-config '(:size 0 :format full) ;; 取消 eglot log
+            ;; ignore lsp formatting provider, format with apheleia.
+            eglot-ignored-server-capabilities '(:documentFormattingProvider
+                                                :documentRangeFormattingProvider))
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
     (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
@@ -132,18 +131,18 @@
     (:hook eglot-java-mode))
   (:when-loaded
     (:also-load lib-eglot)
-    (:option eglot-java-server-install-dir jdtls-install-dir
-             eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
-             eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir (if *is-mac* "/config_mac_arm/" "/config_linux/"))
-             eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
-                                           "-Xmx8G"
-                                           ;; "-XX:+UseG1GC"
-                                           "-XX:+UseZGC"
-                                           "-XX:+UseStringDeduplication"
-                                           ;; "-XX:FreqInlineSize=325"
-                                           ;; "-XX:MaxInlineLevel=9"
-                                           "-XX:+UseCompressedOops")
-             eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
+    (setopt eglot-java-server-install-dir jdtls-install-dir
+            eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
+            eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir (if *is-mac* "/config_mac_arm/" "/config_linux/"))
+            eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
+                                          "-Xmx8G"
+                                          ;; "-XX:+UseG1GC"
+                                          "-XX:+UseZGC"
+                                          "-XX:+UseStringDeduplication"
+                                          ;; "-XX:FreqInlineSize=325"
+                                          ;; "-XX:MaxInlineLevel=9"
+                                          "-XX:+UseCompressedOops")
+            eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster
 ;; Download the executable file from the address above and place it in your exec-path.
