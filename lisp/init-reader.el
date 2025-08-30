@@ -50,27 +50,10 @@
     (setopt gptel-default-mode 'org-mode
             gptel-model 'openai/gpt-4o
             gptel-stream t
-            gptel-backend (gptel-make-openai "vercel-gateway"
-                            :host "ai-gateway.vercel.sh"
-                            :endpoint "/v1/chat/completions"
-                            :key (auth-source-pick-first-password :host "ai-gateway.vercel" :user "vercel")
-                            :models '(deepseek/deepseek-chat
-                                      deepseek/deepseek-r1
-                                      qwen/qwen-turbo
-                                      qwen/qwen-plus
-                                      qwen/qwen-max
-                                      openai/gpt-4o
-                                      openai/gpt-5
-                                      anthropic/claude-3.7-sonnet:thinking
-                                      anthropic/claude-3.7-sonnet
-                                      anthropic/claude-4
-                                      google/gemini-2.5-pro-exp-03-25:free
-                                      google/gemini-2.5-pro-preview-03-25)
-                            :stream t)
-            ;; gptel-backend (gptel-make-openai "OpenRouter"
-            ;;                 :host "openrouter.ai"
-            ;;                 :endpoint "/api/v1/chat/completions"
-            ;;                 :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
+            ;; gptel-backend (gptel-make-openai "vercel-gateway"
+            ;;                 :host "ai-gateway.vercel.sh"
+            ;;                 :endpoint "/v1/chat/completions"
+            ;;                 :key (auth-source-pick-first-password :host "ai-gateway.vercel" :user "vercel")
             ;;                 :models '(deepseek/deepseek-chat
             ;;                           deepseek/deepseek-r1
             ;;                           qwen/qwen-turbo
@@ -84,6 +67,23 @@
             ;;                           google/gemini-2.5-pro-exp-03-25:free
             ;;                           google/gemini-2.5-pro-preview-03-25)
             ;;                 :stream t)
+            gptel-backend (gptel-make-openai "OpenRouter"
+                            :host "openrouter.ai"
+                            :endpoint "/api/v1/chat/completions"
+                            :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
+                            :models '(deepseek/deepseek-chat
+                                      deepseek/deepseek-r1
+                                      qwen/qwen-turbo
+                                      qwen/qwen-plus
+                                      qwen/qwen-max
+                                      openai/gpt-4o
+                                      openai/gpt-5
+                                      anthropic/claude-3.7-sonnet:thinking
+                                      anthropic/claude-3.7-sonnet
+                                      anthropic/claude-4
+                                      google/gemini-2.5-pro-exp-03-25:free
+                                      google/gemini-2.5-pro-preview-03-25)
+                            :stream t)
             gptel-proxy (if *is-mac* "" "socks://127.0.0.1:7897")
             gptel-directives (get-gptel-directives)
             gptel-temperature 0.7)
