@@ -9,14 +9,14 @@
 (setup recentf
   (:hook-into after-init)
   (:when-loaded
-    (:option recentf-max-saved-items 50
-             recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                                   "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                                   "^/tmp/" "^/var/folders/.+$" "/persp-confs/"
-                                   "^/ssh:" "^/scp:" "^/sudo:" "^/rsync:" "^/ftp:" "^/sftp:" ;; TRAMP
-                                   (lambda (file) (file-in-directory-p file package-user-dir))
-                                   (expand-file-name recentf-save-file))
-             recentf-keep nil)
+    (setopt recentf-max-saved-items 50
+            recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                                  "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                                  "^/tmp/" "^/var/folders/.+$" "/persp-confs/"
+                                  "^/ssh:" "^/scp:" "^/sudo:" "^/rsync:" "^/ftp:" "^/sftp:" ;; TRAMP
+                                  (lambda (file) (file-in-directory-p file package-user-dir))
+                                  (expand-file-name recentf-save-file))
+            recentf-keep nil)
     ;; Add dired directories to recentf file list.
     (:with-mode dired-mode
       (:hook (lambda () (recentf-add-file default-directory))))
@@ -27,21 +27,21 @@
 
 (setup minibuffer
   ;; 用于对补全候选项进行分类的变量。通过将它们设置为 nil，我们禁用了 Emacs 自动分类补全候选项的功能，从而获得更简洁的补全列表。
-  (:option completion-category-defaults nil
-           completion-category-overrides nil
-           ;; 将阈值设置为 4 表示只有当需要补全的字符数大于 4 时才会执行循环补全
-           completion-cycle-threshold 4))
+  (setq completion-category-defaults nil)
+  (setopt completion-category-overrides nil
+          ;; 将阈值设置为 4 表示只有当需要补全的字符数大于 4 时才会执行循环补全
+          completion-cycle-threshold 4))
 
 (setup doom-modeline
   (:defer (:require doom-modeline))
   (:when-loaded
     (doom-modeline-mode)
-    (:option doom-modeline-height 18
-             doom-modeline-buffer-file-name-style 'auto
-             doom-modeline-buffer-modification-icon t
-             doom-modeline-bar-width 4
-             doom-modeline-hud t
-             doom-modeline-hud-min-height 1)
+    (setopt doom-modeline-height 18
+            doom-modeline-buffer-file-name-style 'auto
+            doom-modeline-buffer-modification-icon t
+            doom-modeline-bar-width 4
+            doom-modeline-hud t
+            doom-modeline-hud-min-height 1)
     (doom-modeline-def-segment +buffer-info
       "Customize doom-modeline to remove modification indication"
       (let ((buffer-name (doom-modeline--buffer-name)))
@@ -69,45 +69,44 @@
 
 (setup vertico
   (:defer (:require vertico))
-  (:when-loaded (:option vertico-cycle t)
+  (:when-loaded (setopt vertico-cycle t)
                 (vertico-mode)))
 
 (setup consult
   (:defer (:require consult))
   (:when-loaded
-    (:global "M-g l" consult-line
-             "M-g i" consult-imenu
-             "M-g f" consult-recent-file
-             "M-g r" consult-ripgrep
-             "M-g p" consult-project-buffer
-             "M-g y" consult-flymake
-             "M-g m" consult-global-mark
-             "M-g a" consult-org-agenda
-             ;; brew install fd
-             "M-g d" consult-fd
-             [remap switch-to-buffer] consult-buffer
-             [remap switch-to-buffer-other-window] 'consult-buffer-other-window
-             [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame
-             [remap goto-line] 'consult-goto-line)
+    (keymap-global-set "M-g l" 'consult-line)
+    (keymap-global-set "M-g i" 'consult-imenu)
+    (keymap-global-set "M-g f" 'consult-recent-file)
+    (keymap-global-set "M-g r" 'consult-ripgrep)
+    (keymap-global-set "M-g p" 'consult-project-buffer)
+    (keymap-global-set "M-g y" 'consult-flymake)
+    (keymap-global-set "M-g m" 'consult-global-mark)
+    (keymap-global-set "M-g a" 'consult-org-agenda)
+    (keymap-global-set "M-g d" 'consult-fd)
+    (global-set-key [remap switch-to-buffer] 'consult-buffer)
+    (global-set-key [remap switch-to-buffer-other-window] 'consult-buffer-other-window)
+    (global-set-key [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame)
+    (global-set-key [remap goto-line] 'consult-goto-line)
     (:also-load lib-consult)
-    (:option consult-async-min-input 2
-             xref-show-xrefs-function #'consult-xref
-             xref-show-definitions-function #'consult-xref)
+    (setopt consult-async-min-input 2
+            xref-show-xrefs-function #'consult-xref
+            xref-show-definitions-function #'consult-xref)
     (:hooks minibuffer-setup-hook mcfly-time-travel)))
 
 (setup consult-dir
   (:load-after vertico)
   (:when-loaded
-    (:global "C-x C-d" consult-dir)
+    (keymap-global-set "C-x C-d" 'consult-dir)
     (:with-map vertico-map
       (:bind
        "C-x C-d" consult-dir
        "C-x C-j" consult-dir-jump-file))))
 
 (setup isearch
-  (:option isearch-lazy-count t
-           isearch-allow-motion t
-           isearch-motion-changes-direction t))
+  (setopt isearch-lazy-count t
+          isearch-allow-motion t
+          isearch-motion-changes-direction t))
 
 (setup embark
   (:defer (:require embark))
@@ -131,16 +130,16 @@
                              (file-remote-p file 'host) ":" (file-remote-p file 'localname))
                    (concat "/sudo:root@localhost:" file))))
 
-    (:global "C-c ." embark-act
-             "M-n"   embark-next-symbol
-             "M-p"   embark-previous-symbol)
+    (keymap-global-set "C-c ." 'embark-act)
+    (keymap-global-set "M-n"   'embark-next-symbol)
+    (keymap-global-set "M-p"   'embark-previous-symbol)
     (:with-map embark-file-map (if *is-mac* (:bind "o" +embark-open-in-finder)
                                  (:bind "S" sudo-find-file)))
-    (:option embark-indicators '(embark-minimal-indicator
-                                 embark-highlight-indicator
-                                 embark-isearch-highlight-indicator)
-             embark-cycle-key "."
-             embark-help-key "?")
+    (setopt embark-indicators '(embark-minimal-indicator
+                                embark-highlight-indicator
+                                embark-isearch-highlight-indicator)
+            embark-cycle-key "."
+            embark-help-key "?")
     (:hooks embark-collect-mode-hook consult-preview-at-point-mode)))
 
 (setup wgrep (:load-after consult))
@@ -148,8 +147,8 @@
 (setup marginalia
   (:load-after vertico)
   (:when-loaded
-    (:option marginalia-annotators '(marginalia-annotators-heavy
-                                     marginalia-annotators-light nil))
+    (setopt marginalia-annotators '(marginalia-annotators-heavy
+                                    marginalia-annotators-light nil))
     (marginalia-mode)))
 
 (setup wgrep

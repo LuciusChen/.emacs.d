@@ -171,6 +171,7 @@
            "C-S-<tab>" hs-global-cycle)))
 
 (setup whitespace-cleanup-mode
+  (global-set-key [remap just-one-space] 'cycle-spacing)
   (setq-default show-trailing-whitespace nil)
   (:with-mode (prog-mode text-mode conf-mode)
     (:local-set show-trailing-whitespace t))
