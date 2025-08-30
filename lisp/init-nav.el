@@ -3,21 +3,21 @@
 ;;; Code:
 
 (setup files
-  (:option  auto-save-default nil
-            make-backup-files nil
-            enable-local-variables :all)
+  (setopt auto-save-default nil
+          make-backup-files nil
+          enable-local-variables :all)
   (when (version<= "31" emacs-version)
-    (:option trusted-content '("~/.emacs.d/"))))
+    (setopt trusted-content '("~/.emacs.d/"))))
 
 (setup dired
   (:defer (:require dired))
   (:when-loaded
     (:with-map ctl-x-map (:bind "\C-j" 'dired-jump))
     (:with-map ctl-x-4-map (:bind "\C-j" 'dired-jump-other-window))
-    (:option dired-recursive-deletes 'top
-             dired-dwim-target t
-             dired-recursive-copies 'always
-             dired-kill-when-opening-new-dired-buffer t)
+    (setopt dired-recursive-deletes 'top
+            dired-dwim-target t
+            dired-recursive-copies 'always
+            dired-kill-when-opening-new-dired-buffer t)
     ;; Prefer g-prefixed coreutils version of standard utilities when available
     (let ((gls (executable-find "gls")))
       (when gls (setq insert-directory-program gls)))
@@ -27,26 +27,24 @@
 
 (setup bookmark
   (:defer
-   (:option bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
+   (setopt bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
 
 (setup dirvish
   (:defer (:require dirvish))
   (:when-loaded
-    (:global "C-c f f" dirvish
-             "C-c f s" dirvish-side)
+    (keymap-global-set "C-c f f" 'dirvish)
+    (keymap-global-set "C-c f s" 'dirvish-side)
     (dirvish-override-dired-mode)
-    (:option dirvish-quick-access-entries
-             '(("h" "~/" "Home")
-               ("e" "~/.emacs.d/" "Emacs")
-               ("p" "~/IdeaProjects/" "Projects"))
-             dirvish--debouncing-delay 2
-             dirvish-side-width 50
-             dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state)
-             dirvish-side-attributes '(vc-state collapse)
-             delete-by-moving-to-trash t
-             dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
-             dirvish-mode-line-height 15
-             dirvish-header-line-height '(15 .25))
+    (setopt dirvish-quick-access-entries
+            '(("h" "~/" "Home")
+              ("e" "~/.emacs.d/" "Emacs")
+              ("p" "~/IdeaProjects/" "Projects"))
+            dirvish-side-width 50
+            dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state)
+            dirvish-side-attributes '(vc-state collapse)
+            dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
+            dirvish-mode-line-height 15
+            dirvish-header-line-height '(15 .25))
     (:with-map dirvish-mode-map
       (:bind "a"    dirvish-quick-access
              "q"    dirvish-quit
