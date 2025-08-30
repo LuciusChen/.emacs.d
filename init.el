@@ -73,7 +73,7 @@
         password-store-otp password-store eshell-syntax-highlighting
         projectile consult-dir dirvish eat citar-denote
         (image-slicing :host github :repo "ginqi7/image-slicing")
-        (separedit :host github :repo "twlz0ne/separedit.el")
+        (separedit :host github :repo "LuciusChen/separedit.el")
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
