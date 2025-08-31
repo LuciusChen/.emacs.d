@@ -106,7 +106,8 @@
     (:also-load lib-eglot)
     (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
       (:hook eglot-ensure))
-    (setopt eglot-events-buffer-config '(:size 0 :format full) ;; 取消 eglot log
+    (setopt eglot-code-action-indications '(eldoc-hint)
+            eglot-events-buffer-config '(:size 0 :format full) ;; 取消 eglot log
             ;; ignore lsp formatting provider, format with apheleia.
             eglot-ignored-server-capabilities '(:documentFormattingProvider
                                                 :documentRangeFormattingProvider))
