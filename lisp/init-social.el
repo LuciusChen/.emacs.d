@@ -107,7 +107,19 @@
      telega-filters-custom nil
      telega-root-fill-column 70 ; fill-column
      telega-filter-custom-show-folders nil
-     ;;telega-bridge-bot
+     ;; telega-bridge-bot
+     ;; 获取永久性的 access token
+     ;; #+begin_src verb :wrap src ob-verb-response
+     ;; POST https://matrix-client.matrix.org/_matrix/client/r0/login
+     ;; Content-Type: application/json
+
+     ;; {
+     ;;   "type": "m.login.password",
+     ;;   "identifier": {"type": "m.id.user","user": "<username>"},
+     ;;   "password": "<password>",
+     ;;   "refresh_token": false
+     ;; }
+     ;; #+end_src
      telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
      telega-bridge-bot-bridge-info-plist
      ;; telega 中在 Telega Root 对应的群组上 i 键查看 -1001773572820 和 6332621450
