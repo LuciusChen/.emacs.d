@@ -58,8 +58,8 @@
 ;; install packages
 (defvar *use-package-list*
   '(nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
-        corfu forge verb elfeed popper embark bibtex vertico
-        diredfl cdlatex pyvenv consult mmm-mode scratch
+        corfu forge verb elfeed popper embark bibtex vertico clojure-mode
+        diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
         diff-hl company goggles flymake web-mode js2-mode move-dup
         doom-modeline git-link webpaste apheleia mastodon pdf-tools
         macrostep json-mode orderless kind-icon git-modes git-blamed
