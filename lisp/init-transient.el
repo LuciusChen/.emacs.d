@@ -68,7 +68,8 @@
         ("l" "list-diagnostics"        consult-flymake)
         ("s" "show-buffer-diagnostics" flymake-show-buffer-diagnostics)]
        ["Navigate"
-        ("m" "consult-mark" consult-mark)]])
+        ("m" "consult-mark"             consult-mark)
+        ("v" "switch-git-status-buffer" +switch-git-status-buffer)]])
 
     (transient-define-prefix magit-commands ()
       "Magit commands"

@@ -97,6 +97,44 @@ method definition in the XML file."
               (message "Jumped to method: %s" method-name)
             (message "Method '%s' not found in XML file." method-name)))
       (message "No corresponding XML file found."))))
+
+(defun +switch-git-status-buffer ()
+  "Parse git status from an expanded path and switch to a file.
+The completion candidates include the Git status of each file."
+  (interactive)
+  (let ((repo-root (vc-git-root default-directory)))
+    (if (not repo-root)
+        (message "Not inside a Git repository.")
+      (let* ((expanded-root (expand-file-name repo-root))
+             (command-to-run (format "git -C %s status --porcelain=v1"
+                                     (shell-quote-argument expanded-root)))
+             (cmd-output (shell-command-to-string command-to-run))
+             (target-files
+              (let (files)
+                (dolist (line (split-string cmd-output "\n" t) (nreverse files))
+                  (when (> (length line) 3)
+                    (let ((status (substring line 0 2))
+                          (path-info (substring line 3)))
+                      ;; Handle rename specially
+                      (if (string-match "^R" status)
+                          (let* ((paths (split-string path-info " -> " t))
+                                 (new-path (cadr paths)))
+                            (when new-path
+                              (push (cons (format "R %s" new-path) new-path) files)))
+                        ;; Modified or untracked
+                        (when (or (string-match "M" status)
+                                  (string-match "\?\?" status))
+                          (push (cons (format "%s %s" status path-info) path-info) files)))))))))
+        (if (not target-files)
+            (message "No modified or renamed files found.")
+          (let* ((candidates target-files)
+                 (selection (completing-read "Switch to buffer (Git modified): "
+                                             (mapcar #'car candidates) nil t)))
+            (when selection
+              (let ((file-path (cdr (assoc selection candidates))))
+                (when file-path
+                  (find-file (expand-file-name file-path expanded-root)))))))))))
+
 ;;;; provide
 (provide 'lib-transient)
 ;;; lib-transient.el ends here.
