@@ -84,10 +84,10 @@
     (keymap-global-set "M-g m" 'consult-global-mark)
     (keymap-global-set "M-g a" 'consult-org-agenda)
     (keymap-global-set "M-g d" 'consult-fd)
-    (global-set-key [remap switch-to-buffer] 'consult-buffer)
-    (global-set-key [remap switch-to-buffer-other-window] 'consult-buffer-other-window)
-    (global-set-key [remap switch-to-buffer-other-frame] 'consult-buffer-other-frame)
-    (global-set-key [remap goto-line] 'consult-goto-line)
+    (keymap-global-set "<remap> <switch-to-buffer>" 'consult-buffer)
+    (keymap-global-set "<remap> <switch-to-buffer-other-window>" 'consult-buffer-other-window)
+    (keymap-global-set "<remap> <switch-to-buffer-other-frame>" 'consult-buffer-other-frame)
+    (keymap-global-set "<remap> <goto-line>" 'consult-goto-line)
     (:also-load lib-consult)
     (setopt consult-async-min-input 2
             xref-show-xrefs-function #'consult-xref

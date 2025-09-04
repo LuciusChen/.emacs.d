@@ -96,7 +96,7 @@
 (setup lisp-mode
   (:also-load lib-lisp)
   (:require macrostep)
-  (global-set-key [remap eval-expression] 'pp-eval-expression)
+  (keymap-global-set "<remap> <eval-expression>" 'pp-eval-expression)
   (:with-map emacs-lisp-mode-map
     (:bind
      "C-x C-e" +eval-last-sexp-or-region
