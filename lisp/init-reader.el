@@ -68,6 +68,12 @@
             ;;                           google/gemini-2.5-pro-preview-03-25)
             ;;                 :stream t)
             gptel-backend (gptel-make-openai "OpenRouter"
+                            :header (lambda ()
+                                      (when-let* ((key (gptel--get-api-key)))
+                                        `(("Authorization" . ,(concat "Bearer " key))
+                                          ;; https://openrouter.ai/docs/app-attribution
+                                          ("HTTP-Referer" . "https://github.com/karthink/gptel")
+                                          ("X-Title" . "emacs/gptel"))))
                             :host "openrouter.ai"
                             :endpoint "/api/v1/chat/completions"
                             :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
