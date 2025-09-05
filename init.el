@@ -67,29 +67,30 @@
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
         org-cliplink language-detection meow-tree-sitter ox-pandoc
         markdown-mode mode-line-bell embark-consult speed-type diminish
-        elfeed-tube-mpv typescript-mode gt command-log-mode org-download
+        elfeed-tube-mpv typescript-mode command-log-mode org-download
         browse-kill-ring rainbow-delimiters default-text-scale denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         password-store-otp password-store eshell-syntax-highlighting
         projectile consult-dir dirvish eat citar-denote
-        (image-slicing :host github :repo "ginqi7/image-slicing")
+        (rose-pine :host github :repo "LuciusChen/rose-pine")
+        (gt :host github :repo "LuciusChen/gt.el")
         (separedit :host github :repo "LuciusChen/separedit.el")
+        (telega :host github :repo "LuciusChen/telega.el")
+        (panel :host github :repo "LuciusChen/panel")
+        (image-slicing :host github :repo "ginqi7/image-slicing")
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
         (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
-        (telega :host github :repo "LuciusChen/telega.el")
         (md :host github :repo "eki3z/md")
         ;; (telega :host github :repo "zevlg/telega.el")
         (yasnippet :host github :repo "joaotavora/yasnippet")
-        (panel :host github :repo "LuciusChen/panel")
         (indent-bars :host github :repo "jdtsmith/indent-bars")
 	(too-wide-minibuffer-mode :host github :repo "hron/too-wide-minibuffer-mode")
         (consult-mu :host github :repo "armindarvish/consult-mu")
         (eglot-booster :host github :repo "jdtsmith/eglot-booster")
         ;; (beancount-mode :host github :repo "beancount/beancount-mode")
-        (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))
-        (rose-pine :host github :repo "LuciusChen/rose-pine")))
+        (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))))
 
 (dolist (e *use-package-list*) (straight-use-package e))
 (setq vc-follow-symlinks t)
