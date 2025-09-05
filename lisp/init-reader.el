@@ -114,10 +114,15 @@
           (keymap-global-set "C-c s p" 'gt-speak))
   (:when-loaded
     (setopt gt-langs '(en zh)
-            gt-chatgpt-host "https://api.deepseek.com"
-            gt-chatgpt-path "/chat/completions"
-            gt-chatgpt-key '(auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
-            gt-chatgpt-model "deepseek-chat"
+            ;; gt-debug-p t
+            ;; gt-chatgpt-host "https://api.deepseek.com"
+            ;; gt-chatgpt-path "/chat/completions"
+            ;; gt-chatgpt-key '(auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
+            ;; gt-chatgpt-model "deepseek-chat"
+            gt-chatgpt-host "https://openrouter.ai"
+            gt-chatgpt-path "/api/v1/chat/completions"
+            gt-chatgpt-key '(auth-source-pick-first-password :host "api.openrouter.ai" :user "openrouter")
+            gt-chatgpt-model "openai/gpt-4o"
             gt-chatgpt-user-prompt-template
             "Please translate the following text into {{lang}}, ensuring that the original line breaks and formatting are preserved as much as possible, text is: \n{{text}}"
             gt-buffer-render-follow-p t
@@ -130,7 +135,10 @@
                          :taker (list (gt-taker :pick nil :if 'selection)
                                       (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode))
                                       (gt-taker :text 'word))
-                         :engines (list (gt-chatgpt-engine :if 'not-word)
+                         :engines (list (gt-chatgpt-engine :if 'not-word :headers `(("Content-Type" . "application/json")
+                                                                                    ("Authorization" . ,(concat "Bearer " (encode-coding-string (gt-resolve-key (gt-chatgpt-engine)) 'utf-8)))
+                                                                                    ("HTTP-Referer" . "https://github.com/lorniu/gt.el")
+                                                                                    ("X-Title" . "emacs/gt.el")))
                                         (gt-google-engine :if 'word)
                                         (gt-deepl-engine :if 'not-word :cache nil) ;; :pro Set t when use PRO version.
                                         (gt-youdao-dict-engine :if '(or src:zh tgt:zh))
