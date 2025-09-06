@@ -122,7 +122,7 @@
             gt-chatgpt-host "https://openrouter.ai"
             gt-chatgpt-path "/api/v1/chat/completions"
             gt-chatgpt-key '(auth-source-pick-first-password :host "api.openrouter.ai" :user "openrouter")
-            gt-chatgpt-model "openai/gpt-4o"
+            gt-chatgpt-model "deepseek/deepseek-chat-v3.1:free"
             gt-buffer-render-follow-p t
             gt-buffer-render-window-config
             '((display-buffer-reuse-window display-buffer-in-direction)
@@ -201,8 +201,11 @@
       (:bind "F" elfeed-tube-fetch
              [remap save-buffer] elfeed-tube-save)))
   (:when-loaded
-    (setopt mpv-default-options '("--http-proxy=http://127.0.0.1:7897"
-                                  "--ytdl-raw-options-append=proxy=http://127.0.0.1:7897"))
+    (setopt elfeed-tube-captions-languages
+            '("zh" "en" "english (auto generated)")
+            ;; mpv-default-options '("--http-proxy=http://127.0.0.1:7897"
+            ;;                       "--ytdl-raw-options-append=proxy=http://127.0.0.1:7897")
+            )
     (elfeed-tube-setup)))
 
 (setup elfeed-tube-mpv
