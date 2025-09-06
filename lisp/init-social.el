@@ -172,9 +172,7 @@
     (if *is-mac*
         (progn
           (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
-          (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open)))
-    ;; campatible with other formats
-    (:advice telega-chatbuf-attach-clipboard :override +telega-chatbuf-attach-clipboard)))
+          (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open)))))
 
 (setup mastodon
   (:when-loaded
