@@ -51,6 +51,7 @@
 (defun mastodon-detect-and-translate ()
   "Detect the content type under the cursor and translate it using `gt`."
   (interactive)
+  (require 'gt)
   (gt-start
    (gt-translator :taker (list (gt-taker :text 'xxx :langs '(zh en ja fr de)))
                   :engines (gt-chatgpt-engine)
@@ -91,5 +92,10 @@ When called with \\[universal-argument], prompt for a URL."
         ":\n\n#+begin_quote\n"
         (string-trim (buffer-string)) "\n#+end_quote\n"))
       (message "Copied."))))
+
+(defun mastodon-detect-and-toggle-if-folded ()
+  "Toggle fold status if the toot at point is folded."
+  (when (mastodon-tl--property 'toot-folded :no-move)
+    (mastodon-tl-fold-post-toggle)))
 (provide 'lib-mastodon)
 ;;; lib-mastodon.el ends here
