@@ -108,10 +108,9 @@
             gptel-mode-hook gptel-set-default-directory)))
 
 (setup gt
-  (:defer (:require gt)
-          (keymap-global-set "C-c s g" 'gt-translate)
-          (keymap-global-set "C-c s s" 'gt-setup)
-          (keymap-global-set "C-c s p" 'gt-speak))
+  (keymap-global-set "C-c s g" 'gt-translate)
+  (keymap-global-set "C-c s s" 'gt-setup)
+  (keymap-global-set "C-c s p" 'gt-speak)
   (:when-loaded
     (setopt gt-langs '(en zh)
             ;; gt-debug-p t
@@ -121,7 +120,7 @@
             ;; gt-chatgpt-model "deepseek-chat"
             gt-chatgpt-host "https://openrouter.ai"
             gt-chatgpt-path "/api/v1/chat/completions"
-            gt-chatgpt-key '(auth-source-pick-first-password :host "api.openrouter.ai" :user "openrouter")
+            gt-chatgpt-key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
             gt-chatgpt-model "deepseek/deepseek-chat-v3.1:free"
             gt-buffer-render-follow-p t
             gt-buffer-render-window-config
