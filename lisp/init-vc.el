@@ -55,6 +55,7 @@
       (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))))
 
 (setup magit-log
+  ;; When a line or region is selected, =magit-log-buffer-file= displays the Git history of the selected region.
   (:load-after magit)
   (:when-loaded
     ;; Set `magit-log-margin' value in :init as many other variables will be

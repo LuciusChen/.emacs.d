@@ -60,7 +60,7 @@
                   (assq-delete-all key emojify))
                 '(verified vertical-bar checkmark forum heavy-checkmark reply reply-quote horizontal-bar forward button-close)
                 :initial-value telega-symbols-emojify)
-     telega-symbol-button-close (nerd-icons-mdicon "nf-md-close")
+     telega-symbol-button-close (nerd-icons-mdicon "nf-md-close_box_outline")
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
      telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
      telega-symbol-saved-messages-tag-end (nerd-icons-faicon "nf-fa-tag")
