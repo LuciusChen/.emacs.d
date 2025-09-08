@@ -15,26 +15,29 @@
                 completion-at-point-functions))
   (corfu-mode 1))
 
-(defun +telega-chatbuf-attach-clipboard (doc-p)
-  "Attach clipboard image to the chatbuf as photo.
-If `\\[universal-argument]' is given, then attach clipboard as document."
-  (interactive "P")
-  (let* ((selection-coding-system 'no-conversion) ;for rawdata
-         (temporary-file-directory telega-temp-dir)
-         (tmpfile (telega-temp-name "clipboard" ".png"))
-         (coding-system-for-write 'binary))
-    (if (eq system-type 'darwin)
-        (progn
-          ;; NOTE: On MacOS, try extracting clipboard using pngpaste
-          (unless (executable-find "pngpaste")
-            (error "Please install pngpaste to paste images"))
-          (unless (= 0 (telega-screenshot-with-pngpaste tmpfile))
-            (error "No image in CLIPBOARD")))
-      (let ((image-data (or (gui-get-selection 'CLIPBOARD 'image/png)
-                            (gui-get-selection 'CLIPBOARD 'image/jpeg)
-                            (error "No image in CLIPBOARD"))))
-        (write-region image-data nil tmpfile nil 'quiet)))
-    (telega-chatbuf-attach-media tmpfile (when doc-p 'preview))))
+(defun +telega-save-file-to-clipboard (msg)
+  "Save file at point to clipboard.
+NOTE: macOS only."
+  (interactive (list (telega-msg-for-interactive)))
+  (let ((file (telega-msg--content-file msg)))
+    (unless file
+      (user-error "No file associated with message"))
+    (telega-file--download file
+      :priority 32
+      :update-callback
+      (lambda (dfile)
+        (telega-msg-redisplay msg)
+        (when (telega-file--downloaded-p dfile)
+          (let* ((fpath (telega--tl-get dfile :local :path))
+                 (command (if *is-mac*
+                              (list "osascript" "-e" (format "set the clipboard to POSIX file \"%s\"" fpath))
+                            (list "sh" "-c" (format "wl-copy < \"%s\"" fpath)))))
+            (make-process
+             :name "telega-clipboard"
+             :buffer nil
+             :command command
+             :sentinel (lambda (process event)
+                         (message "Process %s had event %s" process event)))))))))
 
 (defun +telega-msg-save-to-cloud-copyleft (msg)
   "Save messages's MSG media content to a file.
