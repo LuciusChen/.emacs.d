@@ -177,17 +177,12 @@
 (setup mastodon
   (:when-loaded
     (:also-load lib-mastodon)
-    (:after gt
-      (:with-map mastodon-mode-map
-        (:bind "a" mastodon-detect-and-translate)))
+    ;; (:with-function mastodon-detect-and-translate (:autoload-this))
+    (:with-map mastodon-mode-map
+      (:bind "a" mastodon-detect-and-translate))
     (setopt mastodon-instance-url "https://mastodon.social"
             mastodon-active-user "Lucius_Chen"
             mastodon-tl--show-avatars t)
-    (defun mastodon-detect-and-toggle-if-folded ()
-      "Toggle fold status if the toot at point is folded."
-      (when (mastodon-tl--property 'toot-folded :no-move)
-        (mastodon-tl-fold-post-toggle)))
-
     (:advice mastodon-detect-and-translate :before #'mastodon-detect-and-toggle-if-folded)))
 (provide 'init-social)
 ;;; init-social.el ends here
