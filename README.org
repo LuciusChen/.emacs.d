@@ -1,12 +1,15 @@
 #+STARTUP: indent
 * .emacs.d
 ** Emacs 编译
-使用脚本 [[./sh/emacs_setup.sh][emacs_setup.sh]] 安装，对于 [[./patches/][patches]] 当中的 patch，如果和 emacs-plus 维护的 patch 同名，则覆盖并修改 =sha= 值，否则则是作为 =user_patch= 维护进 =emacs-plus@31.rb=。
+*** MacOS
+使用脚本 [[./scripts/macos/emacs_setup.sh][emacs_setup.sh]] 安装，对于 [[./patches/][patches]] 当中的 patch，如果和 emacs-plus 维护的 patch 同名，则覆盖并修改 =sha= 值，否则则是作为 =user_patch= 维护进 =emacs-plus@31.rb=。
 
 执行 =./emacs_setup.sh= 即可，增加参数 =mps= 则是安装 =feature/igc= 分支。
+*** Arch
+使用 [[./scripts/arch/build-emacs-pgtk.sh][build-emacs-pgtk.sh]] 进行编译，其实是自己维护的 =PKGBUILD= 方便编译安装。
 ** 包管理工具
 *** [[https://git.sr.ht/~pkal/setup][setup]]
-特点就是简单可定制，其中需要注意的是 =:bind-into= 有一些问题，详见 [[https://git.sr.ht/~pkal/setup/commit/30c03935774e7c34cc4de87dcf1f88ea09c190a1][~pkal/setup: Deprecate passing a map to :bind-into - sourcehut git]]，要避免这个问题其实可以采用下面的写法。
+特点就是简单可定制，其中需要注意的是 =:bind-into= 有一些问题，详见 [[https://codeberg.org/pkal/setup.el/src/commit/0cf74c50d90c00450f8a3425c1b84b3bccd99f84/setup.el#L623][setup.el/setup.el at 0cf74c50d90c00450f8a3425c1b84b3bccd99f84 - pkal/setup.el...]]，要避免这个问题其实可以采用下面的写法。
 #+begin_src elisp
 (:with-map xxx-map (:bind "C-c x t" xxxx))
 #+end_src
@@ -14,7 +17,7 @@
 最初入坑使用的是 Doom，不习惯 Evil 后切换至与原生按键不冲突的 [[https://github.com/meow-edit/meow][meow]]，配合 sis 在模式间切换输入法甚是爽利。尤其爽利的是配合 [[https://github.com/roife/emt][emt]]，利用 AI 完成了 =meow-word= 对于中文的分词选中。
 ** UI
 *** 字体
-主要使 [[https://www.monolisa.dev/][MonoLisa]]，需要对齐的 =mode= 下使用 [[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro]] 或者 [[https://github.com/protesilaos/aporetic][aporetic]]，中文字体使用[[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]，选择 [[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]] 全覆盖 CJK 字符集作为 fallback 字体。（还可以通过强制 org-table 使用等宽字体，参考 [[https://github.com/alphapapa/unpackaged.el?tab=readme-ov-file#force-monospace-face-in-tables][Force monospace face in tables]]。）
+英文用 [[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro]]，中文字体使用[[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]，选择 [[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]] 全覆盖 CJK 字符集作为 fallback 字体。（字体选择有部分原因是可以中英文对齐。当然也有其他方法强制 org-table 使用等宽字体，参考 [[https://github.com/alphapapa/unpackaged.el?tab=readme-ov-file#force-monospace-face-in-tables][Force monospace face in tables]]。）
 
 其中不同 =mode= 使用不同的字体，是通过自定义的 setup =:set-font= 关键字进行设置。
 #+begin_src emacs-lisp
