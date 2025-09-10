@@ -14,6 +14,9 @@ PROJECT_NAME=$1
 # Java version
 JAVA_VERSION=$2
 
+# Tomcat port (change this if your Tomcat uses a different port)
+TOMCAT_PORT=8080
+
 # Navigate to the project directory
 cd ~/IdeaProjects/$PROJECT_NAME
 
@@ -30,3 +33,22 @@ sudo cp target/$PROJECT_NAME.war $TOMCAT_HOME/webapps/
 sudo $TOMCAT_HOME/bin/shutdown.sh || true
 sleep 3
 sudo $TOMCAT_HOME/bin/startup.sh
+
+# Function to check if Tomcat is running
+is_tomcat_running() {
+  nc -z localhost $TOMCAT_PORT
+}
+
+# 4. Check if Tomcat started successfully, retry if necessary
+if ! is_tomcat_running; then
+  echo "Tomcat failed to start, retrying..."
+  sleep 5
+  $TOMCAT_HOME/bin/startup.sh
+  sleep 5 # give some time to start again
+  if ! is_tomcat_running; then
+    echo "Tomcat failed to start after retrying. Please check the logs for more details."
+    exit 1
+  fi
+fi
+
+echo "Deployment successful and Tomcat is running."
