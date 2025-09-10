@@ -69,6 +69,7 @@
     (:advice magit-log-format-margin :filter-args #'+magit-log--abbreviate-author)))
 
 (setup forge
+  ;; =forge-browse= Open the Git repository homepage interactively.
   (:load-after magit)
   (:when-loaded
     (:also-load lib-forge)
