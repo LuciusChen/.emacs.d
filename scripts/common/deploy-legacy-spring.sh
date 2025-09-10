@@ -24,9 +24,9 @@ jenv local $JAVA_VERSION
 mvn clean package -DskipTests
 
 # 2. Copy the WAR file to Tomcat
-cp target/$PROJECT_NAME.war $TOMCAT_HOME/webapps/
+sudo cp target/$PROJECT_NAME.war $TOMCAT_HOME/webapps/
 
 # 3. Restart Tomcat
-$TOMCAT_HOME/bin/shutdown.sh || true
+sudo $TOMCAT_HOME/bin/shutdown.sh || true
 sleep 3
-$TOMCAT_HOME/bin/startup.sh
+sudo $TOMCAT_HOME/bin/startup.sh

@@ -25,6 +25,7 @@ projects
 nov-places
 mastodon.plstore
 .org-id-locations
+.java-version
 org-clock-save.el
 .bookmarks.el
 forge*.sqlite
