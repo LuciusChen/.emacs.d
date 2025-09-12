@@ -155,6 +155,7 @@
       (:require company)
       (:hook +telega-completion-setup)
       (:hook (lambda () (electric-pair-local-mode -1))))
+    (:with-mode telega-image-mode (:hook image-transform-fit-to-window))
     (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
