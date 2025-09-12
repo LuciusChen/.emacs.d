@@ -124,6 +124,11 @@ Returns:
           (flymake-start t)))))
 
 ;; 以下代码都是为了老项目
+(defcustom tomcat-port 8080
+  "The port number that Tomcat server listens on."
+  :type 'integer
+  :group 'tomcat)
+
 (defun select-java-home ()
   "List all available JDK home paths and let the user choose one.
 The selected path will be exported to JAVA_HOME, and PATH will be
@@ -204,20 +209,21 @@ updated so that the chosen JDK's `bin/` directory comes first."
     (sleep-for 5)
 
     ;; Check if Tomcat is running
-    (if (shell-command "nc -z localhost 8080")
+    (if (shell-command (format "nc -z localhost %d" tomcat-port))
         (message "Deployment successful and Tomcat is running.")
       (progn
         (message "Tomcat failed to start, retrying...")
         (shell-command startup-script)
         (sleep-for 5)
-        (if (shell-command "nc -z localhost 8080")
+        (if (shell-command (format "nc -z localhost %d" tomcat-port))
             (message "Deployment successful and Tomcat is running.")
           (message "Tomcat failed to start after retrying. Please check the logs for more details."))))))
 
 (defun stop-tomcat ()
   "Stop Tomcat server."
   (interactive)
-  (let ((shutdown-script "/opt/homebrew/Cellar/tomcat@9/9.0.109/libexec/bin/shutdown.sh"))
+  (let* ((tomcat-home (detect-tomcat-home))
+         (shutdown-script (concat tomcat-home "/bin/shutdown.sh")))
     ;; Execute the shutdown script
     (shell-command shutdown-script)
     (message "Tomcat server stopped.")))
