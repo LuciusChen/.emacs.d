@@ -123,5 +123,105 @@ Returns:
                (not (buffer-modified-p)))
           (flymake-start t)))))
 
+;; 以下代码都是为了老项目
+(defun select-java-home ()
+  "List all available JDK home paths and let the user choose one.
+The selected path will be exported to JAVA_HOME, and PATH will be
+updated so that the chosen JDK's `bin/` directory comes first."
+  (interactive)
+  (let* ((candidates
+          (cond
+           ;; macOS: use /usr/libexec/java_home
+           ((eq system-type 'darwin)
+            (split-string
+             (shell-command-to-string
+              "/usr/libexec/java_home -V 2>&1 | grep '/Library' | awk '{print $NF}'")
+             "\n" t))
+           ;; Linux (Arch and others): list /usr/lib/jvm/
+           ((eq system-type 'gnu/linux)
+            (split-string
+             (shell-command-to-string "ls -d /usr/lib/jvm/*/ 2>/dev/null")
+             "\n" t))
+           (t
+            (user-error "Unsupported system: %s" system-type))))
+         ;; Let user pick one JDK path
+         (choice (completing-read "Select JAVA_HOME: " candidates nil t)))
+    ;; Set JAVA_HOME environment variable
+    (setenv "JAVA_HOME" choice)
+    ;; Prepend its bin/ to PATH
+    (setenv "PATH" (concat (expand-file-name "bin/" choice) ":" (getenv "PATH")))
+    (message "JAVA_HOME set to %s" choice)))
+
+(defun detect-tomcat-home ()
+  "Return TOMCAT_HOME path for macOS (Homebrew) or Arch Linux."
+  (string-trim
+   (shell-command-to-string
+    (concat
+     "( if command -v brew >/dev/null 2>&1; then\n"
+     "    prefix=$(brew --prefix tomcat@9 2>/dev/null || brew --prefix tomcat 2>/dev/null);\n"
+     "    [ -n \"$prefix\" ] && echo \"$prefix/libexec\";\n"
+     "elif [ -d /usr/share/tomcat10 ]; then\n"
+     "    echo /usr/share/tomcat10;\n"
+     "elif [ -d /usr/share/tomcat9 ]; then\n"
+     "    echo /usr/share/tomcat9;\n"
+     "fi )"))))
+
+(defun detect-project-home-and-name ()
+  "Detect the Tomcat home directory and the project name based on the current project."
+  (let ((project (eglot--current-project)))
+    (if (and project (consp project))
+        (let* ((project-home (cdr project))
+               (project-name (file-name-nondirectory (directory-file-name project-home))))
+          (list :name project-name :home project-home))
+      (error "Could not determine the project root"))))
+
+(defun copy-war-and-manage-tomcat ()
+  "Copy the WAR file to Tomcat's webapps directory and manage Tomcat."
+  (interactive)
+  (let* ((tomcat-home (detect-tomcat-home))
+         ;; Use detect-project-home-and-name to get project details
+         (project-details (detect-project-home-and-name))
+         (project-name (plist-get project-details :name))
+         (project-home (plist-get project-details :home))
+         (webapps-path (concat tomcat-home "/webapps/"))
+         (war-file (concat project-home "/target/" project-name ".war"))
+         (shutdown-script (concat tomcat-home "/bin/shutdown.sh"))
+         (startup-script (concat tomcat-home "/bin/startup.sh")))
+
+    ;; Remove existing WAR and exploded directory
+    (delete-file (concat webapps-path project-name ".war"))
+    (delete-directory (concat webapps-path project-name) t)
+
+    ;; Copy the new WAR file
+    (copy-file war-file webapps-path)
+
+    ;; Shutdown Tomcat
+    (shell-command (concat shutdown-script " || true"))
+    (sleep-for 3)
+
+    ;; Startup Tomcat
+    (shell-command startup-script)
+    (sleep-for 5)
+
+    ;; Check if Tomcat is running
+    (if (shell-command "nc -z localhost 8080")
+        (message "Deployment successful and Tomcat is running.")
+      (progn
+        (message "Tomcat failed to start, retrying...")
+        (shell-command startup-script)
+        (sleep-for 5)
+        (if (shell-command "nc -z localhost 8080")
+            (message "Deployment successful and Tomcat is running.")
+          (message "Tomcat failed to start after retrying. Please check the logs for more details."))))))
+
+(defun stop-tomcat ()
+  "Stop Tomcat server."
+  (interactive)
+  (let ((shutdown-script "/opt/homebrew/Cellar/tomcat@9/9.0.109/libexec/bin/shutdown.sh"))
+    ;; Execute the shutdown script
+    (shell-command shutdown-script)
+    (message "Tomcat server stopped.")))
+
+
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here

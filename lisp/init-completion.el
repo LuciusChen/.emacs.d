@@ -132,6 +132,12 @@
     (:hook eglot-java-mode))
   (:when-loaded
     (:also-load lib-eglot)
+    ;; 对于低版本 JDK 需要先执行 +select-java-home 设置 JAVA_HOME 后 build
+    (:with-map eglot-java-mode-map
+      (:bind "C-c l b" eglot-java-project-build-task)
+      (:bind "C-c l t" copy-war-and-manage-tomcat)
+      (:bind "C-c l j" select-java-home)
+      (:bind "C-c l s" stop-tomcat))
     (setopt eglot-java-server-install-dir jdtls-install-dir
             eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
             eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir (if *is-mac* "/config_mac_arm/" "/config_linux/"))
