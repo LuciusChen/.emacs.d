@@ -123,12 +123,15 @@ Returns:
                (not (buffer-modified-p)))
           (flymake-start t)))))
 
-;; 以下代码都是为了老项目
+;; The following code is used when starting a Spring + Servlet (Tomcat) container.
 (defcustom tomcat-port 8080
   "The port number that Tomcat server listens on."
   :type 'integer
   :group 'tomcat)
 
+;; Multiple JDK versions are installed locally,
+;; especially when older code cannot be compiled with newer versions,
+;; it is necessary to select an older JDK version.
 (defun select-java-home ()
   "List all available JDK home paths and let the user choose one.
 The selected path will be exported to JAVA_HOME, and PATH will be
