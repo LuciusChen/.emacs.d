@@ -8,38 +8,31 @@ if [ -z "$1" ] || [ -z "$2" ]; then
   exit 1
 fi
 
-# Project name
 PROJECT_NAME=$1
 
-# Java version
 JAVA_VERSION=$2
 
-# Tomcat port (change this if your Tomcat uses a different port)
 TOMCAT_PORT=8080
 
-# Navigate to the project directory
 cd ~/IdeaProjects/$PROJECT_NAME
 
-# Set the Java version
 jenv local $JAVA_VERSION
 
-# 1. Package the application
 mvn clean package -DskipTests
 
-# 2. Copy the WAR file to Tomcat
-sudo cp target/$PROJECT_NAME.war $TOMCAT_HOME/webapps/
+rm -rf /opt/homebrew/Cellar/tomcat@9/9.0.109/libexec/webapps/$PROJECT_NAME
+rm -f /opt/homebrew/Cellar/tomcat@9/9.0.109/libexec/webapps/$PROJECT_NAME.war
 
-# 3. Restart Tomcat
-sudo $TOMCAT_HOME/bin/shutdown.sh || true
+cp target/$PROJECT_NAME.war $TOMCAT_HOME/webapps/
+
+$TOMCAT_HOME/bin/shutdown.sh || true
 sleep 3
-sudo $TOMCAT_HOME/bin/startup.sh
+$TOMCAT_HOME/bin/startup.sh
 
-# Function to check if Tomcat is running
 is_tomcat_running() {
   nc -z localhost $TOMCAT_PORT
 }
 
-# 4. Check if Tomcat started successfully, retry if necessary
 if ! is_tomcat_running; then
   echo "Tomcat failed to start, retrying..."
   sleep 5
