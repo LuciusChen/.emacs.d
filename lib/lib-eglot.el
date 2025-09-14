@@ -175,12 +175,10 @@ updated so that the chosen JDK's `bin/` directory comes first."
      "fi )"))))
 
 (defun detect-project-home-and-name ()
-  "Detect the Tomcat home directory and the project name based on the current project."
-  (let ((project (eglot--current-project)))
-    (if (and project (consp project))
-        (let* ((project-home (cdr project))
-               (project-name (file-name-nondirectory (directory-file-name project-home))))
-          (list :name project-name :home project-home))
+  "Detect the project home directory and the project name based on the current project."
+  (let ((project (project-current)))
+    (if project
+        (list :name (project-name project) :home (cdr project))
       (error "Could not determine the project root"))))
 
 (defun copy-war-and-manage-tomcat (debug)
