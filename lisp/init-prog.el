@@ -288,6 +288,7 @@
       (:bind "C-c l b" eglot-java-project-build-task)
       (:bind "C-c l d" (lambda () (interactive)(eglot-java-run-test t)))
       (:bind "C-c l t" copy-war-and-manage-tomcat)
+      (:bind "C-c l m" (lambda () (interactive)(copy-war-and-manage-tomcat t)))
       (:bind "C-c l j" select-java-home)
       (:bind "C-c l s" stop-tomcat))
     (setopt eglot-java-server-install-dir jdtls-install-dir

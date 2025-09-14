@@ -183,9 +183,10 @@ updated so that the chosen JDK's `bin/` directory comes first."
           (list :name project-name :home project-home))
       (error "Could not determine the project root"))))
 
-(defun copy-war-and-manage-tomcat ()
-  "Copy the WAR file to Tomcat's webapps directory and manage Tomcat."
-  (interactive)
+(defun copy-war-and-manage-tomcat (debug)
+  "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
+If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
+  (interactive "P")
   (let* ((tomcat-home (detect-tomcat-home))
          ;; Use detect-project-home-and-name to get project details
          (project-details (detect-project-home-and-name))
@@ -194,7 +195,10 @@ updated so that the chosen JDK's `bin/` directory comes first."
          (webapps-path (concat tomcat-home "/webapps/"))
          (war-file (concat project-home "/target/" project-name ".war"))
          (shutdown-script (concat tomcat-home "/bin/shutdown.sh"))
-         (startup-script (concat tomcat-home "/bin/startup.sh")))
+         (startup-script (concat tomcat-home "/bin/startup.sh"))
+         (startup-command (if debug
+                              (concat startup-script " jpda start")
+                            startup-script)))
 
     ;; Remove existing WAR and exploded directory
     (delete-file (concat webapps-path project-name ".war"))
@@ -207,8 +211,8 @@ updated so that the chosen JDK's `bin/` directory comes first."
     (shell-command (concat shutdown-script " || true"))
     (sleep-for 3)
 
-    ;; Startup Tomcat
-    (shell-command startup-script)
+    ;; Startup Tomcat with or without JPDA
+    (shell-command startup-command)
     (sleep-for 5)
 
     ;; Check if Tomcat is running
@@ -216,7 +220,7 @@ updated so that the chosen JDK's `bin/` directory comes first."
         (message "Deployment successful and Tomcat is running.")
       (progn
         (message "Tomcat failed to start, retrying...")
-        (shell-command startup-script)
+        (shell-command startup-command)
         (sleep-for 5)
         (if (shell-command (format "nc -z localhost %d" tomcat-port))
             (message "Deployment successful and Tomcat is running.")
