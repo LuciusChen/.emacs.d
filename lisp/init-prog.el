@@ -231,6 +231,84 @@
             indent-bars-treesit-scope '((python function_definition class_definition for_statement
                                                 if_statement with_statement while_statement)))))
 
+;; Latex
+;; $ luarocks install digestif
+;; ╺═══════════════════════════════════════╸
+;; Java
+;; $ brew install jdtls
+;; ╺═══════════════════════════════════════╸
+;; Python
+;; $ brew install pipx
+;; $ pipx install pyright
+;; ╺═══════════════════════════════════════
+;; HTML
+;; $ npm install -g vscode-langservers-extracted
+;; ╺═══════════════════════════════════════
+;; JS
+;; $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+;; $ nvm install node
+;; $ sudo npm install -g typescript
+;; $ npm install -g @vue/language-server
+;; $ npm install -g typescript-language-server
+
+(setup eglot
+  (:defer (:require eglot))
+  (:when-loaded
+    (:also-load lib-eglot)
+    (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
+      (:hook eglot-ensure))
+    (setopt eglot-code-action-indications '(eldoc-hint)
+            eglot-events-buffer-config '(:size 0 :format full) ;; 取消 eglot log
+            ;; ignore lsp formatting provider, format with apheleia.
+            eglot-ignored-server-capabilities '(:documentFormattingProvider
+                                                :documentRangeFormattingProvider))
+    (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
+    (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
+    (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
+    (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+    ;; https://github.com/joaotavora/eglot/discussions/898
+    (:with-hook eglot-managed-mode-hook
+      (:hook (lambda ()
+               ;; Show flymake diagnostics first.
+               (setq eldoc-documentation-functions
+                     (cons #'flymake-eldoc-function
+                           (remove #'flymake-eldoc-function eldoc-documentation-functions)))
+               ;; Show all eldoc feedback.
+               (setq eldoc-documentation-strategy #'eldoc-documentation-compose))))))
+
+;; 若提示 [eglot] (warning) Could not find required eclipse.jdt.ls files (build required?)
+;; 则需要执行 eglot-java-upgrade-lsp-server
+(setup eglot-java
+  (:with-mode (java-mode java-ts-mode)
+    (:hook eglot-java-mode))
+  (:when-loaded
+    (:also-load lib-eglot)
+    ;; 对于低版本 JDK 需要先执行 +select-java-home 设置 JAVA_HOME 后 build
+    (:with-map eglot-java-mode-map
+      (:bind "C-c l b" eglot-java-project-build-task)
+      (:bind "C-c l d" (lambda () (interactive)(eglot-java-run-test t)))
+      (:bind "C-c l t" copy-war-and-manage-tomcat)
+      (:bind "C-c l j" select-java-home)
+      (:bind "C-c l s" stop-tomcat))
+    (setopt eglot-java-server-install-dir jdtls-install-dir
+            eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
+            eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir (if *is-mac* "/config_mac_arm/" "/config_linux/"))
+            eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
+                                          "-Xmx8G"
+                                          ;; "-XX:+UseG1GC"
+                                          "-XX:+UseZGC"
+                                          "-XX:+UseStringDeduplication"
+                                          ;; "-XX:FreqInlineSize=325"
+                                          ;; "-XX:MaxInlineLevel=9"
+                                          "-XX:+UseCompressedOops")
+            eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
+
+;; https://github.com/blahgeek/emacs-lsp-booster
+;; Download the executable file from the address above and place it in your exec-path.
+(setup eglot-booster
+  (:load-after eglot)
+  (:when-loaded (eglot-booster-mode)))
+
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
 
@@ -245,6 +323,24 @@
   (:when-loaded
     (keymap-global-set "<f5>" 'dape)
     (setopt dape-buffer-window-arrangement 'right)
+    ;; https://github.com/svaante/dape/issues/108
+    (add-to-list 'dape-configs
+                 `(jdtls-extra
+                   modes (java-mode java-ts-mode)
+                   fn (lambda (config)
+                        (with-current-buffer
+                            (find-file-noselect (expand-file-name (plist-get config :program)
+                                                                  (project-root (project-current))))
+                          (thread-first
+                            config
+                            (plist-put 'hostname "localhost")
+                            (plist-put 'port (eglot-execute-command (eglot-current-server)
+                                                                    "vscode.java.startDebugSession" nil))
+                            (plist-put :projectName (project-name (project-current))))))
+                   :program dape-buffer-default
+                   :request "attach"
+                   :hostname "localhost"
+                   :port 8000))
     ;; Save buffers on startup, useful for interpreted languages
     (:hook dape-start-hook (lambda () (save-some-buffers t t)))))
 

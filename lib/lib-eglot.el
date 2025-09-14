@@ -231,6 +231,5 @@ updated so that the chosen JDK's `bin/` directory comes first."
     (shell-command shutdown-script)
     (message "Tomcat server stopped.")))
 
-
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here
