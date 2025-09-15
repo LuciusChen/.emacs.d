@@ -228,7 +228,7 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
   "Stop Tomcat server."
   (interactive)
   (let* ((tomcat-home (detect-tomcat-home))
-         (shutdown-script (concat tomcat-home "/bin/shutdown.sh")))
+         (shutdown-script (concat tomcat-home "/bin/catalina.sh stop")))
     ;; Execute the shutdown script
     (shell-command shutdown-script)
     (message "Tomcat server stopped.")))
