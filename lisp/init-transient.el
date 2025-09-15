@@ -74,7 +74,7 @@
         ("eb" "project-build-task"                eglot-java-project-build-task)
         ("ed" "project-build-task (debug)"        (lambda () (interactive)(eglot-java-run-test t)))
         ("et" "project-build-task-tomcat"         compile-and-start-tomcat)
-        ("et" "project-build-task-tomcat (debug)" (lambda () (interactive)(compile-and-start-tomcat t)))
+        ("eT" "project-build-task-tomcat (debug)" (lambda () (interactive)(compile-and-start-tomcat t)))
         ("ej" "choose-java-home"                  select-java-home)
         ("es" "stop-tomcat"                       stop-tomcat)]])
 
