@@ -181,8 +181,8 @@ updated so that the chosen JDK's `bin/` directory comes first."
         (list :name (project-name project) :home (cdr project))
       (error "Could not determine the project root"))))
 
-(defun copy-war-and-manage-tomcat (debug)
-  "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
+(defun compile-and-start-tomcat (debug)
+  "Compile the project, copy the WAR file to Tomcat's webapps directory, and start Tomcat.
 If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
   (interactive "P")
   (let* ((tomcat-home (detect-tomcat-home))
