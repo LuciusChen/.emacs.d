@@ -62,14 +62,21 @@
         ("a" "code-actions"      eglot-code-actions)
         ("r" "rename"            eglot-rename)
         ("f" "format-all-buffer" apheleia-format-buffer)]
-       ["diagnostic"
+       ["Diagnostic"
         ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
         ("N" "jump-to-prev-diagnostic" flymake-goto-prev-error)
         ("l" "list-diagnostics"        consult-flymake)
         ("s" "show-buffer-diagnostics" flymake-show-buffer-diagnostics)]
        ["Navigate"
         ("m" "consult-mark"             consult-mark)
-        ("v" "switch-git-status-buffer" +switch-git-status-buffer)]])
+        ("v" "switch-git-status-buffer" +switch-git-status-buffer)]
+       ["Build"
+        ("eb" "project-build-task"                eglot-java-project-build-task)
+        ("ed" "project-build-task (debug)"        (lambda () (interactive)(eglot-java-run-test t)))
+        ("et" "project-build-task-tomcat"         compile-and-start-tomcat)
+        ("et" "project-build-task-tomcat (debug)" (lambda () (interactive)(compile-and-start-tomcat t)))
+        ("ej" "choose-java-home"                  select-java-home)
+        ("es" "stop-tomcat"                       stop-tomcat)]])
 
     (transient-define-prefix magit-commands ()
       "Magit commands"
