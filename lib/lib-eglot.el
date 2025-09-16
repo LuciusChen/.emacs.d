@@ -181,6 +181,13 @@ updated so that the chosen JDK's `bin/` directory comes first."
         (list :name (project-name project) :home (cdr project))
       (error "Could not determine the project root"))))
 
+(defun tomcat--get-pid ()
+  "Return Tomcat PID string if running, else nil."
+  (let ((pid (string-trim
+              (shell-command-to-string
+               "pgrep -f 'org.apache.catalina.startup.Bootstrap'"))))
+    (unless (string-empty-p pid) pid)))
+
 (defun copy-war-and-manage-tomcat (debug)
   "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
 If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
@@ -206,7 +213,7 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
     (copy-file war-file webapps-path)
 
     ;; Shutdown Tomcat
-    (shell-command (concat shutdown-script " || true"))
+    (tomcat-safe-shutdown)
     (sleep-for 3)
 
     ;; Startup Tomcat with or without JPDA
@@ -224,14 +231,46 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
             (message "Deployment successful and Tomcat is running.")
           (message "Tomcat failed to start after retrying. Please check the logs for more details."))))))
 
-(defun stop-tomcat ()
-  "Stop Tomcat server."
+(defun tomcat-safe-shutdown ()
+  "Safely shutdown Tomcat.
+Try shutdown.sh first, wait a few seconds, then kill process if needed."
   (interactive)
-  (let* ((tomcat-home (detect-tomcat-home))
-         (shutdown-script (concat tomcat-home "/bin/catalina.sh stop")))
-    ;; Execute the shutdown script
-    (shell-command shutdown-script)
-    (message "Tomcat server stopped.")))
+  (let* ((home (or (detect-tomcat-home)
+                   (error "Unable to detect Tomcat home directory")))
+         (shutdown-script (expand-file-name "bin/shutdown.sh" home)))
+    (unless (file-exists-p shutdown-script)
+      (error "shutdown.sh not found at %s" shutdown-script))
+
+    ;; Step 1: run shutdown.sh
+    (message ">>> Trying shutdown.sh ...")
+    (call-process shutdown-script)
+
+    ;; Step 2: wait a bit
+    (sleep-for 1)
+    (let ((pid (tomcat--get-pid)))
+      (if (not pid)
+          (message ">>> Tomcat already stopped.")
+        ;; Step 3: wait up to 3s
+        (let ((i 0))
+          (while (and pid (< i 3))
+            (sleep-for 1)
+            (setq i (1+ i))
+            (setq pid (tomcat--get-pid)))
+          (if (not pid)
+              (message ">>> Tomcat stopped normally.")
+            ;; Step 4: try kill, then kill -9
+            (message ">>> shutdown.sh failed, sending SIGTERM to %s" pid)
+            (call-process "kill" nil nil nil pid)
+            (sleep-for 5)
+            (setq pid (tomcat--get-pid))
+            (when pid
+              (message ">>> Still alive, force kill -9 %s" pid)
+              (call-process "kill" nil nil nil "-9" pid))
+            (if (tomcat--get-pid)
+                (message ">>> Failed to stop Tomcat.")
+              (message ">>> Tomcat stopped."))))))))
+
+
 
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here
