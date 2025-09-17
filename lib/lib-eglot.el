@@ -139,17 +139,23 @@ updated so that the chosen JDK's `bin/` directory comes first."
   (interactive)
   (let* ((candidates
           (cond
-           ;; macOS: use /usr/libexec/java_home
+           ;; macOS: use /usr/libexec/java_home and exclude JavaAppletPlugin.plugin
            ((eq system-type 'darwin)
-            (split-string
-             (shell-command-to-string
-              "/usr/libexec/java_home -V 2>&1 | grep '/Library' | awk '{print $NF}'")
-             "\n" t))
-           ;; Linux (Arch and others): list /usr/lib/jvm/
+            (seq-filter
+             (lambda (path)
+               (not (string-match-p "JavaAppletPlugin.plugin" path)))
+             (split-string
+              (shell-command-to-string
+               "/usr/libexec/java_home -V 2>&1 | grep '/Library' | awk '{print $NF}'")
+              "\n" t)))
+           ;; Linux (Arch and others): list /usr/lib/jvm/ and exclude default links
            ((eq system-type 'gnu/linux)
-            (split-string
-             (shell-command-to-string "ls -d /usr/lib/jvm/*/ 2>/dev/null")
-             "\n" t))
+            (seq-filter
+             (lambda (path)
+               (not (string-match-p "/default" path)))
+             (split-string
+              (shell-command-to-string "ls -d /usr/lib/jvm/*/ 2>/dev/null")
+              "\n" t)))
            (t
             (user-error "Unsupported system: %s" system-type))))
          ;; Let user pick one JDK path
@@ -159,6 +165,7 @@ updated so that the chosen JDK's `bin/` directory comes first."
     ;; Prepend its bin/ to PATH
     (setenv "PATH" (concat (expand-file-name "bin/" choice) ":" (getenv "PATH")))
     (message "JAVA_HOME set to %s" choice)))
+
 
 (defun detect-tomcat-home ()
   "Return TOMCAT_HOME path for macOS (Homebrew) or Arch Linux."
@@ -190,7 +197,7 @@ updated so that the chosen JDK's `bin/` directory comes first."
 
 (defun copy-war-and-manage-tomcat (debug)
   "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
-If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
+If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground, async)."
   (interactive "P")
   (let* ((tomcat-home (detect-tomcat-home))
          ;; Use detect-project-home-and-name to get project details
@@ -199,78 +206,91 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled."
          (project-home (plist-get project-details :home))
          (webapps-path (concat tomcat-home "/webapps/"))
          (war-file (concat project-home "/target/" project-name ".war"))
-         (shutdown-script (concat tomcat-home "/bin/shutdown.sh"))
-         (startup-script (concat tomcat-home "/bin/startup.sh"))
+         (startup-script (concat tomcat-home "/bin/catalina.sh"))
+         ;; 根据 debug 构建启动命令
          (startup-command (if debug
-                              (concat startup-script " jpda start")
-                            startup-script)))
+                              (concat "CATALINA_OPTS='-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n' "
+                                      startup-script " run")
+                            (concat startup-script " start"))))
 
     ;; Remove existing WAR and exploded directory
-    (delete-file (concat webapps-path project-name ".war"))
-    (delete-directory (concat webapps-path project-name) t)
+    (ignore-errors (delete-file (concat webapps-path project-name ".war")))
+    (ignore-errors (delete-directory (concat webapps-path project-name) t))
 
     ;; Copy the new WAR file
-    (copy-file war-file webapps-path)
+    (copy-file war-file webapps-path t)
 
     ;; Shutdown Tomcat
     (tomcat-safe-shutdown)
     (sleep-for 3)
 
-    ;; Startup Tomcat with or without JPDA
-    (shell-command startup-command)
-    (sleep-for 5)
+    ;; Startup Tomcat with or without JPDA (async, not blocking Emacs)
+    (start-process-shell-command
+     (if debug "tomcat-debug" "tomcat-start")
+     (if debug "*tomcat-debug*" "*tomcat-start*")
+     startup-command)
 
-    ;; Check if Tomcat is running
+    ;; Give Tomcat some time, then check port
+    (sleep-for 5)
     (if (shell-command (format "nc -z localhost %d" tomcat-port))
-        (message "Deployment successful and Tomcat is running.")
-      (progn
-        (message "Tomcat failed to start, retrying...")
-        (shell-command startup-command)
-        (sleep-for 5)
-        (if (shell-command (format "nc -z localhost %d" tomcat-port))
-            (message "Deployment successful and Tomcat is running.")
-          (message "Tomcat failed to start after retrying. Please check the logs for more details."))))))
+        (message "Deployment successful and Tomcat is running%s."
+                 (if debug " with JPDA debugging" ""))
+      (message "Tomcat may have failed to start. Please check the buffer *tomcat-%s* for logs."
+               (if debug "debug" "start")))))
 
 (defun tomcat-safe-shutdown ()
-  "Safely shutdown Tomcat.
-Try shutdown.sh first, wait a few seconds, then kill process if needed."
+  "Safely shutdown Tomcat asynchronously, output to *tomcat-stop* buffer."
   (interactive)
   (let* ((home (or (detect-tomcat-home)
                    (error "Unable to detect Tomcat home directory")))
-         (shutdown-script (expand-file-name "bin/shutdown.sh" home)))
-    (unless (file-exists-p shutdown-script)
-      (error "shutdown.sh not found at %s" shutdown-script))
+         (catalina-script (expand-file-name "bin/catalina.sh" home))
+         (buffer-name "*tomcat-stop*")
+         (shutdown-command (concat catalina-script " stop")))
 
-    ;; Step 1: run shutdown.sh
-    (message ">>> Trying shutdown.sh ...")
-    (call-process shutdown-script)
+    (unless (file-exists-p catalina-script)
+      (error "catalina.sh not found at %s" catalina-script))
 
-    ;; Step 2: wait a bit
-    (sleep-for 1)
+    (message ">>> Shutting down Tomcat asynchronously...")
+    ;; Run catalina.sh stop asynchronously
+    (start-process-shell-command
+     "tomcat-stop" buffer-name shutdown-command)
+
+    (sleep-for 3)
+
+    ;; Check if the PID still exists
     (let ((pid (tomcat--get-pid)))
-      (if (not pid)
-          (message ">>> Tomcat already stopped.")
-        ;; Step 3: wait up to 3s
-        (let ((i 0))
-          (while (and pid (< i 3))
-            (sleep-for 1)
-            (setq i (1+ i))
-            (setq pid (tomcat--get-pid)))
-          (if (not pid)
-              (message ">>> Tomcat stopped normally.")
-            ;; Step 4: try kill, then kill -9
-            (message ">>> shutdown.sh failed, sending SIGTERM to %s" pid)
-            (call-process "kill" nil nil nil pid)
-            (sleep-for 5)
-            (setq pid (tomcat--get-pid))
-            (when pid
-              (message ">>> Still alive, force kill -9 %s" pid)
-              (call-process "kill" nil nil nil "-9" pid))
-            (if (tomcat--get-pid)
-                (message ">>> Failed to stop Tomcat.")
-              (message ">>> Tomcat stopped."))))))))
+      (when pid
+        (message ">>> Tomcat may still be running (PID %s), sending SIGTERM..." pid)
+        (call-process "kill" nil nil nil pid)
+        (sleep-for 5)
+        (setq pid (tomcat--get-pid))
+        (when pid
+          (message ">>> Force kill -9 %s" pid)
+          (call-process "kill" nil nil nil "-9" pid))
+        (if (tomcat--get-pid)
+            (message ">>> Failed to stop Tomcat.")
+          (message ">>> Tomcat stopped."))))))
 
-
+(defun tkj/java-decompile-class ()
+  "Run the FernFlower decompiler on the current .class file using
+ fernflower, and opens the decompiled Java file."
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+         (output-dir (concat (file-name-directory current-file) "decompiled/"))
+         (decompiled-file (concat output-dir (file-name-base current-file) ".java"))
+         (command (format "fernflower %s %s"
+                          (shell-quote-argument current-file)
+                          (shell-quote-argument output-dir))))
+    (if (and current-file (string-equal (file-name-extension current-file) "class"))
+        (progn
+          (unless (file-directory-p output-dir)
+            (make-directory output-dir t))
+          (message "Running FernFlower decompiler...")
+          (shell-command command)
+          (if (file-exists-p decompiled-file)
+              (find-file decompiled-file)
+            (message "Error: Decompiled file not found at %s" decompiled-file)))
+      (message "Error: This command can only be run on .class files"))))
 
 (provide 'lib-eglot)
 ;;; lib-eglot.el ends here
