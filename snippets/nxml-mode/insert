@@ -2,4 +2,4 @@
 # name: insert
 # key: insert
 # --
-insert id="${1:insert}"${2: parameterType="${3:User}"}></insert>
+insert id="${1:insert}"${2: parameterType="${3:User}"}${4: useGeneratedKeys="${5:true}"}${6: keyProperty="${7:id}"}${8: keyColumn="${9:id}"}></insert>
