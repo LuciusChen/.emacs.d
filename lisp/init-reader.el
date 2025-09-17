@@ -3,7 +3,7 @@
 ;;; Code:
 
 (setup nov
-  (:match-file "\\.epub\\'")
+  (:match-file "*.epub")
   (:when-loaded
     (:hooks nov-mode-hook +nov-annotate-font-lock)
     (defface +nov-annotate-face
@@ -22,7 +22,7 @@
 ;; Synchronize color filter with the present Emacs theme.
 (setup pdf-view
   (:defer (:require pdf-tools)
-          (:match-file "\\.PDF\\'"))
+          (:match-file "*.PDF"))
   (:when-loaded
     (:with-mode pdf-view-mode
       (:hook pdf-view-themed-minor-mode))))
