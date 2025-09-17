@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: insert
+# key: insert
+# --
+insert id="${1:insert}"${2: parameterType="${3:User}"}></insert>
