@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: delete
+# key: delete
+# --
+delete id="${1:delete}"${2: parameterType="${3:Long}"}></delete>
