@@ -2,4 +2,4 @@
 # name: select
 # key: select
 # --
-select id="${1:findById}"${2: parameterType="${3:Long}"}${4: resultType="${5:User}"}></select>
+select id="${1:findById}"${2: parameterType="${3:Long}"}${4: resultType="${5:User}"}${6: resultMap="${7:userMap}"}></select>
