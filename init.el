@@ -57,7 +57,7 @@
 
 ;; install packages
 (defvar *use-package-list*
-  '(nov sis plz avy mpv cape citar wgrep setup eglot-java nerd-icons
+  '(nov sis plz avy mpv cape citar wgrep setup nerd-icons citar-denote
         corfu forge verb elfeed popper embark bibtex vertico clojure-mode
         diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
         diff-hl company goggles flymake web-mode js2-mode move-dup
@@ -71,7 +71,8 @@
         browse-kill-ring rainbow-delimiters default-text-scale denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         password-store-otp password-store eshell-syntax-highlighting
-        projectile consult-dir dirvish eat citar-denote
+        projectile consult-dir dirvish eat
+        (eglot-java :host github :repo "LuciusChen/eglot-java")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
         (separedit :host github :repo "LuciusChen/separedit.el")
