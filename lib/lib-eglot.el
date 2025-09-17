@@ -231,7 +231,7 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground, async
      startup-command)
 
     ;; Give Tomcat some time, then check port
-    (sleep-for 5)
+    (sleep-for 3)
     (if (shell-command (format "nc -z localhost %d" tomcat-port))
         (message "Deployment successful and Tomcat is running%s."
                  (if debug " with JPDA debugging" ""))
@@ -262,7 +262,7 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground, async
       (when pid
         (message ">>> Tomcat may still be running (PID %s), sending SIGTERM..." pid)
         (call-process "kill" nil nil nil pid)
-        (sleep-for 5)
+        (sleep-for 3)
         (setq pid (tomcat--get-pid))
         (when pid
           (message ">>> Force kill -9 %s" pid)
