@@ -211,7 +211,7 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground, async
          (startup-command (if debug
                               (concat "CATALINA_OPTS='-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n' "
                                       startup-script " run")
-                            (concat startup-script " start"))))
+                            (concat startup-script " run"))))
 
     ;; Remove existing WAR and exploded directory
     (ignore-errors (delete-file (concat webapps-path project-name ".war")))
