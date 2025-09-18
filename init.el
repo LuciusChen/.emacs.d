@@ -102,7 +102,9 @@
 
 (require 'init-setup)
 (require 'init-auth)
-(when *is-mac* (require 'init-mac))
+(if *is-mac*
+    (require 'init-mac)
+  (require 'init-linux))
 (require 'init-ui)
 
 (require 'init-editing)
