@@ -1,6 +1,6 @@
 #+STARTUP: indent
 
-[[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/Linux-0.24s-brightgreen]]
+[[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/Linux-0.24s-brightgreen.svg?style=svg]]
 
 [[https://circleci.com/gh/akirak/emacs.d/tree/master][https://circleci.com/gh/akirak/emacs.d/tree/master.svg?style=svg]]
 
