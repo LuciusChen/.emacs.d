@@ -1,8 +1,6 @@
 #+STARTUP: indent
 
-[[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/Linux-0.24s-brightgreen.svg?style=svg]]
-
-[[https://circleci.com/gh/akirak/emacs.d/tree/master][https://circleci.com/gh/akirak/emacs.d/tree/master.svg?style=svg]]
+[[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/Linux-0.24s-brightgreen.svg?style=svg]] [[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/macOS-0.58s-blue.svg?style=svg]]
 
 * .emacs.d
 ** Emacs 编译
