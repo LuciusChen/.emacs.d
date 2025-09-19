@@ -1,6 +1,6 @@
 #+STARTUP: indent
-[[https://img.shields.io/badge/Linux-0.24s-brightgreen][Linux init time]]
-[[https://img.shields.io/badge/macOS-0.58s-blue][macOS init time]]
+[[https://img.shields.io/badge/Linux-0.24s-brightgreen]]
+[[https://img.shields.io/badge/macOS-0.58s-blue]]
 * .emacs.d
 ** Emacs 编译
 *** MacOS
