@@ -1,6 +1,6 @@
 #+STARTUP: indent
 #+ATTR_HTML: :align center
-[![Linux init time](https://img.shields.io/badge/Linux-0.24s-brightgreen)](https://img.shields.io/badge/Linux-0.24s-brightgreen) [![macOS init time](https://img.shields.io/badge/macOS-0.58s-blue)]()
+[![Linux init time](https://img.shields.io/badge/Linux-0.24s-brightgreen)](https://github.com/LuciusChen/.emacs.d) [![macOS init time](https://img.shields.io/badge/macOS-0.58s-blue)](https://github.com/LuciusChen/.emacs.d)
 
 * .emacs.d
 ** Emacs 编译
