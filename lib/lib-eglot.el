@@ -195,23 +195,38 @@ updated so that the chosen JDK's `bin/` directory comes first."
                "pgrep -f 'org.apache.catalina.startup.Bootstrap'"))))
     (unless (string-empty-p pid) pid)))
 
+(defun tomcat-truncate-buffer (buffer max-lines)
+  "Keep only the last MAX-LINES lines in BUFFER."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (let ((inhibit-read-only t))
+        (goto-char (point-max))
+        (when (> (count-lines (point-min) (point-max)) max-lines)
+          (delete-region (point-min)
+                         (save-excursion
+                           (goto-char (point-min))
+                           (forward-line (- (count-lines (point-min) (point-max)) max-lines))
+                           (point))))))))
+
 (defun copy-war-and-manage-tomcat (debug)
   "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
-If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground, async)."
+If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground).
+Otherwise start Tomcat normally (background, logs to file)."
   (interactive "P")
   (let* ((tomcat-home (detect-tomcat-home))
-         ;; Use detect-project-home-and-name to get project details
          (project-details (detect-project-home-and-name))
          (project-name (plist-get project-details :name))
          (project-home (plist-get project-details :home))
          (webapps-path (concat tomcat-home "/webapps/"))
          (war-file (concat project-home "/target/" project-name ".war"))
          (startup-script (concat tomcat-home "/bin/catalina.sh"))
-         ;; 根据 debug 构建启动命令
+         (tomcat-port 8080) ;; 你可以改成从 server.xml 读取
+         (logfile (concat tomcat-home "/logs/emacs-tomcat.log"))
+         ;; 构建启动命令
          (startup-command (if debug
                               (concat "CATALINA_OPTS='-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n' "
                                       startup-script " run")
-                            (concat startup-script " run"))))
+                            (concat startup-script " start"))))
 
     ;; Remove existing WAR and exploded directory
     (ignore-errors (delete-file (concat webapps-path project-name ".war")))
@@ -222,54 +237,70 @@ If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground, async
 
     ;; Shutdown Tomcat
     (tomcat-safe-shutdown)
-    (sleep-for 3)
 
-    ;; Startup Tomcat with or without JPDA (async, not blocking Emacs)
-    (start-process-shell-command
-     (if debug "tomcat-debug" "tomcat-start")
-     (if debug "*tomcat-debug*" "*tomcat-start*")
-     startup-command)
+    ;; Startup Tomcat
+    (if debug
+        (let ((proc (start-process-shell-command "tomcat-debug" "*tomcat-debug*" startup-command)))
+          (set-process-filter proc
+                              (lambda (p output)
+                                (with-current-buffer (process-buffer p)
+                                  (goto-char (point-max))
+                                  (insert output)
+                                  (tomcat-truncate-buffer (current-buffer) 5000)))))
+      (start-process-shell-command
+       "tomcat-start" nil
+       (concat startup-command " >> " logfile " 2>&1 &")))
 
-    ;; Give Tomcat some time, then check port
-    (sleep-for 3)
-    (if (shell-command (format "nc -z localhost %d" tomcat-port))
-        (message "Deployment successful and Tomcat is running%s."
-                 (if debug " with JPDA debugging" ""))
-      (message "Tomcat may have failed to start. Please check the buffer *tomcat-%s* for logs."
-               (if debug "debug" "start")))))
+    ;; Retry loop for port availability
+    (let ((tries 15) (ok nil))
+      (while (and (> tries 0) (not ok))
+        (sleep-for 1)
+        (setq tries (1- tries))
+        (setq ok (= 0 (shell-command (format "nc -z localhost %d" tomcat-port)))))
+      (if ok
+          (message "Deployment successful, Tomcat running%s."
+                   (if debug " with JPDA debugging" ""))
+        (message "Tomcat may have failed to start. Check %s or buffer for logs."
+                 (if debug "*tomcat-debug*" logfile))))))
 
 (defun tomcat-safe-shutdown ()
-  "Safely shutdown Tomcat asynchronously, output to *tomcat-stop* buffer."
+  "Safely shutdown Tomcat, like IDEA does.
+Try catalina.sh stop first, wait 2s, then kill process group if needed."
   (interactive)
   (let* ((home (or (detect-tomcat-home)
                    (error "Unable to detect Tomcat home directory")))
          (catalina-script (expand-file-name "bin/catalina.sh" home))
          (buffer-name "*tomcat-stop*")
-         (shutdown-command (concat catalina-script " stop")))
-
+         (shutdown-command (concat catalina-script " stop"))
+         (pid (tomcat--get-pid)))
     (unless (file-exists-p catalina-script)
       (error "catalina.sh not found at %s" catalina-script))
+    (if (not pid)
+        (message ">>> No Tomcat process found.")
+      (progn
+        (message ">>> Trying catalina.sh stop...")
+        (start-process-shell-command "tomcat-stop" buffer-name shutdown-command)
+        (sleep-for 2)
+        (if (not (tomcat--get-pid))
+            (message ">>> Tomcat stopped gracefully.")
+          (let* ((pgid (string-trim
+                        (with-output-to-string
+                          (with-current-buffer standard-output
+                            (call-process "ps" nil t nil "-o" "pgid=" "-p" pid))))))
+            (message ">>> Tomcat still running, killing process group %s..." pgid)
+            ;; macOS kill 没有 GNU -- 参数，所以区分一下
+            (if (eq system-type 'darwin)
+                (call-process "kill" nil nil nil "-TERM" (concat "-" pgid))
+              (call-process "kill" nil nil nil "--" (concat "-" pgid)))
+            (sleep-for 1)
+            (when (tomcat--get-pid)
+              (if (eq system-type 'darwin)
+                  (call-process "kill" nil nil nil "-9" (concat "-" pgid))
+                (call-process "kill" nil nil nil "-9" (concat "-" pgid))))
+            (if (tomcat--get-pid)
+                (message ">>> Failed to stop Tomcat.")
+              (message ">>> Tomcat force killed."))))))))
 
-    (message ">>> Shutting down Tomcat asynchronously...")
-    ;; Run catalina.sh stop asynchronously
-    (start-process-shell-command
-     "tomcat-stop" buffer-name shutdown-command)
-
-    (sleep-for 3)
-
-    ;; Check if the PID still exists
-    (let ((pid (tomcat--get-pid)))
-      (when pid
-        (message ">>> Tomcat may still be running (PID %s), sending SIGTERM..." pid)
-        (call-process "kill" nil nil nil pid)
-        (sleep-for 3)
-        (setq pid (tomcat--get-pid))
-        (when pid
-          (message ">>> Force kill -9 %s" pid)
-          (call-process "kill" nil nil nil "-9" pid))
-        (if (tomcat--get-pid)
-            (message ">>> Failed to stop Tomcat.")
-          (message ">>> Tomcat stopped."))))))
 
 (defun tkj/java-decompile-class ()
   "Run the FernFlower decompiler on the current .class file using
