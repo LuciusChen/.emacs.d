@@ -83,13 +83,13 @@
     (:hook-into nxml-mode)
     (mmm-add-classes
      '((nxml-sql-select :submode sql-mode
-                        :front "<select[^>]*>[ \t]*\n" :back "[ \t]*</select>")
+                        :front "<select[^>]*>" :back "</select>")
        (nxml-sql-insert :submode sql-mode
-                        :front "<insert[^>]*>[ \t]*\n" :back "[ \t]*</insert>")
+                        :front "<insert[^>]*>" :back "</insert>")
        (nxml-sql-update :submode sql-mode
-                        :front "<update[^>]*>[ \t]*\n" :back "[ \t]*</update>")
+                        :front "<update[^>]*>" :back "</update>")
        (nxml-sql-delete :submode sql-mode
-                        :front "<delete[^>]*>[ \t]*\n" :back "[ \t]*</delete>")))
+                        :front "<delete[^>]*>" :back "</delete>")))
     (dolist (class '(nxml-sql-select nxml-sql-insert nxml-sql-update nxml-sql-delete))
       (mmm-add-mode-ext-class 'nxml-mode nil class))))
 
