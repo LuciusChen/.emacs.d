@@ -142,8 +142,6 @@
             embark-help-key "?")
     (:hooks embark-collect-mode-hook consult-preview-at-point-mode)))
 
-(setup wgrep (:load-after consult))
-
 (setup marginalia
   (:load-after vertico)
   (:when-loaded
