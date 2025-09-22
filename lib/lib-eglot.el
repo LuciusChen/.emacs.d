@@ -175,10 +175,10 @@ updated so that the chosen JDK's `bin/` directory comes first."
      "( if command -v brew >/dev/null 2>&1; then\n"
      "    prefix=$(brew --prefix tomcat@9 2>/dev/null || brew --prefix tomcat 2>/dev/null);\n"
      "    [ -n \"$prefix\" ] && echo \"$prefix/libexec\";\n"
-     "elif [ -d /usr/share/tomcat10 ]; then\n"
-     "    echo /usr/share/tomcat10;\n"
-     "elif [ -d /usr/share/tomcat9 ]; then\n"
-     "    echo /usr/share/tomcat9;\n"
+     "elif [ -d $HOME/tomcat10 ]; then\n"
+     "    echo $HOME/tomcat10;\n"
+     "elif [ -d $HOME/tomcat9 ]; then\n"
+     "    echo $HOME/tomcat9;\n"
      "fi )"))))
 
 (defun detect-project-home-and-name ()
@@ -207,6 +207,14 @@ updated so that the chosen JDK's `bin/` directory comes first."
                            (goto-char (point-min))
                            (forward-line (- (count-lines (point-min) (point-max)) max-lines))
                            (point))))))))
+
+(defun port-open-p (host port)
+  (condition-case nil
+      (let ((proc (make-network-process
+                   :name "check-port" :host host :service port
+                   :nowait nil)))
+        (when proc (delete-process proc) t))
+    (error nil)))
 
 (defun copy-war-and-manage-tomcat (debug)
   "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
@@ -256,7 +264,7 @@ Otherwise start Tomcat normally (background, logs to file)."
       (while (and (> tries 0) (not ok))
         (sleep-for 1)
         (setq tries (1- tries))
-        (setq ok (= 0 (shell-command (format "nc -z localhost %d" tomcat-port)))))
+        (setq ok (port-open-p "localhost" tomcat-port)))
       (if ok
           (message "Deployment successful, Tomcat running%s."
                    (if debug " with JPDA debugging" ""))
