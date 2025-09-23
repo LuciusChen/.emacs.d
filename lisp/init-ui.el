@@ -83,7 +83,7 @@
             panel-longitude 118.77969
             panel-path-max-length 35
             panel-min-left-padding 10
-            panel-image-file "~/.emacs.d/assets/bitmap.png"
+            panel-image-file "~/.emacs.d/assets/bitmap.svg"
             panel-image-width 400
             panel-image-height 169
             panel-title "Happy hacking, lucius - Emacs ♥ you")
