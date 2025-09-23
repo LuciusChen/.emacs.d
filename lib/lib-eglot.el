@@ -32,12 +32,6 @@
                                             :documentColor t))
                   :vue (:hybridMode :json-false))))
 
-;; The following code is used when starting a Spring + Servlet (Tomcat) container.
-(defcustom tomcat-port 8080
-  "The port number that Tomcat server listens on."
-  :type 'integer
-  :group 'tomcat)
-
 (defun get-latest-lombok-jar ()
   "Return the path to the latest Lombok JAR file."
   (let* ((lombok-dir (expand-file-name "~/.m2/repository/org/projectlombok/lombok/"))
@@ -129,6 +123,12 @@ Returns:
                                [,(file-truename java-debug-jar)])))))
       contact)))
 
+;; The following code is used when starting a Spring + Servlet (Tomcat) container.
+(defcustom tomcat-port 8080
+  "The port number that Tomcat server listens on."
+  :type 'integer
+  :group 'tomcat)
+
 ;; Multiple JDK versions are installed locally,
 ;; especially when older code cannot be compiled with newer versions,
 ;; it is necessary to select an older JDK version.
@@ -219,23 +219,20 @@ updated so that the chosen JDK's `bin/` directory comes first."
 (defun copy-war-and-manage-tomcat (debug)
   "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
 If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground).
-Otherwise start Tomcat normally (background, logs to file)."
+Otherwise also run Tomcat in foreground, logs go to *tomcat-start* buffer."
   (interactive "P")
-  (let* ((tomcat-home (detect-tomcat-home))
+  (let* ((tomcat-home (or (detect-tomcat-home)
+                          (error "Unable to detect Tomcat home directory")))
          (project-details (detect-project-home-and-name))
          (project-name (plist-get project-details :name))
          (project-home (plist-get project-details :home))
          (webapps-path (concat tomcat-home "/webapps/"))
          (war-file (concat project-home "/target/" project-name ".war"))
          (startup-script (concat tomcat-home "/bin/catalina.sh"))
-         (tomcat-port 8080) ;; 你可以改成从 server.xml 读取
-         (logfile (concat tomcat-home "/logs/emacs-tomcat.log"))
-         ;; 构建启动命令
          (startup-command (if debug
                               (concat "CATALINA_OPTS='-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n' "
                                       startup-script " run")
-                            (concat startup-script " start"))))
-
+                            (concat startup-script " run"))))
     ;; Remove existing WAR and exploded directory
     (ignore-errors (delete-file (concat webapps-path project-name ".war")))
     (ignore-errors (delete-directory (concat webapps-path project-name) t))
@@ -243,24 +240,26 @@ Otherwise start Tomcat normally (background, logs to file)."
     ;; Copy the new WAR file
     (copy-file war-file webapps-path t)
 
-    ;; Shutdown Tomcat
-    (tomcat-safe-shutdown)
+    ;; Shutdown Tomcat if running
+    (when (port-open-p "localhost" tomcat-port)
+      (tomcat-safe-shutdown)
+      (sleep-for 2))
 
     ;; Startup Tomcat
-    (if debug
-        (let ((proc (start-process-shell-command "tomcat-debug" "*tomcat-debug*" startup-command)))
-          (set-process-filter proc
-                              (lambda (p output)
-                                (with-current-buffer (process-buffer p)
-                                  (goto-char (point-max))
-                                  (insert output)
-                                  (tomcat-truncate-buffer (current-buffer) 5000)))))
-      (start-process-shell-command
-       "tomcat-start" nil
-       (concat startup-command " >> " logfile " 2>&1 &")))
+    (let* ((buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
+           (proc (start-process-shell-command
+                  (if debug "tomcat-debug" "tomcat-start")
+                  buf-name
+                  startup-command)))
+      (set-process-filter proc
+                          (lambda (p output)
+                            (with-current-buffer (process-buffer p)
+                              (goto-char (point-max))
+                              (insert output)
+                              (tomcat-truncate-buffer (current-buffer) 5000)))))
 
     ;; Retry loop for port availability
-    (let ((tries 15) (ok nil))
+    (let ((tries 40) (ok nil))
       (while (and (> tries 0) (not ok))
         (sleep-for 1)
         (setq tries (1- tries))
@@ -268,8 +267,8 @@ Otherwise start Tomcat normally (background, logs to file)."
       (if ok
           (message "Deployment successful, Tomcat running%s."
                    (if debug " with JPDA debugging" ""))
-        (message "Tomcat may have failed to start. Check %s or buffer for logs."
-                 (if debug "*tomcat-debug*" logfile))))))
+        (message "Tomcat may have failed to start. Check %s buffer for logs."
+                 (if debug "*tomcat-debug*" "*tomcat-start*"))))))
 
 (defun tomcat-safe-shutdown ()
   "Safely shutdown Tomcat, like IDEA does.
