@@ -14,6 +14,7 @@
   (:when-loaded
     (:also-load lib-org)
     (:also-load image-slicing)
+    (:with-mode org-mode (:bind "C-c C-v" org-download-clipboard))
     (setopt
      org-directory *org-path*
      org-image-actual-width nil
