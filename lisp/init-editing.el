@@ -24,7 +24,10 @@
                 case-fold-search t
                 create-lockfiles nil
                 truncate-partial-width-windows nil
-                history-length 1000))
+                history-length 1000)
+  ;; https://github.com/minad/corfu/discussions/516
+  ;; https://github.com/minad/corfu/discussions/457
+  (setopt text-mode-ispell-word-completion nil))
 
 (setup (:with-hook after-init-hook
          (:hook electric-pair-mode)
