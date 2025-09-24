@@ -178,7 +178,6 @@
 (setup mastodon
   (:when-loaded
     (:also-load lib-mastodon)
-    ;; (:with-function mastodon-detect-and-translate (:autoload-this))
     (:with-map mastodon-mode-map
       (:bind "a" mastodon-detect-and-translate))
     (setopt mastodon-instance-url "https://mastodon.social"

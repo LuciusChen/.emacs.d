@@ -72,13 +72,8 @@
   ;; =forge-browse= Open the Git repository homepage interactively.
   (:load-after magit)
   (:when-loaded
-    (:also-load lib-forge)
     ;; Make it easier to see that a topic was closed.
     (:face forge-topic-closed ((t (:strike-through t))))
-    ;; Forge 使用 gitlab 的 =machine= 也就是 pass 中条目的名称必须是 =example.com/api/v4=，
-    ;; 由于 pass 中每个条目都是一个文件，不支持命名中含有 / 字符。
-    (check-and-update-authinfo
-     '(("192.168.1.220:9081/api/v4" "lucius^forge" "gitlab-forge")))
     (add-to-list 'forge-alist
                  '("192.168.1.220:9081" "192.168.1.220:9081/api/v4"
                    "192.168.1.220:9081" forge-gitlab-repository))
