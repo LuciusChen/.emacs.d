@@ -1,4 +1,4 @@
-;;; lib-forge.el --- Insert description here -*- lexical-binding: t -*-
+;;; lib-auth.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -36,5 +36,5 @@ ENTRIES is a list of lists, where each sublist contains three strings:
               (write-region (point-min) (point-max) authinfo-file)
               (message "Entry for machine %s added." machine))))))))
 
-(provide 'lib-forge)
-;;; lib-forge.el ends here
+(provide 'lib-auth)
+;;; lib-auth.el ends here
