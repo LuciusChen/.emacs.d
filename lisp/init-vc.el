@@ -84,11 +84,11 @@
   (:defer (diff-hl-mode))
   (:when-loaded
     (setopt diff-hl-update-async t)
-    (:hooks magit-post-refresh-hook diff-hl-magit-post-refresh
-            magit-pre-refresh-hook diff-hl-magit-post-refresh
-            prog-mode-hook diff-hl-mode
-            conf-mode-hook diff-hl-mode
-            dired-mode-hook diff-hl-dired-mode)
+    (:with-hook (magit-post-refresh-hook magit-pre-refresh-hook)
+      (:hook diff-hl-magit-post-refresh))
+    (:with-hook (prog-mode-hook conf-mode-hook)
+      (:hook diff-hl-mode))
+    (:with-hook dired-mode-hook (:hook diff-hl-dired-mode))
     (:with-map diff-hl-mode-map
       (:bind "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))))
 

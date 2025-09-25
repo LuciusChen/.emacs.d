@@ -35,7 +35,6 @@
 (setup doom-modeline
   (:defer (:require doom-modeline))
   (:when-loaded
-    (doom-modeline-mode)
     (setopt doom-modeline-height 18
             doom-modeline-buffer-file-name-style 'auto
             doom-modeline-buffer-modification-icon t
@@ -61,13 +60,13 @@
       '(bar workspace-name window-number modals +buffer-info selection-info)
       '(telega misc-info minor-modes buffer-encoding major-mode time))
 
-    (:hooks doom-modeline-mode-hook
-            (lambda ()
-              (doom-modeline-set-modeline 'disable-modification-indication 'default)))
+    (:with-hook doom-modeline-mode-hook
+      (:hook (lambda ()(doom-modeline-set-modeline 'disable-modification-indication 'default))))
 
     (add-to-list 'doom-modeline-mode-alist '(telega-root-mode . disable-modification-indication))
     (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disable-modification-indication))
-    (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disable-modification-indication))))
+    (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disable-modification-indication))
+    (doom-modeline-mode)))
 
 (setup vertico
   (:defer (:require vertico))
@@ -94,7 +93,7 @@
     (setopt consult-async-min-input 2
             xref-show-xrefs-function #'consult-xref
             xref-show-definitions-function #'consult-xref)
-    (:hooks minibuffer-setup-hook mcfly-time-travel)))
+    (:with-hook minibuffer-setup-hook (:hook mcfly-time-travel))))
 
 (setup consult-dir
   (:load-after vertico)
@@ -142,7 +141,7 @@
                                 embark-isearch-highlight-indicator)
             embark-cycle-key "."
             embark-help-key "?")
-    (:hooks embark-collect-mode-hook consult-preview-at-point-mode)))
+    (:with-hook embark-collect-mode-hook (:hook consult-preview-at-point-mode))))
 
 (setup marginalia
   (:load-after vertico)
