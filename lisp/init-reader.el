@@ -5,7 +5,7 @@
 (setup nov
   (:match-file "*.epub")
   (:when-loaded
-    (:hooks nov-mode-hook +nov-annotate-font-lock)
+    (:with-hook nov-mode-hook (:hook +nov-annotate-font-lock))
     (defface +nov-annotate-face
       '((t (:foreground "#86C166")))
       "Face for # in nov-annotate-face."
@@ -104,8 +104,8 @@
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))
       (:hook gptel-auto-scroll))
-    (:hooks gptel-post-response-hook gptel-end-of-response
-            gptel-mode-hook gptel-set-default-directory)))
+    (:with-hook gptel-post-response-hook (:hook gptel-end-of-response))
+    (:with-hook gptel-mode-hook (:hook gptel-set-default-directory))))
 
 (setup gt
   (keymap-global-set "C-c s g" 'gt-translate)

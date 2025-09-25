@@ -68,11 +68,11 @@
                         (define-key map k #'insert-pair))
                       map))
   (meow-normal-define-key (cons "\\" wrap-keymap))
-  (:hooks meow-insert-mode-hook
-          (lambda ()
-            (if meow-insert-mode
-                (run-hooks 'meow-entering-insert-mode-hook)
-              (run-hooks 'meow-leaving-insert-mode-hook))))
+  (:with-hook meow-insert-mode-hook
+    (:hook (lambda ()
+             (if meow-insert-mode
+                 (run-hooks 'meow-entering-insert-mode-hook)
+               (run-hooks 'meow-leaving-insert-mode-hook)))))
   (when *is-mac*
     (:advice meow-mark-thing :override meow-mark-thing-cjk)
     (:advice meow-next-thing :override meow-next-thing-cjk)))
@@ -91,7 +91,7 @@
           sis-default-cursor-color "#cf7fa7"
           sis-other-cursor-color "orange"
           sis-context-hooks '(meow-insert-enter-hook))
-    (:hooks meow-insert-exit-hook sis-set-english)
+    (:with-hook meow-insert-exit-hook (:hook sis-set-english))
     (if *is-mac*
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
@@ -156,7 +156,7 @@
 
 ;; 彩虹括号
 (setup rainbow-delimiters
-  (:hooks prog-mode-hook rainbow-delimiters-mode))
+  (:with-mode prog-mode (:hook rainbow-delimiters-mode)))
 
 (setup rainbow-mode
   ;; add support for ARGB color format e.g "0xFFFF0000"

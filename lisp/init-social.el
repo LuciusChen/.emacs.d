@@ -153,8 +153,8 @@
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))
 
     ;; telega-notifications
-    (:hooks telega-connection-state-hook +tab-bar-telega-icon-update
-            telega-kill-hook +tab-bar-telega-icon-update)
+    (:with-hook telega-connection-state-hook (:hook +tab-bar-telega-icon-update))
+    (:with-hook telega-kill-hook (:hook +tab-bar-telega-icon-update))
     (:advice telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
     (:advice telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
     (:advice telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
@@ -165,7 +165,6 @@
       (:hook +telega-completion-setup)
       (:hook (lambda () (electric-pair-local-mode -1))))
     (:with-mode telega-image-mode (:hook image-transform-fit-to-window))
-    (:hooks telega-chat-update lg-telega-chat-update)
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
     ;; telega-mnz

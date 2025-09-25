@@ -104,7 +104,7 @@
      "C-c C-l" +load-this-file
      "C-c x"   macrostep-expand))
   (:advice pp-display-expression :after +make-read-only)
-  (:hooks emacs-lisp-mode-hook +maybe-set-bundled-elisp-readonly))
+  (:with-hook emacs-lisp-mode-hook (:hook +maybe-set-bundled-elisp-readonly)))
 
 ;; or the product can be set from a comment on the first line
 ;; -- -*- mode: sql; sql-product: mysql; -*-
@@ -139,8 +139,7 @@
 ;; js2-mode
 (setup js2-mode
   (:when-loaded
-    (:hooks js-mode-hook +enable-js2-checks-if-flymake-inactive
-            js2-mode-hook +enable-js2-checks-if-flymake-inactive)
+    (:with-hook (js-mode-hook js2-mode-hook) (:hook +enable-js2-checks-if-flymake-inactive))
     ;; Disable js2 mode's syntax error highlighting by default...
     (setopt js2-mode-show-parse-errors nil
             js2-mode-show-strict-warnings nil)
@@ -171,7 +170,7 @@
 
   (setopt xref-auto-jump-to-first-xref 'move)
   ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)
-  (:hooks xref-after-jump-hook +xref-quit-window))
+  (:with-hook xref-after-jump-hook (:hook +xref-quit-window)))
 
 (setup treesit
   (setq treesit-language-source-alist
@@ -382,7 +381,7 @@
                (+set-eshell-aliases +aliases)
                (display-line-numbers-mode -1)
                (eshell-cmpl-mode -1)))
-      (:hooks eshell-directory-change-hook +sync-dir-in-buffer-name))
+      (:with-hook eshell-directory-change-hook (:hook +sync-dir-in-buffer-name)))
     (add-hook 'eshell-load-hook (lambda () (message "Eshell loaded"))))
   (:with-hook eshell-load-hook
     (:hook eat-eshell-mode)

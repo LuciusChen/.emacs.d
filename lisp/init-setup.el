@@ -25,12 +25,6 @@ See `advice-add' for more details."
   :ensure '(nil nil func)
   :repeatable t)
 
-(setup-define :hooks
-  (lambda (hook func)
-    `(add-hook ',hook #',func))
-  :documentation "Add pairs of hooks."
-  :repeatable t)
-
 (setup-define :load-after
   (lambda (&rest features)
     (let ((body `(require ',(setup-get 'feature))))
