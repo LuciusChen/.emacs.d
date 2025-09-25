@@ -157,7 +157,10 @@
            "C-c C-c" wgrep-finish-edit)))
 
 (setup nerd-icons-completion
-  (:load-after vertico)
-  (:when-loaded (nerd-icons-completion-mode)))
+  (:load-after marginalia)
+  (:when-loaded
+    (nerd-icons-completion-mode)
+    (:with-hook marginalia-mode-hook
+      (:hook nerd-icons-completion-marginalia-setup))))
 (provide 'init-minibuffer)
 ;;; init-minibuffer.el ends here
