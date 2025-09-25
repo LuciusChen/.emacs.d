@@ -186,7 +186,14 @@ its value will be updated. If the key is not present, the entry will be added."
             tab-bar-tab-name-format-function '+tab-bar-tab-name-format-function
             tab-bar-format '(tab-bar-format-tabs
                              tab-bar-format-add-tab
-                             tab-bar-format-align-right))))
+                             tab-bar-format-align-right
+                             +tab-bar-telega-icon))
+    (:hooks telega-connection-state-hook +tab-bar-telega-icon-update
+            telega-kill-hook +tab-bar-telega-icon-update)
+    (:advice telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
+    (:advice telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
+    (:advice telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
+    (:advice telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)))
 
 (setup too-wide-minibuffer-mode
   (:defer (:require too-wide-minibuffer-mode))
