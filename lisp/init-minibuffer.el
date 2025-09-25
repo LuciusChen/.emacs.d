@@ -55,9 +55,11 @@
          (doom-modeline--buffer-state-icon)
          buffer-name)))
 
+    (doom-modeline-def-segment telega (+tab-bar-telega-icon))
+
     (doom-modeline-def-modeline 'disable-modification-indication
       '(bar workspace-name window-number modals +buffer-info selection-info)
-      '(misc-info minor-modes buffer-encoding major-mode time))
+      '(telega misc-info minor-modes buffer-encoding major-mode time))
 
     (:hooks doom-modeline-mode-hook
             (lambda ()
