@@ -121,33 +121,33 @@
      ;;   "refresh_token": false
      ;; }
      ;; #+end_src
-     ;; telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
-     ;; telega-bridge-bot-bridge-info-plist
-     ;; ;; telega 中在 Telega Root 对应的群组上 i 键查看 -1001773572820 和 6332621450
-     ;; ;; chat-id 由 Room Settings -> Advanced -> Internal room ID 得来
-     ;; ;; access token 是在 Help & About 当中，每次新设备加入似乎会自动刷新，因此需要更新 .password。
-     ;; '(-1001773572820                ; @emacs_china
-     ;;   (6332621450                   ; @yamatrix_bridge_bot
-     ;;    (:chat-id "!RJop14SURbXkiNbXJVEcblueYoxsvL16NxF_LdnfIH8" :type :matrix))
-     ;;   -1001478915941                ; @vimzh_real
-     ;;   (5296957089                   ; @nichi_matrix_bot
-     ;;    (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
-     ;;   -1001480067069                ; @keyboard_cn
-     ;;   (6332621450                   ; @matrix_t2bot
-     ;;    (:chat-id "!JDky93zy3mmuljy6WwXNcsXIS2y1SbvDnwXjz7ZINsY" :type :matrix))
-     ;;   -1001154313178                ; @coder_ot
-     ;;   (6332621450                   ; @yamatrix_bridge_bot
-     ;;    (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
-     ;;   -1001873425044                ; @Emacs_CN Lite
-     ;;   (420415423
-     ;;    (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))
-     ;;   -1001031857103
-     ;;   (5296957089                   ; @nichi_matrix_bot
-     ;;    (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
-     ;;   -1001179606678
-     ;;   (5296957089                   ; @nichi_matrix_bot
-     ;;    (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix)))
-     )
+     telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
+     telega-bridge-bot-matrix-access-token (auth-source-pick-first-password :host "matrix.org" :user "@lucius_chen:matrix.org")
+     telega-bridge-bot-bridge-info-plist
+     ;; telega 中在 Telega Root 对应的群组上 i 键查看 -1001773572820 和 6332621450
+     ;; chat-id 由 Room Settings -> Advanced -> Internal room ID 得来
+     ;; access token 是在 Help & About 当中，每次新设备加入似乎会自动刷新，因此需要更新 .password。
+     '(-1001773572820                ; @emacs_china
+       (6332621450                   ; @yamatrix_bridge_bot
+        (:chat-id "!RJop14SURbXkiNbXJVEcblueYoxsvL16NxF_LdnfIH8" :type :matrix))
+       -1001478915941                ; @vimzh_real
+       (5296957089                   ; @nichi_matrix_bot
+        (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
+       -1001480067069                ; @keyboard_cn
+       (6332621450                   ; @matrix_t2bot
+        (:chat-id "!JDky93zy3mmuljy6WwXNcsXIS2y1SbvDnwXjz7ZINsY" :type :matrix))
+       -1001154313178                ; @coder_ot
+       (6332621450                   ; @yamatrix_bridge_bot
+        (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
+       -1001873425044                ; @Emacs_CN Lite
+       (420415423
+        (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))
+       -1001031857103
+       (5296957089                   ; @nichi_matrix_bot
+        (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
+       -1001179606678
+       (5296957089                   ; @nichi_matrix_bot
+        (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))))
     ;; ignore messages from blocked senders (users or chats)
     (:with-hook telega-msg-ignore-predicates
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))
