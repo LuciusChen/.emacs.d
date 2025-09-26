@@ -41,7 +41,6 @@
     (global-corfu-mode)
     (setopt corfu-cycle t
             corfu-auto t
-            corfu-auto-prefix 2
             corfu-quit-no-match 'separator)
     (:with-mode prog-mode (:hook corfu-mode))
     (:with-mode corfu
