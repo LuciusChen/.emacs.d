@@ -121,7 +121,6 @@
      ;;   "refresh_token": false
      ;; }
      ;; #+end_src
-     telega-bridge-bot-matrix-user "@lucius_chen:matrix.org"
      telega-bridge-bot-matrix-access-token (auth-source-pick-first-password :host "matrix.org" :user "@lucius_chen:matrix.org")
      telega-bridge-bot-bridge-info-plist
      ;; telega 中在 Telega Root 对应的群组上 i 键查看 -1001773572820 和 6332621450
