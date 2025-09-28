@@ -75,7 +75,6 @@
         ("ed" "project-build-task (debug)"        (lambda () (interactive)(eglot-java-run-test t)))
         ("et" "project-build-task-tomcat"         copy-war-and-manage-tomcat)
         ("eT" "project-build-task-tomcat (debug)" (lambda () (interactive)(copy-war-and-manage-tomcat t)))
-        ("ej" "choose-java-home"                  select-java-home)
         ("es" "stop-tomcat"                       tomcat-safe-shutdown)]])
 
     (transient-define-prefix magit-commands ()

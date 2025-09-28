@@ -295,7 +295,8 @@
                                           ;; "-XX:FreqInlineSize=325"
                                           ;; "-XX:MaxInlineLevel=9"
                                           "-XX:+UseCompressedOops")
-            eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
+            eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)
+    (:with-hook eglot-connect-hook (:hook maven-auto-select-java-home))))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster
 ;; Download the executable file from the address above and place it in your exec-path.
