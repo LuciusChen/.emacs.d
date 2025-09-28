@@ -109,6 +109,7 @@ specific faces to the counts for visual differentiation."
                  (notification-count (+ mentioned-count unread-count keyword-count)))
             (when (> notification-count 0)
               (concat (nerd-icons-faicon "nf-fae-telegram" :face '(:inherit nerd-icons-purple))
+                      "["
                       (when (> unread-count 0)
                         (propertize (concat " ●​​​" (number-to-string unread-count))
                                     'face 'telega-unmuted-count))
@@ -117,7 +118,8 @@ specific faces to the counts for visual differentiation."
                                     'face 'telega-mention-count))
                       (when (> keyword-count 0)
                         (propertize (concat " #​​​" (number-to-string keyword-count))
-                                    'face 'telega-unmuted-count))))))))
+                                    'face 'telega-unmuted-count))
+                      "]"))))))
 
 (defun +tab-bar-telega-icon ()
   "Return the Telega icon for the tab bar, updating if necessary.

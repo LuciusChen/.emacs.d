@@ -132,40 +132,86 @@ Returns:
 ;; Multiple JDK versions are installed locally,
 ;; especially when older code cannot be compiled with newer versions,
 ;; it is necessary to select an older JDK version.
-(defun select-java-home ()
-  "List all available JDK home paths and let the user choose one.
-The selected path will be exported to JAVA_HOME, and PATH will be
-updated so that the chosen JDK's `bin/` directory comes first."
-  (interactive)
-  (let* ((candidates
-          (cond
-           ;; macOS: use /usr/libexec/java_home and exclude JavaAppletPlugin.plugin
-           ((eq system-type 'darwin)
-            (seq-filter
-             (lambda (path)
-               (not (string-match-p "JavaAppletPlugin.plugin" path)))
-             (split-string
-              (shell-command-to-string
-               "/usr/libexec/java_home -V 2>&1 | grep '/Library' | awk '{print $NF}'")
-              "\n" t)))
-           ;; Linux (Arch and others): list /usr/lib/jvm/ and exclude default links
-           ((eq system-type 'gnu/linux)
-            (seq-filter
-             (lambda (path)
-               (not (string-match-p "/default" path)))
-             (split-string
-              (shell-command-to-string "ls -d /usr/lib/jvm/*/ 2>/dev/null")
-              "\n" t)))
-           (t
-            (user-error "Unsupported system: %s" system-type))))
-         ;; Let user pick one JDK path
-         (choice (completing-read "Select JAVA_HOME: " candidates nil t)))
-    ;; Set JAVA_HOME environment variable
-    (setenv "JAVA_HOME" choice)
-    ;; Prepend its bin/ to PATH
-    (setenv "PATH" (concat (expand-file-name "bin/" choice) ":" (getenv "PATH")))
-    (message "JAVA_HOME set to %s" choice)))
+(defun maven-detect-jdk-version ()
+  "Detect JDK version from a Maven POM file.
+Return version string (e.g. \"1.8\" or \"17\").
+Support both old style (<maven.compiler.source>) and new style (<maven.compiler.release>)."
+  (let* ((project-details (detect-project-home-and-name))
+         (project-home (plist-get project-details :home))
+         (pom (expand-file-name "pom.xml" project-home))
+         (content (when (file-exists-p pom)
+                    (with-temp-buffer
+                      (insert-file-contents pom)
+                      (buffer-string)))))
+    (when content
+      (or
+       ;; New style: <maven.compiler.release>
+       (when (string-match "<maven.compiler.release>\\([^<]+\\)</maven.compiler.release>" content)
+         (match-string 1 content))
+       ;; Old style: <maven.compiler.source>
+       (when (string-match "<maven.compiler.source>\\([^<]+\\)</maven.compiler.source>" content)
+         (match-string 1 content))
+       ;; Plugin style: <source>
+       (when (string-match "<source>\\([^<]+\\)</source>" content)
+         (match-string 1 content))))))
 
+(defun maven-normalize-jdk-version (version)
+  "Normalize Maven JDK VERSION string to plain major version.
+E.g. \"1.8\" -> \"8\", \"11\" -> \"11\", \"17\" -> \"17\"."
+  (cond
+   ((string-match "^1\\.\\([0-9]+\\)$" version)
+    (match-string 1 version))
+   (t version)))
+
+(defun maven-list-jdk-homes ()
+  "Return a list of available JDK home paths depending on system."
+  (cond
+   ;; macOS
+   ((eq system-type 'darwin)
+    (seq-filter
+     (lambda (path)
+       (not (string-match-p "JavaAppletPlugin.plugin" path)))
+     (split-string
+      (shell-command-to-string
+       "/usr/libexec/java_home -V 2>&1 | grep '/Library' | awk '{print $NF}'")
+      "\n" t)))
+   ;; Linux
+   ((eq system-type 'gnu/linux)
+    (seq-filter
+     (lambda (path)
+       (not (string-match-p "/default" path)))
+     (split-string
+      (shell-command-to-string "ls -d /usr/lib/jvm/*/ 2>/dev/null")
+      "\n" t)))
+   (t
+    (user-error "Unsupported system: %s" system-type))))
+
+(defun maven-auto-select-java-home (&rest _)
+  "Auto-select JAVA_HOME based on Maven POM JDK version.
+If no matching version is found, prompt the user to choose."
+  (interactive)
+  (let* ((jdk-version-raw (maven-detect-jdk-version))
+         (jdk-version (and jdk-version-raw
+                           (maven-normalize-jdk-version jdk-version-raw)))
+         (candidates (maven-list-jdk-homes))
+         (match (and jdk-version
+                     (seq-find (lambda (path)
+                                 (string-match-p (concat jdk-version) path))
+                               candidates)))
+         (choice (or match
+                     (completing-read
+                      (if jdk-version
+                          (format "No JDK %s found, select manually: " jdk-version)
+                        "Select JAVA_HOME: ")
+                      candidates nil t))))
+    (when choice
+      (setenv "JAVA_HOME" choice)
+      (setenv "PATH" (concat (expand-file-name "bin/" choice) ":" (getenv "PATH")))
+      (message "JAVA_HOME set to %s%s"
+               choice
+               (if jdk-version
+                   (format " (from pom.xml JDK version %s)" jdk-version)
+                 "")))))
 
 (defun detect-tomcat-home ()
   "Return TOMCAT_HOME path for macOS (Homebrew) or Arch Linux."
