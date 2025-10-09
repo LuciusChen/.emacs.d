@@ -91,7 +91,6 @@
 
   (setup faces
     (:also-load lib-face)
-    ;; (configure-ligatures)
     (:with-hook (window-setup-hook
                  server-after-make-frame-hook
                  default-text-scale-mode-hook)
