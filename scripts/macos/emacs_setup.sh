@@ -78,13 +78,6 @@ if [ "$VERSION_TYPE" = "mps" ]; then
       sudo xcodebuild -runFirstLaunch
   fi
 
-  # Ensure libmps is installed
-  if ! brew list --versions libmps > /dev/null 2>&1; then
-    brew install libmps --HEAD
-  else
-    echo "libmps is already installed."
-  fi
-
   # Update the formula for MPS
   sed -i '' 's|:branch => "master"|:branch => "feature/igc"|' "$FORMULA_PATH"
   sed -i '' '/args << "--with-gnutls"/a\
