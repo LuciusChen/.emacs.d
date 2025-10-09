@@ -32,7 +32,7 @@
   ;; 另外 emoji 的尺寸会导致 corfu candidates 显示不全，因此要缩小。
   (cl-loop for font in *emoji-fonts*
            when (find-font (font-spec :name font))
-           return (set-fontset-font t 'unicode (font-spec :family font) nil 'prepend))
+           return (set-fontset-font t 'emoji (font-spec :family font :size (* *font-size* 0.85)) nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
@@ -60,40 +60,6 @@
                   (#xEA60 . #xEC1E)))) ;; Codicons
     (dolist (range ranges)
       (set-fontset-font t range *nerd-icons-font*))))
-
-;; https://github.com/mickeynp/ligature.el/issues/8
-(defun configure-ligatures ()
-  "Configure ligatures for the current buffer."
-  (let ((ligatures-alist
-         '("!!" "!=" "!==" "!!!" "!≡" "!≡≡" "!>" "!=<" "#("
-           "#_" "#{" "#?" "#>" "##" "#_(" "%=" "%>" "%>%" "%<%"
-           "&%" "&&" "&*" "&+" "&-" "&/" "&=" "&&&" "&>" "$>"
-           "***" "*=" "*/" "*>" "++" "+++" "+=" "+>" "++=" "--"
-           "-<" "-<<" "-=" "->" "->>" "---" "-->" "-+-" "-\\/"
-           "-|>" "-<|" ".." "..." "..<" ".>" ".~" ".=" "/*" "//"
-           "/>" "/=" "/==" "///" "/**" ":::" "::" ":=" ":≡" ":>"
-           ":=>" ":(" ":-(" ":)" ":-)" ":/" ":\\" ":3" ":D" ":P"
-           ":>:" ":<:" "<$>" "<*" "<*>" "<+>" "<-" "<<" "<<<" "<<="
-           "<=" "<=>" "<>" "<|>" "<<-" "<|" "<=<" "<~" "<~~" "<<~"
-           "<$" "<+" "<!>" "<@>" "<#>" "<%>" "<^>" "<&>" "<?>" "<.>"
-           "</>" "<\\>" "<\">" "<:>" "<~>" "<**>" "<<^" "<!" "<@"
-           "<#" "<%" "<^" "<&" "<?" "<." "</" "<\\" "<\"" "<:" "<->"
-           "<!--" "<--" "<~<" "<==>" "<|-" "<<|" "<-<" "<-->" "<<=="
-           "<==" "=<<" "==" "===" "==>" "=>" "=~" "=>>" "=/=" "=~="
-           "==>>" "≡≡" "≡≡≡" "≡:≡" ">-" ">=" ">>" ">>-" ">>=" ">>>"
-           ">=>" ">>^" ">>|" ">!=" ">->" "??" "?~" "?=" "?>" "???"
-           "?." "^=" "^." "^?" "^.." "^<<" "^>>" "^>" "\\\\" "\\>"
-           "\\/-" "@>" "|=" "||" "|>" "|||" "|+|" "|->" "|-->" "|=>"
-           "|==>" "|>-" "|<<" "||>" "|>>" "|-" "||-" "~=" "~>" "~~>"
-           "~>>" "[[" "]]" "\">" "_|_")))
-    (sort ligatures-alist (lambda (x y) (> (length x) (length y))))
-    (dolist (pat ligatures-alist)
-      (set-char-table-range composition-function-table
-                            (aref pat 0)
-                            (nconc (char-table-range composition-function-table (aref pat 0))
-                                   (list (vector (regexp-quote pat)
-                                                 0
-                                                 'compose-gstring-for-graphic)))))))
 
 (defun +suggest-other-faces (func &rest args)
   "Temporarily disable `global-hl-line-mode' while executing FUNC with ARGS."
