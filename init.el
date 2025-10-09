@@ -61,7 +61,7 @@
         corfu forge verb elfeed popper embark bibtex vertico clojure-mode
         diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
         diff-hl company goggles flymake web-mode js2-mode move-dup
-        doom-modeline git-link webpaste apheleia mastodon pdf-tools
+        doom-modeline webpaste apheleia mastodon pdf-tools dirvish
         macrostep json-mode orderless kind-icon git-modes git-blamed
         org-modern ace-pinyin marginalia org-remark elfeed-tube dape
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
@@ -71,7 +71,7 @@
         browse-kill-ring rainbow-delimiters default-text-scale denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         password-store-otp password-store eshell-syntax-highlighting
-        projectile consult-dir dirvish eat
+        projectile consult-dir eat
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
