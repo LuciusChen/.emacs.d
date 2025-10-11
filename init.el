@@ -75,7 +75,6 @@
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
-        (separedit :host github :repo "LuciusChen/separedit.el")
         (telega :host github :repo "LuciusChen/telega.el")
         (panel :host github :repo "LuciusChen/panel")
         (image-slicing :host github :repo "ginqi7/image-slicing")

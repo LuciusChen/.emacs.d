@@ -121,7 +121,7 @@
             gt-chatgpt-host "https://openrouter.ai"
             gt-chatgpt-path "/api/v1/chat/completions"
             gt-chatgpt-key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
-            gt-chatgpt-model "deepseek/deepseek-chat-v3.1:free"
+            gt-chatgpt-model "deepseek/deepseek-chat-v3.1"
             gt-buffer-render-follow-p t
             gt-buffer-render-window-config
             '((display-buffer-reuse-window display-buffer-in-direction)
