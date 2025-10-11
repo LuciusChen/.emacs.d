@@ -23,7 +23,7 @@
              (sunset (aref (cdr (assoc 'sunset daily)) 0))
              (uv (uv-to-sunscreen-advice (aref (cdr (assoc 'uv_index_max daily)) 0)))
              (weather-description (weather-code-to-string weather-code))
-             (weather-string (format "** Weather: %s\n*** Temperature: %.1f°C-%.1f°C\n*** Daytime: %s-%s\n*** UV: %s"
+             (weather-string (format "** : %s\n*** : %.1f°C-%.1f°C\n*** -: %s-%s\n*** UV: %s"
                                      weather-description temp-min temp-max sunrise sunset uv)))
         weather-string))))
 

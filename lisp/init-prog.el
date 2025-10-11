@@ -350,14 +350,6 @@
           (list (lambda ()
                   (setq python-shell-interpreter "python3"))))))
 
-(setup separedit
-  (:defer (:require separedit))
-  (:when-loaded
-    (:with-map prog-mode-map (:bind "C-c '" separedit))
-    (:with-map minibuffer-mode-map (:bind "C-c '" separedit))
-    (:with-map help-mode-map (:bind "C-c '" separedit))
-    (setopt separedit-default-mode 'org-mode)))
-
 (setup webpaste
   (:defer (:require webpaste)
           (setopt webpaste-provider-priority '("paste.rs" "dpaste.org"))))
