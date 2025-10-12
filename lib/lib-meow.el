@@ -213,7 +213,8 @@ If N is negative, select to the beginning of the previous Nth thing instead."
   (dolist
       (state
        '((telega-root-mode . normal)
-         (telega-chat-mode . normal)))
+         (telega-chat-mode . normal)
+         (mastodon-mode . normal)))
     (add-to-list 'meow-mode-state-list state)))
 
 ;; sis-global-respect-mode 使得 meow-reverse 无效
