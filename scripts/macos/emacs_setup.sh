@@ -83,6 +83,13 @@ if [ "$VERSION_TYPE" = "mps" ]; then
   sed -i '' '/args << "--with-gnutls"/a\
     args << "--with-mps=yes"
 ' "$FORMULA_PATH"
+
+  # Add dependency on automake
+  echo "Adding automake dependency for MPS version."
+  sed -i '' '/depends_on.*"pkg-config".*=>.*:build/a\
+  depends_on "automake" => :build
+' "$FORMULA_PATH"
+
 else
   echo "Switching to normal version."
   # Revert any changes for MPS if needed
