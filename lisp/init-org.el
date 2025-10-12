@@ -15,19 +15,7 @@
     (:also-load lib-org)
     (:also-load image-slicing)
     (:with-mode org-mode (:bind "C-c C-v" yank-media))
-    (setq yank-media-preferred-types
-          '(application/x-libreoffice-tsvc
-            image/png
-            image/jpeg
-            image/tiff
-            ,@(when (memq window-system '(x pgtk))
-                (list (lambda (mimetypes)
-                        (ensure-list
-                         (seq-find (lambda (type)
-                                     (string-match-p "x-special/\\(gnome\\|KDE\\|mate\\)-copied-files"
-                                                     (symbol-name type)))
-                                   mimetypes)))))
-            text/html))
+    (:after yank-media (add-to-list 'yank-media-preferred-types 'image/tiff))
     (setopt
      org-directory *org-path*
      org-image-actual-width nil
