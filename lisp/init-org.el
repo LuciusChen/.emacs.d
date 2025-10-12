@@ -14,7 +14,20 @@
   (:when-loaded
     (:also-load lib-org)
     (:also-load image-slicing)
-    (:with-mode org-mode (:bind "C-c C-v" org-download-clipboard))
+    (:with-mode org-mode (:bind "C-c C-v" yank-media))
+    (setq yank-media-preferred-types
+          '(application/x-libreoffice-tsvc
+            image/png
+            image/jpeg
+            image/tiff
+            ,@(when (memq window-system '(x pgtk))
+                (list (lambda (mimetypes)
+                        (ensure-list
+                         (seq-find (lambda (type)
+                                     (string-match-p "x-special/\\(gnome\\|KDE\\|mate\\)-copied-files"
+                                                     (symbol-name type)))
+                                   mimetypes)))))
+            text/html))
     (setopt
      org-directory *org-path*
      org-image-actual-width nil
@@ -175,14 +188,6 @@
                  (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
                  "" :kill-buffer t)))
       (:with-hook org-capture-before-finalize-hook (:hook org-sort-second-level-entries-by-time)))))
-
-(setup org-download
-  (:load-after org)
-  (:when-loaded
-    (:with-mode (org-mode dired-mode) (:hook org-download-enable))
-    (setopt org-download-image-dir (concat *org-path* "/denote/assets/")
-            org-download-screenshot-method (if *is-mac* "screencapture -i %s" "grim -g \"$(slurp)\" %s")
-            org-download-heading-lvl nil)))
 
 (setup org-clock
   (:load-after org)
