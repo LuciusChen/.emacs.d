@@ -67,11 +67,11 @@
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
         org-cliplink language-detection meow-tree-sitter ox-pandoc
         markdown-mode mode-line-bell embark-consult speed-type diminish
-        elfeed-tube-mpv typescript-mode command-log-mode org-download
-        browse-kill-ring rainbow-delimiters default-text-scale denote
+        elfeed-tube-mpv typescript-mode command-log-mode password-store
+        password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
-        password-store-otp password-store eshell-syntax-highlighting
-        projectile consult-dir eat
+        default-text-scale eshell-syntax-highlighting projectile eat
+        consult-dir
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
