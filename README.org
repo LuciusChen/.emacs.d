@@ -15,7 +15,7 @@
 (:with-map xxx-map (:bind "C-c x t" xxxx))
 #+end_src
 ** 模式编辑
-最初入坑使用的是 Doom，不习惯 Evil 后切换至与原生按键不冲突的 [[https://github.com/meow-edit/meow][meow]]，配合 sis 在模式间切换输入法甚是爽利。尤其爽利的是配合 [[https://github.com/roife/emt][emt]]，利用 AI 完成了 =meow-word= 对于中文的分词选中。
+最初入坑使用的是 Doom，不习惯 Evil 后切换至与原生按键不冲突的 [[https://github.com/meow-edit/meow][meow]]，配合 sis 在模式间切换输入法甚是爽利。尤其爽利的是配合 [[https://github.com/roife/emt][emt]]（仅限于 MacOS），利用 AI 完成了 =meow-word= 对于中文的分词选中。
 ** UI
 *** 字体
 英文用 [[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro]]，中文字体使用[[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]，选择 [[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]] 全覆盖 CJK 字符集作为 fallback 字体。（字体选择有部分原因是可以中英文对齐。当然也有其他方法强制 org-table 使用等宽字体，参考 [[https://github.com/alphapapa/unpackaged.el?tab=readme-ov-file#force-monospace-face-in-tables][Force monospace face in tables]]。）
