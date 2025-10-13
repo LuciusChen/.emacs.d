@@ -186,6 +186,20 @@ E.g. \"1.8\" -> \"8\", \"11\" -> \"11\", \"17\" -> \"17\"."
    (t
     (user-error "Unsupported system: %s" system-type))))
 
+(defun select-java-home ()
+  "List all available JDK home paths and let the user choose one.
+The selected path will be exported to JAVA_HOME, and PATH will be
+updated so that the chosen JDK's `bin/` directory comes first."
+  (interactive)
+  (let* ((candidates (maven-list-jdk-homes))
+         ;; Let user pick one JDK path
+         (choice (completing-read "Select JAVA_HOME: " candidates nil t)))
+    ;; Set JAVA_HOME environment variable
+    (setenv "JAVA_HOME" choice)
+    ;; Prepend its bin/ to PATH
+    (setenv "PATH" (concat (expand-file-name "bin/" choice) ":" (getenv "PATH")))
+    (message "JAVA_HOME set to %s" choice)))
+
 (defun maven-auto-select-java-home (&rest _)
   "Auto-select JAVA_HOME based on Maven POM JDK version.
 If no matching version is found, prompt the user to choose."
