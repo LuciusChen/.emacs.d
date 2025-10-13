@@ -296,7 +296,11 @@
                                           ;; "-XX:MaxInlineLevel=9"
                                           "-XX:+UseCompressedOops")
             eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)
-    (:with-hook eglot-connect-hook (:hook maven-auto-select-java-home))))
+    ;; 项目利用 apheleia + google-java-format 格式化的是需要 JDK>17
+    ;; 但是老项目需要 JAVA_HOME 设置低版本
+    ;; 因此暂时注释，手动执行 select-java-home
+    ;; (:with-hook eglot-connect-hook (:hook maven-auto-select-java-home))
+    ))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster
 ;; Download the executable file from the address above and place it in your exec-path.
