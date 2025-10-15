@@ -19,8 +19,8 @@
              (weather-code (aref (cdr (assoc 'weather_code daily)) 0))
              (temp-max (aref (cdr (assoc 'temperature_2m_max daily)) 0))
              (temp-min (aref (cdr (assoc 'temperature_2m_min daily)) 0))
-             (sunrise (aref (cdr (assoc 'sunrise daily)) 0))
-             (sunset (aref (cdr (assoc 'sunset daily)) 0))
+             (sunrise (substring (aref (cdr (assoc 'sunrise daily)) 0) 11))
+             (sunset (substring (aref (cdr (assoc 'sunset daily)) 0) 11))
              (uv (uv-to-sunscreen-advice (aref (cdr (assoc 'uv_index_max daily)) 0)))
              (weather-description (weather-code-to-string weather-code))
              (weather-string (format "** : %s\n*** : %.1f°C-%.1f°C\n*** -: %s-%s\n*** UV: %s"
