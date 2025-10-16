@@ -86,7 +86,8 @@
           sis-default-cursor-color "#cf7fa7"
           sis-other-cursor-color "orange"
           sis-context-hooks '(meow-insert-enter-hook))
-    (:with-hook meow-insert-exit-hook (:hook sis-set-english))
+    (:after meow
+      (:with-hook meow-insert-exit-hook (:hook sis-set-english)))
     (if *is-mac*
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
