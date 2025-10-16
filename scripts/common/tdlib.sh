@@ -1,16 +1,30 @@
 #!/bin/bash
 
-# Install Command Line Tools if not already installed
-if ! xcode-select -p &>/dev/null; then
-  xcode-select --install
-  # Run xcodebuild -runFirstLaunch to complete setup
-  sudo xcodebuild -runFirstLaunch
-fi
+# https://tdlib.github.io/td/build.html
+# Function to install packages based on the operating system
+install_packages() {
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    if ! xcode-select -p &>/dev/null; then
+      xcode-select --install
+      # Run xcodebuild -runFirstLaunch to complete setup
+      sudo xcodebuild -runFirstLaunch
+    fi
 
-# Install necessary packages using Homebrew if not already installed
-brew list gperf &>/dev/null || brew install gperf
-brew list cmake &>/dev/null || brew install cmake
-brew list openssl &>/dev/null || brew install openssl
+    brew list gperf &>/dev/null || brew install gperf
+    brew list cmake &>/dev/null || brew install cmake
+    brew list openssl &>/dev/null || brew install openssl
+
+  elif [[ -n "$(command -v pacman)" ]]; then
+    # Arch Linux
+    sudo pacman -Sy --needed gperf cmake openssl
+  else
+    echo "Unsupported OS or missing package manager."
+    exit 1
+  fi
+}
+
+install_packages
 
 # Set the target directory for cloning the repository
 TARGET_DIR=~/td
@@ -51,5 +65,12 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 rm -rf build
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ -DCMAKE_INSTALL_PREFIX:PATH=/usr/local ..
+
+# Set CMake command based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ -DCMAKE_INSTALL_PREFIX:PATH=/usr/local ..
+else
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
+fi
+
 sudo cmake --build . --target install
