@@ -99,20 +99,19 @@
     (:advice face-at-point :around #'+suggest-other-faces)))
 
 (setup nerd-icons
-  (:defer (:require nerd-icons))
   (:when-loaded
-    (defun update-alist (alist-symbol rep-alist)
-      "Update the alist specified by ALIST-SYMBOL with entries from REP-ALIST.
-If a key from REP-ALIST is present in the alist referred to by ALIST-SYMBOL,
-its value will be updated. If the key is not present, the entry will be added."
-      (let ((alist (symbol-value alist-symbol)))
-        (dolist (rep rep-alist)
-          (let ((key (car rep))
-                (value (cdr rep)))
-            (if (assoc key alist)
-                (setcdr (assoc key alist) value)
-              (setq alist (cons rep alist)))))
-        (set alist-symbol alist)))
+    ;;     (defun update-alist (alist-symbol rep-alist)
+    ;;       "Update the alist specified by ALIST-SYMBOL with entries from REP-ALIST.
+    ;; If a key from REP-ALIST is present in the alist referred to by ALIST-SYMBOL,
+    ;; its value will be updated. If the key is not present, the entry will be added."
+    ;;       (let ((alist (symbol-value alist-symbol)))
+    ;;         (dolist (rep rep-alist)
+    ;;           (let ((key (car rep))
+    ;;                 (value (cdr rep)))
+    ;;             (if (assoc key alist)
+    ;;                 (setcdr (assoc key alist) value)
+    ;;               (setq alist (cons rep alist)))))
+    ;;         (set alist-symbol alist)))
 
     (when (and (display-graphic-p)
                (not (find-font (font-spec :name nerd-icons-font-family))))
