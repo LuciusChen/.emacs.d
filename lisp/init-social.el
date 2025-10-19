@@ -51,7 +51,7 @@
      telega-chat-fill-column 90
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
-     telega-avatar-workaround-gaps-for '(return t)
+     telega-avatar-workaround-gaps-for (when (display-graphic-p) '(return t))
      ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
      ;; telega-symbol
      ;; remove iterm from `telega-symbols-emojify`
