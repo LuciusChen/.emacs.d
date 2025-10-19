@@ -392,10 +392,10 @@
             bibtex-dialect 'biblatex)))
 
 (setup citar
-  (:load-after org)
   (:when-loaded
+    (:also-load nerd-icons)
     ;; nerd-icons
-    (defvar citar-indicator-files
+    (defvar citar-indicator-files-icons
       (citar-indicator-create
        :symbol (nerd-icons-faicon
                 "nf-fa-file_o"
@@ -404,7 +404,7 @@
        :function #'citar-has-files
        :padding "  " ; need this because the default padding is too low for these icons
        :tag "has:files"))
-    (defvar citar-indicator-links
+    (defvar citar-indicator-links-icons
       (citar-indicator-create
        :symbol (nerd-icons-faicon
                 "nf-fa-link"
@@ -413,7 +413,7 @@
        :function #'citar-has-links
        :padding "  "
        :tag "has:links"))
-    (defvar citar-indicator-notes
+    (defvar citar-indicator-notes-icons
       (citar-indicator-create
        :symbol (nerd-icons-codicon
                 "nf-cod-note"
@@ -422,7 +422,7 @@
        :function #'citar-has-notes
        :padding "    "
        :tag "has:notes"))
-    (defvar citar-indicator-cited
+    (defvar citar-indicator-cited-icons
       (citar-indicator-create
        :symbol (nerd-icons-faicon
                 "nf-fa-circle_o"
@@ -430,10 +430,10 @@
        :function #'citar-is-cited
        :padding "  "
        :tag "is:cited"))
-    (setq citar-indicators (list citar-indicator-files
-                                 citar-indicator-links
-                                 citar-indicator-notes
-                                 citar-indicator-cited))
+    (setq citar-indicators (list citar-indicator-files-icons
+                                 citar-indicator-links-icons
+                                 citar-indicator-notes-icons
+                                 citar-indicator-cited-icons))
     (setopt org-cite-global-bibliography (list (concat *org-path* "/bib/bibtex.bib"))
             citar-notes-paths (list (concat *org-path* "/main"))
             citar-library-paths (list (concat *org-path* "/bib/files"))
