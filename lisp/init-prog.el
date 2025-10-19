@@ -251,7 +251,6 @@
 ;; $ npm install -g typescript-language-server
 
 (setup eglot
-  (:defer (:require eglot))
   (:when-loaded
     (:also-load lib-eglot)
     (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
