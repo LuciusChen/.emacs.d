@@ -152,6 +152,7 @@ certain tags, with a default icon if no specific match is found."
         ((member "novel" tags) (nerd-icons-faicon "nf-fa-book" :face '(:foreground "#02C298")))
         ((member "forum" tags) (nerd-icons-faicon "nf-fa-forumbee" :face '(:foreground "#EF9120")))
         ((member "github" tags) (nerd-icons-faicon "nf-fa-github"))
+        ((member "codeberg" tags) (nerd-icons-flicon "nf-linux-codeberg"))
         ((member "sourcehut" tags) (nerd-icons-faicon "nf-fa-circle_o"))
         (t (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
 
