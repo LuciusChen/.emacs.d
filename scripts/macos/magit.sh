@@ -18,4 +18,5 @@ end tell
 EOF
 
 # Pass any additional arguments to emacsclient
-/Applications/Emacs.app/Contents/MacOS/bin/emacsclient "$@"
+# https://dolzhenko.me/blog/2025/03/launching-magit-from-intellij-idea/
+/opt/homebrew/bin/emacsclient "$@"
