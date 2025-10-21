@@ -92,8 +92,8 @@
     ("https://github.com/lorniu/go-translate/commits.atom" github)
     ("https://github.com/meow-edit/meow/commits.atom" github)
 
-    ;; sourcehut
-    ("https://git.sr.ht/~pkal/setup/log/rss.xml" sourcehut)
+    ;; codeberg
+    ("https://codeberg.org/pkal/setup.el.rss" sourcehut)
 
     ;; Instagram
     ;; backup https://openrss.org/www.instagram.com/user
