@@ -23,7 +23,7 @@
   (:require lib-env)
   (+load-env-file))
 
-(setup (:only-if (and (eq system-type 'darwin) (fboundp 'mac-input-source)))
+(setup (:only-if (fboundp 'mac-input-source))
   (:require lib-ime)
   (keymap-global-set "<f13>" 'toggle-ime))
 
@@ -33,6 +33,20 @@
     (keymap-global-set "M-f" 'emt-forward-word)
     (keymap-global-set "M-b" 'emt-backward-word)
     (emt-ensure)))
+
+(setup (:only-if (not (display-graphic-p)))
+  (defun +paste-from-osx ()
+    "Paste clipboard using pbpaste."
+    (shell-command-to-string "pbpaste"))
+
+  (defun +copy-to-osx (text &optional _)
+    "Used in the terminal to copy TEXT."
+    (let ((process-connection-type nil))
+      (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+        (process-send-string proc text)
+        (process-send-eof proc))))
+  (setq interprogram-cut-function   #'+copy-to-osx
+        interprogram-paste-function #'+paste-from-osx))
 
 (provide 'init-mac)
 ;;; init-mac.el ends here
