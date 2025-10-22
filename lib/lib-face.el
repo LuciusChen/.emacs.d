@@ -13,13 +13,13 @@
 (defun +setup-fonts ()
   "Setup fonts."
   ;; Setting the default
-  (set-face-attribute 'default nil :font *default-font* :weight 'normal)
+  (set-face-attribute 'default nil :font DEFAULT-FONT :weight 'normal)
   (set-face-like-default 'fixed-pitch-serif)
   (set-face-like-default 'variable-pitch)
 
   ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
-  (cl-loop for font in *symbol-font*
+  (cl-loop for font in SYMBOL-FONT
            when (find-font (font-spec :name font))
            return (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
 
@@ -30,17 +30,17 @@
   ;; https://emacs-china.org/t/emacs/15676/34
   ;;
   ;; 另外 emoji 的尺寸会导致 corfu candidates 显示不全，因此要缩小。
-  (cl-loop for font in *emoji-fonts*
+  (cl-loop for font in EMOJI-FONTS
            when (find-font (font-spec :name font))
-           return (set-fontset-font t 'emoji (font-spec :family font :size (* *font-size* 0.85)) nil 'prepend))
+           return (set-fontset-font t 'emoji (font-spec :family font :size (* FONT-SIZE 0.85)) nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
-                      (font-spec :family *zh-default-font*)))
+                      (font-spec :family ZH-DEFAULT-FONT)))
   ;; Setting fall-back fonts
   ;; https://idiocy.org/emacs-fonts-and-fontsets.html
-  (dolist (font *fallback-fonts*)
+  (dolist (font FALLBACK-FONTS)
     (when (member font (font-family-list))
       (set-fontset-font "fontset-default" 'han font nil 'append)))
   ;; Force Emacs to search by using font-spec
@@ -59,7 +59,7 @@
                   (#xE000 . #xE00A)    ;; Pomicons
                   (#xEA60 . #xEC1E)))) ;; Codicons
     (dolist (range ranges)
-      (set-fontset-font t range *nerd-icons-font*))))
+      (set-fontset-font t range NERD-ICONS-FONT))))
 
 (defun +suggest-other-faces (func &rest args)
   "Temporarily disable `global-hl-line-mode' while executing FUNC with ARGS."

@@ -7,29 +7,27 @@
 ;; ignore native compile warning
 (setq warning-minimum-level :emergency)
 
-(defconst *spell-check-support-enabled* nil ) ;; Enable with t if you prefer
-(defconst *spell-check-support-enabled* nil )
-(defconst *is-mac* (eq system-type 'darwin))
-(defconst *is-linux* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
-(defconst *org-path*
-  (cond (*is-mac* "~/Library/CloudStorage/Dropbox/org")
-        (*is-linux* "~/Dropbox/org")))
-(defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
-(defconst *font-size* (if *is-mac* 14 12))
-(defconst *default-font* (format "MonoLisa Lucius %d" *font-size*))
-(defconst *org-font* (format "Aporetic Serif Mono %d" *font-size*))
-(defconst *term-default-font* (format "Aporetic Serif Mono %d" *font-size*))
-(defconst *prog-font* (format "Aporetic Serif Mono %d" *font-size*))
-(defconst *zh-default-font* "LXGW WenKai")
-(defconst *nerd-icons-font* "Symbols Nerd Font Mono")
-(defconst *emoji-fonts* '("Apple Color Emoji"
-                          "Noto Color Emoji"
-                          "Noto Emoji"
-                          "Segoe UI Emoji"))
-(defconst *symbol-font* '("Apple Symbols"
-                          "Segoe UI Symbol"
-                          "Symbola"
-                          "Symbol"))
+(defconst IS-MAC (eq system-type 'darwin))
+(defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst ORG-PATH
+  (cond (IS-MAC "~/Library/CloudStorage/Dropbox/org")
+        (IS-LINUX "~/Dropbox/org")))
+(defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
+(defconst FONT-SIZE (if IS-MAC 14 12))
+(defconst DEFAULT-FONT (format "MonoLisa Lucius %d" FONT-SIZE))
+(defconst ORG-FONT (format "Aporetic Serif Mono %d" FONT-SIZE))
+(defconst *term-default-font* (format "Aporetic Serif Mono %d" FONT-SIZE))
+(defconst *prog-font* (format "Aporetic Serif Mono %d" FONT-SIZE))
+(defconst ZH-DEFAULT-FONT "LXGW WenKai")
+(defconst NERD-ICONS-FONT "Symbols Nerd Font Mono")
+(defconst EMOJI-FONTS '("Apple Color Emoji"
+                        "Noto Color Emoji"
+                        "Noto Emoji"
+                        "Segoe UI Emoji"))
+(defconst SYMBOL-FONT '("Apple Symbols"
+                        "Segoe UI Symbol"
+                        "Symbola"
+                        "Symbol"))
 
 ;; Install straight.el
 ;; branch develop
@@ -48,21 +46,21 @@
   (load bootstrap-file nil 'nomessage))
 
 ;; install packages
-(defvar *use-package-list*
+(defvar USE-PACKAGE-LIST
   '(
     setup
     (emt :host github :repo "roife/emt")
     ;; ==== Put the packages related to the code below this line! ====
     ))
 
-(dolist (e *use-package-list*)
+(dolist (e USE-PACKAGE-LIST)
   (straight-use-package e))
 (setq vc-follow-symlinks t)
 
 ;; load module settings
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (require 'init-setup)
-(when *is-mac* (require 'init-mac))
+(if IS-MAC (require 'init-mac) (require 'init-linux))
 ;; ==== put your code below this line! ====
 ;; emacs -Q -l ~/.emacs.d/init-minimum.el
 ;;; init-minimum.el ends here

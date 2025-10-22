@@ -1,0 +1,356 @@
+diff --git a/src/nsterm.h b/src/nsterm.h
+index 6a715fb92fc..537fced4bff 100644
+--- a/src/nsterm.h
++++ b/src/nsterm.h
+@@ -471,7 +471,13 @@ #define NSTRACE_UNSILENCE()
+ #ifdef NS_IMPL_COCOA
+   char *old_title;
+   BOOL maximizing_resize;
+-#endif
++  NSView  *cursorOverlayView;   /* 与 EmacsView 同坐标系（左上为原点） */
++  CALayer *cursorLayer;         /* 真正绘制“光标块”的 CA 子层 */
++  BOOL cursorLayerVisible;
++  NSRect  cursorLayerLastFrame;   /* 上次目标 frame，用于抑制重复动画 */
++  BOOL    cursorLayerLastValid;   /* 是否已有有效的上次目标 */
++  NSUInteger cursorLayerAnimToken;
++#  endif
+   BOOL font_panel_active;
+   NSFont *font_panel_result;
+   BOOL windowClosing;
+@@ -505,6 +511,19 @@ #define NSTRACE_UNSILENCE()
+ - (void) toggleFullScreen: (id) sender;
+ - (BOOL) fsIsNative;
+ - (BOOL) isFullscreen;
++
++#ifdef NS_IMPL_COCOA
++- (void)ensureCursorOverlayAndLayer;
++- (void)updateCursorLayerFrame:(NSRect)fr
++                         scale:(CGFloat)scale
++                         color:(NSColor *)color
++                  cornerRadius:(CGFloat)radius
++                       onState:(BOOL)on_p
++                      activeWL:(BOOL)is_active_selected_window;
++- (void)hideCursorLayer;
++- (BOOL)cursorLayerIsVisible;
++#endif
++
+ #if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
+ - (void) updateCollectionBehavior;
+ #endif
+diff --git a/src/nsterm.m b/src/nsterm.m
+index 472d2a52a7d..e0bd7505e83 100644
+--- a/src/nsterm.m
++++ b/src/nsterm.m
+@@ -72,6 +72,7 @@ Updated by Christian Limpach (chris@nice.ch)
+ #include "macfont.h"
+ #include <Carbon/Carbon.h>
+ #include <IOSurface/IOSurface.h>
++#import <QuartzCore/QuartzCore.h>   /* CALayer, CABasicAnimation, CAMediaTimingFunction */
+ #endif
+ 
+ static EmacsMenu *dockMenu;
+@@ -3190,6 +3191,100 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+   /* Prevent the cursor from being drawn outside the text area.  */
+   r = NSIntersectionRect (r, ns_row_rect (w, glyph_row, TEXT_AREA));
+ 
++/* ---------- Cursor overlay (neo-style; glyph-box correct; pixel-snapped; animated) ---------- */
++#ifdef NS_IMPL_COCOA
++  {
++    EmacsView *view = FRAME_NS_VIEW (f);
++    if (view && [view window])
++      {
++        if (![view wantsLayer]) [view setWantsLayer:YES];
++
++        /* 仅允许“活动 frame + 被选中 window”驱动 overlay，避免多 window 抢层 */
++        bool is_selected_win = (w == XWINDOW (FRAME_SELECTED_WINDOW (f)));
++        BOOL overlay_ctx_ok = (active_p && is_selected_win);
++
++        /* 1) 用“当前 glyph 盒子”重建 r 的高度 —— 避免 box 光标使用整行高 */
++        {
++          int used = glyph_row->used[TEXT_AREA];
++          int hpos = w->phys_cursor.hpos;
++          if (!glyph_row->reversed_p && hpos < 0)           hpos = 0;
++          if ( glyph_row->reversed_p && hpos >= used)       hpos = used - 1;
++
++          if (hpos >= 0 && hpos < used)
++            {
++              struct glyph *g = &glyph_row->glyphs[TEXT_AREA][hpos];
++              int asc = g->ascent;
++              int dsc = g->descent;
++              int glyph_h_px = asc + dsc;
++              if (glyph_h_px < 1) glyph_h_px = 1;
++              r.size.height = glyph_h_px;
++            }
++        }
++
++        /* 2) 设备 scale 与像素对齐 */
++        CGFloat scale = view.window.screen ? view.window.screen.backingScaleFactor : 1.0;
++        NSRect fr = r;
++        fr.origin.x    = floor((fr.origin.x  * scale) + 0.5) / scale;
++        fr.origin.y    = floor((fr.origin.y  * scale) + 0.5) / scale;
++        fr.size.width  = fmax(1.0, floor((fr.size.width  * scale) + 0.5) / scale);
++        fr.size.height = fmax(1.0, floor((fr.size.height * scale) + 0.5) / scale);
++
++        /* 3) 颜色与圆角：bar/hbar 为 0，box 可给轻微圆角 */
++        NSColor *ccolor = FRAME_CURSOR_COLOR (f);
++        CGFloat corner = 0.0;
++        switch (cursor_type)
++          {
++          case BAR_CURSOR:  corner = 0.0; break;
++          case HBAR_CURSOR: corner = 0.0; break;
++          default:          corner = 1.5; break; /* box */
++          }
++
++        /* 4) 更新 overlay（overlay 根层 geometryFlipped = YES，避免 tab-bar 触发 y 偏移） */
++        [view updateCursorLayerFrame:fr
++                               scale:(scale > 0 ? scale : 1.0)
++                               color:ccolor
++                        cornerRadius:corner
++                             onState:on_p
++                            activeWL:overlay_ctx_ok];
++        /* 只在 CA 层不可见（未移动/已就位）时回退绘制原始光标，避免遮挡文本 */
++        if (![view cursorLayerIsVisible])
++          {
++            ns_focus (f, NULL, 0);
++
++            NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
++            [ctx saveGraphicsState];
++            NSRectClip (r);
++
++            [FRAME_CURSOR_COLOR (f) set];
++
++            switch (cursor_type)
++              {
++              case DEFAULT_CURSOR:
++              case NO_CURSOR:
++                break;
++              case FILLED_BOX_CURSOR:
++                [ctx restoreGraphicsState];
++                ns_unfocus (f);
++                draw_phys_cursor_glyph (w, glyph_row, DRAW_CURSOR);
++                ns_focus (f, &r, 1);
++                break;
++              case HOLLOW_BOX_CURSOR:
++                [NSBezierPath strokeRect: NSInsetRect (r, 0.5, 0.5)];
++                [ctx restoreGraphicsState];
++                break;
++              case HBAR_CURSOR:
++              case BAR_CURSOR:
++                NSRectFill (r);
++                [ctx restoreGraphicsState];
++                break;
++              }
++
++            ns_unfocus (f);
++          }
++      }
++  }
++#else
++  /* GNUstep: 回退到原有绘制（无动画）。保留最小可用实现。 */
+   ns_focus (f, NULL, 0);
+ 
+   NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
+@@ -3228,6 +3323,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+     }
+ 
+   ns_unfocus (f);
++#endif /* NS_IMPL_COCOA */
+ }
+ 
+ 
+@@ -6830,6 +6926,195 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
+   [self updateFramePosition];
+ }
+ 
++/* === Cursor overlay helpers =================================== */
++- (void)ensureCursorOverlayAndLayer
++{
++  if (cursorOverlayView == nil)
++    {
++      NSView *ov = [[NSView alloc] initWithFrame:self.bounds];
++      [ov setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
++      [ov setWantsLayer:YES];
++
++      CALayer *root = [CALayer layer];
++      /* 关键：让 CA 坐标与 EmacsView 一致（左上为原点），避免 tab-bar/tool-bar 造成的 y 偏移 */
++      root.geometryFlipped = NO;
++      root.masksToBounds   = NO;
++#ifdef NSAppKitVersionNumber10_14
++      root.contentsFormat  = kCAContentsFormatRGBA8Uint;
++#endif
++      ov.layer = root;
++
++      CALayer *cl = [CALayer layer];
++      cl.anchorPoint = CGPointZero;          /* 用 frame 放置 */
++      cl.masksToBounds = YES;
++
++      CGFloat scale = self.window.screen ? self.window.screen.backingScaleFactor : 1.0;
++      cl.contentsScale = (scale > 0 ? scale : 1.0);
++
++      /* 关闭隐式动画，转而在“确实移动时”手动加动画（平滑移动） */
++      NSMutableDictionary *acts = [NSMutableDictionary dictionary];
++      [acts setObject:[NSNull null] forKey:@"position"];
++      [acts setObject:[NSNull null] forKey:@"bounds"];
++      [acts setObject:[NSNull null] forKey:@"opacity"];
++      cl.actions = acts;
++
++      [root addSublayer:cl];
++
++      cursorOverlayView = ov;      /* MRC：不使用 __weak */
++      cursorLayer       = cl;
++      cl.opacity = 0.0f;          /* 初始隐藏 CA 光标 */
++      cursorLayerVisible = NO;    /* 初始不占位，不抑制原始绘制 */
++      cursorLayerAnimToken = 0;
++      cursorLayerLastValid = NO;
++
++      [self addSubview:cursorOverlayView];   /* 置于最上层 */
++      [ov release];
++      /* cl 由 root 持有，不需额外 retain */
++    }
++  else
++    {
++      if (![cursorOverlayView wantsLayer])
++        [cursorOverlayView setWantsLayer:YES];
++      if (cursorOverlayView.layer && !cursorOverlayView.layer.geometryFlipped)
++        cursorOverlayView.layer.geometryFlipped = YES;
++    }
++}
++
++- (void)hideCursorLayer
++{
++  if (cursorLayer)
++    {
++      cursorLayer.opacity = 0.0f;
++    }
++  cursorLayerVisible = NO;
++  cursorLayerLastValid = NO; /* 防止旧缓存让下一帧被误判为“在动” */
++}
++
++- (void)updateCursorLayerFrame:(NSRect)fr
++                         scale:(CGFloat)scale
++                         color:(NSColor *)color
++                  cornerRadius:(CGFloat)radius
++                       onState:(BOOL)on_p
++                      activeWL:(BOOL)is_active_selected_window
++{
++  [self ensureCursorOverlayAndLayer];
++
++  CALayer *root  = cursorOverlayView.layer;
++  CALayer *layer = cursorLayer;
++
++  /* 非活动窗口或光标关闭：隐藏 CA 光标并退出 */
++  if (!on_p || !is_active_selected_window)
++    {
++      [self hideCursorLayer];
++      return;
++    }
++
++  /* 颜色 / 圆角（每次同步，防止主题/类型变化时不同步） */
++  layer.backgroundColor = [color CGColor];
++  layer.cornerRadius    = radius;
++
++  /* ---- 坐标换算：根层未翻转，EmacsView 为左上原点
++     将 fr 从视图坐标(左上原点)转换为 CA 根层坐标(左下原点)： y' = H - h - y */
++  CGFloat H_view = NSHeight(self.bounds);
++  fr.origin.y = H_view - fr.size.height - fr.origin.y;
++
++  /* 像素对齐，避免 Retina 模糊/跳动 */
++  CGFloat s = (scale > 0 ? scale : 1.0);
++  fr.origin.x    = floor((fr.origin.x  * s) + 0.5) / s;
++  fr.origin.y    = floor((fr.origin.y  * s) + 0.5) / s;
++  fr.size.width  = fmax(1.0, floor((fr.size.width  * s) + 0.5) / s);
++  fr.size.height = fmax(1.0, floor((fr.size.height * s) + 0.5) / s);
++
++  root.contentsScale  = s;
++  layer.contentsScale = s;
++
++  /* ---- 抖动抑制：仅当目标发生“显著变化”时才动画 ---- */
++  const CGFloat eps = 0.25; /* 1/4 像素阈值 */
++  BOOL targetChanged = !cursorLayerLastValid
++    || fabs(fr.origin.x - cursorLayerLastFrame.origin.x) > eps
++    || fabs(fr.origin.y - cursorLayerLastFrame.origin.y) > eps
++    || fabs(fr.size.width  - cursorLayerLastFrame.size.width)  > eps
++    || fabs(fr.size.height - cursorLayerLastFrame.size.height) > eps;
++
++  BOOL moving = targetChanged;
++
++  if (moving)
++    {
++      /* 仅进入移动态的瞬间淡入一次；移动期间不重复改 opacity */
++      if (!cursorLayerVisible)
++        {
++          float targetOpacity = 1.0f;
++          if (layer.opacity != targetOpacity)
++            {
++              CABasicAnimation *blink = [CABasicAnimation animationWithKeyPath:@"opacity"];
++              blink.fromValue = @(layer.opacity);
++              blink.toValue   = @(targetOpacity);
++              blink.duration  = 0.06;
++              blink.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
++              layer.opacity = targetOpacity;
++              [layer addAnimation:blink forKey:@"blink-in"];
++            }
++        }
++
++      cursorLayerVisible = YES;   /* 在动：用 CA 光标，抑制原始绘制 */
++
++      NSUInteger __token = ++cursorLayerAnimToken;
++      /* 提交目标几何（只在 moving 时设置，减少无谓提交） */
++      layer.frame = fr;
++
++      /* 用展示层提供 from 值，保证连续性 */
++      CALayer *pres = (CALayer *)layer.presentationLayer;
++      CGPoint from_pos = pres ? pres.position : layer.position;
++      CGRect  from_bnd = pres ? pres.bounds   : layer.bounds;
++
++      /* 位置与大小各 0.10s，ease-out */
++      CABasicAnimation *pos = [CABasicAnimation animationWithKeyPath:@"position"];
++      pos.fromValue = [NSValue valueWithPoint:NSPointFromCGPoint(from_pos)];
++      pos.toValue   = [NSValue valueWithPoint:NSPointFromCGPoint(layer.position)];
++      pos.duration  = 0.10;
++      pos.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
++
++      CABasicAnimation *bnd = [CABasicAnimation animationWithKeyPath:@"bounds"];
++      bnd.fromValue = [NSValue valueWithRect:NSRectFromCGRect(from_bnd)];
++      bnd.toValue   = [NSValue valueWithRect:NSRectFromCGRect(layer.bounds)];
++      bnd.duration  = 0.10;
++      bnd.timingFunction = pos.timingFunction;
++
++      [CATransaction begin];
++      [CATransaction setCompletionBlock:^{
++        /* 只有当期间未发生新的移动（令牌未变化）时才隐藏，避免竞态 */
++        if (cursorLayerAnimToken == __token)
++          {
++            layer.opacity = 0.0f;
++            cursorLayerVisible = NO;
++          }
++      }];
++
++      [layer addAnimation:pos forKey:@"pos"];
++      [layer addAnimation:bnd forKey:@"bnd"];
++      [CATransaction commit];
++    }
++  else
++    {
++      /* 静止：完全隐藏 CA 光标，恢复原始绘制（不做淡出以免闪） */
++      if (cursorLayerVisible)
++        {
++          layer.opacity = 0.0f;
++          cursorLayerVisible = NO;
++        }
++    }
++
++  /* 更新缓存 */
++  cursorLayerLastFrame = fr;
++  cursorLayerLastValid = YES;
++}
++
++- (BOOL)cursorLayerIsVisible
++{
++  return cursorLayerVisible;
++}
++/* ========================================================================== */
++
+ /* Needed to inform when window closed from lisp.  */
+ - (void) setWindowClosing: (BOOL)closing
+ {

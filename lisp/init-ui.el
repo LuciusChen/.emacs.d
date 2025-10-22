@@ -56,7 +56,7 @@
           dark-theme 'rose-pine-night)))
 
 (setup startup
-  (when *is-mac*
+  (when IS-MAC
     (apply-theme-based-on-appearance)
     (:with-hook ns-system-appearance-change-functions
       (:hook apply-theme-based-on-appearance)))
@@ -95,7 +95,7 @@
                  server-after-make-frame-hook
                  default-text-scale-mode-hook)
       (:hook +setup-fonts))
-    (:with-mode org-mode (:set-font *org-font*))
+    (:with-mode org-mode (:set-font ORG-FONT))
     (:advice face-at-point :around #'+suggest-other-faces)))
 
 (setup nerd-icons

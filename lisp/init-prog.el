@@ -285,7 +285,7 @@
     (setopt eglot-java-server-install-dir jdtls-install-dir
             eglot-java-default-task "clean install" ;; fork 了提了 pr 还未合并
             eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
-            eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir (if *is-mac* "/config_mac_arm/" "/config_linux/"))
+            eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir (if IS-MAC "/config_mac_arm/" "/config_linux/"))
             eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
                                           "-Xmx8G"
                                           ;; "-XX:+UseG1GC"

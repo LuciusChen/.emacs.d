@@ -68,7 +68,7 @@
                         (define-key map k #'insert-pair))
                       map))
   (meow-normal-define-key (cons "\\" wrap-keymap))
-  (when *is-mac*
+  (when IS-MAC
     (:advice meow-mark-thing :override meow-mark-thing-cjk)
     (:advice meow-next-thing :override meow-next-thing-cjk)))
 
@@ -88,7 +88,7 @@
           sis-context-hooks '(meow-insert-enter-hook))
     (:after meow
       (:with-hook meow-insert-exit-hook (:hook sis-set-english)))
-    (if *is-mac*
+    (if IS-MAC
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
          "im.rime.inputmethod.Squirrel.Hans")

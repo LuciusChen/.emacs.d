@@ -17,7 +17,7 @@
     (:with-mode org-mode (:bind "C-c C-v" yank-media))
     (:after yank-media (add-to-list 'yank-media-preferred-types 'image/tiff))
     (setopt
-     org-directory *org-path*
+     org-directory ORG-PATH
      org-image-actual-width nil
      ;; remove org-src content indent
      org-edit-src-content-indentation 0
@@ -99,7 +99,7 @@
                 ob-latex
                 ob-verb)
     (setopt org-plantuml-jar-path
-            (expand-file-name (concat *org-path* "/plantuml/plantuml.jar"))
+            (expand-file-name (concat ORG-PATH "/plantuml/plantuml.jar"))
             ;; 这里应该就是 .zshrc 里面配置的 python3
             org-babel-python-command "python3")
     (org-babel-do-load-languages
@@ -119,7 +119,7 @@
     (keymap-global-set "C-c n b" 'denote-backlinks)
     (keymap-global-set "C-c n r" 'denote-rename-file)
     (keymap-global-set "C-c n R" 'denote-rename-file-using-front-matter)
-    (setopt denote-directory (expand-file-name "denote" *org-path*)
+    (setopt denote-directory (expand-file-name "denote" ORG-PATH)
             denote-save-buffers nil
             denote-known-keywords '("emacs" "private")
             denote-infer-keywords t
@@ -269,7 +269,7 @@
      org-agenda-time-leading-zero t
      ;; 过滤掉 dynamic
      ;; org-agenda-hide-tags-regexp (regexp-opt '("dynamic"))
-     org-agenda-files (file-expand-wildcards (concat *org-path* "/agenda/*.org"))
+     org-agenda-files (file-expand-wildcards (concat ORG-PATH "/agenda/*.org"))
      org-agenda-compact-blocks t
      org-agenda-sticky t
      org-agenda-start-on-weekday nil
@@ -383,7 +383,7 @@
 (setup bibtex
   (:load-after org)
   (:when-loaded
-    (setopt bibtex-file-path (concat *org-path* "/bib/")
+    (setopt bibtex-file-path (concat ORG-PATH "/bib/")
             bibtex-files '("bibtex.bib")
             bibtex-align-at-equal-sign t
             bibtex-autokey-titleword-separator "-"
@@ -434,9 +434,9 @@
                                  citar-indicator-links-icons
                                  citar-indicator-notes-icons
                                  citar-indicator-cited-icons))
-    (setopt org-cite-global-bibliography (list (concat *org-path* "/bib/bibtex.bib"))
-            citar-notes-paths (list (concat *org-path* "/main"))
-            citar-library-paths (list (concat *org-path* "/bib/files"))
+    (setopt org-cite-global-bibliography (list (concat ORG-PATH "/bib/bibtex.bib"))
+            citar-notes-paths (list (concat ORG-PATH "/main"))
+            citar-library-paths (list (concat ORG-PATH "/bib/files"))
             org-cite-insert-processor 'citar
             org-cite-follow-processor 'citar
             org-cite-activate-processor 'citar
@@ -497,7 +497,7 @@
     (:advice org-hugo-export-wim-to-md
              :after
              (lambda (&rest _)
-               (let ((default-directory (replace-regexp-in-string "org" "hugo" *org-path*)))
+               (let ((default-directory (replace-regexp-in-string "org" "hugo" ORG-PATH)))
                  (if (eq (call-process "hugo" nil nil) 0)
                      (message "Hugo compilation successful")
                    (message "Hugo compilation failed")))))))

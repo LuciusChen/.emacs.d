@@ -55,8 +55,8 @@ SERVER and EGLOT-JAVA-ECLIPSE-JDT are passed by Eglot."
 
 (defvar jdtls-install-dir
   (let ((base-dir (cond
-                   (*is-mac* "/opt/homebrew/Cellar/jdtls/")
-                   (*is-linux* "~/.local/share/jdtls/"))))
+                   (IS-MAC "/opt/homebrew/Cellar/jdtls/")
+                   (IS-LINUX "~/.local/share/jdtls/"))))
     (car (last (sort
                 (directory-files base-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$")
                 (lambda (a b)

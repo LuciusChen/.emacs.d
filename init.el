@@ -16,27 +16,26 @@
     (error "Your Emacs is too old -- this config requires v%s or higher" minver)))
 (when (version< emacs-version "30.1")
   (message "Your Emacs is old, and some functionality in this config will be disabled. Please upgrade if possible."))
-;; Enable with t if you prefer
-(defconst *spell-check-support-enabled* nil )
-(defconst *is-mac* (eq system-type 'darwin))
-(defconst *is-linux* (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
-(defconst *org-path*
-  (cond (*is-mac* "~/Library/CloudStorage/Dropbox/org")
-        (*is-linux* "~/Dropbox/org")))
-(defconst *fallback-fonts* '("Jigmo" "Jigmo2" "Jigmo3"))
-(defconst *font-size* (if *is-mac* 14 13))
-(defconst *default-font* (format "PragmataPro Mono %d" *font-size*))
-(defconst *org-font* (format "PragmataPro Liga %d" *font-size*))
-(defconst *zh-default-font* "LXGW WenKai Screen")
-(defconst *nerd-icons-font* "Symbols Nerd Font Mono")
-(defconst *emoji-fonts* '("Apple Color Emoji"
-                          "Noto Color Emoji"
-                          "Noto Emoji"
-                          "Segoe UI Emoji"))
-(defconst *symbol-font* '("Apple Symbols"
-                          "Segoe UI Symbol"
-                          "Symbola"
-                          "Symbol"))
+
+(defconst IS-MAC (eq system-type 'darwin))
+(defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst ORG-PATH
+  (cond (IS-MAC "~/Library/CloudStorage/Dropbox/org")
+        (IS-LINUX "~/Dropbox/org")))
+(defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
+(defconst FONT-SIZE (if IS-MAC 14 13))
+(defconst DEFAULT-FONT (format "PragmataPro Mono %d" FONT-SIZE))
+(defconst ORG-FONT (format "PragmataPro Liga %d" FONT-SIZE))
+(defconst ZH-DEFAULT-FONT "LXGW WenKai Screen")
+(defconst NERD-ICONS-FONT "Symbols Nerd Font Mono")
+(defconst EMOJI-FONTS '("Apple Color Emoji"
+                        "Noto Color Emoji"
+                        "Noto Emoji"
+                        "Segoe UI Emoji"))
+(defconst SYMBOL-FONT '("Apple Symbols"
+                        "Segoe UI Symbol"
+                        "Symbola"
+                        "Symbol"))
 
 ;; Install straight.el
 ;; branch develop
@@ -56,7 +55,7 @@
   (load bootstrap-file nil 'nomessage))
 
 ;; install packages
-(defvar *use-package-list*
+(defvar USE-PACKAGE-LIST
   '(nov sis plz avy mpv cape citar wgrep setup nerd-icons citar-denote
         corfu forge verb elfeed popper embark bibtex vertico clojure-mode
         diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
@@ -92,7 +91,7 @@
         ;; (beancount-mode :host github :repo "beancount/beancount-mode")
         (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))))
 
-(dolist (e *use-package-list*) (straight-use-package e))
+(dolist (e USE-PACKAGE-LIST) (straight-use-package e))
 (setq vc-follow-symlinks t)
 
 ;; load module settings
@@ -101,9 +100,7 @@
 
 (require 'init-setup)
 (require 'init-auth)
-(if *is-mac*
-    (require 'init-mac)
-  (require 'init-linux))
+(if IS-MAC (require 'init-mac) (require 'init-linux))
 (require 'init-ui)
 
 (require 'init-editing)

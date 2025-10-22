@@ -134,7 +134,7 @@
     (keymap-global-set "C-c ." 'embark-act)
     (keymap-global-set "M-n"   'embark-next-symbol)
     (keymap-global-set "M-p"   'embark-previous-symbol)
-    (:with-map embark-file-map (if *is-mac* (:bind "o" +embark-open-in-finder)
+    (:with-map embark-file-map (if IS-MAC (:bind "o" +embark-open-in-finder)
                                  (:bind "S" sudo-find-file)))
     (setopt embark-indicators '(embark-minimal-indicator
                                 embark-highlight-indicator
