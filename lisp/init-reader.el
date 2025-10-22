@@ -90,7 +90,7 @@
                                       google/gemini-2.5-pro-exp-03-25:free
                                       google/gemini-2.5-pro-preview-03-25)
                             :stream t)
-            gptel-proxy (if *is-mac* "" "socks://127.0.0.1:7897")
+            gptel-proxy (if IS-MAC "" "socks://127.0.0.1:7897")
             gptel-directives (get-gptel-directives)
             gptel-temperature 0.7)
     (setq gptel-tools +gptel-tools)
@@ -172,7 +172,7 @@
                                              :render (gt-overlay-render :type 'after
                                                                         :rfmt "(%s)"
                                                                         :rface '(:foreground "grey"))))))
-    (when *is-linux*
+    (when IS-LINUX
       (setopt gt-tts-native-engine 'espeak-ng)
       (cl-defmethod gt-speech ((engine (eql 'espeak-ng)) text lang &optional play-fn)
         ;; 调用 espeak-ng 命令来朗读文本

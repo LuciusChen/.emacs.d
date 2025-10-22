@@ -5,7 +5,7 @@
 (defun +delete-archived-daily-log-files ()
   "Delete Daily log files that have no titles in them."
   (interactive)
-  (let ((dir (concat *org-path* "/daily/"))
+  (let ((dir (concat ORG-PATH "/daily/"))
         (deleted-files '()))
     (dolist (file (directory-files dir nil "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org$"))
       (let* ((fullpath (concat (file-name-as-directory dir) file))
@@ -27,7 +27,7 @@
 ARGS should be a list where the first element is the name of the agenda file
 to open.  The files are located in the '/agenda/' directory."
   (interactive (list (transient-args 'agenda-transient)))
-  (find-file  (concat *org-path* "/agenda/" (car args))))
+  (find-file  (concat ORG-PATH "/agenda/" (car args))))
 
 (defun journal-options (&optional args)
   "Perform various journal-related actions based on ARGS.
@@ -43,7 +43,7 @@ that can include:
 
 The files are located in the directory specified by `file-path-prefix`."
   (interactive (list (transient-args 'journal-transient)))
-  (let ((file-path-prefix (concat *org-path* "/denote/daily/"))
+  (let ((file-path-prefix (concat ORG-PATH "/denote/daily/"))
         (today-date-string (format-time-string "%Y-%m-%d" (current-time))))
     (cond ((member "journal.org" args)
            (find-file (concat file-path-prefix (car args))))
@@ -73,8 +73,8 @@ ARGS should be a list where the first element is the path to the repositories."
   (interactive (list (transient-args 'emacs-access-transient)))
   (let* ((key (car args))
          (repopath (cond
-                    ((string-equal key "agenda") (concat *org-path* "/agenda/"))
-                    ((string-equal key "books") (concat *org-path* "/bib/files"))
+                    ((string-equal key "agenda") (concat ORG-PATH "/agenda/"))
+                    ((string-equal key "books") (concat ORG-PATH "/bib/files"))
                     (t (expand-file-name key))))
          (fd-cmd (concat "fd --no-ignore-vcs . --base-directory " repopath))
          (files (cl-remove-if #'string-empty-p (split-string (shell-command-to-string fd-cmd) "\n")))

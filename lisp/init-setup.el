@@ -71,7 +71,7 @@ See `advice-add' for more details."
 ;; (set-font-for-modes
 ;;    `((vterm-mode . ,*term-default-font*)
 ;;      (nxml-mode  . ,*prog-font*)
-;;      (org-mode   . ,*org-font*)
+;;      (org-mode   . ,ORG-FONT)
 ;;      (latex-mode . ,*prog-font*)
 ;;      (prog-mode  . ,*prog-font*)))
 

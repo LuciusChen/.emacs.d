@@ -45,13 +45,14 @@
                                   (heading-format . "  %C %-18a%f %-80s  %H\n")
                                   (show-message . t))
                                  (highlight
-                                  (highlight-face . magit-blame-highlight))))
+                                  (highlight-face . magit-blame-highlight)))
+            magit-format-file-function #'magit-format-file-nerd-icons)
     (:advice magit-status :around #'magit-fullscreen)
     (:advice magit-mode-quit-window :after #'magit-restore-screen)
     ;; kill 因为 blob-next 和 blob-previous 产生的 buffer
     (:advice magit-blob-next :around #'kill-all-blob-next-after-quit)
     (:advice magit-blob-previous :around #'kill-all-blob-previous-after-quit)
-    (when *is-mac*
+    (when IS-MAC
       (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))))
 
 (setup magit-log
@@ -70,6 +71,9 @@
 
 (setup forge
   ;; =forge-browse= Open the Git repository homepage interactively.
+  ;; =forge-copy-url-at-point-as-kill= Copy a (web) link to
+  ;; the current file if the region isn't active and will copy
+  ;; a permalink to the selected lines if the region /is/ active.
   (:load-after magit)
   (:when-loaded
     ;; Make it easier to see that a topic was closed.

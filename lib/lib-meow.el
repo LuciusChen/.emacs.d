@@ -158,7 +158,7 @@ If N is negative, select to the beginning of the previous Nth thing instead."
    '("1" . meow-expand-1)
    '("-" . negative-argument)
    '("/" . find-file)
-   (if *is-mac*
+   (if IS-MAC
        '(";" . sis-meow-reverse)
      '(";" . meow-reverse))
    '("," . meow-inner-of-thing)

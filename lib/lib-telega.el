@@ -29,7 +29,7 @@ NOTE: macOS only."
         (telega-msg-redisplay msg)
         (when (telega-file--downloaded-p dfile)
           (let* ((fpath (telega--tl-get dfile :local :path))
-                 (command (if *is-mac*
+                 (command (if IS-MAC
                               (list "osascript" "-e" (format "set the clipboard to POSIX file \"%s\"" fpath))
                             (list "sh" "-c" (format "wl-copy < \"%s\"" fpath)))))
             (make-process
