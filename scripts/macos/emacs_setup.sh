@@ -36,12 +36,6 @@ for arg in "$@"; do
   esac
 done
 
-# Ensure MPS is only used with version 31
-if [ "$VERSION_TYPE" = "mps" ] && [ "$EMACS_VERSION" != "31" ]; then
-  echo "The MPS version is only supported with Emacs 31."
-  exit 1
-fi
-
 # Uninstall first
 if brew list --versions emacs-plus@$EMACS_VERSION > /dev/null 2>&1; then
   echo "Uninstalling existing emacs-plus@$EMACS_VERSION..."
@@ -64,7 +58,7 @@ cp "$FORMULA_PATH" "${FORMULA_PATH}.bak"
 
 # Modify the formula based on the version type
 if [ "$VERSION_TYPE" = "mps" ]; then
-  echo "Switching to MPS version."
+  echo "Switching to MPS version on feature/igc branch."
 
   # Check if Xcode is installed
   if ! xcode-select -p > /dev/null 2>&1; then
