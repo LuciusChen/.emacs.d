@@ -1,0 +1,161 @@
+#+STARTUP: indent
+[[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/Linux-0.24s-brightgreen.svg?style=svg]] [[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/macOS-0.58s-blue.svg?style=svg]]
+* .emacs.d
+** Emacs 编译
+*** MacOS
+使用脚本 [[./scripts/macos/emacs_setup.sh][emacs_setup.sh]] 安装，对于 [[./patches/][patches]] 当中的 patch，如果和 emacs-plus 维护的 patch 同名，则覆盖并修改 =sha= 值，否则则是作为 =user_patch= 维护进 =emacs-plus@31.rb=。
+
+执行 =./emacs_setup.sh= 即可，增加参数 =mps= 则是安装 =feature/igc= 分支。
+*** Arch
+使用 [[./scripts/arch/build-emacs-pgtk.sh][build-emacs-pgtk.sh]] 进行编译，其实是自己维护的 =PKGBUILD= 方便编译安装。
+** 包管理工具
+*** [[https://git.sr.ht/~pkal/setup][setup]]
+特点就是简单可定制，其中需要注意的是 =:bind-into= 有一些问题，详见 [[https://codeberg.org/pkal/setup.el/src/commit/0cf74c50d90c00450f8a3425c1b84b3bccd99f84/setup.el#L623][setup.el/setup.el at 0cf74c50d90c00450f8a3425c1b84b3bccd99f84 - pkal/setup.el...]]，要避免这个问题其实可以采用下面的写法。
+#+begin_src elisp
+(:with-map xxx-map (:bind "C-c x t" xxxx))
+#+end_src
+** 模式编辑
+最初入坑使用的是 Doom，不习惯 Evil 后切换至与原生按键不冲突的 [[https://github.com/meow-edit/meow][meow]]，配合 sis 在模式间切换输入法甚是爽利。尤其爽利的是配合 [[https://github.com/roife/emt][emt]]（仅限于 MacOS），利用 AI 完成了 =meow-word= 对于中文的分词选中。
+** UI
+*** 字体
+英文用 [[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro]]，中文字体使用[[https://github.com/lxgw/LxgwWenKai][霞鹜文楷]]，选择 [[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]] 全覆盖 CJK 字符集作为 fallback 字体。（字体选择有部分原因是可以中英文对齐。当然也有其他方法强制 org-table 使用等宽字体，参考 [[https://github.com/alphapapa/unpackaged.el?tab=readme-ov-file#force-monospace-face-in-tables][Force monospace face in tables]]。）
+
+其中不同 =mode= 使用不同的字体，是通过自定义的 setup =:set-font= 关键字进行设置。
+#+begin_src emacs-lisp
+(:with-mode org-mode (:set-font "PragmataPro"))
+#+end_src
+**** 特殊字体
+需要安装 [[https://www.wfonts.com/font/symbola][Symbola]] 字体，安装 [[https://www.wfonts.com/font/symbola][Symbola]] 后 Emoji 需要添加额外的设置，才可以用 Mac 内置的 Emoji，参考 [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs:Set Font in Init File]]。Emoji 的一些在 Unicode 中分布比较零散，比较好的方式是先设置 Emoji 再设置 CJK。（由于 Symbola 和 nerd-icons 所需字体有一些重复，所以需要先安装 Symbola 再安装 nerd-icons 所需字体。）
+*** Themes
+目前使用的是 [[https://github.com/LuciusChen/rose-pine/tree/main][GitHub - LuciusChen/rose-pine]]，Dashboard 使用的是 [[https://github.com/LuciusChen/dashboard][GitHub - LuciusChen/dashboard: A minimalistic dashboard for Emacs]]。
+
+透明以及毛玻璃效果可以参考下面两个 patch
+- [[https://github.com/d12frosted/homebrew-emacs-plus/pull/663][d12frosted/homebrew-emacs-plus#663 feat: add alpha-background support to emac...]] （master 的 ef6ffbdc79645e719d3b5ef23c9200405c58c61e 之后 patch 不能正确 apply，​+参考我修改过的 [[https://github.com/LuciusChen/.emacs.d/blob/bbcb432caee0c66a42100acf6e5322c4bf128ba8/patches/ns-alpha-background.patch][ns-alpha-background.patch]]+​，效果不太好，已不再用。）
+- [[https://github.com/jaaasonSun/homebrew-emacs-plus/blob/master/patches/emacs-29/blur.patch]]
+
+例如添加透明 patch，需要在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@30.rb= 中添加 =local_patch "ns-alpha-background", sha: "eae9abd14c2d00315806116e0eaba09510e98738b420d6e40a9d7d97d9437b81"= 并把 ns-alpha-background.patch 文件放在 =/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-30=  下。
+**** Switch
+在 MacOS 下利用 =ns-system-appearance-change-functions= 跟随系统切换 light/dark theme，非 Macos 下默认 dark theme。手动切换 =M-:= 执行 =(apply-theme light-theme 100)= 即可，第二个参数为透明度。
+** .authinfo
+这一块全部存入 pass 后开启 =auth-source-pass-enable= 自动读取，其中自建的 gitlab 的 =machine= 值必须是 =192.168.1.220:9081/api/v4= 格式，不能存入 pass。因此我换了名字存入 pass，写了函数自动读取写入 =.authinfo= 中，自动化这个配置过程。
+** Reader
+[[file:assets/org.png]]
+
+翻译现在切换到了 [[https://github.com/lorniu/go-translate][lorniu/go-translate]]，可以很方便的通过不同的展示方式展示最终的翻译结果，最让人满意的是可以自己定义 =:pick= 翻译源传入。使用下来 gpt 的翻译还是要较 DeepL 的效果更好的。其中 [[https://platform.openai.com/][OpenAI]] 需要绑定支付方式后才可以使用，可以使用我的 [[https://bewildcard.com/i/YAOHUA][WildCard]] 邀请链接注册充值，享受88折优惠。
+
+阅读书籍 ePub 用 [[https://depp.brause.cc/nov.el/][nov.el]]，阅读 PDF 用 [[https://github.com/vedang/pdf-tools][vedang/pdf-tools]]；RSS 订阅用 [[https://github.com/skeeto/elfeed][skeeto/elfeed]] 和 [[https://github.com/karthink/elfeed-tube][karthink/elfeed-tube]]，其中后者可以拉取字幕，配合沉浸式翻译，可以快速阅读内容，关键处再用 mpv 打开视频，点击字幕跳转到关键处。Elfeed 中也可以方便的创建 org 笔记，根据不同的类型定制模板（lucius/menu-dwim--org-capture-elfeed-show）。
+
+ChatGPT 的应用可以通过 [[https://github.com/karthink/gptel][karthink/gptel]] 在 Emacs 当中使用。
+
+agenda 的使用参考卡片笔记以及 PARA 形成了一套自己的方法，入门可以参考 [[https://github.com/rougier/emacs-GTD][Get Things Done with Emacs]]，另外 org-agenda 的使用，如果需要用到动态加载文件进 agenda 可以参考 [[https://gist.github.com/d12frosted/a60e8ccb9aceba031af243dff0d19b2e][Dynamic org-agenda with org-roam]]。
+*** org-latex-preview
+使用 [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本的 org 进行实时预览，配置可以参考 [[https://abode.karthinks.com/org-latex-preview/][=org-latex-preview=: Set up and troubleshooting]]。
+
+如果用 Homebrew 安装的 texlive，dvisvgm 包含在 texlive 当中，从 =/Library/TeX/texbin/= 复制到 =/opt/homebrew/bin/= 就可以了。
+
+对于有 mathjax 不支持显示的文章可以通过头部添加 =#+OPTIONS: tex:dvisvgm= 来将内容都以图片的形式导出嵌入文章中。若是出现图片偏离文本基线的问题，很可能是 Hugo 主题中定义了 =img= 标签的 =margin= 属性，比如正在用的 [[https://github.com/reorx/hugo-PaperModX/][reorx/hugo-PaperModX]] 主题中就定义了，覆盖就好。
+
+#+begin_src css
+img.org-latex.org-latex-inline.medium-zoom-image {
+    margin: 0.25em;
+}
+#+end_src
+
+但是上述这种对于一些 MathJax 支持的公式也会以图片的形式导出，算不上最好的方式。完美的方式通过 org-babel 导出 svg，其他的继续用 MathJax 渲染。
+
+2024-03-08: [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本中 =org-latex-compile= 改为异步生成 PDF，所以在 Inkscape 转换 PDF 为 SVG 时，PDF 还未生成，导致报错。相关参考如下。
+
+- [[https://github.com/tecosaur/org-latex-preview-todos/issues/28][tecosaur/org-latex-preview-todos#28 Convention for Org mode functions to supp...]]
+- [[https://list.orgmode.org/87frysk0tp.fsf@gmail.com/T/#ma03ea00706247732a7c772dcdcdf27cfa8d76024][{Pre-PATCH} Overhaul of the LaTeX preview system]]
+
+#+header: :headers '("\\usepackage[ruled, linesnumbered]{algorithm2e}")
+#+begin_src latex :results file raw :file assets/lamport-clocks-algorithm.svg
+\begin{algorithm}[H]
+  \renewcommand{\thealgocf}{} \SetKwProg{FnOn}{on}{ do}{end}
+  \caption{Lamport clocks algorithm}
+  \FnOn{\textsf{\upshape initialisation}} {$t := 0$ \tcp*{each node
+      has its own local variable t}} \FnOn{\textsf{\upshape any event
+      occurring at the local node}} {$t := t + 1$}
+  \FnOn{\textsf{\upshape request to send message $m$}} {$t := t + 1$\;
+    \textsf{\upshape send $(t, m)$ via the underlying network link}}
+  \FnOn{\textsf{\upshape receiving $(t', m)$ via the underlying
+      network link}} {$t := \max(t, t') + 1$\; \textsf{\upshape
+      deliver $m$ to the application}}
+\end{algorithm}
+#+end_src
+
+#+RESULTS:
+[[file:assets/lamport-clocks-algorithm.svg]]
+** 输入法自动切换
++使用的是 [[https://github.com/laishulu/emacs-smart-input-source][laishulu/emacs-smart-input-source]] + [[https://github.com/laishulu/macism][laishulu/macism]]，但是会有一些问题，切换时会反复横跳，以及切换到英文输入法。需要将其中的 =select()= 方法的部分修改一下，我 fork 的版本在这 [[https://github.com/LuciusChen/macism][LuciusChen/macism]]，可以自行编译替换。+
+
+2024-10-19: [[https://github.com/laishulu/macism][laishulu/macism]] 已经合并 PR。
+2024-11-05: =ns-mac-input-source.patch= 应用后可以原生支持切换输入法了，主要是添加了 =mac-input-source= 方法，可以很方便的用 [[https://github.com/laishulu/emacs-smart-input-source][laishulu/emacs-smart-input-source]] 切换输入法。
+
+另，Sequoia 系统中增加了 CursorUIViewservice 进程来显示输入法状态，经常会卡死导致内存占用。可以通过下面的命令彻底关闭。参考自 [[https://www.reddit.com/r/MacOS/comments/16vmjfc/comment/kcq6nql/][Reddit - Dive into anything]]。
+
+#+begin_src shell
+sudo mkdir -p /Library/Preferences/FeatureFlags/Domain && sudo /usr/libexec/PlistBuddy -c "Add 'redesigned_text_cursor:Enabled' bool false" /Library/Preferences/FeatureFlags/Domain/UIKit.plist && sudo shutdown -r now
+#+end_src
+** Program
+#+begin_src shell
+# java
+brew install jdtls
+# python
+brew install pipx
+pipx install pyright
+# vue
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+nvm install node
+sudo npm install -g typescript
+npm install -g @volar/vue-language-server
+npm install -g typescript-language-server
+#+end_src
+** Magit
+有时候会在 IDEA 中修改代码，然后切换到 Emacs 用 Magit 进行 git 操作, [[./sh/magit.sh][magit.sh]] 可以自动化这个过程。在 IDEA 当中如下配置，并可以为此绑定一个快捷键。（宏参考 [[https://www.jetbrains.com/help/idea/built-in-macros.html][Built-in IDE macros | IntelliJ IDEA Documentation]]）
+[[file:assets/idea-magit.jpg]]
+** Social
+*** Telega
+针对 UI 做了一些修改
+[[https://github.com/LuciusChen/telega.el][GitHub - LuciusChen/telega.el: GNU Emacs telegram client (unofficial)]]
+
+- 去除关于 bot 命令补全的断言。原本只能在与 bot 的私聊中使用 ~/~ 进行补全，修改后可以在群聊中使用 ~/~ 进行补全（作者原话指出这样会 controversial and even dangerous）。
+- 修改 Specific Quote 以及正文中包含的 Quote 的样式，用 ~❝~ 标识，并在每行前插入空格对齐。
+- 修改 reactions 图标为字符而非 emoji 以及其颜色
+- 在 header 查看数量、转发数量和回复数量的标识和数字之间添加空格。
+- 去除 ~telega-root~ 顶部空行
+- 修改 code blocks 样式，替换 codeblock 符号为 nerd-icons 对应语言的 icons，没有则显示 codeblock 符号。codeblock 头部增加背景填充整行，最后一行代码也填充整行。
+- 重新排布了 edited-date、消息查看数量、回复数量、转发数量的位置，兼容 =telega-ins--message-date-and-status= 为 =non-nil= 的情况。并且对于消息同一个人发的尽量合并到一个 header 下。
+- 以上 nerd-icons 修改在终端同样有效
+- 去掉 notification 的 dbus 依赖，改为数量显示在 tab-bar 当中，同时被查看过的会从 =telega-notifications-history= 中删除。
+
+**** Building TDLib
+~brew install tdlib~ 的版本过低，需要自行编译，参考 [[https://tdlib.github.io/td/build.html?language=Swift][TDLib build instructions]] 。这个之后需要 ~M-x telega-server-build~ 重新加载 telega-server。安装的命令现在写了个 [[./sh/tdlib.sh][tdlib.sh]] 方便编译安装。
+
+如果报错 ~"user-error: TDLib is not installed into "/usr/local". Set ‘telega-server-libs-prefix’ to the TDLib installion path"~​，则可以通过 ~M-: (setq telega-server-libs-prefix “/path/to/tdlib/install/path”) RET~ 然后 ~M-x telega-server-build RET~ 重新构建。
+**** Animated Stickers
+#+begin_src shell
+git clone https://github.com/zevlg/tgs2png.git
+git submodule init
+git submodule update --init --recursive
+mkdir build
+cd build
+cmake ..
+make
+# copy tgs2png somewhere into $PATH
+sudo cp -rf tgs2png /opt/local/bin
+#+end_src
+
+可以 =C-h v= 查看 =exec-path= 变量的值，将 tsg2png 复制到对应的路径即可。另外针对 video stickers 需要 =brew install ffmpeg= 才可以播放。
+**** 推荐 contrib 插件。
+***** telega-url-shorten
+原先插件的做法是针对每个网站的 URL 进行适配，并且配上与之相应的 icons，并不能完全满足所有 URL 缩短的目的，所以这里用 =^\\(https?://\\)\\(.\\{55\\}\\).*?$= 正则处理所有的 URL，超过一定长度后省略。
+***** telega-bridge-bot
+可以方便的同步 Matrix 那边的头像到 Telega 这边，对于「图象记忆者」来说，根据「头像 + username」记忆人远比单独的 username 记忆要牢固快速的多。
+#+CAPTION: telega-bridge-bot
+#+ATTR_ORG: :width 800
+[[file:assets/telega-bridge-bot.png]]
+***** telega-mnz
+高亮消息中的代码块
+*** mastodon
+因为 Twitter 被 Elon Musk 收购后不太喜欢，尝试转向 mastodon 平台，Emacs 当中也有相应的客户端：[[https://codeberg.org/martianh/mastodon.el][martianh/mastodon.el]]，相对 X 的以 follow 为中心，mastodon 更像是 tag 为中心去关注话题，因此不同的语言很多，非常需要翻译。这里的翻译也是通过 [[https://github.com/lorniu/go-translate][lorniu/go-translate]] 自定义了获取 toots 的 bounds 传入 =go-taker= 的 =:pick= 参数进行翻译，也补全了 profile 的翻译（原作者提供的 lingva.el 好像没有针对这个）。
