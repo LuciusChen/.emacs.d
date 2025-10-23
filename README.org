@@ -8,7 +8,7 @@
 *** MacOS
 使用脚本 [[./scripts/macos/emacs_setup.sh][emacs_setup.sh]] 进行安装时，若 [[./patches/][patches]] 目录中的补丁与 emacs-plus 维护的补丁同名，则会覆盖原有补丁并修改其 =sha= 值。否则，这些补丁将作为 =user_patch= 被纳入 =emacs-plus@31.rb= 中进行管理。
 
-只需执行 =./emacs_setup.sh= 即可完成安装。如需安装 =feature/igc= 分支，只需添加参数 =mps=。
+只需执行 =./emacs_setup.sh= 即可完成安装。如需安装 =feature/igc= 分支，只需添加参数 =mps=​。
 **** patches
 与 [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] 重复的 patches 在这里是因为我经常编译，就自己维护了。[[./patches/emacs-30/fix-window-role.patch][fix-window-role.patch]] 在 emacs@31 已经合并到上游了。
 
@@ -16,13 +16,13 @@
 2. [[./patches/emacs-31/ns-alpha-background.patch][ns-alpha-background.patch]]
 3. [[./patches/emacs-31/ns-mac-input-source.patch][ns-mac-input-source.patch]] 经由 @georgealbert 整理提取，用于切换输入法。
 *** Arch Linux
-使用 [[./scripts/arch/build-emacs-pgtk.sh][build-emacs-pgtk.sh]] 进行编译，这实际上是我自行维护的 =PKGBUILD=，旨在简化编译与安装过程。
+使用 [[./scripts/arch/build-emacs-pgtk.sh][build-emacs-pgtk.sh]] 进行编译，这实际上是我自行维护的 =PKGBUILD=​，旨在简化编译与安装过程。
 ** Package Management
 包管理使用的是 [[https://github.com/radian-software/straight.el][straight.el]] + [[https://codeberg.org/pkal/setup.el][setup.el]]，前者功能比较全面，可以 pin 到具体的 commits；后者相对简单，可以在此基础上自定义关键字，比如 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lisp/init-setup.el#L78][:set-font]]（按 =mode= 定义不同的字体）。
 *** setup.el 常见问题
 1. =:bind-into= 已经被淘汰，最好用 =(:with-map xxx-map (:bind "C-c x t" xxxx))= 的写法。
 2. =:option= 已经被淘汰，用 Emacs 内置的 =setq= 和 =setopt=。
-3. =:file-match= 修改后，需要从 =(:match-file "\\.lua\\'")= 改为 =(:match-file "*.lua")=。
+3. =:file-match= 修改后，需要从 =(:match-file "\\.lua\\'")= 改为 =(:match-file "*.lua")=​。
 ** UI/UX
 *** Fonts
 1. 默认字体：[[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro Mono]]
@@ -37,13 +37,13 @@
 *** Theme
 主题目前选用 [[https://github.com/LuciusChen/rose-pine][rose-pine]]，Dashboard 选用 fork 修改后的 [[https://github.com/LuciusChen/panel][panel]]，mode-line 选用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]。
 ** Security
-所有条目都存入 pass 中，并通过启用 =auth-source-pass-enable= 自动读取。然而，对于自建的 GitLab，=machine= 的值必须采用 =192.168.1.220:9081/api/v4= 格式，这一信息无法直接存入 pass。因此，我更改了存储名称，并编写了 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lib/lib-auth.el#L11][check-and-update-authinfo]]，将其自动读取并写入 =.authinfo= 中，从而实现配置过程的自动化。
+所有条目都存入 pass 中，并通过启用 =auth-source-pass-enable= 自动读取。然而，对于自建的 GitLab，​=machine= 的值必须采用 =192.168.1.220:9081/api/v4= 格式，这一信息无法直接存入 pass。因此，我更改了存储名称，并编写了 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lib/lib-auth.el#L11][check-and-update-authinfo]]，将其自动读取并写入 =.authinfo= 中，从而实现配置过程的自动化。
 ** Feature Overview
 *** 输入法切换
 =ns-mac-input-source.patch= 应用后可以原生支持切换输入法，主要是添加了 =mac-input-source= 方法。
 
 1. [[https://github.com/laishulu/emacs-smart-input-source][emacs-smart-input-source]] 如果检测到 =mac-input-source= 就会才用该函数来切换输入法，代替 [[https://github.com/laishulu/macism][macism]]。
-2. 通过 [[https://karabiner-elements.pqrs.org/][Karabiner-Elements]] [[https://github.com/LuciusChen/dotfiles/blob/0b0fe7f03c932d779d187e943fc6d92c9e11795a/macos/.config/karabiner.edn#L58][映射]] =left_shift= 到 =f13=，绑定后就可以通过 =left_shift= 切换输入法。
+2. 通过 [[https://karabiner-elements.pqrs.org/][Karabiner-Elements]] [[https://github.com/LuciusChen/dotfiles/blob/0b0fe7f03c932d779d187e943fc6d92c9e11795a/macos/.config/karabiner.edn#L58][映射]] =left_shift= 到 =f13=​，绑定后就可以通过 =left_shift= 切换输入法。
 **** 常见问题
 - 自 Sequoia 系统开始，系统增加了 =CursorUIViewservice= 进程来显示输入法状态，经常会卡死导致内存占用。可以通过下面的命令彻底关闭。参考自 [[https://www.reddit.com/r/MacOS/comments/16vmjfc/comment/kcq6nql/][Reddit - Dive into anything]]。
 #+begin_src shell
@@ -77,7 +77,7 @@ Emacs 内的预览最初选择的是 [[https://github.com/dandavison/xenops][xen
 
 依旧有兴趣的可以安装 [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本的 org，配置 [[https://abode.karthinks.com/org-latex-preview/][org-latex-preview]] 进行尝试。
 **** 常见问题
-- 用 Homebrew 安装的 texlive，dvisvgm 包含在 texlive 当中，需要从 =/Library/TeX/texbin/= 复制到 =/opt/homebrew/bin/=。
+- 用 Homebrew 安装的 texlive，dvisvgm 包含在 texlive 当中，需要从 =/Library/TeX/texbin/= 复制到 =/opt/homebrew/bin/=​。
 *** 翻译
 [[https://github.com/lorniu/gt.el][gt.el]] 非常易于扩展，除了各种场景的翻译，我还用于 [[https://codeberg.org/martianh/mastodon.el][mastodon.el]] 的 toots 和 profiles 翻译，避免重复安装作者提供的 [[https://codeberg.org/martianh/lingva.el][lingva.el]]（该包没提供 profiles 的翻译）。
 
