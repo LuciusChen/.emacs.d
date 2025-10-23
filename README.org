@@ -43,7 +43,7 @@
 =ns-mac-input-source.patch= 应用后可以原生支持切换输入法，主要是添加了 =mac-input-source= 方法。
 
 1. [[https://github.com/laishulu/emacs-smart-input-source][emacs-smart-input-source]] 如果检测到 =mac-input-source= 就会才用该函数来切换输入法，代替 [[https://github.com/laishulu/macism][macism]]。
-2. 通过 [[https://karabiner-elements.pqrs.org/][Karabiner-Elements]] [[https://github.com/LuciusChen/dotfiles/blob/0b0fe7f03c932d779d187e943fc6d92c9e11795a/macos/.config/karabiner.edn#L58][映射]] =left_shift= 到 =f13 ​，绑定后就可以通过 =left_shift= 切换输入法。
+2. 通过 [[https://karabiner-elements.pqrs.org/][Karabiner-Elements]] [[https://github.com/LuciusChen/dotfiles/blob/0b0fe7f03c932d779d187e943fc6d92c9e11795a/macos/.config/karabiner.edn#L58][映射]] =left_shift= 到 =f13= ，绑定后就可以通过 =left_shift= 切换输入法。
 **** 常见问题
 - 自 Sequoia 系统开始，系统增加了 =CursorUIViewservice= 进程来显示输入法状态，经常会卡死导致内存占用。可以通过下面的命令彻底关闭。参考自 [[https://www.reddit.com/r/MacOS/comments/16vmjfc/comment/kcq6nql/][Reddit - Dive into anything]]。
 #+begin_src shell
