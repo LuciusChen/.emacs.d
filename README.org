@@ -21,7 +21,7 @@
 包管理使用的是 [[https://github.com/radian-software/straight.el][straight.el]] + [[https://codeberg.org/pkal/setup.el][setup.el]]，前者功能比较全面，可以 pin 到具体的 commits；后者相对简单，可以在此基础上自定义关键字，比如 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lisp/init-setup.el#L78][:set-font]]（按 =mode= 定义不同的字体）。
 *** setup.el 常见问题
 1. =:bind-into= 已经被淘汰，最好用 =(:with-map xxx-map (:bind "C-c x t" xxxx))= 的写法。
-2. =:option= 已经被淘汰，用 Emacs 内置的 =setq= 和 =setopt=。
+2. =:option= 已经被淘汰，用 Emacs 内置的 =setq= 和 =setopt= 。
 3. =:file-match= 修改后，需要从 =(:match-file "\\.lua\\'")= 改为 =(:match-file "*.lua")= 。
 ** UI/UX
 *** Fonts
