@@ -8,7 +8,7 @@
 *** MacOS
 使用脚本 [[./scripts/macos/emacs_setup.sh][emacs_setup.sh]] 进行安装时，若 [[./patches/][patches]] 目录中的补丁与 emacs-plus 维护的补丁同名，则会覆盖原有补丁并修改其 =sha= 值。否则，这些补丁将作为 =user_patch= 被纳入 =emacs-plus@31.rb= 中进行管理。
 
-只需执行 =./emacs_setup.sh= 即可完成安装。如需安装 =feature/igc= 分支，只需添加参数 =mps=​。
+只需执行 =./emacs_setup.sh= 即可完成安装。如需安装 =feature/igc= 分支，只需添加参数 ~mps~​。
 **** patches
 与 [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] 重复的 patches 在这里是因为我经常编译，就自己维护了。[[./patches/emacs-30/fix-window-role.patch][fix-window-role.patch]] 在 emacs@31 已经合并到上游了。
 
