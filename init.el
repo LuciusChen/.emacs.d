@@ -70,7 +70,7 @@
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile eat
-        consult-dir
+        consult-dir too-wide-minibuffer-mode ultra-scroll
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
@@ -80,12 +80,9 @@
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
-        (ultra-scroll :host github :repo "jdtsmith/ultra-scroll")
-        (md :host github :repo "eki3z/md")
         ;; (telega :host github :repo "zevlg/telega.el")
         (yasnippet :host github :repo "joaotavora/yasnippet")
         (indent-bars :host github :repo "jdtsmith/indent-bars")
-	(too-wide-minibuffer-mode :host github :repo "hron/too-wide-minibuffer-mode")
         (consult-mu :host github :repo "armindarvish/consult-mu")
         (eglot-booster :host github :repo "jdtsmith/eglot-booster")
         ;; (beancount-mode :host github :repo "beancount/beancount-mode")

@@ -130,7 +130,7 @@
     (setq gt-preset-translators
           `((default . ,(gt-translator
                          :taker (list (gt-taker :pick nil :if 'selection)
-                                      (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode))
+                                      (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode elfeed-show-mode))
                                       (gt-taker :text 'word))
                          :engines (list (gt-chatgpt-engine :if 'not-word
                                                            :headers `(("Content-Type" . "application/json")
@@ -139,7 +139,7 @@
                                                                       ("X-Title" . "emacs/gt.el")))
                                         (gt-google-engine :if 'word)
                                         (gt-youdao-suggest-engine :if '(and word src:en)))
-                         :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode helpful-mode devdocs-mode))
+                         :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode helpful-mode devdocs-mode elfeed-show-mode))
                                         (gt-insert-render :if '(telega-chat-mode) :type 'replace)
                                         (gt-buffer-render))))
             ;; gt-insert-render
@@ -215,12 +215,6 @@
 
 (setup markdown-mode
   (setopt markdown-command "pandoc --standalone --css=GTD.css"))
-
-(setup md
-  (:defer (:require md))
-  (:when-loaded
-    (:require md-ts-mode)
-    (:with-mode md-ts-mode (:hook md-toc-mode))))
 
 (setup citar-denote
   (:load-after denote)
