@@ -28,16 +28,20 @@
       (:hook pdf-view-themed-minor-mode))))
 
 (setup org-remark
-  (:load-after org)
+  (keymap-global-set "C-c i m" 'org-remark-mark)
   (:when-loaded
-    (keymap-global-set "C-c i m" 'org-remark-mark)
-    (setopt org-remark-notes-file-name #'org-remark-notes-file-name-function)
     (:with-map org-remark-mode-map
       (:bind "C-c i o" org-remark-open
              "C-c i ]" org-remark-view-next
              "C-c i [" org-remark-view-prev
              "C-c i r" org-remark-remove
-             "C-c i d" org-remark-delete))))
+             "C-c i d" org-remark-delete))
+    (setopt org-remark-notes-file-name #'org-remark-notes-file-name-function
+            org-remark-icon-notes nil)
+    ;; Enable displaying `help-echo` content in Eldoc when the cursor is on a highlight.
+    (:with-mode org-remark-mode
+      (:hook (lambda ()
+               (setq-local eldoc-help-at-pt t))))))
 
 (setup org-remark-nov
   (:load-after nov)
