@@ -36,7 +36,7 @@ index 6a715fb92fc..9d845f0fd96 100644
  - (void) updateCollectionBehavior;
  #endif
 diff --git a/src/nsterm.m b/src/nsterm.m
-index 472d2a52a7d..cbe114c3808 100644
+index 472d2a52a7d..fe400500c8e 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
 @@ -72,6 +72,12 @@ Updated by Christian Limpach (chris@nice.ch)
@@ -52,7 +52,7 @@ index 472d2a52a7d..cbe114c3808 100644
  #endif
  
  static EmacsMenu *dockMenu;
-@@ -3190,6 +3196,100 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3190,6 +3196,112 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
    /* Prevent the cursor from being drawn outside the text area.  */
    r = NSIntersectionRect (r, ns_row_rect (w, glyph_row, TEXT_AREA));
  
@@ -82,7 +82,19 @@ index 472d2a52a7d..cbe114c3808 100644
 +              int dsc = g->descent;
 +              int glyph_h_px = asc + dsc;
 +              if (glyph_h_px < 1) glyph_h_px = 1;
-+              r.size.height = glyph_h_px;
++              // Preserve hbar (underline) as a thin, bottom-aligned strip.
++              // 经验阈值：如果传入的 r 本就是“很薄”的（相对字形高度），判为 hbar。
++              CGFloat orig_h = r.size.height;            // 这是前面已为不同光标类型算好的高度
++              if (orig_h > glyph_h_px * 0.40) {
++                // box/hollow 这类：按 glyph 高度重建
++                r.size.height = glyph_h_px;
++                // r.origin.y 保持不动（我们使用顶部锚点/翻转几何时即为“以顶为准”）
++              } else {
++                // hbar：维持细条，并保证“贴底”
++                CGFloat bottom_y = NSMaxY(r);
++                r.size.height = MAX(1.0, orig_h);
++                r.origin.y = bottom_y - r.size.height;
++              }
 +            }
 +        }
 +
@@ -153,7 +165,7 @@ index 472d2a52a7d..cbe114c3808 100644
    ns_focus (f, NULL, 0);
  
    NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
-@@ -3228,6 +3328,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3228,6 +3340,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
      }
  
    ns_unfocus (f);
@@ -161,7 +173,7 @@ index 472d2a52a7d..cbe114c3808 100644
  }
  
  
-@@ -6830,6 +6931,223 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
+@@ -6830,6 +6943,223 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
    [self updateFramePosition];
  }
  
