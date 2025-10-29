@@ -21,7 +21,9 @@
        "d" telega-chat-remove-member
        "m" telega-describe-chat-members
        "h" telega-notifications-history
-       "x" telega-chatbuf-thread-cancel))
+       "x" telega-chatbuf-thread-cancel
+       ;; quickly opens a Telegram message link from the clipboard
+       "o" (lambda () (interactive) (browse-url (current-kill 0)))))
     (:with-map telega-msg-button-map
       (:bind
        "C" +telega-save-file-to-clipboard

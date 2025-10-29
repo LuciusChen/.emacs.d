@@ -106,8 +106,7 @@
     (add-to-list 'sis-context-detectors
                  (lambda (&rest _)
                    (when (and meow-insert-mode
-                              (or (derived-mode-p 'org-mode
-                                                  'gfm-mode
+                              (or (derived-mode-p 'gfm-mode
                                                   'telega-chat-mode)
                                   (string-match-p "*new toot*" (buffer-name))))
                      'other)))
