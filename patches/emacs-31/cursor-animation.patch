@@ -1,13 +1,23 @@
 diff --git a/src/nsterm.h b/src/nsterm.h
-index 6a715fb92fc..9d845f0fd96 100644
+index 6a715fb92fc..19e87be0b7c 100644
 --- a/src/nsterm.h
 +++ b/src/nsterm.h
-@@ -471,6 +471,12 @@ #define NSTRACE_UNSILENCE()
+@@ -461,6 +461,8 @@ #define NSTRACE_UNSILENCE()
+ 
+ @class EmacsToolbar;
+ @class EmacsLayer;
++@class CALayer;
++@class CATextLayer;
+ 
+ #ifdef NS_IMPL_COCOA
+ @interface EmacsView : NSView <NSTextInput, NSTextInputClient, NSWindowDelegate>
+@@ -471,6 +473,13 @@ #define NSTRACE_UNSILENCE()
  #ifdef NS_IMPL_COCOA
    char *old_title;
    BOOL maximizing_resize;
 +  NSView  *cursorOverlayView;   /* 与 EmacsView 同坐标系（左上为原点） */
-+  CALayer *cursorLayer;         /* 真正绘制“光标块”的 CA 子层 */
++  CALayer *cursorLayer;         /* 真正绘制"光标块"的 CA 子层 */
++  CATextLayer *cursorTextLayer; /* 光标上显示的文字层 */
 +  BOOL cursorLayerVisible;
 +  NSRect  cursorLayerLastFrame;   /* 上次目标 frame，用于抑制重复动画 */
 +  BOOL    cursorLayerLastValid;   /* 是否已有有效的上次目标 */
@@ -15,7 +25,7 @@ index 6a715fb92fc..9d845f0fd96 100644
  #endif
    BOOL font_panel_active;
    NSFont *font_panel_result;
-@@ -505,6 +511,19 @@ #define NSTRACE_UNSILENCE()
+@@ -505,6 +514,23 @@ #define NSTRACE_UNSILENCE()
  - (void) toggleFullScreen: (id) sender;
  - (BOOL) fsIsNative;
  - (BOOL) isFullscreen;
@@ -27,7 +37,11 @@ index 6a715fb92fc..9d845f0fd96 100644
 +                         color:(NSColor *)color
 +                  cornerRadius:(CGFloat)radius
 +                       onState:(BOOL)on_p
-+                      activeWL:(BOOL)is_active_selected_window;
++                      activeWL:(BOOL)is_active_selected_window
++                    cursorType:(enum text_cursor_kinds)cursor_type
++                   glyphString:(NSString *)glyphStr
++                          font:(NSFont *)font
++                 characterFace:(struct face *)face;
 +- (void)hideCursorLayer;
 +- (BOOL)cursorLayerIsVisible;
 +#endif
@@ -36,7 +50,7 @@ index 6a715fb92fc..9d845f0fd96 100644
  - (void) updateCollectionBehavior;
  #endif
 diff --git a/src/nsterm.m b/src/nsterm.m
-index 472d2a52a7d..fe400500c8e 100644
+index 472d2a52a7d..941f66164bb 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
 @@ -72,6 +72,12 @@ Updated by Christian Limpach (chris@nice.ch)
@@ -52,7 +66,7 @@ index 472d2a52a7d..fe400500c8e 100644
  #endif
  
  static EmacsMenu *dockMenu;
-@@ -3190,6 +3196,112 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3190,6 +3196,160 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
    /* Prevent the cursor from being drawn outside the text area.  */
    r = NSIntersectionRect (r, ns_row_rect (w, glyph_row, TEXT_AREA));
  
@@ -68,7 +82,9 @@ index 472d2a52a7d..fe400500c8e 100644
 +        bool is_selected_win = (w == XWINDOW (FRAME_SELECTED_WINDOW (f)));
 +        BOOL overlay_ctx_ok = (active_p && is_selected_win);
 +
-+        /* 1) 用“当前 glyph 盒子”重建 r 的高度 —— 避免 box 光标使用整行高 */
++        /* 1) 用"当前 glyph 盒子"重建 r 的高度 —— 避免 box 光标使用整行高 */
++        /* 但保留 HBAR/BAR 光标的原始高度（可能被 evil-half-cursor 等修改）*/
++        if (cursor_type == FILLED_BOX_CURSOR || cursor_type == HOLLOW_BOX_CURSOR)
 +        {
 +          int used = glyph_row->used[TEXT_AREA];
 +          int hpos = w->phys_cursor.hpos;
@@ -82,19 +98,9 @@ index 472d2a52a7d..fe400500c8e 100644
 +              int dsc = g->descent;
 +              int glyph_h_px = asc + dsc;
 +              if (glyph_h_px < 1) glyph_h_px = 1;
-+              // Preserve hbar (underline) as a thin, bottom-aligned strip.
-+              // 经验阈值：如果传入的 r 本就是“很薄”的（相对字形高度），判为 hbar。
-+              CGFloat orig_h = r.size.height;            // 这是前面已为不同光标类型算好的高度
-+              if (orig_h > glyph_h_px * 0.40) {
-+                // box/hollow 这类：按 glyph 高度重建
-+                r.size.height = glyph_h_px;
-+                // r.origin.y 保持不动（我们使用顶部锚点/翻转几何时即为“以顶为准”）
-+              } else {
-+                // hbar：维持细条，并保证“贴底”
-+                CGFloat bottom_y = NSMaxY(r);
-+                r.size.height = MAX(1.0, orig_h);
-+                r.origin.y = bottom_y - r.size.height;
-+              }
++              // 对于 BOX 光标，使用精确的 glyph 高度而不是整行高度
++              r.size.height = glyph_h_px;
++              // r.origin.y 保持不动（我们使用顶部锚点/翻转几何时即为"以顶为准"）
 +            }
 +        }
 +
@@ -116,13 +122,69 @@ index 472d2a52a7d..fe400500c8e 100644
 +          default:          corner = 1.5; break; /* box */
 +          }
 +
++        /* 获取光标下的字符和字体信息 */
++        NSString *glyphStr = nil;
++        NSFont *cursorFont = nil;
++        struct face *cursorFace = NULL;
++
++        if (cursor_type == FILLED_BOX_CURSOR && phys_cursor_glyph) {
++          /* 获取字符 */
++          if (phys_cursor_glyph->type == CHAR_GLYPH) {
++            int c = phys_cursor_glyph->u.ch;
++            if (c > 0 && c < 0x110000) {  /* 有效的 Unicode 字符 */
++              unichar uc = (unichar)c;
++              if (c < 0x10000) {
++                glyphStr = [NSString stringWithCharacters:&uc length:1];
++              } else {
++                /* 处理 surrogate pairs (emoji 等) */
++                unichar chars[2];
++                c -= 0x10000;
++                chars[0] = 0xD800 + (c >> 10);
++                chars[1] = 0xDC00 + (c & 0x3FF);
++                glyphStr = [NSString stringWithCharacters:chars length:2];
++              }
++            }
++          }
++
++          /* 获取字体 */
++          int face_id = phys_cursor_glyph->face_id;
++          cursorFace = FACE_FROM_ID_OR_NULL (f, face_id);
++          if (cursorFace && cursorFace->font) {
++#ifdef NS_IMPL_GNUSTEP
++            struct nsfont_info *font_info = (struct nsfont_info *)cursorFace->font;
++            if (font_info && font_info->nsfont)
++              cursorFont = font_info->nsfont;
++#else
++            cursorFont = (NSFont *)macfont_get_nsctfont (cursorFace->font);
++#endif
++          }
++
++          /* 回退到 frame 默认字体 */
++          if (!cursorFont) {
++            struct font *frame_font = FRAME_OUTPUT_DATA (f)->font;
++            if (frame_font) {
++#ifdef NS_IMPL_GNUSTEP
++              struct nsfont_info *font_info = (struct nsfont_info *)frame_font;
++              if (font_info && font_info->nsfont)
++                cursorFont = font_info->nsfont;
++#else
++              cursorFont = (NSFont *)macfont_get_nsctfont (frame_font);
++#endif
++            }
++          }
++        }
++
 +        /* 4) 更新 overlay（overlay 根层 geometryFlipped = YES，避免 tab-bar 触发 y 偏移） */
 +        [view updateCursorLayerFrame:fr
 +                               scale:(scale > 0 ? scale : 1.0)
 +                               color:ccolor
 +                        cornerRadius:corner
 +                             onState:on_p
-+                            activeWL:overlay_ctx_ok];
++                            activeWL:overlay_ctx_ok
++                          cursorType:cursor_type
++                         glyphString:glyphStr
++                                font:cursorFont
++                       characterFace:cursorFace];
 +        /* 只在 CA 层不可见（未移动/已就位）时回退绘制原始光标，避免遮挡文本 */
 +        if (![view cursorLayerIsVisible])
 +          {
@@ -165,7 +227,7 @@ index 472d2a52a7d..fe400500c8e 100644
    ns_focus (f, NULL, 0);
  
    NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
-@@ -3228,6 +3340,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3228,6 +3388,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
      }
  
    ns_unfocus (f);
@@ -173,7 +235,7 @@ index 472d2a52a7d..fe400500c8e 100644
  }
  
  
-@@ -6830,6 +6943,223 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
+@@ -6830,6 +6991,307 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
    [self updateFramePosition];
  }
  
@@ -236,8 +298,13 @@ index 472d2a52a7d..fe400500c8e 100644
 +    {
 +      cursorLayer.opacity = 0.0f;
 +    }
++  if (cursorTextLayer)
++    {
++      [cursorTextLayer removeFromSuperlayer];
++      cursorTextLayer = nil;
++    }
 +  cursorLayerVisible = NO;
-+  cursorLayerLastValid = NO; /* 防止旧缓存让下一帧被误判为“在动” */
++  cursorLayerLastValid = NO; /* 防止旧缓存让下一帧被误判为"在动" */
 +}
 +
 +/* ---------- 方案 B：回落到原生绘制时重置闪烁 ---------- */
@@ -277,6 +344,10 @@ index 472d2a52a7d..fe400500c8e 100644
 +                  cornerRadius:(CGFloat)radius
 +                       onState:(BOOL)on_p
 +                      activeWL:(BOOL)is_active_selected_window
++                    cursorType:(enum text_cursor_kinds)cursor_type
++                   glyphString:(NSString *)glyphStr
++                          font:(NSFont *)font
++                 characterFace:(struct face *)face
 +{
 +  [self ensureCursorOverlayAndLayer];
 +
@@ -295,9 +366,80 @@ index 472d2a52a7d..fe400500c8e 100644
 +    return;
 +  }
 +
-+  /* 外观同步 */
-+  layer.backgroundColor = color.CGColor;
-+  layer.cornerRadius    = radius;
++  /* 外观同步 - 处理 HOLLOW vs FILLED 光标 */
++  if (cursor_type == HOLLOW_BOX_CURSOR) {
++    /* HOLLOW 光标：透明背景 + 边框 */
++    layer.backgroundColor = [[NSColor clearColor] CGColor];
++    layer.borderColor = color.CGColor;
++    layer.borderWidth = 1.0;
++  } else {
++    /* FILLED 光标：正常背景 + 无边框 */
++    layer.backgroundColor = color.CGColor;
++    layer.borderWidth = 0.0;
++  }
++  layer.cornerRadius = radius;
++
++  /* 更新或创建 CATextLayer 显示光标下的字符 */
++  if (glyphStr && [glyphStr length] > 0 && cursor_type == FILLED_BOX_CURSOR) {
++    if (!cursorTextLayer) {
++      cursorTextLayer = [CATextLayer layer];
++      cursorTextLayer.anchorPoint = CGPointZero;
++
++      /* 关闭隐式动画 */
++      NSMutableDictionary *acts = [NSMutableDictionary dictionary];
++      [acts setObject:[NSNull null] forKey:@"position"];
++      [acts setObject:[NSNull null] forKey:@"bounds"];
++      [acts setObject:[NSNull null] forKey:@"foregroundColor"];
++      [acts setObject:[NSNull null] forKey:@"contents"];
++      cursorTextLayer.actions = acts;
++
++      [layer addSublayer:cursorTextLayer];
++    }
++
++    /* 设置文字内容 */
++    cursorTextLayer.string = glyphStr;
++    cursorTextLayer.font = (__bridge CFTypeRef)font;
++    cursorTextLayer.fontSize = [font pointSize];
++
++    /* 智能文字颜色选择（参考 X11 xterm.c:8335-8351）*/
++    struct frame *f = *emacsframe;
++    NSColor *textColor = nil;
++    unsigned long cursorBgColor = [color unsignedLong];
++
++    if (face) {
++      /* 1. 优先使用字符原背景色（保留原色效果）*/
++      textColor = [NSColor colorWithUnsignedLong:face->background];
++      unsigned long textColorVal = [textColor unsignedLong];
++
++      /* 2. 如果文字颜色与光标背景色相同（看不清），尝试用前景色 */
++      if (textColorVal == cursorBgColor) {
++        textColor = [NSColor colorWithUnsignedLong:face->foreground];
++        textColorVal = [textColor unsignedLong];
++      }
++
++      /* 3. 如果还是看不清，使用 frame 背景色（反色）*/
++      if (textColorVal == cursorBgColor) {
++        textColor = FRAME_BACKGROUND_COLOR (f);
++      }
++    } else {
++      /* 无 face 信息时，回退到 frame 背景色 */
++      textColor = FRAME_BACKGROUND_COLOR (f);
++    }
++
++    cursorTextLayer.foregroundColor = [textColor CGColor];
++    cursorTextLayer.contentsScale = scale;
++    cursorTextLayer.alignmentMode = kCAAlignmentCenter;
++
++    /* 设置文字层的位置和大小与光标层一致 */
++    cursorTextLayer.position = CGPointZero;
++    cursorTextLayer.bounds = CGRectMake(0, 0, fr.size.width, fr.size.height);
++  } else {
++    /* HOLLOW 光标或无字符时隐藏文字层 */
++    if (cursorTextLayer) {
++      [cursorTextLayer removeFromSuperlayer];
++      cursorTextLayer = nil;
++    }
++  }
 +
 +  /* 坐标→像素对齐 */
 +  CGFloat H_view = NSHeight(self.bounds);
@@ -384,6 +526,10 @@ index 472d2a52a7d..fe400500c8e 100644
 +  /* ================= 静止：交回原生闪烁 ================= */
 +  layer.opacity       = 0.0;
 +  cursorLayerVisible  = NO;
++  if (cursorTextLayer) {
++    [cursorTextLayer removeFromSuperlayer];
++    cursorTextLayer = nil;
++  }
 +  cursorLayerLastFrame = fr;
 +  cursorLayerLastValid = YES;
 +}
