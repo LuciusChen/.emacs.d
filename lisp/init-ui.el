@@ -122,9 +122,9 @@
   (:when-loaded (window-navigation-mode)))
 
 (setup popper
-  (keymap-global-set "C-c t" popper-toggle)
-  (keymap-global-set "M-~"   popper-cycle)
-  (keymap-global-set "C-M-`" popper-toggle-type)
+  (keymap-global-set "C-c t" 'popper-toggle)
+  (keymap-global-set "M-~"   'popper-cycle)
+  (keymap-global-set "C-M-`" 'popper-toggle-type)
   (setopt popper-window-height (lambda (win)
                                  (fit-window-to-buffer
                                   win
@@ -165,9 +165,9 @@
 
 (setup tab-bar
   (:defer (:require tab-bar))
-  (keymap-global-set "C-c r t" tab-bar-new-tab)
-  (keymap-global-set "C-c r w" tab-bar-close-tab)
-  (keymap-global-set "C-c r s" tab-bar-switch-to-tab)
+  (keymap-global-set "C-c r t" 'tab-bar-new-tab)
+  (keymap-global-set "C-c r w" 'tab-bar-close-tab)
+  (keymap-global-set "C-c r s" 'tab-bar-switch-to-tab)
   (:when-loaded
     (:also-load lib-tabbar)
     (setq tab-bar-separator "")
