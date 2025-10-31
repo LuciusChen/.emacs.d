@@ -37,7 +37,7 @@
              "C-c i r" org-remark-remove
              "C-c i d" org-remark-delete))
     (setopt org-remark-notes-file-name #'org-remark-notes-file-name-function
-            org-remark-icon-notes nil)
+            org-remark-icon-notes "")
     ;; Enable displaying `help-echo` content in Eldoc when the cursor is on a highlight.
     (:with-mode org-remark-mode
       (:hook (lambda ()

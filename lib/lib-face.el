@@ -17,7 +17,6 @@
   (set-face-like-default 'fixed-pitch-serif)
   (set-face-like-default 'variable-pitch)
 
-  ;; 特殊字符需要安装 Symbola 字体
   ;; https://www.wfonts.com/font/symbola
   (cl-loop for font in SYMBOL-FONT
            when (find-font (font-spec :name font))
@@ -62,7 +61,7 @@
     ;; is used to apply this rule only in a Linux environment.
     ;; https://t.me/emacs_china/297476
     (set-char-table-range composition-function-table #xFE0F '(["\\c.\\c^+" 1 compose-gstring-for-graphic])))
-  ;; 不知道为什么会有一些字符不被覆盖，目前只能这么写了。 2025-04-07
+  ;; Some characters are not being covered, so this workaround is used. 2025-04-07
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (let ((ranges '((#xE5FA . #xE6B7)    ;; Seti-UI + Custom
                   (#xE700 . #xE8EF)    ;; Devicons
