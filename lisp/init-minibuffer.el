@@ -146,8 +146,9 @@
 (setup marginalia
   (:load-after vertico)
   (:when-loaded
-    (setopt marginalia-annotators '(marginalia-annotators-heavy
-                                    marginalia-annotators-light nil))
+    (setopt marginalia-annotators '((default marginalia-annotators-heavy
+                                             marginalia-annotators-light
+                                             nil)))
     (marginalia-mode)))
 
 (setup wgrep

@@ -44,7 +44,7 @@
             dirvish-side-attributes '(vc-state collapse)
             dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
             dirvish-mode-line-height 15
-            dirvish-header-line-height '(15 .25))
+            dirvish-header-line-height '(15 . 25))
     (:with-map dirvish-mode-map
       (:bind "a"    dirvish-quick-access
              "q"    dirvish-quit
