@@ -24,13 +24,13 @@
      org-src-preserve-indentation nil
      org-goto-interface 'outline-path-completion
      ;; Various preferences
-     org-log-done t
+     org-log-done 'time
      org-edit-timestamp-down-means-later t
      org-hide-emphasis-markers t
      org-fold-catch-invisible-edits 'show
      org-export-coding-system 'utf-8
      org-fast-tag-selection-single-key 'expert
-     org-html-validation-link nil
+     org-html-validation-link ""
      org-tags-column 80
      ;; refiling
      org-refile-use-cache nil
@@ -228,7 +228,7 @@
      org-format-latex-options '(:foreground default :background "Transparent" :scale 1.5 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
                                             ("begin" "$1" "$" "$$" "\\(" "\\["))
      org-latex-src-block-backend 'minted ;; ‘org-latex-listings’ is obsolete since 9.6; use ‘org-latex-src-block-backend’ instead.
-     org-latex-minted-options '(("breaklines")
+     org-latex-minted-options '(("breaklines" "")
                                 ("bgcolor" "bg"))
      org-latex-compiler "xelatex"
      org-latex-packages-alist
