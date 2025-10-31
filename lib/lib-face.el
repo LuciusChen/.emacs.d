@@ -46,7 +46,7 @@
   ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
   (when IS-LINUX
-    ;; Set character composition rule for U+FE0F on Linux
+    ;; Set character composition rule for U+FE0F on Linux 2025-10-31
     ;;
     ;; Background:
     ;; On some Linux systems, U+FE0F (VARIATION SELECTOR-16) may display as a box
