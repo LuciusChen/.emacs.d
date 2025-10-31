@@ -45,6 +45,23 @@
       (set-fontset-font "fontset-default" 'han font nil 'append)))
   ;; Force Emacs to search by using font-spec
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
+  (when IS-LINUX
+    ;; Set character composition rule for U+FE0F on Linux
+    ;;
+    ;; Background:
+    ;; On some Linux systems, U+FE0F (VARIATION SELECTOR-16) may display as a box
+    ;; instead of the expected variant display (such as a colored emoji). This is
+    ;; due to the lack of proper character composition rules.
+    ;;
+    ;; Solution:
+    ;; Use the `set-char-table-range` function to set a composition rule for U+FE0F
+    ;; in the `composition-function-table`. This ensures it combines correctly with
+    ;; preceding characters to display as the intended variant.
+    ;;
+    ;; To avoid unnecessary settings on non-Linux systems, the `when` conditional
+    ;; is used to apply this rule only in a Linux environment.
+    ;; https://t.me/emacs_china/297476
+    (set-char-table-range composition-function-table #xFE0F '(["\\c.\\c^+" 1 compose-gstring-for-graphic])))
   ;; 不知道为什么会有一些字符不被覆盖，目前只能这么写了。 2025-04-07
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (let ((ranges '((#xE5FA . #xE6B7)    ;; Seti-UI + Custom

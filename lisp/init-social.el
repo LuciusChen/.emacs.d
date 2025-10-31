@@ -39,8 +39,8 @@
                 ;; for code blocks without language explicitly specified.
                 language-detection)
     (setopt
-     telega-autoplay-mode 1
-     telega-notifications-mode 1
+     telega-autoplay-mode t
+     telega-notifications-mode t
      telega-emoji-use-images nil
      telega-notifications-msg-temex '(and (not outgoing)
                                           (not (chat (or (type channel))))
