@@ -131,24 +131,21 @@
                                   (max 26 (floor (frame-height) 2))
                                   26))
           popper-reference-buffers
-          '(("\\*Messages\\*"
-             "Output\\*$"
-             "\\*Async Shell Command\\*"
-             help-mode
-             compilation-mode)
-            ("\\*Help\\*$")
-            ("\\*xref\\*$")
-            ("\\*chatgpt\\*$")
-            ("\\*OpenRouter\\*$")
-            ("\\*vterm\\*$")
-            ("\\*compilation\\*$")
-            ("\\*eshell\\*$")
-            ("\\*Org Select\\*$")
-            ("\\*Telega User\\*$")
-            ("\\*Telegram Chat Info\\*$")
-            ("\\*Telegram Message Info\\*$")
-            ("\\*Telegram Sticker Set\\*$")
-            ("\\*Telegram Notification Messages\\*$")))
+          '("\\*Messages\\*"
+            "Output\\*$"
+            "\\*Async Shell Command\\*"
+            help-mode
+            compilation-mode
+            eshell-mode
+            "\\*xref\\*"
+            "\\*OpenRouter\\*"
+            "\\*compilation\\*"
+            "\\*Org Select\\*"
+            "\\*Telega User\\*"
+            "\\*Telegram Chat Info\\*"
+            "\\*Telegram Message Info\\*"
+            "\\*Telegram Sticker Set\\*"
+            "\\*Telegram Notification Messages\\*"))
   (:defer (popper-mode +1)
           ;; (popper-echo-mode +1)
           (popper-tab-line-mode +1))

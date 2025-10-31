@@ -73,8 +73,8 @@
   (:when-loaded
     (yas-global-mode)
     (setopt yas-keymap-disable-hook
-            (lambda () (and (frame-live-p corfu--frame)
-                            (frame-visible-p corfu--frame))))
+            (list (lambda () (and (frame-live-p corfu--frame)
+                                  (frame-visible-p corfu--frame)))))
     (setq yas-verbosity 0)))
 
 (provide 'init-completion)
