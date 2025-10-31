@@ -4,13 +4,14 @@
 
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
-  (keymap-global-set "C-c L"     'org-store-link)
-  (keymap-global-set "C-c C-o"   'org-open-at-point)
-  (keymap-global-set "C-M-<up>"  'org-up-element)
+  (keymap-global-set "C-c L"       'org-store-link)
+  (keymap-global-set "C-c C-o"     'org-open-at-point)
+  (keymap-global-set "C-M-<up>"    'org-up-element)
   ;; 一般这个函数都是在 org 启动后调用，如果 org 没有启动则会报错。
   ;; Wrong type argument: commandp, dired-copy-images-links
-  (keymap-global-set "C-c n m"   'dired-copy-images-links)
-  (keymap-global-set "C-c b"     'org-cite-insert)
+  (keymap-global-set "C-c n m"     'dired-copy-images-links)
+  (keymap-global-set "C-c b"       'org-cite-insert)
+  (keymap-global-set "C-c C-x C-a" 'org-archive-subtree-hierarchical)
   (:when-loaded
     (:also-load lib-org)
     (:also-load image-slicing)
@@ -45,7 +46,10 @@
      ;; archive
      org-archive-mark-done nil
      org-archive-location "%s_archive::* Archive"
-     org-archive-default-command 'org-archive-subtree-hierarchical
+     ;; `org-archive-default-command` has limited options.
+     ;; `org-archive-subtree-hierarchical`, not in the default options.
+     ;; To avoid a warning, I bind it to "C-c C-x C-a" instead.
+     ;; org-archive-default-command 'org-archive-subtree-hierarchical
      ;; TODO
      ;; HOLD(h@)       ; 进入时添加笔记
      ;; HOLD(h/!)      ; 离开时添加变更信息
