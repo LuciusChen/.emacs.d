@@ -41,6 +41,17 @@ IGNORE is a placeholder for any arguments passed to this function."
       (org-refile nil nil (list "Tasks" today-file nil tasks-pos))
       (org-sort-second-level-entries-by-time today-file))))
 
+(defun +org-refile-mark-refiled ()
+  "Refile current entry but keep it in place, marking with :refiled: tag."
+  (interactive)
+  (let ((origin (point-marker)))
+    (org-refile-copy)
+    (with-current-buffer (marker-buffer origin)
+      (goto-char origin)
+      (org-set-tags ":refiled:")
+      (save-buffer))
+    (message "Refiled and kept entry marked :refiled:")))
+
 ;; C-x d 进入 dired 模式，m 来标记对应需要复制链接的图片，C-c n m 即可复制到需要的图片插入文本。
 ;; source: https://org-roam.discourse.group/t/is-there-a-solution-for-images-organization-in-org-roam/925
 (defun dired-copy-images-links ()
@@ -71,7 +82,7 @@ IGNORE is a placeholder for any arguments passed to this function."
           (dired-toggle-marks)))
     (message "Error: Does not work outside dired-mode")))
 
-(defun gtd-save-org-buffers ()
+(defun gtd-save-org-buffers (&rest _)
   "Save buffers associated with the variable `org-agenda-files`."
   (interactive)
   (message "Saving org-agenda-files buffers...")
@@ -203,6 +214,22 @@ SUBHEADING exists under today's date, adding it if necessary."
         (insert (concat "* " date-headline "\n** " subheading "\n")))
       (list date-headline subheading))))
 
+(defun org-capture-heading-tasks ()
+  "Return the heading path for daily tasks."
+  (get-today-heading-with-subheading "Tasks :task:"))
+
+(defun org-capture-heading-notes ()
+  "Return the heading path for daily notes."
+  (get-today-heading-with-subheading "Notes :note:"))
+
+(defun org-capture-heading-finds ()
+  "Return the heading path for interesting finds."
+  (get-today-heading-with-subheading "Interesting Finds? :finds:"))
+
+(defun org-capture-heading-consume ()
+  "Return the heading path for media consumption."
+  (get-today-heading-with-subheading "What I Consume? :consume:"))
+
 (defun org-sort-second-level-entries-by-time (&optional file-path)
   "Sort second-level Org entries, placing entries without time first, then by time.
 If FILE-PATH is non-nil, sort entries in that file. Otherwise, sort in the current buffer."
@@ -231,6 +258,65 @@ If FILE-PATH is non-nil, sort entries in that file. Otherwise, sort in the curre
         ;; Save the buffer if it was a file
         (when (and file-path (not (string-empty-p file-path)))
           (save-buffer))))))
+
+(defun +fix-smart-punctuation (beg end)
+  "Intelligently fix punctuation and quotes in the region from BEG to END.
+
+- Full-width punctuation after Chinese characters.
+- Half-width punctuation between English letters/digits.
+- Convert English quotes \" and ' to Chinese quotes “”, ‘’ **only if near Chinese characters**."
+  (interactive "r")
+  (let* ((pairs '(("," . "，") ("\\." . "。") ("!" . "！") ("\\?" . "？")
+                  (":" . "：") (";" . "；")
+                  ("(" . "（") (")" . "）")))
+         (zh "[\u4e00-\u9fff]")  ;; Chinese characters
+         (en "[A-Za-z0-9]")     ;; English letters/digits
+         (left-double t)
+         (left-single t))
+    (save-excursion
+      ;; Normalize quotes to ASCII first
+      (goto-char beg)
+      (while (re-search-forward "[“”]" end t)
+        (replace-match "\"" t t))
+      (goto-char beg)
+      (while (re-search-forward "[‘’]" end t)
+        (replace-match "'" t t))
+
+      ;; Convert double quotes near Chinese
+      (goto-char beg)
+      (while (re-search-forward "\"" end t)
+        (let ((prev (char-before (match-beginning 0)))
+              (next (char-after (match-end 0))))
+          (when (or (and prev (string-match-p zh (char-to-string prev)))
+                    (and next (string-match-p zh (char-to-string next))))
+            (replace-match (if left-double "“" "”") t t)
+            (setq left-double (not left-double)))))
+
+      ;; Convert single quotes near Chinese
+      (goto-char beg)
+      (while (re-search-forward "'" end t)
+        (let ((prev (char-before (match-beginning 0)))
+              (next (char-after (match-end 0))))
+          (when (or (and prev (string-match-p zh (char-to-string prev)))
+                    (and next (string-match-p zh (char-to-string next))))
+            (replace-match (if left-single "‘" "’") t t)
+            (setq left-single (not left-single)))))
+
+      ;; Fix punctuation
+      (dolist (pair pairs)
+        (goto-char beg)
+        ;; Full-width after Chinese character
+        (while (re-search-forward (format "\\(%s\\)%s\\(%s\\|$\\)" zh (car pair) zh) end t)
+          (replace-match (concat "\\1" (cdr pair) "\\2") t))
+        ;; Chinese char followed by half-width punctuation and optional spaces
+        (goto-char beg)
+        (while (re-search-forward (format "\\(%s\\)%s\\s-*" zh (car pair)) end t)
+          (replace-match (concat "\\1" (cdr pair)) t))
+        ;; English context → half-width
+        (goto-char beg)
+        (while (re-search-forward (format "\\(%s\\)%s\\(%s\\)" en (cdr pair) en) end t)
+          (replace-match (concat "\\1" (car pair) "\\2") t))))
+    (message "Smart punctuation and quotes fixed in the region.")))
 
 (defun +org-scan-tags (match)
   "Scan tags in the current buffer using MATCH and print matching headings."
