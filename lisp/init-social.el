@@ -38,6 +38,24 @@
                 ;; then laguage could be detected automatically
                 ;; for code blocks without language explicitly specified.
                 language-detection)
+    ;; palettes 根据使用主题的配色去置换
+    (setq telega-builtin-palettes-alist
+          '((light
+             ((:outline "#b4637a") (:foreground "#b4637a") (:background "#d1c7c7"))
+             ((:outline "#ea9d34") (:foreground "#ea9d34") (:background "#d1ccc7"))
+             ((:outline "#907aa9") (:foreground "#907aa9") (:background "#cdc7d1"))
+             ((:outline "#568D68") (:foreground "#568D68") (:background "#c7d1c7"))
+             ((:outline "#286983") (:foreground "#286983") (:background "#cacfcf"))
+             ((:outline "#56949f") (:foreground "#56949f") (:background "#c6cbd1"))
+             ((:outline "#d7827e") (:foreground "#d7827e") (:background "#d1c7cb")))
+            (dark
+             ((:outline "#eb6f92") (:foreground "#eb6f92") (:background "#3d2828"))
+             ((:outline "#f6c177") (:foreground "#f6c177") (:background "#2c2620"))
+             ((:outline "#b294bb") (:foreground "#b294bb") (:background "#2e1e2e"))
+             ((:outline "#95b1ac") (:foreground "#95b1ac") (:background "#1e2e1e"))
+             ((:outline "#81a2be") (:foreground "#81a2be") (:background "#234242"))
+             ((:outline "#9ccfd8") (:foreground "#9ccfd8") (:background "#1e262e"))
+             ((:outline "#ebbcba") (:foreground "#ebbcba") (:background "#470528")))))
     (setopt
      telega-autoplay-mode t
      telega-notifications-mode t
@@ -74,23 +92,6 @@
      telega-symbol-forward (nerd-icons-faicon "nf-fa-mail_forward")
      telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
-     ;; palettes 根据使用主题的配色去置换
-     telega-builtin-palettes-alist '((light
-                                      ((:outline "#b4637a") (:foreground "#b4637a") (:background "#d1c7c7"))
-                                      ((:outline "#ea9d34") (:foreground "#ea9d34") (:background "#d1ccc7"))
-                                      ((:outline "#907aa9") (:foreground "#907aa9") (:background "#cdc7d1"))
-                                      ((:outline "#568D68") (:foreground "#568D68") (:background "#c7d1c7"))
-                                      ((:outline "#286983") (:foreground "#286983") (:background "#cacfcf"))
-                                      ((:outline "#56949f") (:foreground "#56949f") (:background "#c6cbd1"))
-                                      ((:outline "#d7827e") (:foreground "#d7827e") (:background "#d1c7cb")))
-                                     (dark
-                                      ((:outline "#eb6f92") (:foreground "#eb6f92") (:background "#3d2828"))
-                                      ((:outline "#f6c177") (:foreground "#f6c177") (:background "#2c2620"))
-                                      ((:outline "#b294bb") (:foreground "#b294bb") (:background "#2e1e2e"))
-                                      ((:outline "#95b1ac") (:foreground "#95b1ac") (:background "#1e2e1e"))
-                                      ((:outline "#81a2be") (:foreground "#81a2be") (:background "#234242"))
-                                      ((:outline "#9ccfd8") (:foreground "#9ccfd8") (:background "#1e262e"))
-                                      ((:outline "#ebbcba") (:foreground "#ebbcba") (:background "#470528"))))
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")

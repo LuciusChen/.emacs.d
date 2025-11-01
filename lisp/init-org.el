@@ -11,62 +11,34 @@
   ;; Wrong type argument: commandp, dired-copy-images-links
   (keymap-global-set "C-c n m"     'dired-copy-images-links)
   (keymap-global-set "C-c b"       'org-cite-insert)
-  (keymap-global-set "C-c C-x C-a" 'org-archive-subtree-hierarchical)
   (:when-loaded
     (:also-load lib-org)
     (:also-load image-slicing)
     (:with-mode org-mode (:bind "C-c C-v" yank-media))
     (:after yank-media (add-to-list 'yank-media-preferred-types 'image/tiff))
-    (setopt
-     org-directory ORG-PATH
-     org-image-actual-width nil
-     ;; remove org-src content indent
-     org-edit-src-content-indentation 0
-     org-src-preserve-indentation nil
-     org-goto-interface 'outline-path-completion
-     ;; Various preferences
-     org-log-done 'time
-     org-edit-timestamp-down-means-later t
-     org-hide-emphasis-markers t
-     org-fold-catch-invisible-edits 'show
-     org-export-coding-system 'utf-8
-     org-fast-tag-selection-single-key 'expert
-     org-html-validation-link ""
-     org-tags-column 80
-     ;; refiling
-     org-refile-use-cache nil
-     ;; Targets include this file and any file contributing to the agenda - up to 5 levels deep
-     org-refile-targets '((nil :maxlevel . 5) (org-agenda-files :maxlevel . 5))
-     ;; Allow refile to create parent tasks with confirmation
-     org-refile-allow-creating-parent-nodes 'confirm
-     ;; Targets start with the file name - allows creating level 1 tasks
-     ;; org-refile-use-outline-path (quote file))
-     org-refile-use-outline-path 'file
-     org-outline-path-complete-in-steps nil
-     ;; archive
-     org-archive-mark-done nil
-     org-archive-location "%s_archive::* Archive"
-     ;; `org-archive-default-command` has limited options.
-     ;; `org-archive-subtree-hierarchical`, not in the default options.
-     ;; To avoid a warning, I bind it to "C-c C-x C-a" instead.
-     ;; org-archive-default-command 'org-archive-subtree-hierarchical
-     ;; TODO
-     ;; HOLD(h@)       ; 进入时添加笔记
-     ;; HOLD(h/!)      ; 离开时添加变更信息
-     ;; HOLD(h@/!)     ; 进入时添加笔记，离开时添加变更信息
-     org-todo-keywords
-     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
-       (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c/!)")
-       (sequence "WAITING(w/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c/!)"))
-     org-todo-repeat-to-state "NEXT"
-     org-todo-keyword-faces
-     '(("NEXT" :inherit warning)
-       ("PROJECT" :inherit font-lock-string-face))
-     ;; Exclude DONE state tasks from refile targets
-     org-refile-target-verify-function (lambda ()
-                                         (not (member
-                                               (nth 2 (org-heading-components))
-                                               org-done-keywords))))
+    (setopt org-directory ORG-PATH
+            org-image-actual-width nil
+            org-edit-src-content-indentation 0
+            org-goto-interface 'outline-path-completion
+            org-log-done 'time
+            org-edit-timestamp-down-means-later t
+            org-hide-emphasis-markers t
+            org-fold-catch-invisible-edits 'show
+            org-export-coding-system 'utf-8
+            org-fast-tag-selection-single-key 'expert
+            org-tags-column 80
+            ;; TODO
+            ;; HOLD(h@)       ; 进入时添加笔记
+            ;; HOLD(h/!)      ; 离开时添加变更信息
+            ;; HOLD(h@/!)     ; 进入时添加笔记，离开时添加变更信息
+            org-todo-keywords
+            '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
+              (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c/!)")
+              (sequence "WAITING(w/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c/!)"))
+            org-todo-repeat-to-state "NEXT"
+            org-todo-keyword-faces
+            '(("NEXT" :inherit warning)
+              ("PROJECT" :inherit font-lock-string-face)))
     ;; emphasis
     (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:]"
                                            "-[:space:].,:!?;'\")}\\[[:nonascii:]"
@@ -81,8 +53,6 @@
                                       "\\|"
                                       "\\(?:\\*\\|[+-]?[[:alnum:].,\\]*[[:alnum:]]\\)\\)")
           )
-    (:also-load lib-org-archive-hierachical)
-    (:advice org-refile :after (lambda (&rest _) (gtd-save-org-buffers)))
     (:with-mode org-mode
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
@@ -94,6 +64,33 @@
     (+org-emphasize-bindings)
     (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
     (org-element-update-syntax)))
+
+(setup org-refile
+  (:when-loaded
+    (setopt org-refile-use-cache nil
+            org-refile-targets '((nil :maxlevel . 5)
+                                 (org-agenda-files :maxlevel . 5))
+            ;; Allow refile to create parent tasks with confirmation
+            org-refile-allow-creating-parent-nodes 'confirm
+            ;; Targets start with the file name - allows creating level 1 tasks
+            ;; org-refile-use-outline-path (quote file))
+            org-refile-use-outline-path 'file
+            org-outline-path-complete-in-steps nil
+            ;; Exclude DONE state tasks from refile targets
+            org-refile-target-verify-function
+            (lambda ()
+              (not (member
+                    (nth 2 (org-heading-components))
+                    org-done-keywords))))
+    (:advice org-refile :after #'gtd-save-org-buffers)))
+
+(setup org-archive
+  (:when-loaded
+    (:also-load lib-org-archive-hierachical)
+    (setq org-archive-default-command 'org-archive-subtree-hierarchical)
+    (setopt org-archive-mark-done nil
+            org-archive-location "%s_archive::* Archive"
+            org-archive-default-command 'org-archive-subtree-hierarchical)))
 
 (setup ob-core
   (:load-after org)
@@ -151,35 +148,54 @@
             denote-journal-title-format 'day-date-month-year)
     (keymap-global-set "C-c c" 'org-capture)
     (:after org-capture
-      (setopt org-capture-templates
-              '(("d" "Default           ||" entry
-                 (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
-                 "%<%H:%M> %?\n" :kill-buffer t)
-                ("p" "Prod              ||" entry
-                 (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
-                 "%<%H:%M> %? :prod:\n" :kill-buffer t)
-                ("t" "Tasks             || org-agenda" plain
-                 (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
-                 "*** TODO %?" :kill-buffer t)
-                ("n" "Notes with source ||" entry
-                 (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
-                 "** %?\n%U\n%a\n" :kill-buffer t)
-                ("f" "Fleeting Notes    ||" entry
-                 (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Notes :note:")))
-                 "** %?\n" :kill-buffer t)
-                ("i" "Interesting Finds ||" entry
-                 (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Interesting Finds? :finds:")))
-                 "** %?\n" :kill-buffer t)
-                ("c" "Media Consumption || Book, Film, TV, Podcast etc." entry
-                 (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "What I Consume? :consume:")))
-                 "** %?\n" :kill-buffer t)
-                ("w" "Weather           ||" entry
-                 (file+headline denote-journal-path-to-new-or-existing-entry get-today-heading)
-                 "%(fetch-weather-data)\n")
-                ("a" "Tasks             || copying to journal upon TODO completion or cancellation" plain
-                 (file+olp denote-journal-path-to-new-or-existing-entry (lambda ()(get-today-heading-with-subheading "Tasks :task:")))
-                 "" :kill-buffer t)))
-      (:with-hook org-capture-before-finalize-hook (:hook org-sort-second-level-entries-by-time)))))
+      (setq org-capture-templates
+            '(("d" "Default           ||" entry
+               (file+headline
+                denote-journal-path-to-new-or-existing-entry
+                get-today-heading)
+               "%<%H:%M> %?\n" :kill-buffer t)
+              ("p" "Prod              ||" entry
+               (file+headline
+                denote-journal-path-to-new-or-existing-entry
+                get-today-heading)
+               "%<%H:%M> %? :prod:\n" :kill-buffer t)
+              ("t" "Tasks             || org-agenda" plain
+               (file+olp
+                denote-journal-path-to-new-or-existing-entry
+                org-capture-heading-tasks)
+               "*** TODO %?" :kill-buffer t)
+              ("n" "Notes with source ||" entry
+               (file+olp
+                denote-journal-path-to-new-or-existing-entry
+                org-capture-heading-notes)
+               "** %?\n%U\n%a\n" :kill-buffer t)
+              ("f" "Fleeting Notes    ||" entry
+               (file+olp
+                denote-journal-path-to-new-or-existing-entry
+                org-capture-heading-notes)
+               "** %?\n" :kill-buffer t)
+              ("i" "Interesting Finds ||" entry
+               (file+olp
+                denote-journal-path-to-new-or-existing-entry
+                org-capture-heading-finds)
+               "** %?\n" :kill-buffer t)
+              ("c" "Media Consumption || Book, Film, TV, Podcast etc." entry
+               (file+olp
+                denote-journal-path-to-new-or-existing-entry
+                org-capture-heading-consume)
+               "** %?\n" :kill-buffer t)
+              ("w" "Weather           ||" entry
+               (file+headline
+                denote-journal-path-to-new-or-existing-entry
+                get-today-heading)
+               "%(fetch-weather-data)\n")
+              ("a" "Tasks             || copying to journal" plain
+               (file+olp
+                denote-journal-path-to-new-or-existing-entry
+                org-capture-heading-tasks)
+               "" :kill-buffer t)))
+      (:with-hook org-capture-before-finalize-hook
+        (:hook org-sort-second-level-entries-by-time)))))
 
 (setup org-clock
   (:load-after org)
@@ -229,9 +245,16 @@
                     ("xelatex -interaction nonstopmode -output-directory %o %f")
                     :image-converter
                     ("convert -density %D -trim -antialias %f -quality 100 %O")))
-     org-format-latex-options '(:foreground default :background "Transparent" :scale 1.5 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+     org-format-latex-options '(:foreground default
+                                            :background "Transparent"
+                                            :scale 1.5
+                                            :html-foreground "Black"
+                                            :html-background "Transparent"
+                                            :html-scale 1.0
+                                            :matchers
                                             ("begin" "$1" "$" "$$" "\\(" "\\["))
-     org-latex-src-block-backend 'minted ;; ‘org-latex-listings’ is obsolete since 9.6; use ‘org-latex-src-block-backend’ instead.
+     ;; ‘org-latex-listings’ is obsolete since 9.6; use ‘org-latex-src-block-backend’ instead.
+     org-latex-src-block-backend 'minted
      org-latex-minted-options '(("breaklines" "")
                                 ("bgcolor" "bg"))
      org-latex-compiler "xelatex"
