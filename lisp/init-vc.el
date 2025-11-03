@@ -42,10 +42,12 @@
             ;; helpful and only add to runtime costs.
             magit-revision-insert-related-refs nil
             magit-blame-styles '((headings
-                                  (heading-format . "  %C %-18a%f %-80s  %H\n")
-                                  (show-message . t))
+                                  (heading-format . "  %C %-18a%f %-80s  %H\n"))
                                  (highlight
-                                  (highlight-face . magit-blame-highlight)))
+                                  (highlight-face . magit-blame-highlight))
+                                 (lines
+                                  (show-lines     . t)
+                                  (show-message   . t)))
             magit-format-file-function #'magit-format-file-nerd-icons)
     (:advice magit-status :around #'magit-fullscreen)
     (:advice magit-mode-quit-window :after #'magit-restore-screen)
@@ -66,7 +68,7 @@
     ;;   minute->m, hour->h, day->d, week->w, month->M, year->Y
     ;; Also reduce the author column width to 11 as the author name is being
     ;; abbreviated below.
-    (setopt magit-log-margin '(t age-abbreviated magit-log-margin-width :author 11))
+    (setopt magit-log-margin '(t age-abbreviated magit-log-margin-width t 11))
     (:advice magit-log-format-margin :filter-args #'+magit-log--abbreviate-author)))
 
 (setup forge
