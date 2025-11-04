@@ -106,11 +106,11 @@
     (add-to-list 'sis-context-detectors
                  (lambda (&rest _)
                    (when (and meow-insert-mode
-                              (or (derived-mode-p 'gfm-mode
-                                                  'telega-chat-mode)
-                                  (string-match-p "*new toot*" (buffer-name))))
+                              (or (derived-mode-p 'gfm-mode 'org-mode 'telega-chat-mode)
+                                  (string-match-p "*new toot*" (buffer-name)))
+                              (not (looking-back "[a-zA-Z]\\|\\cc" 1))
+                              (not (looking-at "[a-zA-Z]\\|\\cc")))
                      'other)))
-
     (add-function :after after-focus-change-function
                   (lambda ()
                     (if (frame-focus-state)
