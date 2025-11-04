@@ -50,7 +50,7 @@ index 6a715fb92fc..19e87be0b7c 100644
  - (void) updateCollectionBehavior;
  #endif
 diff --git a/src/nsterm.m b/src/nsterm.m
-index 472d2a52a7d..941f66164bb 100644
+index 472d2a52a7d..f735e16cfa2 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
 @@ -72,6 +72,12 @@ Updated by Christian Limpach (chris@nice.ch)
@@ -66,7 +66,7 @@ index 472d2a52a7d..941f66164bb 100644
  #endif
  
  static EmacsMenu *dockMenu;
-@@ -3190,6 +3196,160 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3190,6 +3196,173 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
    /* Prevent the cursor from being drawn outside the text area.  */
    r = NSIntersectionRect (r, ns_row_rect (w, glyph_row, TEXT_AREA));
  
@@ -81,6 +81,13 @@ index 472d2a52a7d..941f66164bb 100644
 +        /* 仅允许“活动 frame + 被选中 window”驱动 overlay，避免多 window 抢层 */
 +        bool is_selected_win = (w == XWINDOW (FRAME_SELECTED_WINDOW (f)));
 +        BOOL overlay_ctx_ok = (active_p && is_selected_win);
++
++        /* 非选中窗口不使用 CALayer，直接跳过避免状态干扰 */
++        if (!overlay_ctx_ok)
++          {
++            /* 非选中窗口不显示光标 */
++            return;
++          }
 +
 +        /* 1) 用"当前 glyph 盒子"重建 r 的高度 —— 避免 box 光标使用整行高 */
 +        /* 但保留 HBAR/BAR 光标的原始高度（可能被 evil-half-cursor 等修改）*/
@@ -98,9 +105,15 @@ index 472d2a52a7d..941f66164bb 100644
 +              int dsc = g->descent;
 +              int glyph_h_px = asc + dsc;
 +              if (glyph_h_px < 1) glyph_h_px = 1;
-+              // 对于 BOX 光标，使用精确的 glyph 高度而不是整行高度
++
++              /* 对于 BOX 光标，使用精确的 glyph 高度而不是整行高度 */
++              /* 参照 HBAR_CURSOR 的逻辑（3187-3189），底部对齐 */
++              int orig_h = r.size.height;  /* 保存原始行高 */
++              if (orig_h > glyph_h_px) {
++                /* 光标高度小于行高时，向下移动使底部对齐 */
++                r.origin.y += (orig_h - glyph_h_px);
++              }
 +              r.size.height = glyph_h_px;
-+              // r.origin.y 保持不动（我们使用顶部锚点/翻转几何时即为"以顶为准"）
 +            }
 +        }
 +
@@ -185,7 +198,7 @@ index 472d2a52a7d..941f66164bb 100644
 +                         glyphString:glyphStr
 +                                font:cursorFont
 +                       characterFace:cursorFace];
-+        /* 只在 CA 层不可见（未移动/已就位）时回退绘制原始光标，避免遮挡文本 */
++        /* 只在 CA 层不可见（光标静止）时回退绘制原始光标，交由原生闪烁处理 */
 +        if (![view cursorLayerIsVisible])
 +          {
 +            ns_focus (f, NULL, 0);
@@ -227,7 +240,7 @@ index 472d2a52a7d..941f66164bb 100644
    ns_focus (f, NULL, 0);
  
    NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
-@@ -3228,6 +3388,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3228,6 +3401,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
      }
  
    ns_unfocus (f);
@@ -235,7 +248,7 @@ index 472d2a52a7d..941f66164bb 100644
  }
  
  
-@@ -6830,6 +6991,307 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
+@@ -6830,6 +7004,302 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
    [self updateFramePosition];
  }
  
@@ -360,11 +373,6 @@ index 472d2a52a7d..941f66164bb 100644
 +  static const CFTimeInterval MOVING_GRACE_S = 0.12;
 +
 +  static CFTimeInterval s_lastMoveT = 0.0;
-+
-+  if (!is_active_selected_window) {
-+    [self hideCursorLayer];
-+    return;
-+  }
 +
 +  /* 外观同步 - 处理 HOLLOW vs FILLED 光标 */
 +  if (cursor_type == HOLLOW_BOX_CURSOR) {
