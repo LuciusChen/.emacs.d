@@ -23,8 +23,8 @@
   (:require lib-env)
   (+load-env-file)
   ;; 修复 dvisvgm 找不到 texmf.cnf 的问题（Homebrew 安装的 TeX Live）
-  (setenv "TEXMFCNF" "/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/web2c")
-  (setenv "TEXMFROOT" "/opt/homebrew/Cellar/texlive/20250308_1/share"))
+  (setenv "TEXMFCNF" "/opt/homebrew/opt/texlive/share/texmf-dist/web2c/")
+  (setenv "TEXMFROOT" "/opt/homebrew/opt/texlive/share"))
 
 (setup (:only-if (fboundp 'mac-input-source))
   (:require lib-ime)
