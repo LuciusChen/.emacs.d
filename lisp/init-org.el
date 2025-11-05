@@ -247,7 +247,7 @@
                     ("convert -density %D -trim -antialias %f -quality 100 %O")))
      org-format-latex-options '(:foreground default
                                             :background "Transparent"
-                                            :scale 1.5
+                                            :scale 1.2
                                             :html-foreground "Black"
                                             :html-background "Transparent"
                                             :html-scale 1.0
@@ -285,7 +285,29 @@
        ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
        ;; ("" "algpseudocode" t)
        ;; for chinese preview
-       ("fontset=LXGW WenKai,UTF8" "ctex" t)))))
+       ("UTF8" "ctex" t))
+     org-format-latex-header "\\documentclass{article}
+\\usepackage[usenames]{color}
+\\usepackage{xeCJK}
+\\usepackage{amsmath}
+\\setCJKmainfont{LXGW WenKai}
+\\setmainfont{PragmataPro}
+\[DEFAULT-PACKAGES]
+\[PACKAGES]
+\\pagestyle{empty}             % do not remove
+% The settings below are copied from fullpage.sty
+\\setlength{\\textwidth}{\\paperwidth}
+\\addtolength{\\textwidth}{-3cm}
+\\setlength{\\oddsidemargin}{1.5cm}
+\\addtolength{\\oddsidemargin}{-2.54cm}
+\\setlength{\\evensidemargin}{\\oddsidemargin}
+\\setlength{\\textheight}{\\paperheight}
+\\addtolength{\\textheight}{-\\headheight}
+\\addtolength{\\textheight}{-\\headsep}
+\\addtolength{\\textheight}{-\\footskip}
+\\addtolength{\\textheight}{-3cm}
+\\setlength{\\topmargin}{1.5cm}
+\\addtolength{\\topmargin}{-2.54cm}")))
 
 (setup org-agenda
   (keymap-global-set "C-c a" 'org-agenda)
