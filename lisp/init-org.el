@@ -219,9 +219,8 @@
   (:when-loaded
     (setopt
      org-latex-pdf-process '("latexmk -f -xelatex -shell-escape -output-directory=%o %F")
-     org-preview-latex-default-process 'dvisvgm
      org-preview-latex-process-alist
-     '((dvisvgm :programs
+     '((xelatex :programs
                 ("xelatex" "dvisvgm")
                 :description "xdv > svg"
                 :message "you need to install the programs: xelatex and dvisvgm."
@@ -232,27 +231,8 @@
                 :latex-compiler
                 ("xelatex -no-pdf -interaction nonstopmode -shell-escape -output-directory %o %f")
                 :image-converter
-                ("dvisvgm %f -e -n -b min -c %S -o %O"))
-       (imagemagick :programs
-                    ("xelatex" "convert")
-                    :description "pdf > png"
-                    :message "you need to install the programs: xelatex and imagemagick."
-                    :use-xcolor t
-                    :image-input-type "pdf"
-                    :image-output-type "png"
-                    :image-size-adjust (1.0 . 1.0)
-                    :latex-compiler
-                    ("xelatex -interaction nonstopmode -output-directory %o %f")
-                    :image-converter
-                    ("convert -density %D -trim -antialias %f -quality 100 %O")))
-     org-format-latex-options '(:foreground default
-                                            :background "Transparent"
-                                            :scale 1.2
-                                            :html-foreground "Black"
-                                            :html-background "Transparent"
-                                            :html-scale 1.0
-                                            :matchers
-                                            ("begin" "$1" "$" "$$" "\\(" "\\["))
+                ("dvisvgm %f -e -n -b min -c %S -o %O")))
+     org-preview-latex-default-process 'xelatex
      ;; ‘org-latex-listings’ is obsolete since 9.6; use ‘org-latex-src-block-backend’ instead.
      org-latex-src-block-backend 'minted
      org-latex-minted-options '(("breaklines" "")
@@ -264,20 +244,25 @@
        ("" "svg" t)
        ("" "svg-extract" t)
 
-       ("" "mathtools" t)
-       ("" "amsmath" t)
-       ("" "amssymb" t)
+       ("" "mathtools"   t)
+       ("" "amsmath"     t)
+       ("" "amssymb"     t)
+
+       ;; english or math fonts
+       ("" "arev"        t)
+       ("" "arevmath"    t)
+
        ;; for mapsfrom
        ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
-       ("" "stmaryrd" t)
-       ("" "mathrsfs" t)
-       ("" "tikz" t)
-       ("" "tikz-cd" t)
+       ("" "stmaryrd"    t)
+       ("" "mathrsfs"    t)
+       ("" "tikz"        t)
+       ("" "tikz-cd"     t)
        ;; ("" "quiver" t)
        ;; see https://castel.dev/post/lecture-notes-2/
-       ("" "import" t)
-       ("" "xifthen" t)
-       ("" "pdfpages" t)
+       ("" "import"      t)
+       ("" "xifthen"     t)
+       ("" "pdfpages"    t)
        ("" "transparent" t)
        ;; algorithm
        ;; https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused
@@ -285,13 +270,10 @@
        ;; You should not load the algorithm2e, algcompatible, algorithmic packages if you have already loaded algpseudocode.
        ;; ("" "algpseudocode" t)
        ;; for chinese preview
-       ("UTF8" "ctex" t))
-     org-format-latex-header "\\documentclass{article}
+       ("UTF8" "ctex"    t))
+     org-format-latex-header "\\documentclass{ctexart}
 \\usepackage[usenames]{color}
-\\usepackage{xeCJK}
-\\usepackage{amsmath}
 \\setCJKmainfont{LXGW WenKai}
-\\setmainfont{PragmataPro}
 \[DEFAULT-PACKAGES]
 \[PACKAGES]
 \\pagestyle{empty}             % do not remove
