@@ -92,6 +92,23 @@
             org-archive-location "%s_archive::* Archive"
             org-archive-default-command 'org-archive-subtree-hierarchical)))
 
+(setup org-clock
+  (:load-after org)
+  (keymap-global-set "C-c o j" 'org-clock-goto)
+  (keymap-global-set "C-c o l" 'org-clock-in-last)
+  (keymap-global-set "C-c o i" 'org-clock-in)
+  (keymap-global-set "C-c o o" 'org-clock-out)
+  (:when-loaded
+    (setopt org-clock-persist t
+            org-clock-in-resume t
+            ;; Save clock data and notes in the LOGBOOK drawer
+            org-clock-into-drawer t
+            ;; Save state changes in the LOGBOOK drawer
+            org-log-into-drawer t
+            ;; Removes clocked tasks with 0:00 duration
+            org-clock-out-remove-zero-time-clocks t)
+    (org-clock-persistence-insinuate)))
+
 (setup ob-core
   (:load-after org)
   (:when-loaded
@@ -101,8 +118,8 @@
                 ob-verb)
     (setopt org-plantuml-jar-path
             (expand-file-name (concat ORG-PATH "/plantuml/plantuml.jar"))
-            ;; 这里应该就是 .zshrc 里面配置的 python3
-            org-babel-python-command "python3")
+            ;; 这里应该就是 .zshrc 里面配置的 python
+            org-babel-python-command "python")
     (org-babel-do-load-languages
      'org-babel-load-languages '((plantuml . t)
                                  (python . t)
@@ -196,23 +213,6 @@
                "" :kill-buffer t)))
       (:with-hook org-capture-before-finalize-hook
         (:hook org-sort-second-level-entries-by-time)))))
-
-(setup org-clock
-  (:load-after org)
-  (keymap-global-set "C-c o j" 'org-clock-goto)
-  (keymap-global-set "C-c o l" 'org-clock-in-last)
-  (keymap-global-set "C-c o i" 'org-clock-in)
-  (keymap-global-set "C-c o o" 'org-clock-out)
-  (:when-loaded
-    (setopt org-clock-persist t
-            org-clock-in-resume t
-            ;; Save clock data and notes in the LOGBOOK drawer
-            org-clock-into-drawer t
-            ;; Save state changes in the LOGBOOK drawer
-            org-log-into-drawer t
-            ;; Removes clocked tasks with 0:00 duration
-            org-clock-out-remove-zero-time-clocks t)
-    (org-clock-persistence-insinuate)))
 
 (setup ox-latex
   (:load-after org)
