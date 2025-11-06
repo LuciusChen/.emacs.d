@@ -289,7 +289,17 @@
 \\addtolength{\\textheight}{-\\footskip}
 \\addtolength{\\textheight}{-3cm}
 \\setlength{\\topmargin}{1.5cm}
-\\addtolength{\\topmargin}{-2.54cm}")))
+\\addtolength{\\topmargin}{-2.54cm}")
+
+    ;; 需要设置中英文字体可以参考 =org-format-latex-header
+    (add-to-list 'org-latex-classes
+                 '("Notes"
+                   "\\documentclass{ctexart}\\usepackage{NotesTeXV3}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))))
 
 (setup org-agenda
   (keymap-global-set "C-c a" 'org-agenda)
