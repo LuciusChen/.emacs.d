@@ -248,10 +248,6 @@
        ("" "amsmath"     t)
        ("" "amssymb"     t)
 
-       ;; english or math fonts
-       ("" "arev"        t)
-       ("" "arevmath"    t)
-
        ;; for mapsfrom
        ;; see: https://tex.stackexchange.com/questions/26508/left-version-of-mapsto
        ("" "stmaryrd"    t)
@@ -271,11 +267,14 @@
        ;; ("" "algpseudocode" t)
        ;; for chinese preview
        ("UTF8" "ctex"    t))
+     ;; `arev' and `arevmath' is font packages
      org-format-latex-header "\\documentclass{ctexart}
 \\usepackage[usenames]{color}
 \\setCJKmainfont{LXGW WenKai}
 \[DEFAULT-PACKAGES]
 \[PACKAGES]
+\\usepackage{arev}
+\\usepackage{arevmath}
 \\pagestyle{empty}             % do not remove
 % The settings below are copied from fullpage.sty
 \\setlength{\\textwidth}{\\paperwidth}
@@ -290,8 +289,10 @@
 \\addtolength{\\textheight}{-3cm}
 \\setlength{\\topmargin}{1.5cm}
 \\addtolength{\\topmargin}{-2.54cm}")
-
-    ;; 需要设置中英文字体可以参考 =org-format-latex-header
+    ;; To set the fonts, you can refer to `org-format-latex-header'
+    ;; Make sure to have NotesTeXV3.sty in the export directory
+    ;; Add #+LATEX_CLASS: Notes to the org header
+    ;; https://github.com/Adhumunt/NotesTeX
     (add-to-list 'org-latex-classes
                  '("Notes"
                    "\\documentclass{ctexart}\\usepackage{NotesTeXV3}"
