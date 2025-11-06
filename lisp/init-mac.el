@@ -23,6 +23,7 @@
   (:require lib-env)
   (+load-env-file)
   ;; 修复 dvisvgm 找不到 texmf.cnf 的问题（Homebrew 安装的 TeX Live）
+  ;; Homebrew symlink
   (setenv "TEXMFCNF" "/opt/homebrew/opt/texlive/share/texmf-dist/web2c/")
   (setenv "TEXMFROOT" "/opt/homebrew/opt/texlive/share"))
 
