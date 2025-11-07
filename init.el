@@ -24,15 +24,16 @@
         (IS-LINUX "~/Dropbox/org")))
 (defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst FONT-SIZE (if IS-MAC 14 13))
-(defconst DEFAULT-FONT (format "PragmataPro Mono %d" FONT-SIZE))
-(defconst ORG-FONT (format "PragmataPro Liga %d" FONT-SIZE))
+(defconst DEFAULT-FONT (format "PragmataPro %d" FONT-SIZE))
+(defconst ORG-FONT (format "PragmataPro %d" FONT-SIZE))
 (defconst ZH-DEFAULT-FONT "LXGW WenKai Screen")
-(defconst NERD-ICONS-FONT "Symbols Nerd Font Mono")
+(defconst NERD-ICONS-FONT "PragmataPro")
 (defconst EMOJI-FONTS '("Apple Color Emoji"
                         "Noto Color Emoji"
                         "Noto Emoji"
                         "Segoe UI Emoji"))
-(defconst SYMBOL-FONT '("Apple Symbols"
+(defconst SYMBOL-FONT '("PragmataPro"
+                        "Apple Symbols"
                         "Segoe UI Symbol"
                         "Symbola"
                         "Symbol"))
@@ -70,7 +71,7 @@
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile eat
-        consult-dir too-wide-minibuffer-mode ultra-scroll
+        consult-dir too-wide-minibuffer-mode ultra-scroll org-edna
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
