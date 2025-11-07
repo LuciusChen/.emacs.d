@@ -268,39 +268,69 @@
        ;; for chinese preview
        ("UTF8" "ctex"    t))
      ;; `arev' and `arevmath' is font packages
-     org-format-latex-header "\\documentclass{ctexart}
-\\usepackage[usenames]{color}
-\\setCJKmainfont{LXGW WenKai}
-\[DEFAULT-PACKAGES]
-\[PACKAGES]
-\\usepackage{arev}
-\\usepackage{arevmath}
-\\pagestyle{empty}             % do not remove
-% The settings below are copied from fullpage.sty
-\\setlength{\\textwidth}{\\paperwidth}
-\\addtolength{\\textwidth}{-3cm}
-\\setlength{\\oddsidemargin}{1.5cm}
-\\addtolength{\\oddsidemargin}{-2.54cm}
-\\setlength{\\evensidemargin}{\\oddsidemargin}
-\\setlength{\\textheight}{\\paperheight}
-\\addtolength{\\textheight}{-\\headheight}
-\\addtolength{\\textheight}{-\\headsep}
-\\addtolength{\\textheight}{-\\footskip}
-\\addtolength{\\textheight}{-3cm}
-\\setlength{\\topmargin}{1.5cm}
-\\addtolength{\\topmargin}{-2.54cm}")
+     org-format-latex-header
+     (string-join
+      '("\\documentclass{ctexart}"
+        "\\usepackage[usenames]{color}"
+        "\\setCJKmainfont{LXGW WenKai}"
+        "[DEFAULT-PACKAGES]"
+        "[PACKAGES]"
+        "\\usepackage{arev}"
+        "\\usepackage{arevmath}"
+        "\\pagestyle{empty}             % do not remove"
+        "% The settings below are copied from fullpage.sty"
+        "\\setlength{\\textwidth}{\\paperwidth}"
+        "\\addtolength{\\textwidth}{-3cm}"
+        "\\setlength{\\oddsidemargin}{1.5cm}"
+        "\\addtolength{\\oddsidemargin}{-2.54cm}"
+        "\\setlength{\\evensidemargin}{\\oddsidemargin}"
+        "\\setlength{\\textheight}{\\paperheight}"
+        "\\addtolength{\\textheight}{-\\headheight}"
+        "\\addtolength{\\textheight}{-\\headsep}"
+        "\\addtolength{\\textheight}{-\\footskip}"
+        "\\addtolength{\\textheight}{-3cm}"
+        "\\setlength{\\topmargin}{1.5cm}"
+        "\\addtolength{\\topmargin}{-2.54cm}")))
     ;; To set the fonts, you can refer to `org-format-latex-header'
     ;; Make sure to have NotesTeXV3.sty in the export directory
     ;; Add #+LATEX_CLASS: Notes to the org header
     ;; https://github.com/Adhumunt/NotesTeX
-    (add-to-list 'org-latex-classes
-                 '("Notes"
-                   "\\documentclass{ctexart}\\usepackage{NotesTeXV3}"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))))
+    ;;
+    ;; TODO
+    ;; 1. 简化 NotesTeXV3 封面 --> affiliations
+    ;; 2. ctex 中，org 加粗等会导致多于空格出现
+    (add-to-list
+     'org-latex-classes
+     `("Notes"
+       ,(concat "\\documentclass{ctexart}\n"
+                "\\usepackage{NotesTeXV3}\n"
+                "\\setCJKmainfont{LXGW WenKai}")
+       ("\\clearpage\\part{%s}" . "\\clearpage\\part*{%s}")
+       ("\\section{%s}" . "\\section*{%s}")
+       ("\\subsection{%s}" . "\\subsection*{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+    (add-to-list
+     'org-latex-classes
+     `("article_cn"
+       ,(concat
+         "\\documentclass[11pt]{ctexart}\n"
+         "[DEFAULT-PACKAGES]\n"
+         "[PACKAGES]\n"
+         "[EXTRA]\n"
+         "\\usepackage[dvipsnames]{xcolor}\n"
+         "\\hypersetup{colorlinks=true,"
+         "linkcolor=Maroon,"
+         "urlcolor=Maroon,"
+         "citecolor=Maroon,"
+         "filecolor=Maroon,"
+         "pdfborder={0 0 0}}")
+       ("\\section{%s}" . "\\section*{%s}")
+       ("\\subsection{%s}" . "\\subsection*{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))))
 
 (setup org-agenda
   (keymap-global-set "C-c a" 'org-agenda)
