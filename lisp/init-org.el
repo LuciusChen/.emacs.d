@@ -297,15 +297,17 @@
     ;; https://github.com/Adhumunt/NotesTeX
     ;;
     ;; TODO
-    ;; 1. 简化 NotesTeXV3 封面 --> affiliations
-    ;; 2. ctex 中，org 加粗等会导致多于空格出现
+    ;; 1. ctex 中，org 加粗等会导致多于空格出现
     (add-to-list
      'org-latex-classes
      `("Notes"
        ,(concat "\\documentclass{ctexart}\n"
                 "\\usepackage{NotesTeXV3}\n"
+                "[NO-DEFAULT-PACKAGES]\n"
+                "[NO-PACKAGES]\n"
+                "[EXTRA]\n" ;; the stuff from #+LATEX_HEADER(_EXTRA)
                 "\\setCJKmainfont{LXGW WenKai}")
-       ("\\clearpage\\part{%s}" . "\\clearpage\\part*{%s}")
+       ;; ("\\part{%s}" . "\\part*{%s}")
        ("\\section{%s}" . "\\section*{%s}")
        ("\\subsection{%s}" . "\\subsection*{%s}")
        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
