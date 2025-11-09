@@ -366,9 +366,11 @@
 % Page layout
 \renewcommand{\baselinestretch}{1.0}\normalsize
 \setlength\lineskip{1\p@}
-\setlength\parindent{1.2\parindent}
+\setlength\parindent{0pt}
+%% \setlength\parindent{1.2\parindent}
 \setlength\normallineskip{1\p@}
-\setlength\parskip{0\p@ \@plus \p@}
+%% \setlength\parskip{0\p@ \@plus \p@}
+\setlength\parskip{0.5\baselineskip plus 2pt minus 1pt}
 \@lowpenalty   51
 \@medpenalty  151
 \@highpenalty 301
@@ -462,12 +464,12 @@
 {\large\bfseries}
 [\vspace{-5pt}\color{Maroon}\rule{\textwidth}{.6pt}]
 
-\titleformat{name=\part}[hang]
-{{\thispagestyle{fancypart}}\Huge\bfseries}
-{\marginnote{
-  \begin{center}
-  {\color{lightgray}\thepart}
-  \end{center}}[-.95in]}{0pt}{\Huge\bfseries\itshape}
+%% \titleformat{name=\part}[hang]
+%% {{\thispagestyle{fancypart}}\Huge\bfseries}
+%% {\marginnote{
+%%   \begin{center}
+%%   {\color{lightgray}\thepart}
+%%   \end{center}}[-.95in]}{0pt}{\Huge\bfseries\itshape}
 
 %% \titleformat{\part}[hang]{{\thispagestyle{fancypart}}\Huge\bfseries}{\marginnote{
 %% \begin{tcolorbox}[width=\marginparwidth,height=\marginparwidth/2,colback=black!50!white,colframe=black!50!white,center title,fonttitle=\bfseries\normalsize,title=PART,text fill]
