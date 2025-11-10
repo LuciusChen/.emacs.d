@@ -111,11 +111,21 @@
                               (not (looking-back "[a-zA-Z]\\|\\cc" 1))
                               (not (looking-at "[a-zA-Z]\\|\\cc")))
                      'other)))
+    ;; Fix: Ensure input method switches to English for both keyboard and mouse focus.
+    ;; Problem: Mouse clicks don't trigger input method switch in after-focus-change-function
+    ;; due to event processing timing differences.
+    ;; Solution: Defer the switch to pre-command-hook, which runs after all focus events.
+    (defvar +should-switch-to-english nil)
     (add-function :after after-focus-change-function
                   (lambda ()
                     (if (frame-focus-state)
-                        (sis-set-english)
+                        (setq +should-switch-to-english t)
                       (meow-insert-exit))))
+    (:with-hook pre-command-hook (lambda ()
+                                   (when +should-switch-to-english
+                                     (setq +should-switch-to-english nil)
+                                     (sis-set-english)
+                                     (message (mac-input-source)))))
 
     (define-advice sis--auto-refresh-timer-function
         (:around (orig) toggle-override-map)
