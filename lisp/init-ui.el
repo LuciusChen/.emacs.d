@@ -109,7 +109,6 @@
   (:when-loaded (window-navigation-mode)))
 
 (setup popper
-  (keymap-global-set "C-c t" 'popper-toggle)
   (keymap-global-set "M-~"   'popper-cycle)
   (keymap-global-set "C-M-`" 'popper-toggle-type)
   (setopt popper-window-height (lambda (win)

@@ -199,10 +199,14 @@
 
 (setup avy
   (keymap-global-set "C-;" 'avy-goto-word-or-subword-1)
-  (keymap-global-set "C-:" 'avy-goto-char-in-line)
-  (setopt avy-style 'de-bruijn)
-  (:defer (:require ace-pinyin)
-          (ace-pinyin-global-mode +1)))
+  (:when-loaded (setopt avy-style 'de-bruijn)))
+
+(setup ace-pinyin
+  (:load-after avy)
+  (:when-loaded
+    (keymap-global-set "C-:" 'ace-pinyin-jump-char-in-line)
+    (ace-pinyin-global-mode +1)))
+
 
 (setup goggles
   (:hook-into prog-mode)
