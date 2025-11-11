@@ -101,7 +101,7 @@
     ;; enable the /context/ mode for all buffers
     (sis-global-context-mode t)
     ;; enable the /inline english/ mode for all buffers
-    ;; (sis-global-inline-mode t)
+    (sis-global-inline-mode t)
     ;; When these conditions are met, it returns `other',
     ;; indicating that in these modes or buffers,
     ;; with no surrounding characters, the input defaults to Chinese.
@@ -130,7 +130,8 @@
          (setq sis--prefix-override-map-enable t))))
     ;; Sets up an idle timer to automatically
     ;; switch input methods based on the editing context
-    (+setup-idle-command-for-sis)))
+    (:with-hook meow-insert-enter-hook (:hook +start-idle-command-for-sis))
+    (:with-hook meow-insert-exit-hook (:hook +stop-idle-command-for-sis))))
 
 (setup auto-space
   (:defer (:require auto-space))
