@@ -105,15 +105,15 @@
     ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。
     (add-to-list 'sis-context-detectors
                  (lambda (&rest _)
-                   (when (and meow-insert-mode
-                              (or (derived-mode-p 'gfm-mode 'org-mode 'telega-chat-mode)
-                                  (string-match-p "*new toot*" (buffer-name)))
-                              (not (looking-back "[a-zA-Z]\\|\\cc" 1))
-                              (not (looking-at "[a-zA-Z]\\|\\cc")))
-                     'other)))
-    ;; Fix: Ensure input method switches to English for both keyboard and mouse focus.
-    ;; Problem: Mouse clicks don't trigger input method switch in after-focus-change-function
-    ;; due to event processing timing differences.
+                   (and meow-insert-mode
+                        (or (derived-mode-p 'gfm-mode 'org-mode 'telega-chat-mode)
+                            (string-match-p "\\*new toot\\*" (buffer-name)))
+                        (not (or (looking-back "[a-zA-Z]\\|\\cc" 1)
+                                 (looking-at "[a-zA-Z]\\|\\cc")))
+                        'other)))
+    ;; Fix: Ensure input method switches to English for both keyboard and mouse focus on macOS.
+    ;; Problem: On macOS, mouse clicks don't trigger input method switch in after-focus-change-function
+    ;; due to event processing timing differences. Linux doesn't have this issue.
     ;; Solution: Defer the switch to pre-command-hook, which runs after all focus events.
     (defvar +should-switch-to-english nil)
     (add-function :after after-focus-change-function
