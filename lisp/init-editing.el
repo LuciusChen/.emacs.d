@@ -79,6 +79,7 @@
 (setup sis
   (:defer (:require sis))
   (:when-loaded
+    (:also-load lib-sis)
     (setq sis-english-source "com.apple.keylayout.ABC"
           ;; 用了 emacs-mac 提取的 patch 中的 mac-input-source 方法来切换
           ;; sis-external-ism "macism"
@@ -101,32 +102,24 @@
     (sis-global-context-mode t)
     ;; enable the /inline english/ mode for all buffers
     ;; (sis-global-inline-mode t)
-    ;; org title 处切换 Rime，telega 聊天时切换 Rime。
-    ;; 使用模式编辑 meow，需要额外加 meow-insert-mode 条件。
-    (add-to-list 'sis-context-detectors
-                 (lambda (&rest _)
-                   (and meow-insert-mode
-                        (or (derived-mode-p 'gfm-mode 'org-mode 'telega-chat-mode)
-                            (string-match-p "\\*new toot\\*" (buffer-name)))
-                        (not (or (looking-back "[a-zA-Z]\\|\\cc" 1)
-                                 (looking-at "[a-zA-Z]\\|\\cc")))
-                        'other)))
+    ;; When these conditions are met, it returns `other',
+    ;; indicating that in these modes or buffers,
+    ;; with no surrounding characters, the input defaults to Chinese.
+    ;; If characters are present, the input method switches
+    ;; automatically based on context.
+    (add-to-list 'sis-context-detectors #'+context-detector-function)
     ;; Fix: Ensure input method switches to English for both keyboard and mouse focus on macOS.
     ;; Problem: On macOS, mouse clicks don't trigger input method switch in after-focus-change-function
     ;; due to event processing timing differences. Linux doesn't have this issue.
     ;; Solution: Defer the switch to pre-command-hook, which runs after all focus events.
-    (defvar +should-switch-to-english nil)
-    (add-function :after after-focus-change-function
-                  (lambda ()
-                    (if (frame-focus-state)
-                        (setq +should-switch-to-english t)
-                      (meow-insert-exit))))
-    (:with-hook pre-command-hook (lambda ()
-                                   (when +should-switch-to-english
-                                     (setq +should-switch-to-english nil)
-                                     (sis-set-english)
-                                     (message (mac-input-source)))))
-
+    (add-function :after after-focus-change-function #'+handle-focus-change)
+    (:with-hook pre-command-hook #'+pre-command-hook-function)
+    ;; Disables prefix key override maps during keyboard macro recording
+    ;; when `sis-global-respect-mode' is active to prevent conflicts.
+    ;; This is achieved by advising `sis--auto-refresh-timer-function'
+    ;; to toggle the `sis--prefix-override-map-enable' variable based on
+    ;; the current input method, disabling it for English input
+    ;; and enabling it for other input methods.
     (define-advice sis--auto-refresh-timer-function
         (:around (orig) toggle-override-map)
       (funcall orig)
@@ -134,13 +127,15 @@
         ('english
          (setq sis--prefix-override-map-enable nil))
         ('other
-         (setq sis--prefix-override-map-enable t))))))
+         (setq sis--prefix-override-map-enable t))))
+    ;; Sets up an idle timer to automatically
+    ;; switch input methods based on the editing context
+    (+setup-idle-command-for-sis)))
 
 (setup auto-space
   (:defer (:require auto-space))
   (:when-loaded (auto-space-mode)))
 
-;; 剪贴板查找
 (setup browse-kill-ring
   (:with-map browse-kill-ring-mode-map
     (:bind
@@ -213,7 +208,7 @@
   (:hook-into prog-mode)
   (:hook-into text-mode)
   (setopt goggles-pulse t)
-
+  ;; https://github.com/minad/goggles/issues/14
   (defun +goggles--post-command ()
     "Highlight change after command."
     (when goggles--changes
