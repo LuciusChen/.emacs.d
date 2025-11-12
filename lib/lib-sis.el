@@ -28,38 +28,26 @@
     (sis-set-english)
     (message (mac-input-source))))
 
-
-(defvar +idle-command-for-sis-timer nil
-  "Timer for automatic sis context switching.")
-
-(defvar +idle-command-for-sis-delay 0.2
-  "Idle delay in seconds before triggering sis context switch.")
-
-(defun +idle-command-for-sis ()
-  "Automatically switch sis context when conditions are met."
+(defun +post-command-sis-context-switch ()
+  "Switch sis context before command execution if conditions are met."
   (when (and (bound-and-true-p meow-insert-mode)
              (not (or (and (boundp 'sis--inline-overlay)
                            (overlayp sis--inline-overlay))
                       (and (boundp 'sis--prefix-handle-stage)
                            (eq sis--prefix-handle-stage 'sequence))
-                      (memq real-last-command
+                      (memq this-command
                             '(sis-inline-mode-force
                               sis--inline-ret-check-to-deactivate))
                       (equal last-input-event '(ns-put-working-text)))))
     (sis-context)))
 
-(defun +start-idle-command-for-sis ()
-  "Start idle timer for sis context switching."
-  (unless +idle-command-for-sis-timer
-    (setq +idle-command-for-sis-timer
-          (run-with-idle-timer +idle-command-for-sis-delay t
-                               #'+idle-command-for-sis))))
+(defun +enable-sis-context-switch ()
+  "Enable automatic sis context switching in meow insert mode."
+  (add-hook 'post-command-hook #'+post-command-sis-context-switch nil t))
 
-(defun +stop-idle-command-for-sis ()
-  "Stop idle timer for sis context switching."
-  (when +idle-command-for-sis-timer
-    (cancel-timer +idle-command-for-sis-timer)
-    (setq +idle-command-for-sis-timer nil)))
+(defun +disable-sis-context-switch ()
+  "Disable automatic sis context switching."
+  (remove-hook 'post-command-hook #'+post-command-sis-context-switch t))
 
 (provide 'lib-sis)
 ;;; lib-sis.el ends here
