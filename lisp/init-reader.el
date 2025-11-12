@@ -51,7 +51,8 @@
   (:when-loaded
     (:also-load lib-gpt)
     (:also-load org)
-    (setopt gptel-default-mode 'org-mode
+    (setopt gptel-expert-commands t
+            gptel-default-mode 'org-mode
             gptel-model 'openai/gpt-4o
             gptel-stream t
             ;; gptel-backend (gptel-make-openai "vercel-gateway"
@@ -83,16 +84,12 @@
                             :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
                             :models '(deepseek/deepseek-chat
                                       deepseek/deepseek-r1
-                                      qwen/qwen-turbo
-                                      qwen/qwen-plus
-                                      qwen/qwen-max
                                       openai/gpt-4o
                                       openai/gpt-5
-                                      anthropic/claude-3.7-sonnet:thinking
-                                      anthropic/claude-3.7-sonnet
-                                      anthropic/claude-4
-                                      google/gemini-2.5-pro-exp-03-25:free
-                                      google/gemini-2.5-pro-preview-03-25)
+                                      anthropic/claude-sonnet-4
+                                      anthropic/claude-sonnet-4.5
+                                      google/gemini-2.5-pro
+                                      google/gemini-2.5-pro-flash)
                             :stream t)
             gptel-proxy (if IS-MAC "" "socks://127.0.0.1:7897")
             gptel-directives (get-gptel-directives)
