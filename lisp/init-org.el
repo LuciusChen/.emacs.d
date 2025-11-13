@@ -301,7 +301,9 @@
        ,(concat "\\documentclass{ctexart}\n"
                 "\\usepackage{NotesTeXV3}\n"
                 "[EXTRA]\n" ;; the stuff from #+LATEX_HEADER(_EXTRA)
-                "\\catcode`\\^^^^200b=\\active\\let^^^^200b\\relax\n" ;; 忽略源码中所有零宽空格
+                ;; Ignore invisible zero-width space (U+200B) characters that may appear in the source.
+                ;; Make them active and define them to do nothing to prevent compilation errors.
+                "\\catcode`\\^^^^200b=\\active\\let^^^^200b\\relax\n"
                 "\\setCJKmainfont{LXGW WenKai}")
        ;; ("\\part{%s}" . "\\part*{%s}")
        ("\\section{%s}" . "\\section*{%s}")
@@ -317,6 +319,7 @@
          "[DEFAULT-PACKAGES]\n"
          "[PACKAGES]\n"
          "[EXTRA]\n"
+         "\\catcode`\\^^^^200b=\\active\\let^^^^200b\\relax\n"
          "\\usepackage[dvipsnames]{xcolor}\n"
          "\\hypersetup{colorlinks=true,"
          "linkcolor=Maroon,"
