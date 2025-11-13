@@ -295,17 +295,13 @@
     ;; Make sure to have NotesTeXV3.sty in the export directory
     ;; Add #+LATEX_CLASS: Notes to the org header
     ;; https://github.com/Adhumunt/NotesTeX
-    ;;
-    ;; TODO
-    ;; 1. ctex 中，org 加粗等会导致多于空格出现
     (add-to-list
      'org-latex-classes
      `("Notes"
        ,(concat "\\documentclass{ctexart}\n"
                 "\\usepackage{NotesTeXV3}\n"
-                "[NO-DEFAULT-PACKAGES]\n"
-                "[NO-PACKAGES]\n"
                 "[EXTRA]\n" ;; the stuff from #+LATEX_HEADER(_EXTRA)
+                "\\catcode`\\^^^^200b=\\active\\let^^^^200b\\relax\n" ;; 忽略源码中所有零宽空格
                 "\\setCJKmainfont{LXGW WenKai}")
        ;; ("\\part{%s}" . "\\part*{%s}")
        ("\\section{%s}" . "\\section*{%s}")
