@@ -127,11 +127,7 @@
         ('english
          (setq sis--prefix-override-map-enable nil))
         ('other
-         (setq sis--prefix-override-map-enable t))))
-    ;; Sets up an idle timer to automatically
-    ;; switch input methods based on the editing context
-    (:with-hook meow-insert-enter-hook (:hook +enable-sis-context-switch))
-    (:with-hook meow-insert-exit-hook (:hook +disable-sis-context-switch))))
+         (setq sis--prefix-override-map-enable t))))))
 
 (setup auto-space
   (:defer (:require auto-space))

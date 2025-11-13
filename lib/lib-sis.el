@@ -28,26 +28,5 @@
     (sis-set-english)
     (message (mac-input-source))))
 
-(defun +post-command-sis-context-switch ()
-  "Switch sis context before command execution if conditions are met."
-  (when (and (bound-and-true-p meow-insert-mode)
-             (not (or (and (boundp 'sis--inline-overlay)
-                           (overlayp sis--inline-overlay))
-                      (and (boundp 'sis--prefix-handle-stage)
-                           (eq sis--prefix-handle-stage 'sequence))
-                      (memq this-command
-                            '(sis-inline-mode-force
-                              sis--inline-ret-check-to-deactivate))
-                      (equal last-input-event '(ns-put-working-text)))))
-    (sis-context)))
-
-(defun +enable-sis-context-switch ()
-  "Enable automatic sis context switching in meow insert mode."
-  (add-hook 'post-command-hook #'+post-command-sis-context-switch nil t))
-
-(defun +disable-sis-context-switch ()
-  "Disable automatic sis context switching."
-  (remove-hook 'post-command-hook #'+post-command-sis-context-switch t))
-
 (provide 'lib-sis)
 ;;; lib-sis.el ends here
