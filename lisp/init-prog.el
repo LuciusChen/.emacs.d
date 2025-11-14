@@ -66,8 +66,7 @@
           '("pg_format"
             "-W" "1"
             (apheleia-formatters-indent "--tabs" "--spaces" 'tab-width)
-            (apheleia-formatters-fill-column "--wrap-limit")
-            filepath))
+            (apheleia-formatters-fill-column "--wrap-limit")))
 
     (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black))
     (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html)
