@@ -18,13 +18,23 @@
                  (edit-buffer (generate-new-buffer (format "*MyBatis SQL: %s*" tag-type)))
                  (base-indent nil)
                  (tag-placeholder-map '())
-                 (param-placeholder-map '()))
+                 (param-placeholder-map '())
+                 (comment-placeholder-map '()))
             (goto-char tag-start)
             (beginning-of-line)
             (when (looking-at "^\\([ \t]*\\)")
               (setq base-indent (+ (length (match-string 1)) 4)))
             (with-current-buffer edit-buffer
               (insert sql-content)
+              ;; Replace XML comments with placeholders
+              (goto-char (point-min))
+              (let ((counter 0))
+                (while (re-search-forward "<!--\\(.*?\\)-->" nil t)
+                  (let ((original (match-string 0))
+                        (placeholder (format "/*COMMENT_%d*/" counter)))
+                    (push (cons placeholder original) comment-placeholder-map)
+                    (replace-match placeholder t t)
+                    (setq counter (1+ counter)))))
               ;; Replace MyBatis parameters #{} and ${}
               (goto-char (point-min))
               (let ((counter 0))
@@ -82,6 +92,7 @@
               (setq-local +mybatis-base-indent base-indent)
               (setq-local +mybatis-tag-placeholder-map tag-placeholder-map)
               (setq-local +mybatis-param-placeholder-map param-placeholder-map)
+              (setq-local +mybatis-comment-placeholder-map comment-placeholder-map)
               (use-local-map (copy-keymap sql-mode-map))
               (local-set-key (kbd "C-c C-c") #'+mybatis-commit-sql-block)
               (local-set-key (kbd "C-c C-k") #'+mybatis-abort-sql-block)
@@ -99,7 +110,8 @@
         (tag-end +mybatis-tag-end)
         (base-indent +mybatis-base-indent)
         (tag-placeholder-map +mybatis-tag-placeholder-map)
-        (param-placeholder-map +mybatis-param-placeholder-map))
+        (param-placeholder-map +mybatis-param-placeholder-map)
+        (comment-placeholder-map +mybatis-comment-placeholder-map))
     (with-temp-buffer
       (insert edited-sql)
       ;; Format SQL
@@ -113,6 +125,10 @@
       (while (re-search-forward " < " nil t) (replace-match " &lt; " t t))
       (goto-char (point-min))
       (while (re-search-forward " > " nil t) (replace-match " &gt; " t t))
+      ;; Restore XML comments
+      (dolist (pair comment-placeholder-map)
+        (goto-char (point-min))
+        (while (search-forward (car pair) nil t) (replace-match (cdr pair) t t)))
       ;; Restore MyBatis parameters
       (dolist (pair param-placeholder-map)
         (goto-char (point-min))
@@ -129,22 +145,23 @@
       (goto-char (point-min))
       (while (re-search-forward "\\s-*</where>" nil t)
         (replace-match "\n</where>"))
-      ;; Add indentation for MyBatis tags only
+      ;; Add indentation based on nesting level for all content
       (goto-char (point-min))
       (let ((indent-level 0)
             (extra-indent "    "))
         (while (not (eobp))
           (beginning-of-line)
-          ;; Only process lines with MyBatis tags
-          (when (looking-at "\\s-*</?\\(where\\|if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\)")
-            ;; Check for closing tags - decrease indent before this line
-            (when (looking-at "\\s-*</")
+          (let ((is-tag-line (looking-at "\\s-*</?\\(where\\|if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\)"))
+                (is-closing-tag (looking-at "\\s-*</")))
+            ;; Decrease indent for closing tags before processing the line
+            (when (and is-tag-line is-closing-tag)
               (setq indent-level (max 0 (1- indent-level))))
-            ;; Remove existing indentation and add new
-            (delete-horizontal-space)
-            (insert (make-string (* indent-level (length extra-indent)) ?\s))
-            ;; Check for opening tags - increase indent after this line
-            (when (looking-at "\\s-*<[^/]")
+            ;; Apply indentation to all non-empty lines
+            (unless (looking-at "^\\s-*$")
+              (delete-horizontal-space)
+              (insert (make-string (* indent-level (length extra-indent)) ?\s)))
+            ;; Increase indent for opening tags after processing the line
+            (when (and is-tag-line (not is-closing-tag))
               (setq indent-level (1+ indent-level))))
           (forward-line 1)))
       ;; Add base indentation to all lines
