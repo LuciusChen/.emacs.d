@@ -50,17 +50,13 @@
           python-indent-guess-indent-offset-verbose nil))
 
 (setup apheleia
-  (:with-mode prog-mode (:require apheleia)
-              (:hook apheleia-global-mode))
+  (keymap-global-set "C-c C-x C-f" 'apheleia-format-buffer)
   (:when-loaded
-    (keymap-global-set "C-c C-x C-f" 'apheleia-format-buffer)
-    ;; $ brew install isort black google-java-format stylua libxml2
-    ;; $ npm install -g prettier
     (setf (alist-get 'google-java-format apheleia-formatters)
-          '("google-java-format" "--aosp" filepath))
+          '("google-java-format" "--aosp" filepath)) ; google-java-format
     (setf (alist-get 'stylua apheleia-formatters)
-          '("stylua" "--indent-type" "Spaces" filepath))
-    (setf (alist-get 'xmllint apheleia-formatters)
+          '("stylua" "--indent-type" "Spaces" filepath)) ;; stylua
+    (setf (alist-get 'xmllint apheleia-formatters) ;; libxml2
           '("xmllint" "--encode" "utf-8" "--format" "-"))
     (setf (alist-get 'pgformatter apheleia-formatters)
           '("pg_format"
@@ -68,11 +64,10 @@
             (apheleia-formatters-indent "--tabs" "--spaces" 'tab-width)
             (apheleia-formatters-fill-column "--wrap-limit")))
 
-    (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black))
-    (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html)
+    (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black)) ;; isort black
+    (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html) ;; prettier
     (setf (alist-get 'sql-mode           apheleia-mode-alist) 'pgformatter)
     (setf (alist-get 'xml-mode           apheleia-mode-alist) 'xmllint)
-    (setf (alist-get 'nxml-mode          apheleia-mode-alist) 'xmllint)
     (setf (alist-get 'css-mode           apheleia-mode-alist) 'prettier)
     (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'prettier)
     (setf (alist-get 'js-ts-mode         apheleia-mode-alist) 'prettier)))
@@ -96,7 +91,8 @@
        (nxml-sql-delete :submode sql-mode
                         :front "<delete[^>]*>" :back "</delete>")))
     (dolist (class '(nxml-sql-select nxml-sql-insert nxml-sql-update nxml-sql-delete))
-      (mmm-add-mode-ext-class 'nxml-mode nil class))))
+      (mmm-add-mode-ext-class 'nxml-mode nil class))
+    (:after nxml-mode (:also-load lib-format))))
 
 (setup lisp-mode
   (:also-load lib-lisp)
@@ -114,7 +110,11 @@
 ;; or the product can be set from a comment on the first line
 ;; -- -*- mode: sql; sql-product: mysql; -*-
 ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
-(setup sql (:when-loaded (sql-set-product 'mysql)))
+(setup sql
+  (:when-loaded
+    (:also-load lib-format)
+    (:with-map sql-mode-map (:bind "C-c '" +mybatis-edit-sql-block))
+    (sql-set-product 'mysql)))
 
 (setup projectile
   (:defer (:require projectile))
