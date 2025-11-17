@@ -131,6 +131,8 @@
 (setup sql
   (:when-loaded
     (:also-load lib-format)
+    ;; Replace MyBatis tags with placeholders for clean SQL editing.
+    ;; Formatting delegated to apheleia; tags restored after editing.
     (:with-map sql-mode-map (:bind "C-c '" +mybatis-edit-sql-block))
     (setq-default sql-product 'mysql)))
 
