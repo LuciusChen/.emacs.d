@@ -73,7 +73,22 @@
     (setf (alist-get 'xml-mode           apheleia-mode-alist) 'xmllint)
     (setf (alist-get 'css-mode           apheleia-mode-alist) 'prettier)
     (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'prettier)
-    (setf (alist-get 'js-ts-mode         apheleia-mode-alist) 'prettier)))
+    (setf (alist-get 'js-ts-mode         apheleia-mode-alist) 'prettier)
+
+    ;; Setup SQL formatter based on sql-product.
+    ;; Default is MySQL. For other databases (e.g., PostgreSQL), set =sql-product'
+    ;; in =.dir-locals.el':
+    ;;   ((sql-mode . ((sql-product . postgres))))
+    ;; This allows Apheleia to use the correct formatter (=pgformatter' for PostgreSQL,
+    ;; =sql-formatter' for MySQL/others).
+    (defun +setup-sql-formatter ()
+      "Setup SQL formatter based on sql-product."
+      (setq-local apheleia-formatter
+                  (pcase sql-product
+                    ('postgres 'pgformatter)
+                    ('mysql 'sql-formatter)
+                    (_ 'sql-formatter))))
+    (:with-mode sql-mode (:hook +setup-sql-formatter))))
 
 (setup mmm-mode
   (:with-mode prog-mode (:require mmm-mode))
@@ -117,7 +132,7 @@
   (:when-loaded
     (:also-load lib-format)
     (:with-map sql-mode-map (:bind "C-c '" +mybatis-edit-sql-block))
-    (sql-set-product 'mysql)))
+    (setq-default sql-product 'mysql)))
 
 (setup projectile
   (:defer (:require projectile))
