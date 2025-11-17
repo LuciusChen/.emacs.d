@@ -63,10 +63,13 @@
             "-W" "1"
             (apheleia-formatters-indent "--tabs" "--spaces" 'tab-width)
             (apheleia-formatters-fill-column "--wrap-limit")))
+    (setf (alist-get 'sql-formatter apheleia-formatters)
+          '("sql-formatter" "-l" "mysql"))
 
     (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black)) ;; isort black
     (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html) ;; prettier
-    (setf (alist-get 'sql-mode           apheleia-mode-alist) 'pgformatter)
+    ;; (setf (alist-get 'sql-mode           apheleia-mode-alist) 'pgformatter) ;; pgformatter
+    (setf (alist-get 'sql-mode           apheleia-mode-alist) 'sql-formatter) ;; sql-formatter
     (setf (alist-get 'xml-mode           apheleia-mode-alist) 'xmllint)
     (setf (alist-get 'css-mode           apheleia-mode-alist) 'prettier)
     (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'prettier)
