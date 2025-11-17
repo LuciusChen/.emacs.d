@@ -11,7 +11,8 @@
              (tag-start (match-end 0))
              (original-buffer (current-buffer))
              (original-window (selected-window))
-             (window-config (current-window-configuration)))
+             (window-config (current-window-configuration))
+             (original-sql-product (or sql-product 'mysql)))
         (when (re-search-forward (format "</%s>" tag-type) nil t)
           (let* ((tag-end (match-beginning 0))
                  (sql-content (buffer-substring-no-properties tag-start tag-end))
@@ -26,50 +27,51 @@
               (setq base-indent (+ (length (match-string 1)) 4)))
             (with-current-buffer edit-buffer
               (insert sql-content)
-              ;; Replace XML comments with placeholders
+              ;; Replace XML comments
               (goto-char (point-min))
               (let ((counter 0))
                 (while (re-search-forward "<!--\\(.*?\\)-->" nil t)
                   (let ((original (match-string 0))
-                        (placeholder (format "/*COMMENT_%d*/" counter)))
+                        (placeholder (format "/* __COMMENT_%d__ */" counter)))
                     (push (cons placeholder original) comment-placeholder-map)
                     (replace-match placeholder t t)
                     (setq counter (1+ counter)))))
-              ;; Replace MyBatis parameters #{} and ${}
+              ;; Replace MyBatis parameters
               (goto-char (point-min))
               (let ((counter 0))
                 (while (re-search-forward "\\(#\\|\\$\\){[^}]+}" nil t)
                   (let ((original (match-string 0))
-                        (placeholder (format ":PARAM_%d:" counter)))
+                        (placeholder (format "? /* __PARAM_%d__ */" counter)))
                     (push (cons placeholder original) param-placeholder-map)
                     (replace-match placeholder t t)
                     (setq counter (1+ counter)))))
-              ;; Replace MyBatis dynamic tags with placeholders
+              ;; Replace MyBatis dynamic tags - opening tags
               (goto-char (point-min))
               (let ((counter 0))
                 (while (re-search-forward "<\\(if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\|where\\)\\(\\s-+[^>]*\\)?>" nil t)
                   (let* ((full-tag (match-string 0))
                          (tag-name (match-string 1))
                          (placeholder (if (string= tag-name "where")
-                                          (format "/*WHERE_OPEN_%d*/ WHERE" counter)
-                                        (format "/*TAG_OPEN_%d*/" counter))))
+                                          (format "/* __WHERE_OPEN_%d__ */\nWHERE" counter)
+                                        (format "/* __TAG_OPEN_%d__ */" counter))))
                     (push (cons (if (string= tag-name "where")
-                                    (format "/*WHERE_OPEN_%d*/" counter)
+                                    (format "/* __WHERE_OPEN_%d__ */" counter)
                                   placeholder) full-tag) tag-placeholder-map)
                     (replace-match placeholder t t)
-                    (setq counter (1+ counter))))
-                (goto-char (point-min))
-                (setq counter 0)
+                    (setq counter (1+ counter)))))
+              ;; Replace MyBatis dynamic tags - closing tags
+              (goto-char (point-min))
+              (let ((counter 0))
                 (while (re-search-forward "</\\(if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\|where\\)>" nil t)
                   (let* ((full-tag (match-string 0))
                          (tag-name (match-string 1))
                          (placeholder (if (string= tag-name "where")
-                                          (format "/*WHERE_CLOSE_%d*/" counter)
-                                        (format "/*TAG_CLOSE_%d*/" counter))))
+                                          (format "/* __WHERE_CLOSE_%d__ */" counter)
+                                        (format "/* __TAG_CLOSE_%d__ */" counter))))
                     (push (cons placeholder full-tag) tag-placeholder-map)
                     (replace-match placeholder t t)
                     (setq counter (1+ counter)))))
-              ;; Replace XML entities in SQL
+              ;; Replace XML entities
               (goto-char (point-min))
               (while (re-search-forward "&lt;" nil t) (replace-match "<" t t))
               (goto-char (point-min))
@@ -80,10 +82,10 @@
               (while (re-search-forward "&quot;" nil t) (replace-match "\"" t t))
               (goto-char (point-min))
               (while (re-search-forward "&apos;" nil t) (replace-match "'" t t))
-              ;; Clean up extra blank lines
               (goto-char (point-min))
               (while (re-search-forward "\n\n\n+" nil t) (replace-match "\n\n"))
               (sql-mode)
+              (setq-local sql-product original-sql-product)
               (setq-local +mybatis-original-buffer original-buffer)
               (setq-local +mybatis-original-window original-window)
               (setq-local +mybatis-window-config window-config)
@@ -97,7 +99,7 @@
               (local-set-key (kbd "C-c C-c") #'+mybatis-commit-sql-block)
               (local-set-key (kbd "C-c C-k") #'+mybatis-abort-sql-block)
               (goto-char (point-min))
-              (message "Edit SQL, then C-c C-c to commit or C-c C-k to abort"))
+              (message "Edit SQL (%s), then C-c C-c to commit or C-c C-k to abort" sql-product))
             (pop-to-buffer edit-buffer)))))))
 
 (defun +mybatis-commit-sql-block ()
@@ -114,8 +116,6 @@
         (comment-placeholder-map +mybatis-comment-placeholder-map))
     (with-temp-buffer
       (insert edited-sql)
-      ;; Format SQL
-      (shell-command-on-region (point-min) (point-max) "pg_format -f 2 -W 1 -" nil t)
       ;; Convert comparison operators back to XML entities
       (goto-char (point-min))
       (while (re-search-forward " <= " nil t) (replace-match " &lt;= " t t))
@@ -125,46 +125,50 @@
       (while (re-search-forward " < " nil t) (replace-match " &lt; " t t))
       (goto-char (point-min))
       (while (re-search-forward " > " nil t) (replace-match " &gt; " t t))
-      ;; Restore XML comments
+      ;; Restore placeholders: comments first
       (dolist (pair comment-placeholder-map)
         (goto-char (point-min))
-        (while (search-forward (car pair) nil t) (replace-match (cdr pair) t t)))
-      ;; Restore MyBatis parameters
+        (while (search-forward (car pair) nil t)
+          (replace-match (cdr pair) t t)))
+      ;; Restore parameters
       (dolist (pair param-placeholder-map)
-        (goto-char (point-min))
-        (while (search-forward (car pair) nil t) (replace-match (cdr pair) t t)))
-      ;; Restore MyBatis tags
+        (let ((placeholder (car pair))
+              (original (cdr pair)))
+          (goto-char (point-min))
+          ;; Replace "? /* __PARAM_123__ */" patterns,
+          ;; allowing for formatter-added whitespace.
+          (while (re-search-forward
+                  (concat "\\?\\s-*" (regexp-quote "/* __PARAM_")
+                          "[0-9]+\\s-*__\\s-*\\*/")
+                  nil t)
+            (replace-match original t t))))
+      ;; Restore tags
       (dolist (pair tag-placeholder-map)
         (goto-char (point-min))
         (while (search-forward (car pair) nil t)
           (replace-match (cdr pair) t t)))
-      ;; Clean up <where> tags
+      ;; Clean up <where> tags - remove WHERE keyword
       (goto-char (point-min))
-      (while (re-search-forward "<where>\\s-*WHERE\\s-*" nil t)
+      (while (re-search-forward "<where>\\s-*\n?\\s-*WHERE\\s-*\n?" nil t)
         (replace-match "<where>\n"))
-      (goto-char (point-min))
-      (while (re-search-forward "\\s-*</where>" nil t)
-        (replace-match "\n</where>"))
-      ;; Add indentation based on nesting level for all content
+      ;; Add indentation for MyBatis tags and comments
       (goto-char (point-min))
       (let ((indent-level 0)
             (extra-indent "    "))
         (while (not (eobp))
           (beginning-of-line)
-          (let ((is-tag-line (looking-at "\\s-*</?\\(where\\|if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\)"))
-                (is-closing-tag (looking-at "\\s-*</")))
-            ;; Decrease indent for closing tags before processing the line
-            (when (and is-tag-line is-closing-tag)
+          (when (looking-at "\\s-*</?\\(where\\|if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\)")
+            (when (looking-at "\\s-*</")
               (setq indent-level (max 0 (1- indent-level))))
-            ;; Apply indentation to all non-empty lines
-            (unless (looking-at "^\\s-*$")
-              (delete-horizontal-space)
-              (insert (make-string (* indent-level (length extra-indent)) ?\s)))
-            ;; Increase indent for opening tags after processing the line
-            (when (and is-tag-line (not is-closing-tag))
+            (delete-horizontal-space)
+            (insert (make-string (* indent-level (length extra-indent)) ?\s))
+            (when (looking-at "\\s-*<[^/]")
               (setq indent-level (1+ indent-level))))
+          (when (looking-at "\\s-*<!--")
+            (delete-horizontal-space)
+            (insert (make-string (* indent-level (length extra-indent)) ?\s)))
           (forward-line 1)))
-      ;; Add base indentation to all lines
+      ;; Add base indentation
       (let ((indent-str (make-string base-indent ?\s)))
         (goto-char (point-min))
         (insert "\n")
@@ -179,12 +183,10 @@
         (goto-char tag-start)
         (delete-region tag-start tag-end)
         (insert edited-sql)
-        ;; Fix the closing tag indentation (</select>, </insert>, etc.)
         (when (looking-at "[ \t]*</\\(select\\|insert\\|update\\|delete\\)>")
-          (let ((closing-tag-start (point)))
-            (beginning-of-line)
-            (delete-horizontal-space)
-            (insert (make-string (- base-indent 4) ?\s))))))
+          (beginning-of-line)
+          (delete-horizontal-space)
+          (insert (make-string (- base-indent 4) ?\s)))))
     (kill-buffer)
     (set-window-configuration window-config)
     (message "SQL block updated")))
