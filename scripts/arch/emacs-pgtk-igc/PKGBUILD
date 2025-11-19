@@ -22,7 +22,7 @@ url="http://www.gnu.org/software/emacs/"
 license=('GPL3')
 depends=('gnutls' 'libxml2' 'jansson' 'harfbuzz' 'libgccjit' 'gtk3' 'tree-sitter' 'alsa-lib')
 optdepends=('libnotify: for desktop notification support')
-makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi')
+makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi' 'texinfo')
 replaces=('emacs')
 # source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
 # If Savannah fails, use Github's mirror
@@ -35,15 +35,15 @@ b2sums=("SKIP")
 export LD=/usr/bin/mold
 export CC="sccache gcc"
 export CXX="sccache g++"
-export LDFLAGS+=" -L/usr/lib"
-export CPPFLAGS+=" -I/usr/include"
-export CFLAGS+=" -I/usr/include"
+export LDFLAGS="-L/usr/lib ${LDFLAGS}"
+export CFLAGS="-I/usr/include ${CFLAGS}"
+export CPPFLAGS="-I/usr/include ${CPPFLAGS}"
 
 pkgver() {
   cd "$srcdir/emacs"
   local version
   version=$(awk -F',' '/AC_INIT/{gsub("[ \\[\\]]","",$2); print $2}' configure.ac)
-  printf "%s.%s" "$version" "$(git rev-list --count HEAD)"
+  printf "%s.r%s.%s" "$version" "$(git rev-list --count HEAD)"
 }
 
 prepare() {
@@ -55,7 +55,7 @@ prepare() {
     git checkout "$_commit"
   fi
   git clean -fdx
-  [[ -x configure ]] || (./autogen.sh git && ./autogen.sh autoconf)
+  [[ -x configure ]] || ./autogen.sh all
 }
 build() {
   cd "$srcdir/emacs"
