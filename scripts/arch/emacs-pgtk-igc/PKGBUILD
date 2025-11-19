@@ -23,7 +23,6 @@ license=('GPL3')
 depends=('gnutls' 'libxml2' 'jansson' 'harfbuzz' 'libgccjit' 'gtk3' 'tree-sitter' 'alsa-lib')
 optdepends=('libnotify: for desktop notification support')
 makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi' 'texinfo')
-replaces=('emacs')
 # source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
 # If Savannah fails, use Github's mirror
 source=("emacs::git+https://github.com/emacs-mirror/emacs.git")
