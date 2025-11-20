@@ -1,23 +1,22 @@
 ;;; auto-space.el --- Automatically add space between Chinese and English characters -*- lexical-binding: t -*-
+;;; Commentary:
+;;; Code:
+
 (defun add-space-between-chinese-and-english ()
   "Automatically add a space between Chinese and English characters."
   (let ((current-char (char-before))
         (prev-char (char-before (1- (point))))
         (next-char (char-after)))
     (when (and current-char prev-char
-               (or (and (is-chinese-character prev-char)
-                        (is-halfwidth-character current-char))
-                   (and (is-halfwidth-character prev-char)
-                        (is-chinese-character current-char)))
-               (not (eq prev-char ?\s))) ; Check if the previous character is a space
+               (should-insert-space prev-char current-char)
+               (not (eq (char-before (1- (point))) ?\s)))
       (save-excursion
-        (goto-char (1- (point)))
+        (backward-char)
         (insert " ")))
     (when (and current-char next-char
                (should-insert-space current-char next-char)
-               (not (eq current-char ?\s))) ; Check if the current character is a space
+               (not (eq (char-after) ?\s)))
       (save-excursion
-        (goto-char (point))
         (insert " ")))))
 
 (defun is-chinese-character (char)
@@ -30,24 +29,23 @@
                 (and (>= char #x2b820) (<= char #x2ceaf)))))
 
 (defun is-halfwidth-character (char)
-  "Determine if a character is a halfwidth character using char-width."
-  (and char (or (and (>= char ?a) (<= char ?z))
-                (and (>= char ?A) (<= char ?Z))
-                (and (>= char ?0) (<= char ?9))
-                (and char (member char '(?% ?> ?<))))))
+  "Determine if a character is a halfwidth character."
+  (and char
+       (or (and (>= char ?a) (<= char ?z))
+           (and (>= char ?A) (<= char ?Z))
+           (and (>= char ?0) (<= char ?9))
+           (memq char '(?% ?> ?<)))))
 
 (defun should-insert-space (char1 char2)
   "Determine if a space should be inserted between CHAR1 and CHAR2."
   (or (and (is-chinese-character char1) (is-halfwidth-character char2))
       (and (is-halfwidth-character char1) (is-chinese-character char2))))
 
-(defun delayed-add-space-between-chinese-and-english ()
-  "Delay execution to automatically add a space between Chinese and English characters."
-  (run-with-idle-timer 0 nil 'add-space-between-chinese-and-english))
-
 (defun insert-space-if-needed (char1 char2 buffer-content)
   "Insert a space between CHAR1 and CHAR2 in BUFFER-CONTENT if needed."
-  (if (and (should-insert-space char1 char2) (not (eq char2 ?\s)))
+  (if (and char2
+           (should-insert-space char1 char2)
+           (not (eq char2 ?\s)))
       (concat buffer-content " ")
     buffer-content))
 
