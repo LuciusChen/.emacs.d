@@ -87,9 +87,10 @@
           sis-default-cursor-color "#cf7fa7"
           sis-other-cursor-color "orange"
           sis-context-hooks '(meow-insert-enter-hook))
-    (:after meow
-      (:with-hook meow-insert-exit-hook (:hook sis-set-english))
-      (:advice meow-quit :after (lambda (&rest _) (sis-set-english))))
+    (:with-feature meow
+      (:when-loaded
+        (:with-hook meow-insert-exit-hook (:hook sis-set-english))
+        (:advice meow-quit :after (lambda (&rest _) (sis-set-english)))))
     (if IS-MAC
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
@@ -193,7 +194,19 @@
                                         (1+ blank)
                                         (group-n 1 (1+ (or (syntax word)
                                                            (syntax symbol)))))))
-                           1)))))))
+                           1))
+               (add-to-list
+                'imenu-generic-expression
+                (list
+                 "Transient"
+                 (rx line-start (0+ blank)
+                     "("
+                     (group-n 1
+                       "transient-define-"
+                       (or "prefix" "infix" "suffix"))
+                     (1+ blank)
+                     (group-n 2 (1+ (or (syntax word) (syntax symbol) "\\"))))
+                 2)))))))
 
 (setup avy
   (keymap-global-set "C-;" 'avy-goto-word-or-subword-1)
