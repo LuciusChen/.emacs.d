@@ -87,13 +87,13 @@
     (add-to-list 'ghub-insecure-hosts "192.168.1.220:9081")))
 
 (setup diff-hl
-  (:defer (diff-hl-mode))
+  (:with-mode (prog-mode conf-mode)
+    (:hook diff-hl-mode))
   (:when-loaded
     (setopt diff-hl-update-async t)
     (:with-hook (magit-post-refresh-hook magit-pre-refresh-hook)
       (:hook diff-hl-magit-post-refresh))
-    (:with-hook (prog-mode-hook conf-mode-hook)
-      (:hook diff-hl-mode))
+    (diff-hl-margin-mode)
     (:with-hook dired-mode-hook (:hook diff-hl-dired-mode))
     (:with-map diff-hl-mode-map
       (:bind "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))))
