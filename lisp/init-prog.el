@@ -109,8 +109,7 @@
        (nxml-sql-delete :submode sql-mode
                         :front "<delete[^>]*>" :back "</delete>")))
     (dolist (class '(nxml-sql-select nxml-sql-insert nxml-sql-update nxml-sql-delete))
-      (mmm-add-mode-ext-class 'nxml-mode nil class))
-    (:after nxml-mode (:also-load lib-format))))
+      (mmm-add-mode-ext-class 'nxml-mode nil class))))
 
 (setup lisp-mode
   (:also-load lib-lisp)

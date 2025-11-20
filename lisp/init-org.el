@@ -14,8 +14,10 @@
   (:when-loaded
     (:also-load lib-org)
     (:also-load image-slicing)
-    (:with-mode org-mode (:bind "C-c C-v" yank-media))
-    (:after yank-media (add-to-list 'yank-media-preferred-types 'image/tiff))
+    (:with-feature yank-media
+        (:when-loaded
+          (:with-mode org-mode (:bind "C-c C-v" yank-media))
+          (add-to-list 'yank-media-preferred-types 'image/tiff)))
     (setopt org-directory ORG-PATH
             org-image-actual-width nil
             org-edit-src-content-indentation 0
@@ -164,7 +166,7 @@
     (setopt denote-journal-directory (expand-file-name "daily" denote-directory)
             denote-journal-title-format 'day-date-month-year)
     (keymap-global-set "C-c c" 'org-capture)
-    (:after org-capture
+    (:with-feature org-capture
       (setq org-capture-templates
             '(("d" "Default           ||" entry
                (file+headline
