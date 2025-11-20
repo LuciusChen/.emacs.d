@@ -129,6 +129,7 @@
 ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
 (setup sql
   (:when-loaded
+    (:also-load lib-format)
     ;; Replace MyBatis tags with placeholders for clean SQL editing.
     ;; Formatting delegated to apheleia; tags restored after editing.
     (:with-map sql-mode-map (:bind "C-c '" +mybatis-edit-sql-block))
