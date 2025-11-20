@@ -72,6 +72,7 @@
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile eat
         consult-dir too-wide-minibuffer-mode ultra-scroll org-edna
+        breadcrumb
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")

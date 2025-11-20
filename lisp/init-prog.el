@@ -303,7 +303,8 @@
 ;; 则需要执行 eglot-java-upgrade-lsp-server
 (setup eglot-java
   (:with-mode (java-mode java-ts-mode)
-    (:hook eglot-java-mode))
+    (:hook eglot-java-mode)
+    (:hook breadcrumb-local-mode))
   (:when-loaded
     (:also-load lib-eglot)
     ;; 对于低版本 JDK 需要先执行 select-java-home 设置 JAVA_HOME 后 build
