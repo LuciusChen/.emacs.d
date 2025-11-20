@@ -213,9 +213,9 @@
   (:when-loaded (setopt avy-style 'de-bruijn)))
 
 (setup ace-pinyin
-  (:load-after avy)
+  (:with-function ace-pinyin-jump-char-in-line (:autoload-this))
+  (keymap-global-set "C-:" 'ace-pinyin-jump-char-in-line)
   (:when-loaded
-    (keymap-global-set "C-:" 'ace-pinyin-jump-char-in-line)
     (ace-pinyin-global-mode +1)))
 
 
