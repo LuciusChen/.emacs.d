@@ -1,7 +1,7 @@
 ;;; git-blame-fringe.el --- Show git blame in fringe with colors -*- lexical-binding: t; -*-
 
 ;; Author: Your Name
-;; Version: 2.2
+;; Version: 2.3
 ;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: git, vc, convenience
 
@@ -67,10 +67,12 @@
                  (const right-fringe))
   :group 'git-blame-fringe)
 
-(defcustom git-blame-fringe-format "%s %s %s"
-  "Format string for blame info.
-%s will be replaced by: commit-short, author, date."
-  :type 'string
+(defcustom git-blame-fringe-header-format 'full
+  "Format for commit message header.
+- 'full: Show hash, commit message, author, and date
+- 'simple: Show only commit message"
+  :type '(choice (const full)
+                 (const simple))
   :group 'git-blame-fringe)
 
 (defcustom git-blame-fringe-header-style 'background
@@ -300,6 +302,20 @@ Returns (START-LINE . END-LINE)."
   (or (face-background 'hl-line nil t)
       (face-background 'default)))
 
+(defun git-blame-fringe--format-header-text (commit-hash)
+  "Format header text for COMMIT-HASH based on `git-blame-fringe-header-format`."
+  (let ((info (gethash commit-hash git-blame-fringe--commit-info)))
+    (if info
+        (pcase git-blame-fringe-header-format
+          ('simple (nth 3 info))  ; Only commit message
+          ('full (format "%s\n%s | %s at %s"
+                         (nth 3 info)  ; summary (first line)
+                         (nth 0 info)  ; short hash
+                         (nth 1 info)  ; author
+                         (nth 2 info))) ; date (second line)
+          (_ (nth 3 info)))  ; Default to simple
+      (substring commit-hash 0 8))))
+
 (defun git-blame-fringe--create-header-overlay (line-number commit-hash color)
   "Create header line above LINE-NUMBER with fringe."
   (save-excursion
@@ -308,13 +324,7 @@ Returns (START-LINE . END-LINE)."
     (unless (eobp)
       (let* ((pos (line-beginning-position))
              (overlay (make-overlay pos pos))
-             (info (gethash commit-hash git-blame-fringe--commit-info))
-             (header-text (if info
-                              (format git-blame-fringe-format
-                                      (nth 0 info)  ; short hash
-                                      (nth 1 info)  ; author
-                                      (nth 2 info)) ; date
-                            (substring commit-hash 0 8)))
+             (header-text (git-blame-fringe--format-header-text commit-hash))
              (fringe-face (intern (format "git-blame-fringe-face-%s" color)))
              (hl-bg (git-blame-fringe--get-hl-line-color))
              (header-face (pcase git-blame-fringe-header-style
@@ -322,7 +332,11 @@ Returns (START-LINE . END-LINE)."
                             ('box `(:background ,hl-bg :foreground ,color :weight bold
                                                 :box (:line-width 1 :color ,color)))
                             ('inverse `(:background ,color :foreground ,hl-bg :weight bold))
-                            (_ `(:background ,hl-bg :foreground ,color :weight bold)))))
+                            (_ `(:background ,hl-bg :foreground ,color :weight bold))))
+             ;; Split header text into lines for full format
+             (header-lines (if (eq git-blame-fringe-header-format 'full)
+                               (split-string header-text "\n")
+                             (list header-text))))
         (unless (facep fringe-face)
           (eval `(defface ,fringe-face
                    '((t :background ,color :foreground ,color))
@@ -330,15 +344,30 @@ Returns (START-LINE . END-LINE)."
                    :group 'git-blame-fringe)))
         (overlay-put overlay 'git-blame-fringe t)
         (overlay-put overlay 'git-blame-commit commit-hash)
-        (overlay-put overlay 'git-blame-header t)  ; 标记为 header overlay
+        (overlay-put overlay 'git-blame-header t)
         (overlay-put overlay 'before-string
                      (concat
+                      ;; First line with fringe
                       (propertize "!" 'display
                                   (list git-blame-fringe-style
                                         'git-blame-fringe-full
                                         fringe-face))
-                      (propertize header-text 'face header-face)
+                      (propertize (car header-lines) 'face header-face)
                       "\n"
+                      ;; Additional lines for full format
+                      (when (cdr header-lines)
+                        (mapconcat
+                         (lambda (line)
+                           (concat
+                            (propertize "!" 'display
+                                        (list git-blame-fringe-style
+                                              'git-blame-fringe-full
+                                              fringe-face))
+                            (propertize line 'face header-face)
+                            "\n"))
+                         (cdr header-lines)
+                         ""))
+                      ;; Final fringe line
                       (propertize "!" 'display
                                   (list git-blame-fringe-style
                                         'git-blame-fringe-full
@@ -351,7 +380,6 @@ Returns (START-LINE . END-LINE)."
     (when (overlay-buffer overlay)
       (delete-overlay overlay)))
   (setq git-blame-fringe--overlays nil)
-  ;; 同时清除 header overlay
   (when git-blame-fringe--header-overlay
     (delete-overlay git-blame-fringe--header-overlay)
     (setq git-blame-fringe--header-overlay nil))
@@ -374,7 +402,7 @@ Returns (START-LINE . END-LINE)."
         (let ((commit-hash (nth 1 block)))
           (git-blame-fringe--ensure-commit-info commit-hash)))
 
-      ;; Second pass: render with colors (不创建 header)
+      ;; Second pass: render with colors
       (dolist (block blocks)
         (let* ((block-start (nth 0 block))
                (commit-hash (nth 1 block))
@@ -382,7 +410,6 @@ Returns (START-LINE . END-LINE)."
                (color (git-blame-fringe--get-commit-color commit-hash))
                (block-end (+ block-start block-length -1)))
           (when color
-            ;; 渲染所有行的 fringe (包括第一行)
             (let ((render-start (max block-start start-line))
                   (render-end (min block-end end-line)))
               (when (<= render-start render-end)
@@ -403,7 +430,6 @@ Returns (COMMIT-HASH . START-LINE) or nil."
           (let ((ov-line (line-number-at-pos (overlay-start overlay))))
             (when (= ov-line line-num)
               (let ((commit (overlay-get overlay 'git-blame-commit)))
-                ;; 找到这个 commit 块的起始行
                 (dolist (block (git-blame-fringe--find-block-boundaries
                                 git-blame-fringe--blame-data))
                   (let ((block-start (nth 0 block))
@@ -421,20 +447,16 @@ Returns (COMMIT-HASH . START-LINE) or nil."
     (let ((current-block (git-blame-fringe--get-current-block)))
       (if (and current-block
                (not (equal (car current-block) git-blame-fringe--current-block-commit)))
-          ;; 光标在新的代码块
           (let ((commit-hash (car current-block))
                 (block-start (cdr current-block))
                 (color (git-blame-fringe--get-commit-color (car current-block))))
-            ;; 删除旧的 header
             (when git-blame-fringe--header-overlay
               (delete-overlay git-blame-fringe--header-overlay)
               (setq git-blame-fringe--header-overlay nil))
-            ;; 创建新的 header
             (setq git-blame-fringe--current-block-commit commit-hash)
             (setq git-blame-fringe--header-overlay
                   (git-blame-fringe--create-header-overlay
                    block-start commit-hash color)))
-        ;; 如果 current-block 为 nil，清除 header
         (unless current-block
           (when git-blame-fringe--header-overlay
             (delete-overlay git-blame-fringe--header-overlay)
@@ -468,7 +490,6 @@ Returns (COMMIT-HASH . START-LINE) or nil."
 (defun git-blame-fringe--recolor-and-render ()
   "Recalculate colors and re-render (for theme changes)."
   (when git-blame-fringe--blame-data
-    ;; Clear color map to force recalculation
     (setq git-blame-fringe--color-map (make-hash-table :test 'equal))
     (git-blame-fringe--render-visible-region)))
 
@@ -525,7 +546,7 @@ Returns (COMMIT-HASH . START-LINE) or nil."
         (add-hook 'window-scroll-functions
                   (lambda (_win _start) (git-blame-fringe--on-scroll))
                   nil t)
-        (add-hook 'post-command-hook #'git-blame-fringe--update-header nil t)  ; 新增
+        (add-hook 'post-command-hook #'git-blame-fringe--update-header nil t)
         (git-blame-fringe--setup-theme-advice))
 
     (setq emulation-mode-map-alists
@@ -536,7 +557,7 @@ Returns (COMMIT-HASH . START-LINE) or nil."
     (remove-hook 'window-scroll-functions
                  (lambda (_win _start) (git-blame-fringe--on-scroll))
                  t)
-    (remove-hook 'post-command-hook #'git-blame-fringe--update-header t)  ; 新增
+    (remove-hook 'post-command-hook #'git-blame-fringe--update-header t)
     (when git-blame-fringe--scroll-timer
       (cancel-timer git-blame-fringe--scroll-timer)
       (setq git-blame-fringe--scroll-timer nil))
