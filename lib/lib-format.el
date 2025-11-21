@@ -72,29 +72,44 @@ Content inside <if>, <foreach>, etc. is also indented."
   (let ((level 0)
         (step 4)
         (tag-regex "\\s-*</?\\(where\\|if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\)")
+        (include-regex "\\s-*/\\* __INCLUDE_[0-9]+__ \\*/")
         (comment-regex "\\s-*<!--"))
     (while (not (eobp))
       (beginning-of-line)
       (let ((is-tag (looking-at tag-regex))
+            (is-include (looking-at include-regex))
             (is-comment (looking-at comment-regex))
             (is-closing (looking-at "\\s-*</")))
 
-        ;; Decrease level for closing tags
-        (when is-closing
+        ;; Decrease level for closing tags BEFORE processing the line
+        (when (and is-tag is-closing)
           (setq level (max 0 (1- level))))
 
         ;; Apply indentation
         (cond
-         ;; Tags and comments
-         ((or is-tag is-comment)
+         ;; Tags and include: use current level
+         ((or is-tag is-include)
           (delete-horizontal-space)
           (insert (make-string (* level step) ?\s)))
-         ;; Non-empty content lines inside tags (level > 0)
+         ;; Comments: peek at next non-empty line to determine level
+         (is-comment
+          (delete-horizontal-space)
+          (let ((comment-level (save-excursion
+                                 (forward-line 1)
+                                 (while (and (not (eobp)) (looking-at "^\\s-*$"))
+                                   (forward-line 1))
+                                 (cond
+                                  ((looking-at "\\s-*</") level)
+                                  ((looking-at tag-regex) level)
+                                  ((not (eobp)) (if (> level 0) (1+ level) level))
+                                  (t level)))))
+            (insert (make-string (* comment-level step) ?\s))))
+         ;; Non-empty content lines inside tags
          ((and (> level 0) (not (looking-at "^\\s-*$")))
           (delete-horizontal-space)
-          (insert (make-string (* level step) ?\s))))
+          (insert (make-string (* (1+ level) step) ?\s))))
 
-        ;; Increase level for opening tags
+        ;; Increase level for opening tags AFTER processing the line
         (when (and is-tag (not is-closing))
           (setq level (1+ level))))
 
@@ -145,18 +160,23 @@ Return cons of (encoded-content . placeholder-maps-alist)."
                         "\\(#\\|\\$\\){[^}]+}"
                         "__PARAM_%d__")))
 
-        ;; Replace opening tags
+        ;; Replace opening tags (including self-closing <include/>)
         (goto-char (point-min))
         (let ((counter 0)
               (tag-map '()))
           (while (re-search-forward
-                  "<\\(if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\|where\\)\\(\\s-+[^>]*\\)?>"
+                  "<\\(if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\|where\\|include\\)\\(\\s-+[^/>]*\\)\\(/?>\\)"
                   nil t)
             (let* ((full-tag (match-string 0))
                    (tag-name (match-string 1))
-                   (placeholder (if (string= tag-name "where")
-                                    (format "/* __WHERE_OPEN_%d__ */\nWHERE" counter)
-                                  (format "/* __TAG_OPEN_%d__ */" counter)))
+                   (is-self-closing (string-match-p "/>" full-tag))
+                   (placeholder (cond
+                                ((string= tag-name "where")
+                                 (format "/* __WHERE_OPEN_%d__ */\nWHERE" counter))
+                                (is-self-closing
+                                 (format "/* __INCLUDE_%d__ */" counter))
+                                (t
+                                 (format "/* __TAG_OPEN_%d__ */" counter))))
                    (key (if (string= tag-name "where")
                             (format "/* __WHERE_OPEN_%d__ */" counter)
                           placeholder)))
