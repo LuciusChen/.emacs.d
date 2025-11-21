@@ -51,6 +51,12 @@
 (defvar git-blame-fringe--scroll-timer nil
   "Timer to debounce scroll updates.")
 
+(defvar-local git-blame-fringe--current-block-commit nil
+  "Commit hash of the currently highlighted block.")
+
+(defvar-local git-blame-fringe--header-overlay nil
+  "Overlay for the currently displayed header.")
+
 (defgroup git-blame-fringe nil
   "Show git blame in fringe with colors."
   :group 'vc)
@@ -324,6 +330,7 @@ Returns (START-LINE . END-LINE)."
                    :group 'git-blame-fringe)))
         (overlay-put overlay 'git-blame-fringe t)
         (overlay-put overlay 'git-blame-commit commit-hash)
+        (overlay-put overlay 'git-blame-header t)  ; 标记为 header overlay
         (overlay-put overlay 'before-string
                      (concat
                       (propertize "!" 'display
@@ -343,7 +350,12 @@ Returns (START-LINE . END-LINE)."
   (dolist (overlay git-blame-fringe--overlays)
     (when (overlay-buffer overlay)
       (delete-overlay overlay)))
-  (setq git-blame-fringe--overlays nil))
+  (setq git-blame-fringe--overlays nil)
+  ;; 同时清除 header overlay
+  (when git-blame-fringe--header-overlay
+    (delete-overlay git-blame-fringe--header-overlay)
+    (setq git-blame-fringe--header-overlay nil))
+  (setq git-blame-fringe--current-block-commit nil))
 
 (defun git-blame-fringe--render-visible-region ()
   "Render git blame fringe for visible region only."
@@ -362,7 +374,7 @@ Returns (START-LINE . END-LINE)."
         (let ((commit-hash (nth 1 block)))
           (git-blame-fringe--ensure-commit-info commit-hash)))
 
-      ;; Second pass: render with colors
+      ;; Second pass: render with colors (不创建 header)
       (dolist (block blocks)
         (let* ((block-start (nth 0 block))
                (commit-hash (nth 1 block))
@@ -370,15 +382,8 @@ Returns (START-LINE . END-LINE)."
                (color (git-blame-fringe--get-commit-color commit-hash))
                (block-end (+ block-start block-length -1)))
           (when color
-            ;; Create header with fringe at block start (if visible)
-            (when (and (>= block-start start-line) (<= block-start end-line))
-              (let ((header-ov (git-blame-fringe--create-header-overlay
-                                block-start commit-hash color)))
-                (when header-ov
-                  (push header-ov git-blame-fringe--overlays))))
-
-            ;; Create fringe for remaining lines in block (only visible ones)
-            (let ((render-start (max (1+ block-start) start-line))
+            ;; 渲染所有行的 fringe (包括第一行)
+            (let ((render-start (max block-start start-line))
                   (render-end (min block-end end-line)))
               (when (<= render-start render-end)
                 (dotimes (i (- render-end render-start -1))
@@ -387,6 +392,54 @@ Returns (START-LINE . END-LINE)."
                                      line-num color commit-hash)))
                     (when fringe-ov
                       (push fringe-ov git-blame-fringe--overlays))))))))))))
+
+(defun git-blame-fringe--get-current-block ()
+  "Get the commit hash and start line of block at current line.
+Returns (COMMIT-HASH . START-LINE) or nil."
+  (let ((line-num (line-number-at-pos)))
+    (catch 'found
+      (dolist (overlay git-blame-fringe--overlays)
+        (when (overlay-get overlay 'git-blame-commit)
+          (let ((ov-line (line-number-at-pos (overlay-start overlay))))
+            (when (= ov-line line-num)
+              (let ((commit (overlay-get overlay 'git-blame-commit)))
+                ;; 找到这个 commit 块的起始行
+                (dolist (block (git-blame-fringe--find-block-boundaries
+                                git-blame-fringe--blame-data))
+                  (let ((block-start (nth 0 block))
+                        (block-commit (nth 1 block))
+                        (block-length (nth 2 block)))
+                    (when (and (equal commit block-commit)
+                               (>= line-num block-start)
+                               (< line-num (+ block-start block-length)))
+                      (throw 'found (cons commit block-start)))))))))
+      nil))))
+
+(defun git-blame-fringe--update-header ()
+  "Update header display based on current cursor position."
+  (when git-blame-fringe--blame-data
+    (let ((current-block (git-blame-fringe--get-current-block)))
+      (if (and current-block
+               (not (equal (car current-block) git-blame-fringe--current-block-commit)))
+          ;; 光标在新的代码块
+          (let ((commit-hash (car current-block))
+                (block-start (cdr current-block))
+                (color (git-blame-fringe--get-commit-color (car current-block))))
+            ;; 删除旧的 header
+            (when git-blame-fringe--header-overlay
+              (delete-overlay git-blame-fringe--header-overlay)
+              (setq git-blame-fringe--header-overlay nil))
+            ;; 创建新的 header
+            (setq git-blame-fringe--current-block-commit commit-hash)
+            (setq git-blame-fringe--header-overlay
+                  (git-blame-fringe--create-header-overlay
+                   block-start commit-hash color)))
+        ;; 如果 current-block 为 nil，清除 header
+        (unless current-block
+          (when git-blame-fringe--header-overlay
+            (delete-overlay git-blame-fringe--header-overlay)
+            (setq git-blame-fringe--header-overlay nil)
+            (setq git-blame-fringe--current-block-commit nil)))))))
 
 (defun git-blame-fringe--load-blame-data ()
   "Load git blame data in background."
@@ -472,6 +525,7 @@ Returns (START-LINE . END-LINE)."
         (add-hook 'window-scroll-functions
                   (lambda (_win _start) (git-blame-fringe--on-scroll))
                   nil t)
+        (add-hook 'post-command-hook #'git-blame-fringe--update-header nil t)  ; 新增
         (git-blame-fringe--setup-theme-advice))
 
     (setq emulation-mode-map-alists
@@ -482,6 +536,7 @@ Returns (START-LINE . END-LINE)."
     (remove-hook 'window-scroll-functions
                  (lambda (_win _start) (git-blame-fringe--on-scroll))
                  t)
+    (remove-hook 'post-command-hook #'git-blame-fringe--update-header t)  ; 新增
     (when git-blame-fringe--scroll-timer
       (cancel-timer git-blame-fringe--scroll-timer)
       (setq git-blame-fringe--scroll-timer nil))
