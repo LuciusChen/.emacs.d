@@ -90,6 +90,13 @@
   :type 'integer
   :group 'git-blame-fringe)
 
+(defcustom git-blame-fringe-highlight-recent-days 30
+  "Number of days to consider a commit as 'recent'.
+Recent commits will be highlighted with age-based colors,
+older commits will only show fringe when cursor is on them."
+  :type 'integer
+  :group 'git-blame-fringe)
+
 (defvar-local git-blame-fringe--overlays nil
   "List of overlays used for blame display.")
 
@@ -196,47 +203,45 @@ Returns (SHORT-HASH AUTHOR DATE SUMMARY TIMESTAMP)."
                           (* 0.114 (nth 2 rgb)))))
         (< luminance 0.5)))))
 
+(defun git-blame-fringe--ease-out-quad (x)
+  "Ease-out quadratic function for smoother color transitions.
+X should be between 0.0 and 1.0."
+  (- 1.0 (* (- 1.0 x) (- 1.0 x))))
+
 (defun git-blame-fringe--timestamp-to-color (timestamp)
-  "Convert TIMESTAMP to blue color based on age.
-Dark theme: newer=lighter, older=darker
-Light theme: newer=darker, older=lighter
-Very old commits use uniform gray."
+  "Convert TIMESTAMP to blue color based on age with discrete color levels.
+Uses 5 distinct color levels for better visual distinction."
   (if (not git-blame-fringe--timestamps)
-      "#6699cc"  ; default color
-    (let* ((current-timestamp (float-time))  ; 修正：使用 float-time 获取当前时间戳
+      "#6699cc"
+    (let* ((current-timestamp (float-time))
            (age-in-days (/ (- current-timestamp timestamp) 86400.0))
            (is-dark (git-blame-fringe--is-dark-theme-p)))
 
-      ;; If older than threshold, use uniform gray
+      ;; Old commits: uniform gray
       (if (> age-in-days git-blame-fringe-highlight-recent-days)
-          (if is-dark "#4a4a4a" "#d0d0d0")  ; Dark gray for dark theme, light gray for light theme
+          (if is-dark "#4a4a4a" "#d0d0d0")
 
-        ;; For recent commits, use age-based coloring
-        (let* ((oldest-timestamp (car git-blame-fringe--timestamps))
-               (newest-timestamp (cdr git-blame-fringe--timestamps))
-               ;; Only consider recent commits for color range
-               (recent-threshold (- current-timestamp
-                                   (* git-blame-fringe-highlight-recent-days 86400)))
-               (effective-oldest (max oldest-timestamp recent-threshold))
-               (age-range (- newest-timestamp effective-oldest))
-               (age (- newest-timestamp timestamp))
-               ;; Normalize to 0.0-1.0 (0=newest, 1=oldest in recent range)
-               (normalized (if (> age-range 0)
-                               (/ (float age) age-range)
-                             0.0)))
+        ;; Recent commits: 5 distinct color levels
+        (cond
+         ;; Within 1 day - Level 0 (newest)
+         ((<= age-in-days 1)
+          (if is-dark "#6B9BD1" "#4A7BA7"))
 
-          (if is-dark
-              ;; Dark theme: newer=lighter (#b3d9ff), older=darker (#1a4d7a)
-              (let ((r (+ 26 (round (* (- 1.0 normalized) (- 179 26)))))
-                    (g (+ 77 (round (* (- 1.0 normalized) (- 217 77)))))
-                    (b (+ 122 (round (* (- 1.0 normalized) (- 255 122))))))
-                (format "#%02x%02x%02x" r g b))
+         ;; 1-3 days - Level 1
+         ((<= age-in-days 3)
+          (if is-dark "#6090C4" "#5585B0"))
 
-            ;; Light theme: newer=darker (#1a4d7a), older=lighter (#b3d9ff)
-            (let ((r (+ 26 (round (* normalized (- 179 26)))))
-                  (g (+ 77 (round (* normalized (- 217 77)))))
-                  (b (+ 122 (round (* normalized (- 255 122))))))
-              (format "#%02x%02x%02x" r g b))))))))
+         ;; 3-7 days - Level 2
+         ((<= age-in-days 7)
+          (if is-dark "#5585B7" "#6090B9"))
+
+         ;; 7-14 days - Level 3
+         ((<= age-in-days 14)
+          (if is-dark "#4F7DAD" "#6B9BC2"))
+
+         ;; 14-30 days - Level 4 (oldest in recent range)
+         (t
+          (if is-dark "#4A7BA7" "#7BA3C7")))))))
 
 (defun git-blame-fringe--get-commit-color (commit-hash)
   "Get color for COMMIT-HASH, calculating if necessary."
