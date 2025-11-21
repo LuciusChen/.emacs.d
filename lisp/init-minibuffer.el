@@ -74,37 +74,6 @@
   (:when-loaded (setopt vertico-cycle t)
                 (vertico-mode)))
 
-(setup consult
-  (:defer (:require consult))
-  (:when-loaded
-    (keymap-global-set "M-g l" 'consult-line)
-    (keymap-global-set "M-g i" 'consult-imenu)
-    (keymap-global-set "M-g f" 'consult-recent-file)
-    (keymap-global-set "M-g r" 'consult-ripgrep)
-    (keymap-global-set "M-g p" 'consult-project-buffer)
-    (keymap-global-set "M-g y" 'consult-flymake)
-    (keymap-global-set "M-g m" 'consult-global-mark)
-    (keymap-global-set "M-g a" 'consult-org-agenda)
-    (keymap-global-set "M-g d" 'consult-fd)
-    (keymap-global-set "<remap> <switch-to-buffer>" 'consult-buffer)
-    (keymap-global-set "<remap> <switch-to-buffer-other-window>" 'consult-buffer-other-window)
-    (keymap-global-set "<remap> <switch-to-buffer-other-frame>" 'consult-buffer-other-frame)
-    (keymap-global-set "<remap> <goto-line>" 'consult-goto-line)
-    (:also-load lib-consult)
-    (setopt consult-async-min-input 2
-            xref-show-xrefs-function #'consult-xref
-            xref-show-definitions-function #'consult-xref)
-    (:with-hook minibuffer-setup-hook (:hook mcfly-time-travel))))
-
-(setup consult-dir
-  (:load-after vertico)
-  (:when-loaded
-    (keymap-global-set "C-x C-d" 'consult-dir)
-    (:with-map vertico-map
-      (:bind
-       "C-x C-d" consult-dir
-       "C-x C-j" consult-dir-jump-file))))
-
 (setup isearch
   (setopt isearch-lazy-count t
           isearch-allow-motion t

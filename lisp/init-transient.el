@@ -5,15 +5,10 @@
   (:defer (require 'transient))
   (:when-loaded
     (:also-load lib-transient)
-    (keymap-global-set "C-c e a" 'agenda-transient)
     (keymap-global-set "C-c e j" 'journal-transient)
     (keymap-global-set "C-c e e" 'emacs-access-transient)
-    (keymap-global-set "C-c e g" 'gptel-menu)
     (keymap-global-set "C-c e p" 'prog-commands)
-    (keymap-global-set "C-c e m" 'magit-commands)
-    (keymap-global-set "C-c e u" 'uniline-transient)
     (keymap-global-set "C-c e d" 'dape-transient)
-    (keymap-global-set "C-c e i" 'projectile-transient)
     (:with-map transient-base-map
       (:bind "<escape>" transient-quit-one))
     (setopt transient-semantic-coloring t)
@@ -46,48 +41,6 @@
       [("q" "Quit" transient-quit-one)])
 
     ;; transient 适合大量单一相关的功能需要在 buffer 进行交互的，单纯频次较高的功能按键其实并不适合。
-    ;; TODO 需要改为单纯的快捷键
-    (transient-define-prefix prog-commands ()
-      "Prog commands"
-      :info-manual "Prog commands"
-      [["Code find"
-        ("d" "find-definitions"      xref-find-definitions)
-        ("D" "find-references"       xref-find-references)
-        ("i" "find-impl"             eglot-find-implementation)
-        ("s" "find-symbols"          xref-find-apropos)
-        ("x" "find-mapper-xml"       +java-to-xml-mapper)
-        ("o" "find-def-other-window" xref-find-definitions-other-window)
-        ]
-       ["Code action"
-        ("a" "code-actions"      eglot-code-actions)
-        ("r" "rename"            eglot-rename)
-        ("f" "format-all-buffer" apheleia-format-buffer)]
-       ["Diagnostic"
-        ("n" "jump-to-next-diagnostic" flymake-goto-next-error)
-        ("N" "jump-to-prev-diagnostic" flymake-goto-prev-error)
-        ("l" "list-diagnostics"        consult-flymake)
-        ("s" "show-buffer-diagnostics" flymake-show-buffer-diagnostics)]
-       ["Navigate"
-        ("m" "consult-mark"             consult-mark)
-        ("v" "switch-git-status-buffer" +switch-git-status-buffer)]
-       ["Build"
-        ("eb" "project-build-task"                eglot-java-project-build-task)
-        ("ed" "project-build-task (debug)"        (lambda () (interactive)(eglot-java-run-test t)))
-        ("et" "project-build-task-tomcat"         copy-war-and-manage-tomcat)
-        ("eT" "project-build-task-tomcat (debug)" (lambda () (interactive)(copy-war-and-manage-tomcat t)))
-        ("es" "stop-tomcat"                       tomcat-safe-shutdown)]])
-
-    (transient-define-prefix magit-commands ()
-      "Magit commands"
-      :info-manual "Magit commands"
-      [["Magit navigate"
-        ("n"   "Untracked section"        magit-jump-to-untracked)
-        ("u"   "Unstaged section"         magit-jump-to-unstaged)
-        ("s"   "Staged section"           magit-jump-to-staged)
-        ("p"   "Unpushed section"         magit-jump-to-unpushed-to-pushremote)
-        ("M-p" "previous sibling section" magit-section-backward-sibling)
-        ("M-n" "next sibling section"     magit-section-forward-sibling)]])
-
     ;; dape
     (transient-define-prefix dape-transient ()
       "Transient for dape."
@@ -110,48 +63,7 @@
        ["Quit"
         ("qq" "Quit" dape-quit :transient nil)
         ("qk" "Kill" dape-kill :transient nil)]])
-
-    (transient-define-prefix projectile-transient ()
-      "Projectile command map."
-      ["Transient menu for projectile commands."
-       ["Command"
-        ("c p" "package project" projectile-package-project)
-        ("c t" "test project" projectile-test-project)
-        ("c r" "run project cmd" projectile-run-project)
-        ("c i" "install project" projectile-install-project)
-        ("c c" "compile project" projectile-compile-project)
-        ("!" "run shell cmd in root" projectile-run-shell-command-in-root)
-        ("&" "(async)run shell cmd in root" projectile-run-async-shell-command-in-root)
-        ("x 4 v" "run vterm in other window" projectile-run-vterm-other-window)
-        ("x v" "run vterm" projectile-run-vterm)
-        ("x g" "run gdb" projectile-run-gdb)]
-       ["Buffer"
-        ("B" "show project buffers" projectile-display-buffer)
-        ("l" "ibuffer" projectile-ibuffer)
-        ("S" "save buffers" projectile-save-project-buffers)
-        ("K" "kill buffers" projectile-kill-buffers)
-        ("b" "switch project buffer" projectile-switch-to-buffer)]
-       ["File"
-        ("o f" "find file in other window" projectile-find-file-other-window)
-        ("f" "find file" projectile-find-file)
-        ("g" "find file dwim" projectile-find-file-dwim)
-        ("t f" "find test files in project" projectile-find-test-file)
-        ("t t" "toggle implementation and test" projectile-toggle-between-implementation-and-test)]
-       ["Edit"
-        ("s x" "references" projectile-find-references)
-        ("j" "jump to tag" projectile-find-tag)
-        ("e r" "replace" projectile-replace)
-        ("e R" "regex replace"  projectile-replace-regexp)]
-       ["Directory"
-        ("d" "find dir " projectile-find-dir)
-        ("o d" "find dir in other window" projectile-find-dir-other-window)
-        ("D" "dired" projectile-dired)
-        ("o D" "dired in other window" projectile-dired-other-window)]
-       ["Projectile"
-        ("p" "switch project" projectile-switch-project)
-        ("q" "switch open project" projectile-switch-open-project)
-        ("i" "invalidate cache" projectile-invalidate-cache :transient t)
-        ("z" "cache current file" projectile-cache-current-file)]])))
+    ))
 
 (provide 'init-transient)
 ;;; init-transient.el ends here

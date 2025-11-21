@@ -48,6 +48,7 @@
   (:when-loaded (org-remark-nov-mode +1)))
 
 (setup gptel
+  (keymap-global-set "C-c e g" 'gptel-menu)
   (:when-loaded
     (:also-load lib-gpt)
     (:also-load org)
