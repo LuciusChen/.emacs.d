@@ -81,23 +81,6 @@ ARGS should be a list where the first element is the path to the repositories."
          (file (completing-read "Find file: " files nil t)))
     (find-file (file-name-concat repopath file))))
 
-(defun +java-to-xml-mapper ()
-  "Jump from a Java mapper file to the corresponding XML mapper file.
-If the cursor is on a method name in the Java file, jump to the corresponding
-method definition in the XML file."
-  (interactive)
-  (let* ((java-file (buffer-file-name))
-         (xml-file (concat (file-name-sans-extension java-file) ".xml"))
-         (method-name (thing-at-point 'symbol t)))
-    (if (file-exists-p xml-file)
-        (progn
-          (find-file xml-file)
-          (goto-char (point-min))
-          (if (re-search-forward (concat "id=\"\\(" method-name "\\)\"") nil t)
-              (message "Jumped to method: %s" method-name)
-            (message "Method '%s' not found in XML file." method-name)))
-      (message "No corresponding XML file found."))))
-
 (defun +switch-git-status-buffer ()
   "Parse git status from an expanded path and switch to a file.
 The completion candidates include the Git status of each file."

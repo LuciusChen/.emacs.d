@@ -186,6 +186,23 @@ E.g. \"1.8\" -> \"8\", \"11\" -> \"11\", \"17\" -> \"17\"."
    (t
     (user-error "Unsupported system: %s" system-type))))
 
+(defun mapper-find-xml ()
+  "Jump from a Java mapper file to the corresponding XML mapper file.
+If the cursor is on a method name in the Java file, jump to the corresponding
+method definition in the XML file."
+  (interactive)
+  (let* ((java-file (buffer-file-name))
+         (xml-file (concat (file-name-sans-extension java-file) ".xml"))
+         (method-name (thing-at-point 'symbol t)))
+    (if (file-exists-p xml-file)
+        (progn
+          (find-file xml-file)
+          (goto-char (point-min))
+          (if (re-search-forward (concat "id=\"\\(" method-name "\\)\"") nil t)
+              (message "Jumped to method: %s" method-name)
+            (message "Method '%s' not found in XML file." method-name)))
+      (message "No corresponding XML file found."))))
+
 (defun select-java-home ()
   "List all available JDK home paths and let the user choose one.
 The selected path will be exported to JAVA_HOME, and PATH will be

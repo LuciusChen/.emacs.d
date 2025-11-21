@@ -280,6 +280,11 @@
     (:also-load lib-eglot)
     (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
       (:hook eglot-ensure))
+    (:with-map eglot-mode-map
+      (:bind "C-c C-i" eglot-find-implementation
+             "C-c C-x" mapper-find-xml
+             "C-c C-a" eglot-code-actions
+             "C-c C-r" eglot-rename))
     (setopt eglot-extend-to-xref t
             eglot-code-action-indications '(eldoc-hint)
             eglot-events-buffer-config '(:size 0 :format full) ;; 取消 eglot log
@@ -308,6 +313,12 @@
     (:hook breadcrumb-local-mode))
   (:when-loaded
     (:also-load lib-eglot)
+    (:with-map eglot-java-mode-map
+      (:bind "C-c C-b" eglot-java-project-build-task
+             "C-c C-B" (lambda () (interactive)(eglot-java-run-test t))
+             "C-c C-t" eglot-code-actions
+             "C-c C-T" (lambda () (interactive)(copy-war-and-manage-tomcat t))
+             "C-c C-s" tomcat-safe-shutdown))
     ;; 对于低版本 JDK 需要先执行 select-java-home 设置 JAVA_HOME 后 build
     (setopt eglot-java-server-install-dir jdtls-install-dir
             eglot-java-default-task "clean install" ;; fork 了提了 pr 还未合并
