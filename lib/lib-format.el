@@ -57,12 +57,8 @@ If WITH-WHITESPACE is non-nil, allow flexible whitespace matching."
           (original (cdr pair)))
       (goto-char (point-min))
       (if with-whitespace
-          ;; For parameters: match "? /* __PARAM_N__ */" with flexible spacing
-          (while (re-search-forward
-                  (concat "\\?\\s-*"
-                          (regexp-quote "/* __PARAM_")
-                          "[0-9]+\\s-*__\\s-*\\*/")
-                  nil t)
+          ;; For parameters: match __PARAM_N__ with possible surrounding whitespace
+          (while (re-search-forward (regexp-quote placeholder) nil t)
             (replace-match original t t))
         ;; For others: exact match
         (while (search-forward placeholder nil t)
@@ -144,10 +140,10 @@ Return cons of (encoded-content . placeholder-maps-alist)."
                         "<!--\\(.*?\\)-->"
                         "/* __COMMENT_%d__ */")))
 
-      ;; Replace MyBatis parameters
+      ;; Replace MyBatis parameters - use unique column-like names
       (let ((param-map (+mybatis--replace-with-placeholders
                         "\\(#\\|\\$\\){[^}]+}"
-                        "? /* __PARAM_%d__ */")))
+                        "__PARAM_%d__")))
 
         ;; Replace opening tags
         (goto-char (point-min))
