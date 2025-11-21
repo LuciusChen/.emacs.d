@@ -1,7 +1,7 @@
 ;;; git-blame-fringe.el --- Show git blame in fringe with colors -*- lexical-binding: t; -*-
 
 ;; Author: Your Name
-;; Version: 2.0
+;; Version: 2.2
 ;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: git, vc, convenience
 
@@ -9,6 +9,7 @@
 ;; Display git blame information in the fringe with color blocks.
 ;; Color intensity based on commit age (newer = darker blue).
 ;; Show commit info above each block.
+;; Performance optimized: only renders visible region and loads commits on-demand.
 
 ;;; Code:
 
@@ -47,6 +48,9 @@
 (defvar git-blame-fringe--theme-change-timer nil
   "Timer to debounce theme changes.")
 
+(defvar git-blame-fringe--scroll-timer nil
+  "Timer to debounce scroll updates.")
+
 (defgroup git-blame-fringe nil
   "Show git blame in fringe with colors."
   :group 'vc)
@@ -73,6 +77,11 @@
                  (const inverse))
   :group 'git-blame-fringe)
 
+(defcustom git-blame-fringe-render-margin 50
+  "Number of lines to render above and below visible window."
+  :type 'integer
+  :group 'git-blame-fringe)
+
 (defvar-local git-blame-fringe--overlays nil
   "List of overlays used for blame display.")
 
@@ -81,6 +90,18 @@
 
 (defvar-local git-blame-fringe--commit-info nil
   "Hash table mapping commit hash to info (author, date, summary, timestamp).")
+
+(defvar-local git-blame-fringe--blame-data nil
+  "Cached blame data for the entire file.")
+
+(defvar-local git-blame-fringe--last-window-start nil
+  "Last window start position to detect scrolling.")
+
+(defvar-local git-blame-fringe--loading nil
+  "Flag to indicate if blame data is being loaded.")
+
+(defvar-local git-blame-fringe--timestamps nil
+  "Cached min/max timestamps for color calculation.")
 
 (defun git-blame-fringe--on-theme-change (&rest _)
   "Handle theme change event."
@@ -92,7 +113,7 @@
                           (dolist (buffer (buffer-list))
                             (with-current-buffer buffer
                               (when git-blame-fringe-mode
-                                (git-blame-fringe--update))))))))
+                                (git-blame-fringe--recolor-and-render))))))))
 
 (defun git-blame-fringe--setup-theme-advice ()
   "Setup advice to monitor theme changes."
@@ -137,15 +158,21 @@ Returns (SHORT-HASH AUTHOR DATE SUMMARY TIMESTAMP)."
               (match-string 4)  ; summary
               (string-to-number (match-string 5))))))) ; timestamp
 
-(defun git-blame-fringe--build-commit-info-map (blame-data)
-  "Build hash table of commit info from BLAME-DATA."
-  (let ((info-map (make-hash-table :test 'equal))
-        (unique-commits (delete-dups (mapcar #'cdr blame-data))))
-    (dolist (commit unique-commits)
-      (let ((info (git-blame-fringe--get-commit-info commit)))
-        (when info
-          (puthash commit info info-map))))
-    info-map))
+(defun git-blame-fringe--ensure-commit-info (commit-hash)
+  "Ensure commit info is loaded for COMMIT-HASH."
+  (unless (gethash commit-hash git-blame-fringe--commit-info)
+    (let ((info (git-blame-fringe--get-commit-info commit-hash)))
+      (when info
+        (puthash commit-hash info git-blame-fringe--commit-info)
+        ;; Update timestamp range
+        (let ((timestamp (nth 4 info)))
+          (when timestamp
+            (unless git-blame-fringe--timestamps
+              (setq git-blame-fringe--timestamps (cons timestamp timestamp)))
+            (setcar git-blame-fringe--timestamps
+                    (min (car git-blame-fringe--timestamps) timestamp))
+            (setcdr git-blame-fringe--timestamps
+                    (max (cdr git-blame-fringe--timestamps) timestamp))))))))
 
 (defun git-blame-fringe--is-dark-theme-p ()
   "Check if current theme is dark based on default background."
@@ -158,58 +185,49 @@ Returns (SHORT-HASH AUTHOR DATE SUMMARY TIMESTAMP)."
                           (* 0.114 (nth 2 rgb)))))
         (< luminance 0.5)))))
 
-(defun git-blame-fringe--timestamp-to-color (timestamp oldest-timestamp newest-timestamp)
+(defun git-blame-fringe--timestamp-to-color (timestamp)
   "Convert TIMESTAMP to blue color based on age.
 Dark theme: newer=lighter, older=darker
 Light theme: newer=darker, older=lighter"
-  (let* ((age-range (- newest-timestamp oldest-timestamp))
-         (age (- newest-timestamp timestamp))
-         ;; Normalize to 0.0-1.0 (0=newest, 1=oldest)
-         (normalized (if (> age-range 0)
-                         (/ (float age) age-range)
-                       0.0))
-         (is-dark (git-blame-fringe--is-dark-theme-p)))
+  (if (not git-blame-fringe--timestamps)
+      "#6699cc"  ; default color
+    (let* ((oldest-timestamp (car git-blame-fringe--timestamps))
+           (newest-timestamp (cdr git-blame-fringe--timestamps))
+           (age-range (- newest-timestamp oldest-timestamp))
+           (age (- newest-timestamp timestamp))
+           ;; Normalize to 0.0-1.0 (0=newest, 1=oldest)
+           (normalized (if (> age-range 0)
+                           (/ (float age) age-range)
+                         0.0))
+           (is-dark (git-blame-fringe--is-dark-theme-p)))
 
-    (if is-dark
-        ;; Dark theme: newer=lighter (#b3d9ff), older=darker (#1a4d7a)
-        (let ((r (+ 26 (round (* (- 1.0 normalized) (- 179 26)))))    ; 26 -> 179 (reversed)
-              (g (+ 77 (round (* (- 1.0 normalized) (- 217 77)))))    ; 77 -> 217 (reversed)
-              (b (+ 122 (round (* (- 1.0 normalized) (- 255 122)))))) ; 122 -> 255 (reversed)
-          (format "#%02x%02x%02x" r g b))
+      (if is-dark
+          ;; Dark theme: newer=lighter (#b3d9ff), older=darker (#1a4d7a)
+          (let ((r (+ 26 (round (* (- 1.0 normalized) (- 179 26)))))    ; 26 -> 179 (reversed)
+                (g (+ 77 (round (* (- 1.0 normalized) (- 217 77)))))    ; 77 -> 217 (reversed)
+                (b (+ 122 (round (* (- 1.0 normalized) (- 255 122)))))) ; 122 -> 255 (reversed)
+            (format "#%02x%02x%02x" r g b))
 
-      ;; Light theme: newer=darker (#1a4d7a), older=lighter (#b3d9ff)
-      (let ((r (+ 26 (round (* normalized (- 179 26)))))    ; 26 -> 179
-            (g (+ 77 (round (* normalized (- 217 77)))))    ; 77 -> 217
-            (b (+ 122 (round (* normalized (- 255 122)))))) ; 122 -> 255
-        (format "#%02x%02x%02x" r g b)))))
+        ;; Light theme: newer=darker (#1a4d7a), older=lighter (#b3d9ff)
+        (let ((r (+ 26 (round (* normalized (- 179 26)))))    ; 26 -> 179
+              (g (+ 77 (round (* normalized (- 217 77)))))    ; 77 -> 217
+              (b (+ 122 (round (* normalized (- 255 122)))))) ; 122 -> 255
+          (format "#%02x%02x%02x" r g b))))))
 
-(defun git-blame-fringe--assign-colors (blame-data commit-info-map)
-  "Assign colors to commits in BLAME-DATA based on timestamp.
-Returns updated color-map hash table."
-  (let ((color-map (make-hash-table :test 'equal))
-        (timestamps nil))
-    ;; Collect all timestamps
-    (maphash (lambda (commit info)
-               (when (nth 4 info)
-                 (push (nth 4 info) timestamps)))
-             commit-info-map)
-    (when timestamps
-      (let ((oldest (apply #'min timestamps))
-            (newest (apply #'max timestamps)))
-        ;; Assign colors based on timestamp
-        (dolist (entry blame-data)
-          (let* ((commit-hash (cdr entry))
-                 (info (gethash commit-hash commit-info-map))
-                 (timestamp (and info (nth 4 info))))
-            (unless (gethash commit-hash color-map)
-              (when timestamp
-                (puthash commit-hash
-                         (git-blame-fringe--timestamp-to-color timestamp oldest newest)
-                         color-map)))))))
-    color-map))
+(defun git-blame-fringe--get-commit-color (commit-hash)
+  "Get color for COMMIT-HASH, calculating if necessary."
+  (or (gethash commit-hash git-blame-fringe--color-map)
+      (let* ((info (gethash commit-hash git-blame-fringe--commit-info))
+             (timestamp (and info (nth 4 info)))
+             (color (if timestamp
+                        (git-blame-fringe--timestamp-to-color timestamp)
+                      "#6699cc")))
+        (puthash commit-hash color git-blame-fringe--color-map)
+        color)))
 
-(defun git-blame-fringe--find-block-boundaries (blame-data)
+(defun git-blame-fringe--find-block-boundaries (blame-data &optional start-line end-line)
   "Find boundaries of same-commit blocks in BLAME-DATA.
+If START-LINE and END-LINE are provided, only return blocks in that range.
 Returns list of (START-LINE COMMIT-HASH BLOCK-LENGTH)."
   (let ((blocks nil)
         (current-commit nil)
@@ -221,13 +239,31 @@ Returns list of (START-LINE COMMIT-HASH BLOCK-LENGTH)."
         (if (equal commit current-commit)
             (setq block-length (1+ block-length))
           (when current-commit
-            (push (list block-start current-commit block-length) blocks))
+            ;; Add block if no range specified or block overlaps with range
+            (when (or (not start-line)
+                      (and (>= (+ block-start block-length -1) start-line)
+                           (<= block-start end-line)))
+              (push (list block-start current-commit block-length) blocks)))
           (setq current-commit commit
                 block-start line
                 block-length 1))))
     (when current-commit
-      (push (list block-start current-commit block-length) blocks))
+      (when (or (not start-line)
+                (and (>= (+ block-start block-length -1) start-line)
+                     (<= block-start end-line)))
+        (push (list block-start current-commit block-length) blocks)))
     (nreverse blocks)))
+
+(defun git-blame-fringe--get-visible-line-range ()
+  "Get the range of visible lines with margin.
+Returns (START-LINE . END-LINE)."
+  (let* ((window-start (window-start))
+         (window-end (window-end nil t))
+         (start-line (max 1 (- (line-number-at-pos window-start)
+                               git-blame-fringe-render-margin)))
+         (end-line (+ (line-number-at-pos window-end)
+                      git-blame-fringe-render-margin)))
+    (cons start-line end-line)))
 
 (defun git-blame-fringe--create-fringe-overlay (line-number color commit-hash)
   "Create fringe overlay at LINE-NUMBER with COLOR and COMMIT-HASH."
@@ -245,7 +281,7 @@ Returns list of (START-LINE COMMIT-HASH BLOCK-LENGTH)."
                    ,(format "Face for git blame color %s" color)
                    :group 'git-blame-fringe)))
         (overlay-put overlay 'git-blame-fringe t)
-        (overlay-put overlay 'git-blame-commit commit-hash)  ; 保存 commit hash
+        (overlay-put overlay 'git-blame-commit commit-hash)
         (overlay-put overlay 'before-string
                      (propertize "!" 'display
                                  (list git-blame-fringe-style
@@ -275,32 +311,27 @@ Returns list of (START-LINE COMMIT-HASH BLOCK-LENGTH)."
                             (substring commit-hash 0 8)))
              (fringe-face (intern (format "git-blame-fringe-face-%s" color)))
              (hl-bg (git-blame-fringe--get-hl-line-color))
-             ;; Header face: hl-line background + fringe color foreground
              (header-face (pcase git-blame-fringe-header-style
                             ('background `(:background ,hl-bg :foreground ,color :weight bold))
                             ('box `(:background ,hl-bg :foreground ,color :weight bold
                                                 :box (:line-width 1 :color ,color)))
                             ('inverse `(:background ,color :foreground ,hl-bg :weight bold))
                             (_ `(:background ,hl-bg :foreground ,color :weight bold)))))
-        ;; Define face if not exists
         (unless (facep fringe-face)
           (eval `(defface ,fringe-face
                    '((t :background ,color :foreground ,color))
                    ,(format "Face for git blame color %s" color)
                    :group 'git-blame-fringe)))
         (overlay-put overlay 'git-blame-fringe t)
-        (overlay-put overlay 'git-blame-commit commit-hash)  ; 保存 commit hash
+        (overlay-put overlay 'git-blame-commit commit-hash)
         (overlay-put overlay 'before-string
                      (concat
-                      ;; Fringe for header line
                       (propertize "!" 'display
                                   (list git-blame-fringe-style
                                         'git-blame-fringe-full
                                         fringe-face))
-                      ;; Header text with hl-line background and fringe color text
                       (propertize header-text 'face header-face)
                       "\n"
-                      ;; Fringe for the actual code line
                       (propertize "!" 'display
                                   (list git-blame-fringe-style
                                         'git-blame-fringe-full
@@ -314,45 +345,104 @@ Returns list of (START-LINE COMMIT-HASH BLOCK-LENGTH)."
       (delete-overlay overlay)))
   (setq git-blame-fringe--overlays nil))
 
-(defun git-blame-fringe--update ()
-  "Update git blame fringe display."
-  (interactive)
-  (git-blame-fringe--clear-overlays)
-  (let* ((blame-data (git-blame-fringe--get-blame-data))
-         (commit-info-map (git-blame-fringe--build-commit-info-map blame-data))
-         (color-map (git-blame-fringe--assign-colors blame-data commit-info-map))
-         (blocks (git-blame-fringe--find-block-boundaries blame-data)))
-    (when blame-data
-      (setq git-blame-fringe--color-map color-map
-            git-blame-fringe--commit-info commit-info-map)
-      (message "Updating fringe for %d lines with %d unique commits..."
-               (length blame-data)
-               (hash-table-count color-map))
+(defun git-blame-fringe--render-visible-region ()
+  "Render git blame fringe for visible region only."
+  (when git-blame-fringe--blame-data
+    (git-blame-fringe--clear-overlays)
+    (let* ((range (git-blame-fringe--get-visible-line-range))
+           (start-line (car range))
+           (end-line (cdr range))
+           (blocks (git-blame-fringe--find-block-boundaries
+                    git-blame-fringe--blame-data
+                    start-line
+                    end-line)))
 
-      ;; Process each block
+      ;; First pass: ensure all commit info is loaded for visible blocks
       (dolist (block blocks)
-        (let* ((start-line (nth 0 block))
+        (let ((commit-hash (nth 1 block)))
+          (git-blame-fringe--ensure-commit-info commit-hash)))
+
+      ;; Second pass: render with colors
+      (dolist (block blocks)
+        (let* ((block-start (nth 0 block))
                (commit-hash (nth 1 block))
                (block-length (nth 2 block))
-               (color (gethash commit-hash color-map)))
+               (color (git-blame-fringe--get-commit-color commit-hash))
+               (block-end (+ block-start block-length -1)))
           (when color
-            ;; Create header with fringe at block start
-            (let ((header-ov (git-blame-fringe--create-header-overlay
-                              start-line commit-hash color)))
-              (when header-ov
-                (push header-ov git-blame-fringe--overlays)))
+            ;; Create header with fringe at block start (if visible)
+            (when (and (>= block-start start-line) (<= block-start end-line))
+              (let ((header-ov (git-blame-fringe--create-header-overlay
+                                block-start commit-hash color)))
+                (when header-ov
+                  (push header-ov git-blame-fringe--overlays))))
 
-            ;; Create fringe for remaining lines in block
-            (dotimes (i (1- block-length))
-              (let* ((line-num (+ start-line i 1))
-                     (fringe-ov (git-blame-fringe--create-fringe-overlay
-                                 line-num color commit-hash)))  ; 传入 commit-hash
-                (when fringe-ov
-                  (push fringe-ov git-blame-fringe--overlays)))))))
+            ;; Create fringe for remaining lines in block (only visible ones)
+            (let ((render-start (max (1+ block-start) start-line))
+                  (render-end (min block-end end-line)))
+              (when (<= render-start render-end)
+                (dotimes (i (- render-end render-start -1))
+                  (let* ((line-num (+ render-start i))
+                         (fringe-ov (git-blame-fringe--create-fringe-overlay
+                                     line-num color commit-hash)))
+                    (when fringe-ov
+                      (push fringe-ov git-blame-fringe--overlays))))))))))))
 
-      (message "Git blame fringe updated: %d blocks, %d overlays created"
-               (length blocks)
-               (length git-blame-fringe--overlays)))))
+(defun git-blame-fringe--load-blame-data ()
+  "Load git blame data in background."
+  (unless git-blame-fringe--loading
+    (setq git-blame-fringe--loading t)
+    (message "Loading git blame data...")
+    (run-with-idle-timer
+     0.01 nil
+     (lambda (buffer)
+       (when (buffer-live-p buffer)
+         (with-current-buffer buffer
+           (let ((blame-data (git-blame-fringe--get-blame-data)))
+             (if blame-data
+                 (progn
+                   (setq git-blame-fringe--blame-data blame-data)
+                   (setq git-blame-fringe--commit-info (make-hash-table :test 'equal))
+                   (setq git-blame-fringe--color-map (make-hash-table :test 'equal))
+                   (setq git-blame-fringe--timestamps nil)
+                   (setq git-blame-fringe--loading nil)
+                   (git-blame-fringe--render-visible-region)
+                   (message "Git blame loaded: %d lines" (length blame-data)))
+               (setq git-blame-fringe--loading nil)
+               (message "No git blame data available"))))))
+     (current-buffer))))
+
+(defun git-blame-fringe--recolor-and-render ()
+  "Recalculate colors and re-render (for theme changes)."
+  (when git-blame-fringe--blame-data
+    ;; Clear color map to force recalculation
+    (setq git-blame-fringe--color-map (make-hash-table :test 'equal))
+    (git-blame-fringe--render-visible-region)))
+
+(defun git-blame-fringe--full-update ()
+  "Full update: reload blame data and render visible region."
+  (interactive)
+  (setq git-blame-fringe--blame-data nil
+        git-blame-fringe--commit-info nil
+        git-blame-fringe--color-map nil
+        git-blame-fringe--timestamps nil)
+  (git-blame-fringe--load-blame-data))
+
+(defun git-blame-fringe--on-scroll ()
+  "Handle scroll event with debouncing."
+  (let ((current-start (window-start)))
+    (unless (equal current-start git-blame-fringe--last-window-start)
+      (setq git-blame-fringe--last-window-start current-start)
+      (when git-blame-fringe--scroll-timer
+        (cancel-timer git-blame-fringe--scroll-timer))
+      (setq git-blame-fringe--scroll-timer
+            (run-with-idle-timer 0.1 nil
+                                 (lambda (buf)
+                                   (when (buffer-live-p buf)
+                                     (with-current-buffer buf
+                                       (when git-blame-fringe-mode
+                                         (git-blame-fringe--render-visible-region)))))
+                                 (current-buffer))))))
 
 (defun git-blame-fringe--get-commit-at-line ()
   "Get commit hash at current line."
@@ -372,22 +462,30 @@ Returns list of (START-LINE COMMIT-HASH BLOCK-LENGTH)."
   :group 'git-blame-fringe
   (if git-blame-fringe-mode
       (progn
-        ;; 添加到 emulation-mode-map-alists（最高优先级）
         (setq git-blame-fringe--emulation-alist
               `((git-blame-fringe-mode . ,git-blame-fringe-mode-map)))
         (add-to-list 'emulation-mode-map-alists
                      'git-blame-fringe--emulation-alist)
 
-        (git-blame-fringe--update)
-        (add-hook 'after-save-hook #'git-blame-fringe--update nil t)
+        (git-blame-fringe--load-blame-data)
+        (add-hook 'after-save-hook #'git-blame-fringe--full-update nil t)
+        (add-hook 'window-scroll-functions
+                  (lambda (_win _start) (git-blame-fringe--on-scroll))
+                  nil t)
         (git-blame-fringe--setup-theme-advice))
 
-    ;; 清理
     (setq emulation-mode-map-alists
           (delq 'git-blame-fringe--emulation-alist
                 emulation-mode-map-alists))
     (git-blame-fringe--clear-overlays)
-    (remove-hook 'after-save-hook #'git-blame-fringe--update t)
+    (remove-hook 'after-save-hook #'git-blame-fringe--full-update t)
+    (remove-hook 'window-scroll-functions
+                 (lambda (_win _start) (git-blame-fringe--on-scroll))
+                 t)
+    (when git-blame-fringe--scroll-timer
+      (cancel-timer git-blame-fringe--scroll-timer)
+      (setq git-blame-fringe--scroll-timer nil))
+    (setq git-blame-fringe--loading nil)
     (unless (cl-some (lambda (buf)
                        (with-current-buffer buf
                          (and (not (eq buf (current-buffer)))
@@ -410,26 +508,6 @@ Returns list of (START-LINE COMMIT-HASH BLOCK-LENGTH)."
   "Toggle git blame fringe display."
   (interactive)
   (git-blame-fringe-mode 'toggle))
-
-;;;###autoload
-(defun git-blame-fringe-debug ()
-  "Debug git blame fringe - show blame data."
-  (interactive)
-  (let* ((blame-data (git-blame-fringe--get-blame-data))
-         (commit-info-map (git-blame-fringe--build-commit-info-map blame-data))
-         (color-map (git-blame-fringe--assign-colors blame-data commit-info-map))
-         (blocks (git-blame-fringe--find-block-boundaries blame-data)))
-    (if blame-data
-        (message "Got %d lines, %d commits, %d blocks. Colors: %s"
-                 (length blame-data)
-                 (hash-table-count color-map)
-                 (length blocks)
-                 (mapconcat (lambda (block)
-                              (let ((color (gethash (nth 1 block) color-map)))
-                                (format "L%d=%s" (nth 0 block) color)))
-                            (seq-take blocks 3)
-                            ", "))
-      (message "No blame data found. Is this a git repository?"))))
 
 (provide 'git-blame-fringe)
 ;;; git-blame-fringe.el ends here
