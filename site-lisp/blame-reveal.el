@@ -1,6 +1,6 @@
 ;;; blame-reveal.el --- Show git blame in fringe with colors -*- lexical-binding: t; -*-
 
-;; Author: Your Name
+;; Author: Lucius Chen
 ;; Version: 2.3
 ;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: git, vc, convenience
@@ -391,6 +391,16 @@ Returns (START-LINE . END-LINE)."
                       blame-reveal-render-margin)))
     (cons start-line end-line)))
 
+(defun blame-reveal--ensure-fringe-face (color)
+  "Ensure fringe face for COLOR exists."
+  (let ((face-name (intern (format "blame-reveal-face-%s" color))))
+    (unless (facep face-name)
+      (custom-declare-face face-name
+        `((t :background ,color :foreground ,color))
+        (format "Face for git blame color %s" color)
+        :group 'blame-reveal))
+    face-name))
+
 (defun blame-reveal--create-fringe-overlay (line-number color commit-hash)
   "Create fringe overlay at LINE-NUMBER with COLOR and COMMIT-HASH."
   (save-excursion
@@ -399,13 +409,7 @@ Returns (START-LINE . END-LINE)."
     (unless (eobp)
       (let* ((pos (line-beginning-position))
              (overlay (make-overlay pos pos))
-             (fringe-face (intern (format "blame-reveal-face-%s" color))))
-        ;; Define face dynamically if not exists
-        (unless (facep fringe-face)
-          (eval `(defface ,fringe-face
-                   '((t :background ,color :foreground ,color))
-                   ,(format "Face for git blame color %s" color)
-                   :group 'blame-reveal)))
+             (fringe-face (blame-reveal--ensure-fringe-face color)))
         (overlay-put overlay 'blame-reveal t)
         (overlay-put overlay 'blame-reveal-commit commit-hash)
         (overlay-put overlay 'before-string
@@ -463,7 +467,7 @@ COLOR is the fringe color, which will also be used for header text foreground."
       (let* ((pos (line-beginning-position))
              (overlay (make-overlay pos pos))
              (header-text (blame-reveal--format-header-text commit-hash))
-             (fringe-face (intern (format "blame-reveal-face-%s" color)))
+             (fringe-face (blame-reveal--ensure-fringe-face color))
              (hl-bg (blame-reveal--get-hl-line-color))
              ;; Get configured weights and heights
              (header-weight blame-reveal-header-weight)
@@ -494,14 +498,7 @@ COLOR is the fringe color, which will also be used for header text foreground."
                                  ('inverse (list :background color :foreground hl-bg :weight description-weight :height description-height))
                                  (_ (list :background hl-bg :foreground color :weight description-weight :height description-height))))
              ;; Split header text into lines based on format
-             (header-lines (split-string header-text "\n"))
-             ;; Determine which lines use which style
-             (is-simple (eq blame-reveal-header-format 'line)))
-        (unless (facep fringe-face)
-          (eval `(defface ,fringe-face
-                   '((t :background ,color :foreground ,color))
-                   ,(format "Face for git blame color %s" color)
-                   :group 'blame-reveal)))
+             (header-lines (split-string header-text "\n")))
         (overlay-put overlay 'blame-reveal t)
         (overlay-put overlay 'blame-reveal-commit commit-hash)
         (overlay-put overlay 'blame-reveal-header t)
@@ -600,28 +597,22 @@ COLOR is the fringe color, which will also be used for header text foreground."
       (blame-reveal--update-header))))
 
 (defun blame-reveal--get-current-block ()
-  "Get the commit hash and start line of block at current line.
-Returns (COMMIT-HASH . START-LINE) or nil."
-  (let ((line-num (line-number-at-pos)))
+  "Get the commit hash and start line of block at current line."
+  (let ((line-num (line-number-at-pos))
+        (overlays (overlays-at (point))))
     (catch 'found
-      ;; First try to find from rendered overlays (for recent commits)
-      (dolist (overlay blame-reveal--overlays)
-        (when (overlay-get overlay 'blame-reveal-commit)
-          (let ((ov-line (line-number-at-pos (overlay-start overlay))))
-            (when (= ov-line line-num)
-              (let ((commit (overlay-get overlay 'blame-reveal-commit)))
-                (dolist (block (blame-reveal--find-block-boundaries
-                                blame-reveal--blame-data))
-                  (let ((block-start (nth 0 block))
-                        (block-commit (nth 1 block))
-                        (block-length (nth 2 block)))
-                    (when (and (equal commit block-commit)
-                               (>= line-num block-start)
-                               (< line-num (+ block-start block-length)))
-                      (throw 'found (cons commit block-start))))))))))
+      (dolist (ov overlays)
+        (when-let ((commit (overlay-get ov 'blame-reveal-commit)))
+          (dolist (block (blame-reveal--find-block-boundaries
+                          blame-reveal--blame-data))
+            (let ((block-start (nth 0 block))
+                  (block-commit (nth 1 block))
+                  (block-length (nth 2 block)))
+              (when (and (equal commit block-commit)
+                         (>= line-num block-start)
+                         (< line-num (+ block-start block-length)))
+                (throw 'found (cons commit block-start)))))))
 
-      ;; If not found in overlays, search directly in blame-data
-      ;; (this handles old commits that don't have fringe rendered)
       (dolist (block (blame-reveal--find-block-boundaries
                       blame-reveal--blame-data))
         (let ((block-start (nth 0 block))
@@ -762,16 +753,9 @@ Returns list of created overlays."
                                          (blame-reveal--render-visible-region)))))
                                  (current-buffer))))))
 
-(defun blame-reveal--get-commit-at-line ()
-  "Get commit hash at current line."
-  (let ((line-num (line-number-at-pos)))
-    (catch 'found
-      (dolist (overlay blame-reveal--overlays)
-        (when (overlay-get overlay 'blame-reveal-commit)
-          (let ((ov-line (line-number-at-pos (overlay-start overlay))))
-            (when (= ov-line line-num)
-              (throw 'found (overlay-get overlay 'blame-reveal-commit))))))
-      nil)))
+(defun blame-reveal--scroll-handler (_win _start)
+  "Handle window scroll events."
+  (blame-reveal--on-scroll))
 
 ;;;###autoload
 (defun blame-reveal-show-commit-diff ()
@@ -838,9 +822,7 @@ Format matches the 'full' header format."
 
         (blame-reveal--load-blame-data)
         (add-hook 'after-save-hook #'blame-reveal--full-update nil t)
-        (add-hook 'window-scroll-functions
-                  (lambda (_win _start) (blame-reveal--on-scroll))
-                  nil t)
+        (add-hook 'window-scroll-functions #'blame-reveal--scroll-handler nil t)
         (add-hook 'post-command-hook #'blame-reveal--update-header nil t)
         (blame-reveal--setup-theme-advice))
 
@@ -849,9 +831,7 @@ Format matches the 'full' header format."
                 emulation-mode-map-alists))
     (blame-reveal--clear-overlays)
     (remove-hook 'after-save-hook #'blame-reveal--full-update t)
-    (remove-hook 'window-scroll-functions
-                 (lambda (_win _start) (blame-reveal--on-scroll))
-                 t)
+    (remove-hook 'window-scroll-functions #'blame-reveal--scroll-handler t)
     (remove-hook 'post-command-hook #'blame-reveal--update-header t)
     (when blame-reveal--scroll-timer
       (cancel-timer blame-reveal--scroll-timer)
@@ -868,7 +848,8 @@ Format matches the 'full' header format."
 (defun blame-reveal-copy-commit-hash ()
   "Copy the commit hash of the current line to kill ring."
   (interactive)
-  (if-let ((commit (blame-reveal--get-commit-at-line)))
+  (if-let* ((current-block (blame-reveal--get-current-block))
+            (commit (car current-block)))
       (progn
         (kill-new commit)
         (message "Copied commit hash: %s" (substring commit 0 8)))
