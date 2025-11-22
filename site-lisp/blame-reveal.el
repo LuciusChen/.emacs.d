@@ -73,7 +73,7 @@ Quick start:
 Common customizations:
   - `blame-reveal-color-scheme': Change color scheme
   - `blame-reveal-recent-commit-count': How many commits to highlight
-  - `blame-reveal-header-format': Header display style
+  - `blame-reveal-display-layout': Header display layout
   - `blame-reveal-use-magit': Use magit for commit details
 
 See all options: M-x customize-group RET blame-reveal"
@@ -86,17 +86,17 @@ See all options: M-x customize-group RET blame-reveal"
                  (const right-fringe))
   :group 'blame-reveal)
 
-(defcustom blame-reveal-header-format 'normal
+(defcustom blame-reveal-display-layout 'compact
   "Format for commit message header.
-- 'full: Show hash, commit message, author, date and description
-- 'normal: Show hash, commit message, author, and date
-- 'line: Show only commit message"
+- `line`: show only the commit header
+- `compact`: show header + metadata
+- `full`: show header + metadata + description"
   :type '(choice (const full)
-                 (const normal)
+                 (const compact)
                  (const line))
   :group 'blame-reveal)
 
-(defcustom blame-reveal-header-style 'background
+(defcustom blame-reveal-display-style 'background
   "Style for commit message header.
 - 'background: Use background color
 - 'box: Use box border
@@ -618,7 +618,7 @@ Returns (START-LINE . END-LINE)."
       (face-background 'default)))
 
 (defun blame-reveal--format-header-text (commit-hash)
-  "Format header text for COMMIT-HASH based on `blame-reveal-header-format'."
+  "Format header text for COMMIT-HASH based on `blame-reveal-display-layout'."
   (let ((info (gethash commit-hash blame-reveal--commit-info)))
     (if info
         (let ((short-hash (nth 0 info))
@@ -626,11 +626,11 @@ Returns (START-LINE . END-LINE)."
               (date (nth 2 info))
               (summary (nth 3 info))
               (description (nth 5 info)))
-          (pcase blame-reveal-header-format
+          (pcase blame-reveal-display-layout
             ('line
              ;; Only commit message
              (format "▸ %s" summary))
-            ('normal
+            ('compact
              ;; Commit message + metadata (2 lines)
              (format "▸ %s\n  %s · %s · %s"
                      summary short-hash author date))
@@ -644,7 +644,7 @@ Returns (START-LINE . END-LINE)."
                              (mapconcat (lambda (line) (concat "  " line))
                                         desc-lines
                                         "\n")))
-                 ;; No description, fall back to normal format
+                 ;; No description, fall back to compact format
                  (format "▸ %s\n  %s · %s · %s"
                          summary short-hash author date))))
             (_ (format "▸ %s" summary))))
@@ -670,21 +670,21 @@ COLOR is the fringe color, which will also be used for header text foreground."
              (description-weight blame-reveal-description-weight)
              (description-height blame-reveal-description-height)
              ;; Header line style
-             (header-face (pcase blame-reveal-header-style
+             (header-face (pcase blame-reveal-display-style
                             ('background (list :background hl-bg :foreground color :weight header-weight :height header-height))
                             ('box (list :background hl-bg :foreground color :weight header-weight :height header-height
                                         :box (list :line-width 1 :color color)))
                             ('inverse (list :background color :foreground hl-bg :weight header-weight :height header-height))
                             (_ (list :background hl-bg :foreground color :weight header-weight :height header-height))))
              ;; Metadata line style
-             (metadata-face (pcase blame-reveal-header-style
+             (metadata-face (pcase blame-reveal-display-style
                               ('background (list :background hl-bg :foreground color :weight metadata-weight :height metadata-height))
                               ('box (list :background hl-bg :foreground color :weight metadata-weight :height metadata-height
                                           :box (list :line-width 1 :color color)))
                               ('inverse (list :background color :foreground hl-bg :weight metadata-weight :height metadata-height))
                               (_ (list :background hl-bg :foreground color :weight metadata-weight :height metadata-height))))
              ;; Description line style
-             (description-face (pcase blame-reveal-header-style
+             (description-face (pcase blame-reveal-display-style
                                  ('background (list :background hl-bg :foreground color :weight description-weight :height description-height))
                                  ('box (list :background hl-bg :foreground color :weight description-weight :height description-height
                                              :box (list :line-width 1 :color color)))
@@ -710,7 +710,7 @@ COLOR is the fringe color, which will also be used for header text foreground."
                               (result ""))
                           (dotimes (i (length remaining-lines))
                             (let* ((line (nth i remaining-lines))
-                                   (line-face (if (and (eq blame-reveal-header-format 'full)
+                                   (line-face (if (and (eq blame-reveal-display-layout 'full)
                                                        (> i 0)
                                                        (not (string-empty-p (string-trim line))))
                                                   description-face
