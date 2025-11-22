@@ -55,6 +55,9 @@
 (defvar blame-reveal--scroll-timer nil
   "Timer to debounce scroll updates.")
 
+(defvar-local blame-reveal--temp-overlay-timer nil
+  "Timer for delayed temp overlay rendering.")
+
 (defvar-local blame-reveal--current-block-commit nil
   "Commit hash of the currently highlighted block.")
 
@@ -121,6 +124,14 @@ If nil, uses automatic gray color based on theme (dark theme: #4a4a4a, light the
 Set to a color string like \"#888888\" to use a fixed color."
   :type '(choice (const :tag "Auto (theme-based gray)" nil)
                  (color :tag "Fixed color"))
+  :group 'blame-reveal)
+
+(defcustom blame-reveal-temp-overlay-delay 0.05
+  "Delay in seconds before rendering temp overlays for old commits.
+Lower values (e.g., 0.02) make overlays appear faster but may cause lag
+when moving cursor quickly. Higher values (e.g., 0.1) reduce lag but
+overlays appear with more delay."
+  :type 'number
   :group 'blame-reveal)
 
 ;; Header styling customization
@@ -678,7 +689,6 @@ Returns list of created overlays."
                (not (equal (car current-block) blame-reveal--current-block-commit)))
           (let* ((commit-hash (car current-block))
                  (block-start (cdr current-block))
-                 ;; Ensure commit info is loaded even for old commits
                  (_ (blame-reveal--ensure-commit-info commit-hash))
                  (info (gethash commit-hash blame-reveal--commit-info))
                  (timestamp (and info (nth 4 info)))
@@ -686,35 +696,52 @@ Returns list of created overlays."
                  (is-old-commit (and timestamp
                                      (not (blame-reveal--should-render-commit timestamp)))))
 
-            ;; Clear previous header
+            ;; Cancel any pending temp overlay rendering
+            (when blame-reveal--temp-overlay-timer
+              (cancel-timer blame-reveal--temp-overlay-timer)
+              (setq blame-reveal--temp-overlay-timer nil))
+
+            ;; Clear previous header immediately
             (when blame-reveal--header-overlay
               (delete-overlay blame-reveal--header-overlay)
               (setq blame-reveal--header-overlay nil))
 
-            ;; Clear previous temp overlays
+            ;; Clear previous temp overlays immediately
             (blame-reveal--clear-temp-overlays)
 
-            ;; Create new header
+            ;; Create new header immediately (for instant feedback)
             (setq blame-reveal--current-block-commit commit-hash)
             (setq blame-reveal--header-overlay
                   (blame-reveal--create-header-overlay
                    block-start commit-hash color))
 
-            ;; If this is an old commit, temporarily show its fringe
+            ;; Delay temp overlay rendering for old commits to avoid lag
             (when is-old-commit
-              (dolist (block (blame-reveal--find-block-boundaries
-                              blame-reveal--blame-data))
-                (let ((blk-start (nth 0 block))
-                      (blk-commit (nth 1 block))
-                      (blk-length (nth 2 block)))
-                  (when (equal blk-commit commit-hash)
-                    (let ((temp-ovs (blame-reveal--render-block-fringe
-                                     blk-start blk-length commit-hash color)))
-                      (setq blame-reveal--temp-old-overlays
-                            (append temp-ovs blame-reveal--temp-old-overlays))))))))
+              (setq blame-reveal--temp-overlay-timer
+                    (run-with-idle-timer
+                     blame-reveal-temp-overlay-delay nil
+                     (lambda (buf hash col)
+                       (when (buffer-live-p buf)
+                         (with-current-buffer buf
+                           ;; Only render if we're still on the same commit
+                           (when (equal blame-reveal--current-block-commit hash)
+                             (dolist (block (blame-reveal--find-block-boundaries
+                                             blame-reveal--blame-data))
+                               (let ((blk-start (nth 0 block))
+                                     (blk-commit (nth 1 block))
+                                     (blk-length (nth 2 block)))
+                                 (when (equal blk-commit hash)
+                                   (let ((temp-ovs (blame-reveal--render-block-fringe
+                                                    blk-start blk-length hash col)))
+                                     (setq blame-reveal--temp-old-overlays
+                                           (append temp-ovs blame-reveal--temp-old-overlays))))))))))
+                     (current-buffer) commit-hash color))))
 
-        ;; No current block, clear everything
+        ;; No current block or moved away, clear everything
         (unless current-block
+          (when blame-reveal--temp-overlay-timer
+            (cancel-timer blame-reveal--temp-overlay-timer)
+            (setq blame-reveal--temp-overlay-timer nil))
           (when blame-reveal--header-overlay
             (delete-overlay blame-reveal--header-overlay)
             (setq blame-reveal--header-overlay nil))
@@ -789,7 +816,12 @@ Uses magit if `blame-reveal-use-magit' is configured to do so."
             (commit-hash (car current-block)))
       (if (blame-reveal--should-use-magit-p)
           ;; 使用 magit
-          (magit-show-commit commit-hash)
+          (progn
+            (magit-show-commit commit-hash)
+            ;; 在 magit buffer 中重新绑定 q 键
+            (with-current-buffer (magit-get-mode-buffer 'magit-revision-mode)
+              (use-local-map (copy-keymap (current-local-map)))
+              (local-set-key (kbd "q") #'quit-window)))
         ;; 使用内置
         (let ((buffer-name (format "*Commit Diff: %s*" (substring commit-hash 0 8))))
           (with-current-buffer (get-buffer-create buffer-name)
@@ -950,6 +982,12 @@ Format matches the 'full' header format."
     (setq emulation-mode-map-alists
           (delq 'blame-reveal--emulation-alist
                 emulation-mode-map-alists))
+
+    ;; Cancel any pending timers
+    (when blame-reveal--temp-overlay-timer
+      (cancel-timer blame-reveal--temp-overlay-timer)
+      (setq blame-reveal--temp-overlay-timer nil))
+
     (blame-reveal--clear-overlays)
     (remove-hook 'after-save-hook #'blame-reveal--full-update t)
     (remove-hook 'window-scroll-functions #'blame-reveal--scroll-handler t)
