@@ -1,11 +1,11 @@
 * blame-reveal.el
 
-A lightweight Git blame visualization for Emacs that renders blame information as /contextual UI/ - only what you need, when you need it.
+A contextual, high-performance Git blame UI for Emacs.
 
 ** Philosophy
 
 > Blame is context, not decoration.
-  blame-reveal renders *only what matters* — the visible viewport and recent commits — keeping Emacs fast even on large files.
+  blame-reveal displays only what matters — visible lines and recent commits — keeping Emacs responsive even on very large files.
 
 Unlike traditional blame tools that process entire files upfront, =blame-reveal= renders only the visible viewport plus a margin. This ensures instant activation, smooth scrolling, and minimal resource usage.
 
@@ -63,6 +63,8 @@ With auto-expand:    All commits <90d colorized (ignores count)
 Without auto-expand: Max 20 commits AND <90d
 #+end_src
 
+In short: recent commits get color; older history stays unobtrusive until inspected.
+
 *** Color Gradient
 
 Colors assigned by *relative rank* among recent commits:
@@ -93,14 +95,14 @@ Rank 21+          ░░░░░░░░  Gray       #4A4A4A
 
 *** Interactive Commands
 
-| Key | Command | Description |
-|-----|---------|-------------|
-| =q= | =blame-reveal-mode= | Toggle |
-| =c= | =blame-reveal-copy-commit-hash= | Copy hash |
-| =d= | =blame-reveal-show-commit-diff= | Show diff |
-| =s= | =blame-reveal-show-commit-details= | Full message |
-| =h= | =blame-reveal-show-file-history= | File log |
-| =l= | =blame-reveal-show-line-history= | Line log |
+| Key | Command                          | Action       |
+|-----+----------------------------------+--------------|
+| =q=   | =blame-reveal-mode=                | Toggle       |
+| =c=   | =blame-reveal-copy-commit-hash=    | Copy hash    |
+| =d=   | =blame-reveal-show-commit-diff=    | Show diff    |
+| =s=   | =blame-reveal-show-commit-details= | Full message |
+| =h=   | =blame-reveal-show-file-history=   | File log     |
+| =l=   | =blame-reveal-show-line-history=   | Line log     |
 
 *** Magit Integration
 
@@ -138,11 +140,64 @@ M-x blame-reveal-mode
 
 #+begin_src elisp
 (setq blame-reveal-style 'left-fringe)          ; or 'right-fringe
-(setq blame-reveal-display-layout 'compact)       ; 'line, 'compact, 'full
-(setq blame-reveal-display-style 'background)    ; 'background, 'box, 'inverse
+(setq blame-reveal-display-layout 'compact)     ; 'line, 'compact, 'full
+(setq blame-reveal-display-style 'background)   ; 'background, 'box, 'inverse
 #+end_src
 
-*** Commit Selection
+* Color Scheme
+
+The gradient color scheme for recent commits uses HSL (Hue, Saturation, Lightness) parameters:
+
+#+begin_src elisp
+(setq blame-reveal-color-scheme
+      '(:hue 210                    ; Blue (0-360: 0=red, 120=green, 210=blue, 280=purple)
+        :dark-newest 0.70           ; Lightness for newest (dark theme, higher=brighter)
+        :dark-oldest 0.35           ; Lightness for oldest (dark theme, lower=dimmer)
+        :light-newest 0.45          ; Lightness for newest (light theme, lower=darker)
+        :light-oldest 0.75          ; Lightness for oldest (light theme, higher=lighter)
+        :saturation-min 0.25        ; Minimum saturation (oldest commits)
+        :saturation-max 0.60))      ; Maximum saturation (newest commits)
+#+end_src
+
+/Preset Schemes:/
+
+#+begin_src elisp
+;; High contrast (more dramatic gradient)
+(setq blame-reveal-color-scheme
+      '(:hue 210
+        :dark-newest 0.75 :dark-oldest 0.30
+        :light-newest 0.35 :light-oldest 0.85
+        :saturation-min 0.35 :saturation-max 0.70))
+
+;; Green
+(setq blame-reveal-color-scheme
+      '(:hue 120
+        :dark-newest 0.70 :dark-oldest 0.35
+        :light-newest 0.40 :light-oldest 0.75
+        :saturation-min 0.25 :saturation-max 0.60))
+
+;; Purple
+(setq blame-reveal-color-scheme
+      '(:hue 280
+        :dark-newest 0.70 :dark-oldest 0.35
+        :light-newest 0.45 :light-oldest 0.75
+        :saturation-min 0.25 :saturation-max 0.60))
+
+;; Subtle (less contrast)
+(setq blame-reveal-color-scheme
+      '(:hue 210
+        :dark-newest 0.60 :dark-oldest 0.40
+        :light-newest 0.55 :light-oldest 0.70
+        :saturation-min 0.20 :saturation-max 0.45))
+#+end_src
+
+/How it works:/
+- Gradient applied to recent commits (top N within time limit)
+- Newest commit gets highest saturation + theme-appropriate lightness
+- Oldest recent commit gets lowest saturation + theme-appropriate lightness
+- Ease-out curve makes newest commits stand out more
+
+* Commit Selection
 
 #+begin_src elisp
 (setq blame-reveal-recent-commit-count 20)      ; Default: 20
@@ -150,7 +205,7 @@ M-x blame-reveal-mode
 (setq blame-reveal-auto-expand-recent t)        ; Default: t
 #+end_src
 
-*Examples:*
+/Examples:/
 #+begin_src elisp
 ;; All commits from last month
 (setq blame-reveal-auto-expand-recent t
@@ -167,40 +222,48 @@ M-x blame-reveal-mode
       blame-reveal-recent-days-limit nil)
 #+end_src
 
-*** Colors
+* Color Overrides
+
+Override automatic gradient with fixed colors:
 
 #+begin_src elisp
-;; Recent commits
-(setq blame-reveal-recent-commit-color nil)     ; Auto gradient (default)
-;;    blame-reveal-recent-commit-color "#6699cc")  ; Fixed color
-;;    blame-reveal-recent-commit-color (lambda (ts) ...))  ; Custom
+;; Recent commits (default: auto gradient)
+(setq blame-reveal-recent-commit-color nil)         ; Auto gradient (recommended)
+;;    blame-reveal-recent-commit-color "#6699cc")   ; Fixed color for all recent
+;;    blame-reveal-recent-commit-color              ; Custom function
+;;      (lambda (timestamp)
+;;        (if (< (- (float-time) timestamp) 86400)
+;;            "#ff6b6b"  ; Red for commits < 1 day
+;;          "#6699cc"))) ; Blue for older
 
-;; Old commits
-(setq blame-reveal-old-commit-color nil)        ; Auto gray (default)
-;;    blame-reveal-old-commit-color "#888888")    ; Fixed color
+;; Old commits (default: theme-based gray)
+(setq blame-reveal-old-commit-color nil)            ; Auto: dark=#4a4a4a, light=#d0d0d0
+;;    blame-reveal-old-commit-color "#888888")      ; Fixed gray
 #+end_src
 
-*** Typography
+/Note:/ =blame-reveal-color-scheme= is ignored when =blame-reveal-recent-commit-color= is set to a fixed color or function.
+
+* Typography
 
 #+begin_src elisp
-;; Commit message
+;; Commit message line
 (setq blame-reveal-header-weight 'bold
       blame-reveal-header-height 1.0)
 
-;; Metadata (hash, author, date)
+;; Metadata line (hash, author, date)
 (setq blame-reveal-metadata-weight 'normal
       blame-reveal-metadata-height 0.9)
 
-;; Description
+;; Description lines
 (setq blame-reveal-description-weight 'normal
       blame-reveal-description-height 0.9)
 #+end_src
 
-*** Performance
+* Performance
 
 #+begin_src elisp
 (setq blame-reveal-render-margin 50)            ; Lines beyond viewport
-(setq blame-reveal-temp-overlay-delay 0.05)     ; Old commit overlay delay
+(setq blame-reveal-temp-overlay-delay 0.05)     ; Old commit overlay delay (seconds)
 #+end_src
 
 ** How It Works
@@ -245,6 +308,8 @@ Tested on 10,000+ lines, 500+ commits:
 | Magit integration | ✓ | ✗ | ✗ |
 
 ** Tips
+
+These presets provide sensible defaults depending on project activity and file size.
 
 *Active projects* (many commits/day):
 #+begin_src elisp
