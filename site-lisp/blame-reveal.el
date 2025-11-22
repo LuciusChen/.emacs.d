@@ -41,6 +41,8 @@
     (define-key map (kbd "c") #'blame-reveal-copy-commit-hash)
     (define-key map (kbd "d") #'blame-reveal-show-commit-diff)
     (define-key map (kbd "s") #'blame-reveal-show-commit-details)
+    (define-key map (kbd "h") #'blame-reveal-show-file-history)
+    (define-key map (kbd "l") #'blame-reveal-show-line-history)
     map)
   "Keymap for blame-reveal-mode.")
 
@@ -164,6 +166,16 @@ Set to a color string like \"#888888\" to use a fixed color."
   :type 'number
   :group 'blame-reveal)
 
+(defcustom blame-reveal-use-magit 'auto
+  "Whether to use magit for showing commit details.
+- 'auto: Use magit if available, otherwise use built-in
+- t: Always use magit (error if not available)
+- nil: Always use built-in git commands"
+  :type '(choice (const :tag "Auto (use magit if available)" auto)
+                 (const :tag "Always use magit" t)
+                 (const :tag "Always use built-in" nil))
+  :group 'blame-reveal)
+
 (defvar-local blame-reveal--overlays nil
   "List of overlays used for blame display.")
 
@@ -187,6 +199,17 @@ Set to a color string like \"#888888\" to use a fixed color."
 
 (defvar-local blame-reveal--temp-old-overlays nil
   "Temporary overlays for old commit blocks when cursor is on them.")
+
+(defun blame-reveal--should-use-magit-p ()
+  "Check if magit should be used based on configuration."
+  (pcase blame-reveal-use-magit
+    ('auto (and (fboundp 'magit-show-commit)
+                (fboundp 'magit-log-buffer-file)))
+    ('t (if (and (fboundp 'magit-show-commit)
+                 (fboundp 'magit-log-buffer-file))
+            t
+          (error "Magit is not available but blame-reveal-use-magit is set to t")))
+    (_ nil)))
 
 (defun blame-reveal--on-theme-change (&rest _)
   "Handle theme change event."
@@ -396,9 +419,9 @@ Returns (START-LINE . END-LINE)."
   (let ((face-name (intern (format "blame-reveal-face-%s" color))))
     (unless (facep face-name)
       (custom-declare-face face-name
-        `((t :background ,color :foreground ,color))
-        (format "Face for git blame color %s" color)
-        :group 'blame-reveal))
+                           `((t :background ,color :foreground ,color))
+                           (format "Face for git blame color %s" color)
+                           :group 'blame-reveal))
     face-name))
 
 (defun blame-reveal--create-fringe-overlay (line-number color commit-hash)
@@ -520,8 +543,8 @@ COLOR is the fringe color, which will also be used for header text foreground."
                                    ;; For full mode: first line after message is metadata,
                                    ;; rest are description
                                    (line-face (if (and (eq blame-reveal-header-format 'full)
-                                                      (> i 0)
-                                                      (not (string-empty-p (string-trim line))))
+                                                       (> i 0)
+                                                       (not (string-empty-p (string-trim line))))
                                                   ;; Description lines
                                                   description-face
                                                 ;; Metadata or simple second line
@@ -529,9 +552,9 @@ COLOR is the fringe color, which will also be used for header text foreground."
                               (setq result
                                     (concat result
                                             (propertize "!" 'display
-                                                       (list blame-reveal-style
-                                                             'blame-reveal-full
-                                                             fringe-face))
+                                                        (list blame-reveal-style
+                                                              'blame-reveal-full
+                                                              fringe-face))
                                             (propertize line 'face line-face)
                                             "\n"))))
                           result))
@@ -661,7 +684,7 @@ Returns list of created overlays."
                  (timestamp (and info (nth 4 info)))
                  (color (blame-reveal--get-commit-color commit-hash))
                  (is-old-commit (and timestamp
-                                    (not (blame-reveal--should-render-commit timestamp)))))
+                                     (not (blame-reveal--should-render-commit timestamp)))))
 
             ;; Clear previous header
             (when blame-reveal--header-overlay
@@ -759,26 +782,107 @@ Returns list of created overlays."
 
 ;;;###autoload
 (defun blame-reveal-show-commit-diff ()
-  "Show the diff of the commit at current line."
+  "Show the diff of the commit at current line.
+Uses magit if `blame-reveal-use-magit' is configured to do so."
   (interactive)
   (if-let* ((current-block (blame-reveal--get-current-block))
             (commit-hash (car current-block)))
-      (let ((buffer-name (format "*Commit Diff: %s*" (substring commit-hash 0 8))))
-        (with-current-buffer (get-buffer-create buffer-name)
-          (let ((inhibit-read-only t))
-            (erase-buffer)
-            (call-process "git" nil t nil "show" "--color=never" commit-hash)
-            (goto-char (point-min))
-            (diff-mode)
-            (view-mode 1)
-            (setq-local revert-buffer-function
-                        (lambda (&rest _)
-                          (let ((inhibit-read-only t))
-                            (erase-buffer)
-                            (call-process "git" nil t nil "show" "--color=never" commit-hash)
-                            (goto-char (point-min))))))
-          (pop-to-buffer (current-buffer))))
+      (if (blame-reveal--should-use-magit-p)
+          ;; 使用 magit
+          (magit-show-commit commit-hash)
+        ;; 使用内置
+        (let ((buffer-name (format "*Commit Diff: %s*" (substring commit-hash 0 8))))
+          (with-current-buffer (get-buffer-create buffer-name)
+            (let ((inhibit-read-only t))
+              (erase-buffer)
+              (call-process "git" nil t nil "show" "--color=never" commit-hash)
+              (goto-char (point-min))
+              (diff-mode)
+              (view-mode 1)
+              (setq-local revert-buffer-function
+                          (lambda (&rest _)
+                            (let ((inhibit-read-only t))
+                              (erase-buffer)
+                              (call-process "git" nil t nil "show" "--color=never" commit-hash)
+                              (goto-char (point-min))))))
+            (pop-to-buffer (current-buffer)))))
     (message "No commit info at current line")))
+
+;;;###autoload
+(defun blame-reveal-show-line-history ()
+  "Show the git log history of current line.
+This function always uses built-in git, as magit doesn't have a direct equivalent."
+  (interactive)
+  (if-let ((file (buffer-file-name)))
+      (if (vc-git-registered file)
+          (let* ((line-num (line-number-at-pos))
+                 (buffer-name (format "*Git Log: %s:%d*"
+                                      (file-name-nondirectory file)
+                                      line-num)))
+            (with-current-buffer (get-buffer-create buffer-name)
+              (let ((inhibit-read-only t))
+                (erase-buffer)
+                ;; 使用带颜色的格式
+                (call-process "git" nil t nil "log"
+                              "--color=always"  ; 启用颜色
+                              "-L" (format "%d,%d:%s" line-num line-num file))
+                (goto-char (point-min))
+                ;; 使用 ansi-color 来解析颜色
+                (require 'ansi-color)
+                (ansi-color-apply-on-region (point-min) (point-max))
+                (special-mode)  ; 或者用 view-mode
+                (setq-local revert-buffer-function
+                            (lambda (&rest _)
+                              (let ((inhibit-read-only t))
+                                (erase-buffer)
+                                (call-process "git" nil t nil "log"
+                                              "--color=always"
+                                              "-L" (format "%d,%d:%s" line-num line-num file))
+                                (goto-char (point-min))
+                                (ansi-color-apply-on-region (point-min) (point-max))))))
+              (pop-to-buffer (current-buffer))))
+        (message "File is not tracked by git"))
+    (message "No file associated with current buffer")))
+
+;;;###autoload
+(defun blame-reveal-show-file-history ()
+  "Show the git log history of current file.
+Uses magit if =blame-reveal-use-magit' is configured to do so."
+  (interactive)
+  (if-let ((file (buffer-file-name)))
+      (if (vc-git-registered file)
+          (if (blame-reveal--should-use-magit-p)
+              ;; 使用 magit
+              (magit-log-buffer-file)
+            ;; 使用内置
+            (let ((buffer-name (format "*Git Log: %s/" (file-name-nondirectory file))))
+              (with-current-buffer (get-buffer-create buffer-name)
+                (let ((inhibit-read-only t))
+                  (erase-buffer)
+                  (call-process "git" nil t nil "log"
+                                "--color=always"  ; 启用颜色
+                                "--follow"
+                                "--pretty=format:%C(yellow)%h%Creset - %s %C(green)(%an, %ar)%Creset"
+                                "--" file)
+                  (goto-char (point-min))
+                  ;; 使用 ansi-color 来解析颜色
+                  (require 'ansi-color)
+                  (ansi-color-apply-on-region (point-min) (point-max))
+                  (special-mode)
+                  (setq-local revert-buffer-function
+                              (lambda (&rest _)
+                                (let ((inhibit-read-only t))
+                                  (erase-buffer)
+                                  (call-process "git" nil t nil "log"
+                                                "--color=always"
+                                                "--follow"
+                                                "--pretty=format:%C(yellow)%h%Creset - %s %C(green)(%an, %ar)%Creset"
+                                                "--" file)
+                                  (goto-char (point-min))
+                                  (ansi-color-apply-on-region (point-min) (point-max))))))
+                (pop-to-buffer (current-buffer)))))
+        (message "File is not tracked by git"))
+    (message "No file associated with current buffer")))
 
 ;;;###autoload
 (defun blame-reveal-show-commit-details ()
@@ -809,22 +913,39 @@ Format matches the 'full' header format."
     (message "No commit info at current line")))
 
 ;;;###autoload
+(defun blame-reveal-copy-commit-hash ()
+  "Copy the commit hash of the current line to kill ring."
+  (interactive)
+  (if-let* ((current-block (blame-reveal--get-current-block))
+            (commit (car current-block)))
+      (progn
+        (kill-new commit)
+        (message "Copied commit hash: %s" (substring commit 0 8)))
+    (message "No git blame info at current line")))
+
+;;;###autoload
 (define-minor-mode blame-reveal-mode
   "Toggle git blame fringe display."
   :lighter " BlameReveal"
   :group 'blame-reveal
   (if blame-reveal-mode
       (progn
-        (setq blame-reveal--emulation-alist
-              `((blame-reveal-mode . ,blame-reveal-mode-map)))
-        (add-to-list 'emulation-mode-map-alists
-                     'blame-reveal--emulation-alist)
+        (let ((file (buffer-file-name)))
+          (if (not (and file (vc-git-registered file)))
+              (progn
+                (message "Cannot enable blame-reveal-mode: not a git-tracked file")
+                (setq blame-reveal-mode nil))
 
-        (blame-reveal--load-blame-data)
-        (add-hook 'after-save-hook #'blame-reveal--full-update nil t)
-        (add-hook 'window-scroll-functions #'blame-reveal--scroll-handler nil t)
-        (add-hook 'post-command-hook #'blame-reveal--update-header nil t)
-        (blame-reveal--setup-theme-advice))
+            (setq blame-reveal--emulation-alist
+                  `((blame-reveal-mode . ,blame-reveal-mode-map)))
+            (add-to-list 'emulation-mode-map-alists
+                         'blame-reveal--emulation-alist)
+
+            (blame-reveal--load-blame-data)
+            (add-hook 'after-save-hook #'blame-reveal--full-update nil t)
+            (add-hook 'window-scroll-functions #'blame-reveal--scroll-handler nil t)
+            (add-hook 'post-command-hook #'blame-reveal--update-header nil t)
+            (blame-reveal--setup-theme-advice))))
 
     (setq emulation-mode-map-alists
           (delq 'blame-reveal--emulation-alist
@@ -843,23 +964,6 @@ Format matches the 'full' header format."
                               blame-reveal-mode)))
                      (buffer-list))
       (blame-reveal--remove-theme-advice))))
-
-;;;###autoload
-(defun blame-reveal-copy-commit-hash ()
-  "Copy the commit hash of the current line to kill ring."
-  (interactive)
-  (if-let* ((current-block (blame-reveal--get-current-block))
-            (commit (car current-block)))
-      (progn
-        (kill-new commit)
-        (message "Copied commit hash: %s" (substring commit 0 8)))
-    (message "No git blame info at current line")))
-
-;;;###autoload
-(defun blame-reveal-toggle ()
-  "Toggle git blame fringe display."
-  (interactive)
-  (blame-reveal-mode 'toggle))
 
 (provide 'blame-reveal)
 ;;; blame-reveal.el ends here
