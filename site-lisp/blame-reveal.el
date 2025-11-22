@@ -1232,18 +1232,23 @@ Uses magit if `blame-reveal-use-magit' is configured to do so."
              (date (nth 2 info))
              (summary (nth 3 info))
              (description (nth 5 info))
-             (desc-trimmed (if description (string-trim description) "")))
-        (with-output-to-temp-buffer "*Commit Details*"
-          (with-current-buffer "*Commit Details*"
-            (insert (format "▸ %s\n" summary))
-            (insert (format "  %s · %s · %s\n" short-hash author date))
-            (if (and desc-trimmed (not (string-empty-p desc-trimmed)))
-                (progn
-                  (insert "\n")
-                  (let ((desc-lines (split-string desc-trimmed "\n")))
-                    (dolist (line desc-lines)
-                      (insert (format "  %s\n" line)))))
-              (insert "\n  (no description)\n")))))
+             (desc-trimmed (if description (string-trim description) ""))
+             (buffer (get-buffer-create "*Commit Details*")))
+        (with-current-buffer buffer
+          (setq buffer-read-only nil)
+          (erase-buffer)
+          (insert (format "▸ %s\n" summary))
+          (insert (format "  %s · %s · %s\n" short-hash author date))
+          (if (and desc-trimmed (not (string-empty-p desc-trimmed)))
+              (progn
+                (insert "\n")
+                (let ((desc-lines (split-string desc-trimmed "\n")))
+                  (dolist (line desc-lines)
+                    (insert (format "  %s\n" line)))))
+            (insert "\n  (no description)\n"))
+          (goto-char (point-min))
+          (special-mode))
+        (pop-to-buffer buffer))
     (message "No commit info at current line")))
 
 ;;;###autoload
