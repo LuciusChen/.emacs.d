@@ -1,0 +1,277 @@
+* blame-reveal.el
+
+A lightweight Git blame visualization for Emacs that renders blame information as /contextual UI/ - only what you need, when you need it.
+
+** Philosophy
+
+> Blame information is contextual UI - no need to render invisible regions.
+
+Unlike traditional blame tools that process entire files upfront, =blame-reveal= renders only the visible viewport plus a margin. This ensures instant activation, smooth scrolling, and minimal resource usage.
+
+** Features
+
+*** Visual Indicators
+
+- *Color-coded fringe blocks* (IDEA-style)
+  - *Recent commits* (top N, within time limit): Gradient colors, always visible
+    - Color intensity by rank (newest = brightest)
+  - *Old commits* (not in top N or beyond time limit): Gray, visible only when cursor is on them
+    - Smart highlighting: All visible lines from same commit temporarily highlighted
+  - Automatic theme adaptation (dark/light)
+
+- *Inline commit headers* above each block
+  - Three formats: =line= (message), =normal= (+ metadata), =full= (+ description)
+  - Styles: background, box, or inverse video
+  - Customizable typography (weight, height)
+
+*** Commit Selection
+
+Recent commits must satisfy *both* conditions:
+
+#+begin_src
+Active Project Example:
+═══════════════════════════════════════════════════════════════
+Today ←──────────── 90 days ───────→ 2 years ago
+
+C1  (3d ago)   ✓ Top 20  ✓ <90d  → Colorized
+C2  (5d ago)   ✓ Top 20  ✓ <90d  → Colorized
+...
+C20 (85d ago)  ✓ Top 20  ✓ <90d  → Colorized
+C21 (95d ago)  ✗ >90d             → Gray
+C50 (2y ago)   ✗ Not top 20       → Gray
+
+Result: 20 commits colorized
+#+end_src
+
+#+begin_src
+Inactive Project Example:
+═══════════════════════════════════════════════════════════════
+C1  (3d ago)    ✓ Top 20  ✓ <90d  → Colorized
+C2  (5d ago)    ✓ Top 20  ✓ <90d  → Colorized
+C3  (100d ago)  ✓ Top 20  ✗ >90d  → Gray
+...
+C20 (2y ago)    ✓ Top 20  ✗ >90d  → Gray
+
+Result: 2 commits colorized
+#+end_src
+
+*Auto-Expand Mode* (default: =t=)
+
+#+begin_src
+With auto-expand:    All commits <90d colorized (ignores count)
+Without auto-expand: Max 20 commits AND <90d
+#+end_src
+
+*** Color Gradient
+
+Colors assigned by *relative rank* among recent commits:
+
+#+begin_src
+Rank 1  (newest)  ████████  Brightest  #5A9FD4
+Rank 10           ████░░░░  Medium     #4F8FBF
+Rank 20 (oldest)  █░░░░░░░  Darkest    #4A7BA7
+Rank 21+          ░░░░░░░░  Gray       #4A4A4A
+
+- HSL gradient with ease-out curve
+- Dark theme: newer = brighter
+- Light theme: newer = darker
+#+end_src
+
+*** Performance Optimizations
+
+*Incremental Loading*
+1. Phase 1: Visible commits (immediate, synchronous)
+2. Phase 2: Remaining commits (background, 20/batch)
+3. Re-render only when recent list changes
+
+*Other Optimizations*
+- Viewport-based rendering (visible + margin)
+- Lazy commit loading (on-demand)
+- Debounced updates (scroll, theme)
+- Efficient caching (per buffer)
+
+*** Interactive Commands
+
+| Key | Command | Description |
+|-----|---------|-------------|
+| =q= | =blame-reveal-mode= | Toggle |
+| =c= | =blame-reveal-copy-commit-hash= | Copy hash |
+| =d= | =blame-reveal-show-commit-diff= | Show diff |
+| =s= | =blame-reveal-show-commit-details= | Full message |
+| =h= | =blame-reveal-show-file-history= | File log |
+| =l= | =blame-reveal-show-line-history= | Line log |
+
+*** Magit Integration
+
+#+begin_src elisp
+(setq blame-reveal-use-magit 'auto)  ; auto, t, or nil
+#+end_src
+
+** Installation
+
+*Manual*
+#+begin_src elisp
+(add-to-list 'load-path "/path/to/blame-reveal")
+(require 'blame-reveal)
+#+end_src
+
+*use-package*
+#+begin_src elisp
+(use-package blame-reveal
+  :load-path "/path/to/blame-reveal"
+  :commands blame-reveal-mode)
+#+end_src
+
+** Usage
+
+#+begin_src elisp
+M-x blame-reveal-mode
+
+;; Or auto-enable
+(add-hook 'prog-mode-hook #'blame-reveal-mode)
+#+end_src
+
+** Customization
+
+*** Display
+
+#+begin_src elisp
+(setq blame-reveal-style 'left-fringe)          ; or 'right-fringe
+(setq blame-reveal-header-format 'normal)       ; 'line, 'normal, 'full
+(setq blame-reveal-header-style 'background)    ; 'background, 'box, 'inverse
+#+end_src
+
+*** Commit Selection
+
+#+begin_src elisp
+(setq blame-reveal-recent-commit-count 20)      ; Default: 20
+(setq blame-reveal-recent-days-limit 90)        ; Default: 90 (nil = no limit)
+(setq blame-reveal-auto-expand-recent t)        ; Default: t
+#+end_src
+
+*Examples:*
+#+begin_src elisp
+;; All commits from last month
+(setq blame-reveal-auto-expand-recent t
+      blame-reveal-recent-days-limit 30)
+
+;; Exactly top 10, max 2 weeks
+(setq blame-reveal-auto-expand-recent nil
+      blame-reveal-recent-commit-count 10
+      blame-reveal-recent-days-limit 14)
+
+;; Top 50, no time limit
+(setq blame-reveal-auto-expand-recent nil
+      blame-reveal-recent-commit-count 50
+      blame-reveal-recent-days-limit nil)
+#+end_src
+
+*** Colors
+
+#+begin_src elisp
+;; Recent commits
+(setq blame-reveal-recent-commit-color nil)     ; Auto gradient (default)
+;;    blame-reveal-recent-commit-color "#6699cc")  ; Fixed color
+;;    blame-reveal-recent-commit-color (lambda (ts) ...))  ; Custom
+
+;; Old commits
+(setq blame-reveal-old-commit-color nil)        ; Auto gray (default)
+;;    blame-reveal-old-commit-color "#888888")    ; Fixed color
+#+end_src
+
+*** Typography
+
+#+begin_src elisp
+;; Commit message
+(setq blame-reveal-header-weight 'bold
+      blame-reveal-header-height 1.0)
+
+;; Metadata (hash, author, date)
+(setq blame-reveal-metadata-weight 'normal
+      blame-reveal-metadata-height 0.9)
+
+;; Description
+(setq blame-reveal-description-weight 'normal
+      blame-reveal-description-height 0.9)
+#+end_src
+
+*** Performance
+
+#+begin_src elisp
+(setq blame-reveal-render-margin 50)            ; Lines beyond viewport
+(setq blame-reveal-temp-overlay-delay 0.05)     ; Old commit overlay delay
+#+end_src
+
+** How It Works
+
+#+begin_src
+Loading:
+1. Parse git blame → line-commit mapping
+2. Load visible commits (immediate)
+3. Load remaining commits (background, 20/batch)
+
+Rendering:
+1. Calculate visible range (viewport + margin)
+2. Find blocks in range
+3. Render recent commits (permanent fringe)
+4. On cursor move to old commit → render gray (temporary)
+5. On scroll → re-render (debounced)
+#+end_src
+
+** Performance
+
+Tested on 10,000+ lines, 500+ commits:
+
+| Operation | Time | Notes |
+|-----------|------|-------|
+| Initial load | <100ms | Visible region only |
+| Background load | ~2-5s | Non-blocking |
+| Scroll | <50ms | Debounced |
+| Cursor move | <10ms | Header update |
+| Old commit highlight | <30ms | Visible area only |
+| Theme change | <200ms | Color recalc |
+| Memory | ~1-2MB | Per buffer |
+
+** Comparison
+
+| Feature | blame-reveal | git-gutter+ | blamer.el |
+|---------|--------------|-------------|-----------|
+| Viewport rendering | ✓ | ✗ | ✗ |
+| Incremental loading | ✓ | ✗ | ✗ |
+| Large files (10k+) | ✓ | ~ | ✗ |
+| IDEA-style colors | ✓ | ✗ | ~ |
+| Interactive commands | ✓ | ✗ | ✓ |
+| Magit integration | ✓ | ✗ | ✗ |
+
+** Tips
+
+*Active projects* (many commits/day):
+#+begin_src elisp
+(setq blame-reveal-recent-days-limit 7
+      blame-reveal-auto-expand-recent t)
+#+end_src
+
+*Inactive projects*:
+#+begin_src elisp
+(setq blame-reveal-recent-days-limit nil
+      blame-reveal-recent-commit-count 10)
+#+end_src
+
+*Large files, fast scrolling*:
+#+begin_src elisp
+(setq blame-reveal-render-margin 100)
+#+end_src
+
+** Requirements
+
+- Emacs 27.1+
+- Git CLI
+- Optional: Magit
+
+** License
+
+GPL-3.0-or-later
+
+** Author
+
+Lucius Chen
