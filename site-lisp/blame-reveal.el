@@ -65,8 +65,20 @@
   "Overlay for the currently displayed header.")
 
 (defgroup blame-reveal nil
-  "Show git blame in fringe with colors."
-  :group 'vc)
+  "Show git blame in fringe with colors.
+
+Quick start:
+  M-x blame-reveal-mode
+
+Common customizations:
+  - `blame-reveal-color-scheme': Change color scheme
+  - `blame-reveal-recent-commit-count': How many commits to highlight
+  - `blame-reveal-header-format': Header display style
+  - `blame-reveal-use-magit': Use magit for commit details
+
+See all options: M-x customize-group RET blame-reveal"
+  :group 'vc
+  :prefix "blame-reveal-")
 
 (defcustom blame-reveal-style 'left-fringe
   "Which fringe to use for blame indicators."
@@ -102,7 +114,7 @@
 (defcustom blame-reveal-recent-commit-count 10
   "Number of most recent unique commits to highlight with colors.
 Only the N most recent commits in the file will be shown with age-based
-gradient colors, AND they must be within `blame-reveal-recent-days-limit`.
+gradient colors, AND they must be within `blame-reveal-recent-days-limit'.
 Older commits will be shown in gray (or when cursor is on them).
 
 For active projects, you may want to increase this (e.g., 30-50).
@@ -214,6 +226,55 @@ overlays appear with more delay."
                  (const :tag "Always use built-in" nil))
   :group 'blame-reveal)
 
+(defcustom blame-reveal-color-scheme
+  '(:hue 210                    ; Hue value (0-360): 210=blue, 120=green, 0=red, 280=purple
+         :dark-newest 0.70           ; Lightness for newest commits in dark theme (higher = brighter)
+         :dark-oldest 0.35           ; Lightness for oldest commits in dark theme (lower = dimmer)
+         :light-newest 0.45          ; Lightness for newest commits in light theme (lower = darker)
+         :light-oldest 0.75          ; Lightness for oldest commits in light theme (higher = lighter)
+         :saturation-min 0.25        ; Minimum saturation (0.0-1.0, for oldest commits)
+         :saturation-max 0.60)       ; Maximum saturation (0.0-1.0, for newest commits)
+  "Color scheme for blame visualization.
+All lightness values are between 0.0 and 1.0.
+
+Dark theme: newest commits are brighter (higher lightness) to stand out
+Light theme: newest commits are darker (lower lightness) to stand out
+
+Example schemes:
+
+  High contrast:
+  '(:hue 210
+    :dark-newest 0.75 :dark-oldest 0.30
+    :light-newest 0.35 :light-oldest 0.85
+    :saturation-min 0.35 :saturation-max 0.70)
+
+  Green:
+  '(:hue 120
+    :dark-newest 0.70 :dark-oldest 0.35
+    :light-newest 0.40 :light-oldest 0.75
+    :saturation-min 0.25 :saturation-max 0.60)
+
+  Purple:
+  '(:hue 280
+    :dark-newest 0.70 :dark-oldest 0.35
+    :light-newest 0.45 :light-oldest 0.75
+    :saturation-min 0.25 :saturation-max 0.60)
+
+  Subtle:
+  '(:hue 210
+    :dark-newest 0.60 :dark-oldest 0.40
+    :light-newest 0.55 :light-oldest 0.70
+    :saturation-min 0.20 :saturation-max 0.45)"
+  :type 'plist
+  :set (lambda (symbol value)
+         (set-default symbol value)
+         (when (and (boundp 'blame-reveal-mode) blame-reveal-mode)
+           (dolist (buffer (buffer-list))
+             (with-current-buffer buffer
+               (when blame-reveal-mode
+                 (blame-reveal--recolor-and-render))))))
+  :group 'blame-reveal)
+
 (defvar-local blame-reveal--overlays nil
   "List of overlays used for blame display.")
 
@@ -256,28 +317,60 @@ overlays appear with more delay."
     (_ nil)))
 
 (defun blame-reveal--on-theme-change (&rest _)
-  "Handle theme change event."
+  "Handle theme change event and refresh all blame displays."
   (when blame-reveal--theme-change-timer
     (cancel-timer blame-reveal--theme-change-timer))
   (setq blame-reveal--theme-change-timer
-        (run-with-timer 0.1 nil
+        (run-with-timer 0.3 nil
                         (lambda ()
-                          (dolist (buffer (buffer-list))
-                            (with-current-buffer buffer
-                              (when blame-reveal-mode
-                                (blame-reveal--recolor-and-render))))))))
+                          (let ((current-buf (current-buffer))
+                                (current-point (point)))
+                            (dolist (buffer (buffer-list))
+                              (with-current-buffer buffer
+                                (when blame-reveal-mode
+                                  ;; Re-render fringe overlays with new theme colors
+                                  (blame-reveal--recolor-and-render))))
+
+                            ;; Refresh header in current buffer if it exists
+                            (when (buffer-live-p current-buf)
+                              (with-current-buffer current-buf
+                                (when (and blame-reveal-mode
+                                           blame-reveal--current-block-commit)
+                                  (save-excursion
+                                    (goto-char current-point)
+                                    ;; Force header refresh by clearing and re-triggering
+                                    (let ((old-commit blame-reveal--current-block-commit))
+                                      (setq blame-reveal--current-block-commit nil)
+                                      ;; Clear existing header
+                                      (when blame-reveal--header-overlay
+                                        (delete-overlay blame-reveal--header-overlay)
+                                        (setq blame-reveal--header-overlay nil))
+                                      ;; Clear temp overlays
+                                      (blame-reveal--clear-temp-overlays)
+                                      ;; Re-trigger header update
+                                      (blame-reveal--update-header)))))))))))
 
 (defun blame-reveal--setup-theme-advice ()
   "Setup advice to monitor theme changes."
-  (advice-add 'load-theme :after #'blame-reveal--on-theme-change)
-  (advice-add 'enable-theme :after #'blame-reveal--on-theme-change)
-  (advice-add 'disable-theme :after #'blame-reveal--on-theme-change))
+  (if (boundp 'after-enable-theme-hook)
+      ;; Use official hook for Emacs 29+
+      (add-hook 'after-enable-theme-hook #'blame-reveal--on-theme-change)
+    ;; Use advice for older Emacs versions
+    (advice-add 'load-theme :after #'blame-reveal--on-theme-change)
+    (advice-add 'enable-theme :after #'blame-reveal--on-theme-change)
+    (advice-add 'disable-theme :after #'blame-reveal--on-theme-change)))
 
 (defun blame-reveal--remove-theme-advice ()
   "Remove theme change advice."
-  (advice-remove 'load-theme #'blame-reveal--on-theme-change)
-  (advice-remove 'enable-theme #'blame-reveal--on-theme-change)
-  (advice-remove 'disable-theme #'blame-reveal--on-theme-change))
+  (when blame-reveal--theme-change-timer
+    (cancel-timer blame-reveal--theme-change-timer)
+    (setq blame-reveal--theme-change-timer nil))
+
+  (if (boundp 'after-enable-theme-hook)
+      (remove-hook 'after-enable-theme-hook #'blame-reveal--on-theme-change)
+    (advice-remove 'load-theme #'blame-reveal--on-theme-change)
+    (advice-remove 'enable-theme #'blame-reveal--on-theme-change)
+    (advice-remove 'disable-theme #'blame-reveal--on-theme-change)))
 
 (defun blame-reveal--get-blame-data ()
   "Get git blame data for current buffer.
@@ -372,7 +465,7 @@ H: 0-360, S: 0.0-1.0, L: 0.0-1.0"
 
 (defun blame-reveal--relative-color-by-rank (commit-hash is-dark)
   "Calculate color based on commit's rank in recent commits list.
-Newest commit = brightest, oldest in list = darkest (but still colored).
+Newest commit = most prominent, oldest in list = less prominent.
 Returns nil if commit is not in recent list."
   (when-let ((rank (cl-position commit-hash blame-reveal--recent-commits
                                 :test 'equal)))
@@ -383,24 +476,21 @@ Returns nil if commit is not in recent list."
                         (/ (float rank) (- total-recent 1))))
            ;; Apply ease-out curve
            (eased-ratio (blame-reveal--ease-out-cubic age-ratio))
-           ;; HSL values
-           (hue 210)
-           ;; Vary saturation: newer = more saturated
-           (sat-min (if is-dark 0.30 0.25))
-           (sat-max (if is-dark 0.60 0.55))
+           ;; Get values from color scheme
+           (hue (plist-get blame-reveal-color-scheme :hue))
+           (sat-min (plist-get blame-reveal-color-scheme :saturation-min))
+           (sat-max (plist-get blame-reveal-color-scheme :saturation-max))
            (saturation (+ sat-min (* (- sat-max sat-min) (- 1.0 eased-ratio))))
-           ;; Lightness range
-           (min-lightness (if is-dark 0.35 0.60))  ; Oldest in recent list
-           (max-lightness (if is-dark 0.70 0.90))  ; Newest
+           ;; Lightness based on theme
            (lightness (if is-dark
                           ;; Dark: newer = brighter
-                          (+ min-lightness
-                             (* (- max-lightness min-lightness)
-                                (- 1.0 eased-ratio)))
+                          (let ((newest (plist-get blame-reveal-color-scheme :dark-newest))
+                                (oldest (plist-get blame-reveal-color-scheme :dark-oldest)))
+                            (+ oldest (* (- newest oldest) (- 1.0 eased-ratio))))
                         ;; Light: newer = darker
-                        (+ min-lightness
-                           (* (- max-lightness min-lightness)
-                              eased-ratio)))))
+                        (let ((newest (plist-get blame-reveal-color-scheme :light-newest))
+                              (oldest (plist-get blame-reveal-color-scheme :light-oldest)))
+                          (- oldest (* (- oldest newest) (- 1.0 eased-ratio)))))))
       (blame-reveal--hsl-to-hex hue saturation lightness))))
 
 (defun blame-reveal--is-recent-commit-p (commit-hash)
@@ -411,10 +501,10 @@ Returns nil if commit is not in recent list."
   "Convert TIMESTAMP to color based on commit age.
 
 For commits not in recent list (either not in top N or too old):
-  Returns `blame-reveal-old-commit-color` or theme-based gray.
+  Returns `blame-reveal-old-commit-color' or theme-based gray.
 
 For commits in recent list (in top N AND within time limit):
-  If `blame-reveal-recent-commit-color` is:
+  If `blame-reveal-recent-commit-color' is:
     - Function: Calls it with timestamp
     - Color string: Uses that fixed color
     - nil: Uses gradient based on rank in recent list"
