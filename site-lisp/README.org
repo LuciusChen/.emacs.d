@@ -138,7 +138,7 @@ M-x blame-reveal-mode
 
 #+begin_src elisp
 (setq blame-reveal-style 'left-fringe)          ; or 'right-fringe
-(setq blame-reveal-display-layout 'normal)       ; 'line, 'normal, 'full
+(setq blame-reveal-display-layout 'compact)       ; 'line, 'compact, 'full
 (setq blame-reveal-display-style 'background)    ; 'background, 'box, 'inverse
 #+end_src
 
