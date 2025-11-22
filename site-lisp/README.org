@@ -4,7 +4,8 @@ A lightweight Git blame visualization for Emacs that renders blame information a
 
 ** Philosophy
 
-> Blame information is contextual UI - no need to render invisible regions.
+> Blame is context, not decoration.
+  blame-reveal renders *only what matters* — the visible viewport and recent commits — keeping Emacs fast even on large files.
 
 Unlike traditional blame tools that process entire files upfront, =blame-reveal= renders only the visible viewport plus a margin. This ensures instant activation, smooth scrolling, and minimal resource usage.
 
@@ -137,8 +138,8 @@ M-x blame-reveal-mode
 
 #+begin_src elisp
 (setq blame-reveal-style 'left-fringe)          ; or 'right-fringe
-(setq blame-reveal-header-format 'normal)       ; 'line, 'normal, 'full
-(setq blame-reveal-header-style 'background)    ; 'background, 'box, 'inverse
+(setq blame-reveal-display-layout 'normal)       ; 'line, 'normal, 'full
+(setq blame-reveal-display-style 'background)    ; 'background, 'box, 'inverse
 #+end_src
 
 *** Commit Selection
