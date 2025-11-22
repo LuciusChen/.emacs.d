@@ -39,6 +39,7 @@
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "q") #'blame-reveal-mode)
     (define-key map (kbd "c") #'blame-reveal-copy-commit-hash)
+    (define-key map (kbd "d") #'blame-reveal-show-commit-details)
     map)
   "Keymap for blame-reveal-mode.")
 
@@ -67,12 +68,14 @@
                  (const right-fringe))
   :group 'blame-reveal)
 
-(defcustom blame-reveal-header-format 'full
+(defcustom blame-reveal-header-format 'normal
   "Format for commit message header.
-- 'full: Show hash, commit message, author, and date
-- 'simple: Show only commit message"
+- 'full: Show hash, commit message, author, date and description
+- 'normal: Show hash, commit message, author, and date
+- 'line: Show only commit message"
   :type '(choice (const full)
-                 (const simple))
+                 (const normal)
+                 (const line))
   :group 'blame-reveal)
 
 (defcustom blame-reveal-header-style 'background
@@ -117,31 +120,45 @@ Set to a color string like \"#888888\" to use a fixed color."
                  (color :tag "Fixed color"))
   :group 'blame-reveal)
 
-;; Header 样式自定义
-(defcustom blame-reveal-header-line1-weight 'bold
-  "Font weight for the first line of blame header (commit message)."
+;; Header styling customization
+(defcustom blame-reveal-header-weight 'bold
+  "Font weight for the commit message line in blame header."
   :type '(choice (const :tag "Bold" bold)
                  (const :tag "Normal" normal)
                  (const :tag "Semi-bold" semi-bold)
                  (const :tag "Extra-bold" extra-bold))
   :group 'blame-reveal)
 
-(defcustom blame-reveal-header-line1-height 1.0
-  "Font height for the first line of blame header (commit message).
+(defcustom blame-reveal-header-height 1.0
+  "Font height for the commit message line in blame header.
 1.0 means default size, 0.9 means 90% of default, 1.1 means 110%."
   :type 'number
   :group 'blame-reveal)
 
-(defcustom blame-reveal-header-line2-weight 'normal
-  "Font weight for the second line of blame header (hash, author, date)."
+(defcustom blame-reveal-metadata-weight 'normal
+  "Font weight for the metadata line in blame header (hash, author, date)."
   :type '(choice (const :tag "Bold" bold)
                  (const :tag "Normal" normal)
                  (const :tag "Semi-bold" semi-bold)
                  (const :tag "Light" light))
   :group 'blame-reveal)
 
-(defcustom blame-reveal-header-line2-height 0.9
-  "Font height for the second line of blame header (hash, author, date).
+(defcustom blame-reveal-metadata-height 0.9
+  "Font height for the metadata line in blame header (hash, author, date).
+1.0 means default size, 0.9 means 90% of default, 1.1 means 110%."
+  :type 'number
+  :group 'blame-reveal)
+
+(defcustom blame-reveal-description-weight 'normal
+  "Font weight for the description lines in blame header."
+  :type '(choice (const :tag "Bold" bold)
+                 (const :tag "Normal" normal)
+                 (const :tag "Semi-bold" semi-bold)
+                 (const :tag "Light" light))
+  :group 'blame-reveal)
+
+(defcustom blame-reveal-description-height 0.9
+  "Font height for the description lines in blame header.
 1.0 means default size, 0.9 means 90% of default, 1.1 means 110%."
   :type 'number
   :group 'blame-reveal)
@@ -412,21 +429,21 @@ Returns (START-LINE . END-LINE)."
               (summary (nth 3 info))
               (description (nth 5 info)))
           (pcase blame-reveal-header-format
-            ('simple
+            ('line
              ;; Only commit message
              (format "▸ %s" summary))
-            ('full
+            ('normal
              ;; Commit message + metadata (2 lines)
              (format "▸ %s\n  %s · %s · %s"
                      summary short-hash author date))
-            ('detailed
+            ('full
              ;; Commit message + metadata + description
              (let ((desc-trimmed (if description (string-trim description) "")))
                (if (and desc-trimmed (not (string-empty-p desc-trimmed)))
                    (let ((desc-lines (split-string desc-trimmed "\n")))
                      (format "▸ %s\n  %s · %s · %s\n\n%s"
                              summary short-hash author date
-                             (mapconcat (lambda (line) (concat "   " line))
+                             (mapconcat (lambda (line) (concat "  " line))
                                         desc-lines
                                         "\n")))
                  ;; No description, fall back to full format
@@ -447,29 +464,38 @@ COLOR is the fringe color, which will also be used for header text foreground."
              (header-text (blame-reveal--format-header-text commit-hash))
              (fringe-face (intern (format "blame-reveal-face-%s" color)))
              (hl-bg (blame-reveal--get-hl-line-color))
-             ;; 获取配置的字重和字号
-             (line1-weight blame-reveal-header-line1-weight)
-             (line1-height blame-reveal-header-line1-height)
-             (line2-weight blame-reveal-header-line2-weight)
-             (line2-height blame-reveal-header-line2-height)
-             ;; 第一行样式：直接设置所有属性，确保前景色为 fringe 颜色
-             (header-face-line1 (pcase blame-reveal-header-style
-                                  ('background (list :background hl-bg :foreground color :weight line1-weight :height line1-height))
-                                  ('box (list :background hl-bg :foreground color :weight line1-weight :height line1-height
-                                              :box (list :line-width 1 :color color)))
-                                  ('inverse (list :background color :foreground hl-bg :weight line1-weight :height line1-height))
-                                  (_ (list :background hl-bg :foreground color :weight line1-weight :height line1-height))))
-             ;; 第二行样式：直接设置所有属性，确保前景色为 fringe 颜色
-             (header-face-line2 (pcase blame-reveal-header-style
-                                  ('background (list :background hl-bg :foreground color :weight line2-weight :height line2-height))
-                                  ('box (list :background hl-bg :foreground color :weight line2-weight :height line2-height
-                                              :box (list :line-width 1 :color color)))
-                                  ('inverse (list :background color :foreground hl-bg :weight line2-weight :height line2-height))
-                                  (_ (list :background hl-bg :foreground color :weight line2-weight :height line2-height))))
+             ;; Get configured weights and heights
+             (header-weight blame-reveal-header-weight)
+             (header-height blame-reveal-header-height)
+             (metadata-weight blame-reveal-metadata-weight)
+             (metadata-height blame-reveal-metadata-height)
+             (description-weight blame-reveal-description-weight)
+             (description-height blame-reveal-description-height)
+             ;; Header line style: set all properties, ensure foreground color is fringe color
+             (header-face (pcase blame-reveal-header-style
+                            ('background (list :background hl-bg :foreground color :weight header-weight :height header-height))
+                            ('box (list :background hl-bg :foreground color :weight header-weight :height header-height
+                                        :box (list :line-width 1 :color color)))
+                            ('inverse (list :background color :foreground hl-bg :weight header-weight :height header-height))
+                            (_ (list :background hl-bg :foreground color :weight header-weight :height header-height))))
+             ;; Metadata line style: set all properties, ensure foreground color is fringe color
+             (metadata-face (pcase blame-reveal-header-style
+                              ('background (list :background hl-bg :foreground color :weight metadata-weight :height metadata-height))
+                              ('box (list :background hl-bg :foreground color :weight metadata-weight :height metadata-height
+                                          :box (list :line-width 1 :color color)))
+                              ('inverse (list :background color :foreground hl-bg :weight metadata-weight :height metadata-height))
+                              (_ (list :background hl-bg :foreground color :weight metadata-weight :height metadata-height))))
+             ;; Description line style
+             (description-face (pcase blame-reveal-header-style
+                                 ('background (list :background hl-bg :foreground color :weight description-weight :height description-height))
+                                 ('box (list :background hl-bg :foreground color :weight description-weight :height description-height
+                                             :box (list :line-width 1 :color color)))
+                                 ('inverse (list :background color :foreground hl-bg :weight description-weight :height description-height))
+                                 (_ (list :background hl-bg :foreground color :weight description-weight :height description-height))))
              ;; Split header text into lines based on format
              (header-lines (split-string header-text "\n"))
              ;; Determine which lines use which style
-             (is-simple (eq blame-reveal-header-format 'simple)))
+             (is-simple (eq blame-reveal-header-format 'line)))
         (unless (facep fringe-face)
           (eval `(defface ,fringe-face
                    '((t :background ,color :foreground ,color))
@@ -480,37 +506,28 @@ COLOR is the fringe color, which will also be used for header text foreground."
         (overlay-put overlay 'blame-reveal-header t)
         (overlay-put overlay 'before-string
                      (concat
-                      ;; First line with fringe - always uses line1 style
+                      ;; First line with fringe - always uses header style
                       (propertize "!" 'display
                                   (list blame-reveal-style
                                         'blame-reveal-full
                                         fringe-face))
-                      (propertize (car header-lines) 'face header-face-line1)
+                      (propertize (car header-lines) 'face header-face)
                       "\n"
-                      ;; Additional lines - use line2 style for metadata, line1 style for description
+                      ;; Additional lines - use metadata style for metadata, description style for description
                       (when (cdr header-lines)
                         (let ((remaining-lines (cdr header-lines))
                               (result ""))
                           (dotimes (i (length remaining-lines))
                             (let* ((line (nth i remaining-lines))
-                                   ;; For detailed mode: first line after message is metadata (line2),
-                                   ;; rest are description (line1 but smaller)
-                                   (line-face (if (and (eq blame-reveal-header-format 'detailed)
+                                   ;; For full mode: first line after message is metadata,
+                                   ;; rest are description
+                                   (line-face (if (and (eq blame-reveal-header-format 'full)
                                                       (> i 0)
                                                       (not (string-empty-p (string-trim line))))
-                                                  ;; Description lines: use normal weight and line2 height
-                                                  (pcase blame-reveal-header-style
-                                                    ('background (list :background hl-bg :foreground color
-                                                                      :weight line2-weight :height line2-height))
-                                                    ('box (list :background hl-bg :foreground color
-                                                               :weight line2-weight :height line2-height
-                                                               :box (list :line-width 1 :color color)))
-                                                    ('inverse (list :background color :foreground hl-bg
-                                                                   :weight line2-weight :height line2-height))
-                                                    (_ (list :background hl-bg :foreground color
-                                                            :weight line2-weight :height line2-height)))
+                                                  ;; Description lines
+                                                  description-face
                                                 ;; Metadata or simple second line
-                                                header-face-line2)))
+                                                metadata-face)))
                               (setq result
                                     (concat result
                                             (propertize "!" 'display
@@ -754,6 +771,34 @@ Returns list of created overlays."
             (when (= ov-line line-num)
               (throw 'found (overlay-get overlay 'blame-reveal-commit))))))
       nil)))
+
+;;;###autoload
+(defun blame-reveal-show-commit-details ()
+  "Show full commit details including description in a separate buffer.
+Format matches the 'full' header format."
+  (interactive)
+  (if-let* ((current-block (blame-reveal--get-current-block))
+            (commit-hash (car current-block))
+            (info (gethash commit-hash blame-reveal--commit-info)))
+      (let* ((short-hash (nth 0 info))
+             (author (nth 1 info))
+             (date (nth 2 info))
+             (summary (nth 3 info))
+             (description (nth 5 info))
+             (desc-trimmed (if description (string-trim description) "")))
+        (with-output-to-temp-buffer "*Commit Details*"
+          (with-current-buffer "*Commit Details*"
+            ;; Insert with same format as 'full' mode
+            (insert (format "▸ %s\n" summary))
+            (insert (format "  %s · %s · %s\n" short-hash author date))
+            (if (and desc-trimmed (not (string-empty-p desc-trimmed)))
+                (progn
+                  (insert "\n")
+                  (let ((desc-lines (split-string desc-trimmed "\n")))
+                    (dolist (line desc-lines)
+                      (insert (format "  %s\n" line)))))
+              (insert "\n  (no description)\n")))))
+    (message "No commit info at current line")))
 
 ;;;###autoload
 (define-minor-mode blame-reveal-mode
