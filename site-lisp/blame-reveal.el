@@ -39,7 +39,8 @@
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "q") #'blame-reveal-mode)
     (define-key map (kbd "c") #'blame-reveal-copy-commit-hash)
-    (define-key map (kbd "d") #'blame-reveal-show-commit-details)
+    (define-key map (kbd "d") #'blame-reveal-show-commit-diff)
+    (define-key map (kbd "s") #'blame-reveal-show-commit-details)
     map)
   "Keymap for blame-reveal-mode.")
 
@@ -771,6 +772,29 @@ Returns list of created overlays."
             (when (= ov-line line-num)
               (throw 'found (overlay-get overlay 'blame-reveal-commit))))))
       nil)))
+
+;;;###autoload
+(defun blame-reveal-show-commit-diff ()
+  "Show the diff of the commit at current line."
+  (interactive)
+  (if-let* ((current-block (blame-reveal--get-current-block))
+            (commit-hash (car current-block)))
+      (let ((buffer-name (format "*Commit Diff: %s*" (substring commit-hash 0 8))))
+        (with-current-buffer (get-buffer-create buffer-name)
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (call-process "git" nil t nil "show" "--color=never" commit-hash)
+            (goto-char (point-min))
+            (diff-mode)
+            (view-mode 1)
+            (setq-local revert-buffer-function
+                        (lambda (&rest _)
+                          (let ((inhibit-read-only t))
+                            (erase-buffer)
+                            (call-process "git" nil t nil "show" "--color=never" commit-hash)
+                            (goto-char (point-min))))))
+          (pop-to-buffer (current-buffer))))
+    (message "No commit info at current line")))
 
 ;;;###autoload
 (defun blame-reveal-show-commit-details ()
