@@ -98,5 +98,8 @@
     (:with-map diff-hl-mode-map
       (:bind "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))))
 
+(setup blame-reveal
+  (keymap-global-set "C-c C-x C-b" 'blame-reveal-mode))
+
 (provide 'init-vc)
 ;;; init-vc.el ends here
