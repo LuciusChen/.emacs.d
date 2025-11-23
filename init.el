@@ -65,16 +65,16 @@
         macrostep json-mode orderless kind-icon git-modes git-blamed
         org-modern ace-pinyin marginalia org-remark elfeed-tube dape
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
-        org-cliplink language-detection meow-tree-sitter ox-pandoc
+        org-cliplink language-detection ox-pandoc breadcrumb ultra-scroll
         markdown-mode mode-line-bell embark-consult speed-type diminish
         elfeed-tube-mpv typescript-mode command-log-mode password-store
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile eat
-        consult-dir too-wide-minibuffer-mode ultra-scroll org-edna
-        breadcrumb
+        consult-dir too-wide-minibuffer-mode org-edna
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
+        (meow-cjk :host github :repo "LuciusChen/meow-cjk")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
         (telega :host github :repo "LuciusChen/telega.el")

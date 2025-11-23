@@ -67,14 +67,9 @@
                       (dolist (k '("(" "[" "{" "<"))
                         (define-key map k #'insert-pair))
                       map))
-  (meow-normal-define-key (cons "\\" wrap-keymap))
-  (when IS-MAC
-    (:advice meow-mark-thing :override meow-mark-thing-cjk)
-    (:advice meow-next-thing :override meow-next-thing-cjk)))
+  (meow-normal-define-key (cons "\\" wrap-keymap)))
 
-(setup meow-tree-sitter
-  (:defer (:require meow-tree-sitter))
-  (:when-loaded (meow-tree-sitter-register-defaults)))
+(setup meow-cjk (:hook-into meow-mode))
 
 (setup sis
   (:defer (:require sis))
