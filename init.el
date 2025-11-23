@@ -74,6 +74,7 @@
         consult-dir too-wide-minibuffer-mode ultra-scroll org-edna
         breadcrumb
         (eglot-java :host github :repo "LuciusChen/eglot-java")
+        (blame-reveal :host github :repo "LuciusChen/blame-reveal")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
         (telega :host github :repo "LuciusChen/telega.el")

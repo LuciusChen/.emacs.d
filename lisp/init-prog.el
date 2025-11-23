@@ -111,18 +111,20 @@
     (dolist (class '(nxml-sql-select nxml-sql-insert nxml-sql-update nxml-sql-delete))
       (mmm-add-mode-ext-class 'nxml-mode nil class))))
 
-(setup lisp-mode
-  (:also-load lib-lisp)
-  (:require macrostep)
+(setup elisp-mode
   (keymap-global-set "<remap> <eval-expression>" 'pp-eval-expression)
-  (:with-map emacs-lisp-mode-map
-    (:bind
-     "C-x C-e" +eval-last-sexp-or-region
-     "C-c C-e" pp-eval-expression
-     "C-c C-l" +load-this-file
-     "C-c x"   macrostep-expand))
-  (:advice pp-display-expression :after +make-read-only)
-  (:with-hook emacs-lisp-mode-hook (:hook +maybe-set-bundled-elisp-readonly)))
+  (:when-loaded
+    (:also-load lib-lisp)
+    (:with-map emacs-lisp-mode-map
+      (:bind "C-x C-e" +eval-last-sexp-or-region
+             "C-c C-e" pp-eval-expression
+             "C-c C-l" +load-this-file))
+    (setopt elisp-fontify-semantically t)
+    (:advice pp-display-expression :after +make-read-only)
+    (:with-hook emacs-lisp-mode-hook (:hook +maybe-set-bundled-elisp-readonly))))
+
+(setup macrostep
+  (:hook-into elisp-mode))
 
 ;; or the product can be set from a comment on the first line
 ;; -- -*- mode: sql; sql-product: mysql; -*-
