@@ -69,7 +69,7 @@
                       map))
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
-(setup meow-cjk (:hook-into meow-mode))
+(when IS-MAC (setup meow-cjk (:hook-into meow-mode)))
 
 (setup sis
   (:defer (:require sis))
