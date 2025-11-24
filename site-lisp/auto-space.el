@@ -2,22 +2,40 @@
 ;;; Commentary:
 ;;; Code:
 
+(defcustom auto-space-additional-halfwidth-chars '(?% ?> ?<)
+  "Additional characters to be treated as halfwidth characters.
+These characters will trigger automatic space insertion when adjacent to Chinese characters."
+  :type '(repeat character)
+  :group 'auto-space)
+
+(defun in-comment-p ()
+  "Check if point is in a comment."
+  (nth 4 (syntax-ppss)))
+
+(defun should-apply-auto-space ()
+  "Check if auto-space should be applied at current position.
+In prog-mode, only apply in comments. In other modes, always apply."
+  (if (derived-mode-p 'prog-mode)
+      (in-comment-p)
+    t))
+
 (defun add-space-between-chinese-and-english ()
   "Automatically add a space between Chinese and English characters."
-  (let ((current-char (char-before))
-        (prev-char (char-before (1- (point))))
-        (next-char (char-after)))
-    (when (and current-char prev-char
-               (should-insert-space prev-char current-char)
-               (not (eq (char-before (1- (point))) ?\s)))
-      (save-excursion
-        (backward-char)
-        (insert " ")))
-    (when (and current-char next-char
-               (should-insert-space current-char next-char)
-               (not (eq (char-after) ?\s)))
-      (save-excursion
-        (insert " ")))))
+  (when (should-apply-auto-space)
+    (let ((current-char (char-before))
+          (prev-char (char-before (1- (point))))
+          (next-char (char-after)))
+      (when (and current-char prev-char
+                 (should-insert-space prev-char current-char)
+                 (not (eq (char-before (1- (point))) ?\s)))
+        (save-excursion
+          (backward-char)
+          (insert " ")))
+      (when (and current-char next-char
+                 (should-insert-space current-char next-char)
+                 (not (eq (char-after) ?\s)))
+        (save-excursion
+          (insert " "))))))
 
 (defun is-chinese-character (char)
   "Determine if a character is a Chinese character."
@@ -34,7 +52,7 @@
        (or (and (>= char ?a) (<= char ?z))
            (and (>= char ?A) (<= char ?Z))
            (and (>= char ?0) (<= char ?9))
-           (memq char '(?% ?> ?<)))))
+           (memq char auto-space-additional-halfwidth-chars))))
 
 (defun should-insert-space (char1 char2)
   "Determine if a space should be inserted between CHAR1 and CHAR2."
@@ -76,14 +94,16 @@
 
 (defun auto-space-yank-advice (orig-fun &rest args)
   "Advice to automatically add spaces between Chinese and English characters after yanking."
-  (let ((beg (point))
-        (prev-char (char-before)))
-    (apply orig-fun args)
-    (let ((end (point))
-          (next-char (char-after)))
-      (let ((pasted-text (buffer-substring-no-properties beg end)))
-        (delete-region beg end)
-        (insert (process-pasted-text pasted-text prev-char next-char))))))
+  (if (should-apply-auto-space)
+      (let ((beg (point))
+            (prev-char (char-before)))
+        (apply orig-fun args)
+        (let ((end (point))
+              (next-char (char-after)))
+          (let ((pasted-text (buffer-substring-no-properties beg end)))
+            (delete-region beg end)
+            (insert (process-pasted-text pasted-text prev-char next-char)))))
+    (apply orig-fun args)))
 
 ;;;###autoload
 (define-minor-mode auto-space-mode
