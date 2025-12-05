@@ -51,7 +51,6 @@
   (keymap-global-set "C-c e g" 'gptel-menu)
   (:when-loaded
     (:also-load lib-gpt)
-    (:also-load org)
     (setopt gptel-expert-commands t
             gptel-default-mode 'org-mode
             gptel-model 'openai/gpt-4o
