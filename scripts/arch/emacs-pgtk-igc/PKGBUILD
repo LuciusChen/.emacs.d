@@ -25,11 +25,15 @@ optdepends=('libnotify: for desktop notification support')
 makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi' 'texinfo')
 # source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
 # If Savannah fails, use Github's mirror
-source=("emacs::git+https://github.com/emacs-mirror/emacs.git")
+source=("emacs::git+https://github.com/emacs-mirror/emacs.git"
+        # 🚨 [REQUIRED: Add your patch file names here, e.g., "0001-fix-a.patch"]
+)
 # source=("emacs::git+https://github.com/LuciusChen/emacs.git")
 
 options=(!strip)
-b2sums=("SKIP")
+b2sums=("SKIP"
+        # 🚨 [REQUIRED: Add a checksum (or "SKIP") for each patch file listed above]
+)
 
 export LD=/usr/bin/mold
 export CC="sccache gcc"
@@ -47,6 +51,7 @@ pkgver() {
 
 prepare() {
   cd "$srcdir/emacs"
+  # Ensure the repository is clean and on the correct branch/commit
   git fetch --all --prune
   git checkout "$_branch"
   git reset --hard "origin/$_branch"
@@ -55,6 +60,24 @@ prepare() {
   fi
   git clean -fdx
   [[ -x configure ]] || ./autogen.sh all
+
+  # --- 🌟 Multi-Patch Application Logic (No need to modify this part) ---
+  # Iterates and applies all *.patch files found in $srcdir.
+  # Files must be listed in the 'source' array to be present in $srcdir.
+  for patchfile in "$srcdir"/*.patch; do
+    if [[ -f "$patchfile" ]]; then
+      echo "Applying patch: $(basename "$patchfile")..."
+      # Apply patch, -p1 strips the first path component
+      patch -p1 -i "$patchfile"
+      if [[ $? -ne 0 ]]; then
+        echo "🚨 ERROR: Failed to apply patch: $(basename "$patchfile")" >&2
+        # Abort build on patch failure
+        exit 1
+      fi
+    fi
+  done
+  echo "Patch application finished (applied all found *.patch files listed in source array)."
+  # ----------------------------------------------------------------------
 }
 build() {
   cd "$srcdir/emacs"

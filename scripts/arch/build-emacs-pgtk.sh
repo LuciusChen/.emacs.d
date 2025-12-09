@@ -9,6 +9,7 @@ mkdir -p "$BUILD_DIR"
 
 # Copy PKGBUILD to the build directory
 cp "$EMACS_D/PKGBUILD" "$BUILD_DIR/"
+cp "$EMACS_D"/*.patch "$BUILD_DIR/"
 
 # Change to the build directory
 cd "$BUILD_DIR"
