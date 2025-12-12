@@ -14,7 +14,7 @@ else
   conflicts=('emacs' 'emacs-pgtk')
 fi
 
-pkgver=0.0.0
+pkgver=31.0.50.r189126.
 pkgrel=1
 pkgdesc="GNU Emacs. Branch: $_branch. With PGTK support."
 arch=('x86_64')
@@ -25,15 +25,24 @@ optdepends=('libnotify: for desktop notification support')
 makedepends=('git' 'mold' 'sccache' 'xorgproto' 'libxi' 'texinfo')
 # source=("emacs::git+https://git.savannah.gnu.org/git/emacs.git")
 # If Savannah fails, use Github's mirror
-source=("emacs::git+https://github.com/emacs-mirror/emacs.git"
-        # 🚨 [REQUIRED: Add your patch file names here, e.g., "0001-fix-a.patch"]
-)
+source=("emacs::git+https://github.com/emacs-mirror/emacs.git")
 # source=("emacs::git+https://github.com/LuciusChen/emacs.git")
 
+# Dynamically add patches - using array expansion
+_patches=(*.patch)
+if [[ -f "${_patches[0]}" ]]; then
+  source+=("${_patches[@]}")
+fi
+
 options=(!strip)
-b2sums=("SKIP"
-        # 🚨 [REQUIRED: Add a checksum (or "SKIP") for each patch file listed above]
-)
+
+# Generate b2sums array
+b2sums=('SKIP')
+if [[ -f "${_patches[0]}" ]]; then
+  for patch in "${_patches[@]}"; do
+    b2sums+=('SKIP')
+  done
+fi
 
 export LD=/usr/bin/mold
 export CC="sccache gcc"
@@ -51,7 +60,6 @@ pkgver() {
 
 prepare() {
   cd "$srcdir/emacs"
-  # Ensure the repository is clean and on the correct branch/commit
   git fetch --all --prune
   git checkout "$_branch"
   git reset --hard "origin/$_branch"
@@ -59,26 +67,19 @@ prepare() {
     git checkout "$_commit"
   fi
   git clean -fdx
-  [[ -x configure ]] || ./autogen.sh all
 
-  # --- 🌟 Multi-Patch Application Logic (No need to modify this part) ---
-  # Iterates and applies all *.patch files found in $srcdir.
-  # Files must be listed in the 'source' array to be present in $srcdir.
-  for patchfile in "$srcdir"/*.patch; do
-    if [[ -f "$patchfile" ]]; then
-      echo "Applying patch: $(basename "$patchfile")..."
-      # Apply patch, -p1 strips the first path component
-      patch -p1 -i "$patchfile"
-      if [[ $? -ne 0 ]]; then
-        echo "🚨 ERROR: Failed to apply patch: $(basename "$patchfile")" >&2
-        # Abort build on patch failure
-        exit 1
-      fi
+  # Apply patches from build directory root
+  local patch
+  for patch in "$srcdir"/../*.patch; do
+    if [[ -f "$patch" ]]; then
+      msg2 "Applying $(basename "$patch")..."
+      patch -Np1 -i "$patch"
     fi
   done
-  echo "Patch application finished (applied all found *.patch files listed in source array)."
-  # ----------------------------------------------------------------------
+
+  [[ -x configure ]] || ./autogen.sh all
 }
+
 build() {
   cd "$srcdir/emacs"
 
