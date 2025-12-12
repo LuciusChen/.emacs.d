@@ -1,8 +1,8 @@
 diff --git a/src/Makefile.in b/src/Makefile.in
-index 8101d4406da..8a006152c1c 100644
+index a2f7ea011c3..428f3ea5d86 100644
 --- a/src/Makefile.in
 +++ b/src/Makefile.in
-@@ -451,7 +451,7 @@ .m.o:
+@@ -447,7 +447,7 @@ .m.o:
  .cc.o:
  	$(AM_V_CXX)$(CXX) -c $(CPPFLAGS) $(ALL_CXX_CFLAGS) $(PROFILING_CFLAGS) $<
  
@@ -13,10 +13,10 @@ index 8101d4406da..8a006152c1c 100644
  	emacs.o keyboard.o macros.o keymap.o sysdep.o 			       \
 diff --git a/src/cursor-animation.c b/src/cursor-animation.c
 new file mode 100644
-index 00000000000..981f4b9db33
+index 00000000000..52cf99afc17
 --- /dev/null
 +++ b/src/cursor-animation.c
-@@ -0,0 +1,291 @@
+@@ -0,0 +1,313 @@
 +/* Cross-platform cursor animation implementation for GNU Emacs.
 +
 +Copyright (C) 2025 Free Software Foundation, Inc.
@@ -60,18 +60,18 @@ index 00000000000..981f4b9db33
 +{
 +  if (!state->last_frame_valid)
 +    return true;
-+
++  
 +  /* Calculate movement delta */
-+  double dx = fabs (new_x - state->last_frame.x);
-+  double dy = fabs (new_y - state->last_frame.y);
-+  double dw = fabs (new_width - state->last_frame.width);
-+  double dh = fabs (new_height - state->last_frame.height);
-+
++  double dx = fabs ((double)(new_x - state->last_frame.x));
++  double dy = fabs ((double)(new_y - state->last_frame.y));
++  double dw = fabs ((double)(new_width - state->last_frame.width));
++  double dh = fabs ((double)(new_height - state->last_frame.height));
++  
 +  bool move_delta_big = (dx > CURSOR_MOVE_ON_EPS) || (dy > CURSOR_MOVE_ON_EPS) ||
 +                       (dw > CURSOR_MOVE_ON_EPS) || (dh > CURSOR_MOVE_ON_EPS);
 +  bool move_delta_small = (dx < CURSOR_MOVE_OFF_EPS) && (dy < CURSOR_MOVE_OFF_EPS) &&
 +                         (dw < CURSOR_MOVE_OFF_EPS) && (dh < CURSOR_MOVE_OFF_EPS);
-+
++  
 +  /* Determine if currently moving */
 +  bool moving;
 +  if (!state->last_frame_valid)
@@ -82,7 +82,7 @@ index 00000000000..981f4b9db33
 +    moving = (current_time - state->last_move_time) < CURSOR_MOVING_GRACE_TIME;
 +  else
 +    moving = state->visible;
-+
++  
 +  return moving;
 +}
 +
@@ -118,16 +118,16 @@ index 00000000000..981f4b9db33
 +                                struct frame *f)
 +{
 +  unsigned long text_color;
-+
++  
 +  if (char_face)
 +    {
 +      /* Try character's background color first */
 +      text_color = char_face->background;
-+
++      
 +      /* If text color matches cursor background (invisible), try foreground */
 +      if (text_color == cursor_bg_color)
 +        text_color = char_face->foreground;
-+
++      
 +      /* If still matching, use frame background as fallback */
 +      if (text_color == cursor_bg_color)
 +        text_color = FRAME_BACKGROUND_PIXEL (f);
@@ -137,7 +137,7 @@ index 00000000000..981f4b9db33
 +      /* No face info, use frame background */
 +      text_color = FRAME_BACKGROUND_PIXEL (f);
 +    }
-+
++  
 +  return text_color;
 +}
 +
@@ -172,27 +172,47 @@ index 00000000000..981f4b9db33
 +    return;
 +
 +  bool is_selected_window = (w == XWINDOW (selected_window));
-+  bool should_animate = active_p && is_selected_window;
++
++  /* IMPORTANT: Only process cursor updates for the selected window.
++     This prevents issues with minibuffer and other windows causing
++     constant window switching detection. */
++  if (!is_selected_window || !active_p)
++    return;
++
++  bool should_animate = true;  /* Always animate in selected, active window */
 +
 +  /* Get cursor animation state from frame - use a global for now */
 +  static struct cursor_animation_state global_state = {0};
 +  struct cursor_animation_state *state = &global_state;
 +
-+  /* Get current time for movement detection (needed early for NO_CURSOR check) */
++  /* Get current time early for window switching logic */
 +  double current_time = timespectod (current_timespec ());
++
++  /* If window changed, update tracking but preserve position for smooth animation */
++  if (state->last_window != w)
++    {
++      /* DON'T reset last_frame_valid - we want to animate from old window position!
++         This creates smooth animation when switching between windows. */
++      state->last_move_time = current_time;  /* Mark as just moved to prevent NO_CURSOR from hiding */
++      state->last_window = w;
++
++      /* Reset blink cursor to make it immediately visible in new window */
++      cursor_animation_try_reset_blink ();
++
++      /* Don't clear platform cursor position - preserve it to enable animation
++         from old window position to new window position */
++    }
 +
 +  /* Handle NO_CURSOR specially BEFORE should_animate check */
 +  if (cursor_type == NO_CURSOR)
 +    {
-+      /* Check if cursor is currently moving - if so, ignore NO_CURSOR to keep cursor visible */
-+      if (state->last_frame_valid)
++      /* Check if cursor is currently moving - if so, ignore NO_CURSOR to keep cursor visible
++         Check time since last move regardless of last_frame_valid state */
++      double time_since_move = current_time - state->last_move_time;
++      if (time_since_move < CURSOR_MOVING_GRACE_TIME)
 +        {
-+          double time_since_move = current_time - state->last_move_time;
-+          if (time_since_move < CURSOR_MOVING_GRACE_TIME)
-+            {
-+              /* Cursor is still moving or just stopped - ignore NO_CURSOR to keep it visible */
-+              return;
-+            }
++          /* Cursor is still moving or just stopped - ignore NO_CURSOR to keep it visible */
++          return;
 +        }
 +
 +      if (cursor_animation_interface)
@@ -258,7 +278,9 @@ index 00000000000..981f4b9db33
 +#elif defined (HAVE_ANDROID)
 +      appearance.background_color = f->output_data.android->cursor_pixel;
 +#elif defined (HAVE_NS)
-+      appearance.background_color = [(NSColor *) FRAME_CURSOR_COLOR (f) unsignedLong];
++      /* NS uses NSColor object, cannot convert in C file.
++         NS platform will handle color directly in its update_cursor implementation. */
++      appearance.background_color = 0;
 +#elif defined (HAVE_HAIKU)
 +      appearance.background_color = FRAME_CURSOR_COLOR (f).pixel;
 +#else
@@ -292,7 +314,7 @@ index 00000000000..981f4b9db33
 +      appearance.foreground_color = cursor_animation_get_text_color (
 +        appearance.background_color, appearance.glyph_info.face, f);
 +
-+      /* Update animated cursor */
++      /* Update animated cursor - always animate in selected window */
 +      cursor_animation_interface->update_cursor (f, x, y, width, height,
 +                                               &appearance, on_p, should_animate);
 +
@@ -311,10 +333,10 @@ index 00000000000..981f4b9db33
 \ No newline at end of file
 diff --git a/src/cursor-animation.h b/src/cursor-animation.h
 new file mode 100644
-index 00000000000..0fb7d656e39
+index 00000000000..e643b361ac1
 --- /dev/null
 +++ b/src/cursor-animation.h
-@@ -0,0 +1,133 @@
+@@ -0,0 +1,136 @@
 +/* Cross-platform cursor animation system for GNU Emacs.
 +
 +Copyright (C) 2025 Free Software Foundation, Inc.
@@ -347,7 +369,7 @@ index 00000000000..0fb7d656e39
 +#define CURSOR_MOVE_ON_EPS  0.35   /* Movement threshold to start animation (pixels) */
 +#define CURSOR_MOVE_OFF_EPS 0.20   /* Movement threshold to end animation (pixels) */
 +#define CURSOR_MOVING_GRACE_TIME 0.12  /* Grace period after stopping (seconds) */
-+#define CURSOR_ANIMATION_DURATION 0.10 /* Animation duration (seconds) */
++#define CURSOR_ANIMATION_DURATION 0.10 /* Animation duration (seconds) - matches macOS */
 +#define CURSOR_FADE_IN_DURATION 0.06   /* Fade in duration (seconds) */
 +
 +/* Cross-platform cursor animation state */
@@ -369,6 +391,9 @@ index 00000000000..0fb7d656e39
 +  /* Timing */
 +  double last_move_time;           /* Last movement timestamp */
 +
++  /* Window tracking - per frame to detect window switches */
++  struct window *last_window;      /* Last window that had cursor */
++
 +  /* Platform-specific data */
 +  void *platform_data;             /* Platform-specific animation objects */
 +};
@@ -381,7 +406,7 @@ index 00000000000..0fb7d656e39
 +  unsigned long foreground_color;  /* For text on cursor */
 +  float corner_radius;
 +  bool is_hollow;                  /* For hollow box cursors */
-+
++  
 +  /* Character info for box cursors */
 +  struct {
 +    int character;                 /* Unicode codepoint, 0 if none */
@@ -396,19 +421,19 @@ index 00000000000..0fb7d656e39
 +{
 +  /* Initialize animation system for a frame */
 +  void (*init_animation)(struct frame *f);
-+
++  
 +  /* Cleanup animation system for a frame */
 +  void (*cleanup_animation)(struct frame *f);
-+
++  
 +  /* Update cursor animation with new position/appearance */
-+  void (*update_cursor)(struct frame *f,
++  void (*update_cursor)(struct frame *f, 
 +                       int x, int y, int width, int height,
 +                       const struct cursor_appearance *appearance,
 +                       bool on_state, bool active_window);
-+
++  
 +  /* Hide animated cursor (fall back to native drawing) */
 +  void (*hide_cursor)(struct frame *f);
-+
++  
 +  /* Check if animated cursor is currently visible */
 +  bool (*is_cursor_visible)(struct frame *f);
 +};
@@ -450,7 +475,7 @@ index 00000000000..0fb7d656e39
 +#endif /* CURSOR_ANIMATION_H */
 \ No newline at end of file
 diff --git a/src/nsterm.h b/src/nsterm.h
-index 6a715fb92fc..19e87be0b7c 100644
+index d9d16ffabd3..98c00fb6e3b 100644
 --- a/src/nsterm.h
 +++ b/src/nsterm.h
 @@ -461,6 +461,8 @@ #define NSTRACE_UNSILENCE()
@@ -501,10 +526,10 @@ index 6a715fb92fc..19e87be0b7c 100644
  - (void) updateCollectionBehavior;
  #endif
 diff --git a/src/nsterm.m b/src/nsterm.m
-index 472d2a52a7d..f735e16cfa2 100644
+index 66b4a3c82e7..54e2661ecca 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
-@@ -72,6 +72,12 @@ Updated by Christian Limpach (chris@nice.ch)
+@@ -71,6 +71,12 @@ Updated by Christian Limpach (chris@nice.ch)
  #include "macfont.h"
  #include <Carbon/Carbon.h>
  #include <IOSurface/IOSurface.h>
@@ -517,7 +542,7 @@ index 472d2a52a7d..f735e16cfa2 100644
  #endif
  
  static EmacsMenu *dockMenu;
-@@ -3190,6 +3196,173 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3184,6 +3190,173 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
    /* Prevent the cursor from being drawn outside the text area.  */
    r = NSIntersectionRect (r, ns_row_rect (w, glyph_row, TEXT_AREA));
  
@@ -691,7 +716,7 @@ index 472d2a52a7d..f735e16cfa2 100644
    ns_focus (f, NULL, 0);
  
    NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
-@@ -3228,6 +3401,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+@@ -3222,6 +3395,7 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
      }
  
    ns_unfocus (f);
@@ -699,7 +724,7 @@ index 472d2a52a7d..f735e16cfa2 100644
  }
  
  
-@@ -6830,6 +7004,302 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
+@@ -6824,6 +6998,302 @@ - (void)windowDidEndLiveResize:(NSNotification *)notification
    [self updateFramePosition];
  }
  
@@ -1003,7 +1028,7 @@ index 472d2a52a7d..f735e16cfa2 100644
  - (void) setWindowClosing: (BOOL)closing
  {
 diff --git a/src/pgtkterm.c b/src/pgtkterm.c
-index a21d8be25dd..b5f9be0ef9a 100644
+index a7be2d90899..c87b499be7d 100644
 --- a/src/pgtkterm.c
 +++ b/src/pgtkterm.c
 @@ -26,6 +26,9 @@ Copyright (C) 1989, 1993-1994, 2005-2006, 2008-2025 Free Software
@@ -1024,7 +1049,7 @@ index a21d8be25dd..b5f9be0ef9a 100644
  
  #ifdef GDK_WINDOWING_WAYLAND
  #include <gdk/gdkwayland.h>
-@@ -121,6 +125,31 @@ #define FRAME_CR_SURFACE(f)		(cairo_get_target (FRAME_CR_CONTEXT (f)))
+@@ -117,6 +121,31 @@ #define FRAME_CR_SURFACE(f)		(cairo_get_target (FRAME_CR_CONTEXT (f)))
  static struct frame *pgtk_any_window_to_frame (GdkWindow *);
  static void pgtk_regenerate_devices (struct pgtk_display_info *);
  
@@ -1056,7 +1081,7 @@ index a21d8be25dd..b5f9be0ef9a 100644
  static void
  pgtk_device_added_or_removal_cb (GdkSeat *seat, GdkDevice *device,
  				 gpointer user_data)
-@@ -3031,48 +3060,45 @@ pgtk_draw_window_cursor (struct window *w, struct glyph_row *glyph_row, int x,
+@@ -3002,48 +3031,45 @@ pgtk_draw_window_cursor (struct window *w, struct glyph_row *glyph_row, int x,
  	{
  	  glyph_row->cursor_in_fringe_p = true;
  	  draw_fringe_bitmap (w, glyph_row, glyph_row->reversed_p);
@@ -1083,8 +1108,8 @@ index a21d8be25dd..b5f9be0ef9a 100644
 -	    case HBAR_CURSOR:
 -	      pgtk_draw_bar_cursor (w, glyph_row, cursor_width, HBAR_CURSOR);
 -	      break;
-+      /* Handle cursor_width < 0: use cursor glyph's actual width */
-+      if (cursor_width < 0)
++      /* Handle cursor_width <= 0: use cursor glyph's actual width */
++      if (cursor_width <= 0)
 +        {
 +          struct glyph *cursor_glyph = get_phys_cursor_glyph (w);
 +          if (cursor_glyph)
@@ -1131,7 +1156,7 @@ index a21d8be25dd..b5f9be0ef9a 100644
  }
  
  static void
-@@ -5104,6 +5130,209 @@ pgtk_handle_draw (GtkWidget *widget, cairo_t *cr, gpointer *data)
+@@ -5073,6 +5099,212 @@ pgtk_handle_draw (GtkWidget *widget, cairo_t *cr, gpointer *data)
  	  cairo_set_source_surface (cr, src, 0, 0);
  	  cairo_paint (cr);
  	}
@@ -1140,6 +1165,9 @@ index a21d8be25dd..b5f9be0ef9a 100644
 +      if (f != NULL)
 +        {
 +          struct pgtk_cursor_animation_data *cursor_data = pgtk_get_cursor_animation_data (f);
++          /* Draw cursor if it has valid dimensions
++             Note: Don't check cursor_visible here - that's for intentional hiding (e.g., NO_CURSOR)
++             The on_state parameter in update_cursor controls blink visibility */
 +          if (cursor_data &&
 +              cursor_data->animation.current_width > 0 &&
 +              cursor_data->animation.current_height > 0)
@@ -1341,7 +1369,7 @@ index a21d8be25dd..b5f9be0ef9a 100644
      }
    return FALSE;
  }
-@@ -7030,6 +7259,191 @@ pgtk_selection_event (GtkWidget *widget, GdkEvent *event,
+@@ -6985,6 +7217,193 @@ pgtk_selection_event (GtkWidget *widget, GdkEvent *event,
  /* Display a warning message if the PGTK port is being used under X;
     that is not supported.  */
  
@@ -1417,7 +1445,7 @@ index a21d8be25dd..b5f9be0ef9a 100644
 +      return G_SOURCE_REMOVE;
 +    }
 +
-+  /* Ease-out cubic interpolation */
++  /* Ease-out cubic interpolation (matches macOS kCAMediaTimingFunctionEaseOut) */
 +  double t = progress - 1.0;
 +  double eased = 1.0 + t * t * t;
 +
@@ -1460,8 +1488,11 @@ index a21d8be25dd..b5f9be0ef9a 100644
 +  data->animation.target_width = width;
 +  data->animation.target_height = height;
 +
-+  /* If first time or not animating, jump to target */
-+  if (!data->cursor_visible || !should_animate)
++  /* If first time (no valid position) or explicitly not animating, jump to target */
++  bool has_valid_position = (data->animation.current_width > 0 &&
++                             data->animation.current_height > 0);
++
++  if (!has_valid_position || !should_animate)
 +    {
 +      data->animation.current_x = x;
 +      data->animation.current_y = y;
@@ -1498,9 +1529,8 @@ index a21d8be25dd..b5f9be0ef9a 100644
 +  if (!data)
 +    return;
 +
-+  /* Clear current dimensions to hide cursor */
-+  data->animation.current_width = 0;
-+  data->animation.current_height = 0;
++  /* Mark cursor as not visible but preserve position
++     This allows smooth animation when cursor reappears (e.g., after blink or window switch) */
 +  data->cursor_visible = false;
 +  data->animation.active = false;
 +
@@ -1533,7 +1563,7 @@ index a21d8be25dd..b5f9be0ef9a 100644
  static void
  pgtk_display_x_warning (GdkDisplay *display)
  {
-@@ -7312,6 +7726,9 @@ #define NUM_ARGV 10
+@@ -7260,6 +7679,9 @@ #define NUM_ARGV 10
  		    G_CALLBACK (pgtk_seat_removed_cb), dpyinfo);
    pgtk_enumerate_devices (dpyinfo, true);
  
@@ -1544,7 +1574,7 @@ index a21d8be25dd..b5f9be0ef9a 100644
  
    return dpyinfo;
 diff --git a/src/pgtkterm.h b/src/pgtkterm.h
-index fa522244e14..7c31199c134 100644
+index 94a40b823c8..6e0928ba948 100644
 --- a/src/pgtkterm.h
 +++ b/src/pgtkterm.h
 @@ -450,6 +450,9 @@ #define BLUE_FROM_ULONG(color)	((color) & 0xff)
