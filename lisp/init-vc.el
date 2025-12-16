@@ -99,7 +99,8 @@
       (:bind "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))))
 
 (setup blame-reveal
-  (keymap-global-set "C-c e b" 'blame-reveal-mode))
+  (keymap-global-set "C-c e b" 'blame-reveal-mode)
+  (:when-loaded (:also-load blame-reveal-focus)))
 
 (provide 'init-vc)
 ;;; init-vc.el ends here
