@@ -224,5 +224,9 @@
             citar-denote-subdir "bib-notes")
     (citar-denote-mode)))
 
+(setup discourse-graph
+  (:when-loaded
+    (setopt dg-directories (list org-directory))))
+
 (provide 'init-reader)
 ;;; init-reader.el ends here
