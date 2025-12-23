@@ -71,7 +71,7 @@
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile eat
-        consult-dir too-wide-minibuffer-mode org-edna graphviz-dot-mode
+        consult-dir too-wide-minibuffer-mode org-edna
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
