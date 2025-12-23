@@ -224,7 +224,7 @@
             citar-denote-subdir "bib-notes")
     (citar-denote-mode)))
 
-(setup discourse-graph
+(setup discourse-graphs
   (:when-loaded
     (setopt dg-directories (list org-directory))))
 
