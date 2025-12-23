@@ -74,7 +74,7 @@
         consult-dir too-wide-minibuffer-mode org-edna graphviz-dot-mode
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
-        (discourse-graph :host github :repo "LuciusChen/discourse-graph")
+        (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (gt :host github :repo "LuciusChen/gt.el")
