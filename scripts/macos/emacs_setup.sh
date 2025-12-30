@@ -159,9 +159,9 @@ inject_patches
 
 # Install emacs-plus with specified options
 if [ -n "$REVISION" ]; then
-  HOMEBREW_EMACS_PLUS_31_REVISION=$REVISION brew install emacs-plus@$EMACS_VERSION --with-savchenkovaleriy-big-sur-icon --with-xwidgets
+  HOMEBREW_EMACS_PLUS_31_REVISION=$REVISION brew install emacs-plus@$EMACS_VERSION --with-xwidgets
 else
-  brew install emacs-plus@$EMACS_VERSION --with-savchenkovaleriy-big-sur-icon --with-xwidgets
+  brew install emacs-plus@$EMACS_VERSION --with-xwidgets
 fi
 
 osascript -e "tell application \"Finder\" to make alias file to posix file \"/opt/homebrew/opt/emacs-plus@$EMACS_VERSION/Emacs.app\" at posix file \"/Applications\" with properties {name:\"Emacs.app\"}"
