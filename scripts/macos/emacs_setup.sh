@@ -50,7 +50,7 @@ git pull
 
 # Define the path to the formula and patches
 FORMULA_PATH="/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/Formula/emacs-plus@$EMACS_VERSION.rb"
-PATCH_DIR="$HOME/.emacs.d/patches/emacs-$EMACS_VERSION"
+PATCH_DIR="$HOME/.emacs.d/scripts/macos/patches/emacs-$EMACS_VERSION"
 TARGET_PATCH_DIR="/opt/homebrew/Library/Taps/d12frosted/homebrew-emacs-plus/patches/emacs-$EMACS_VERSION"
 
 # Copy the original formula for backup
@@ -96,61 +96,76 @@ INSERTION_POINT="round-undecorated-frame"
 # Function to calculate SHA and inject patch
 inject_patches() {
   local inserted=false
-  local existing_user_patches=()
-  local existing_non_user_patches=()
+  local excluded_patches=()
+  local exclude_file="$PATCH_DIR/exclude.txt"
 
-  # Read all existing user-defined patches from the formula
+  # Read excluded patches from exclude.txt (if exists)
+  if [ -f "$exclude_file" ]; then
+    while IFS= read -r line || [ -n "$line" ]; do
+      # Skip empty lines and comments
+      [[ -z "$line" || "$line" =~ ^# ]] && continue
+      excluded_patches+=("$line")
+    done < "$exclude_file"
+    echo "Excluded patches: ${excluded_patches[*]}"
+  fi
+
+  # Remove excluded patches from formula
+  for patch_name in "${excluded_patches[@]}"; do
+    if grep -q "local_patch \"$patch_name\"" "$FORMULA_PATH"; then
+      sed -i '' "/local_patch \"$patch_name\"/d" "$FORMULA_PATH"
+      echo "Excluded patch $patch_name from the formula."
+      rm -f "$TARGET_PATCH_DIR/$patch_name.patch"
+    fi
+  done
+
+  # Read existing user patches from the formula
+  local existing_user_patches=()
   while read -r line; do
     if [[ $line =~ local_patch\ \"([^\"]+)\".*#\ user_patch ]]; then
       existing_user_patches+=("${BASH_REMATCH[1]}")
     fi
   done < <(grep "local_patch" "$FORMULA_PATH")
 
-  # Read all existing non-user-defined patches from the formula
-  while read -r line; do
-    if [[ $line =~ local_patch\ \"([^\"]+)\" ]] && [[ ! $line =~ \#\ user_patch ]]; then
-      existing_non_user_patches+=("${BASH_REMATCH[1]}")
-    fi
-  done < <(grep "local_patch" "$FORMULA_PATH")
-
-  # Remove entries for user patches that no longer exist
+  # Remove user patches that no longer exist in patch directory
   for old_patch in "${existing_user_patches[@]}"; do
     if [ ! -f "$PATCH_DIR/$old_patch.patch" ]; then
       sed -i '' "/local_patch \"$old_patch\".*# user_patch/d" "$FORMULA_PATH"
       echo "Removed user patch $old_patch from the formula."
       rm -f "$TARGET_PATCH_DIR/$old_patch.patch"
-      echo "Removed symbolic link for $old_patch."
     fi
   done
 
-  # Process new user patches
+  # Process user patches
   for patch in "$PATCH_DIR"/*.patch; do
+    [ -f "$patch" ] || continue
+
     local patch_name
     patch_name=$(basename "$patch" .patch)
     local sha
     sha=$(shasum -a 256 "$patch" | awk '{ print $1 }')
 
     if grep -q "local_patch \"$patch_name\"" "$FORMULA_PATH" && ! grep -q "local_patch \"$patch_name\".*# user_patch" "$FORMULA_PATH"; then
-      # Update SHA for non-user patches if they exist in user patches
-      sed -i '' "s|local_patch \"$patch_name\", sha: \".*\"|local_patch \"$patch_name\", sha: \"$sha\"|" "$FORMULA_PATH"
-      echo "Updated SHA for existing non-user patch $patch_name in the formula."
+      # Update SHA for formula patches that user is overriding
+      sed -i '' "s|local_patch \"$patch_name\", sha: \"[^\"]*\"|local_patch \"$patch_name\", sha: \"$sha\"|" "$FORMULA_PATH"
+      echo "Updated SHA for existing patch $patch_name."
     elif ! grep -q "local_patch \"$patch_name\"" "$FORMULA_PATH"; then
+      # Add new user patch
       sed -i '' "/$INSERTION_POINT/a\\
   local_patch \"$patch_name\", sha: \"$sha\" # user_patch
 " "$FORMULA_PATH"
-      echo "Patch $patch_name added to the formula."
+      echo "Added patch $patch_name to the formula."
       inserted=true
     else
-      echo "Patch $patch_name already exists in the formula."
+      echo "Patch $patch_name already exists."
     fi
 
     ln -sf "$patch" "$TARGET_PATCH_DIR/${patch_name}.patch"
   done
 
   if [ "$inserted" = true ]; then
-    echo "All patches applied successfully."
+    echo "New patches were added."
   else
-    echo "No new patches to apply."
+    echo "All patches are up to date."
   fi
 }
 
