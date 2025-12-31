@@ -25,7 +25,8 @@
           (:match-file "*.PDF"))
   (:when-loaded
     (:with-mode pdf-view-mode
-      (:hook pdf-view-themed-minor-mode))))
+      (:hook pdf-view-themed-minor-mode)
+      (:hook pdf-tools-enable-minor-modes))))
 
 (setup org-remark
   (keymap-global-set "C-c i m" 'org-remark-mark)
