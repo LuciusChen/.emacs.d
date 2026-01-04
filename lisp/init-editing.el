@@ -3,11 +3,7 @@
 ;;; Code:
 
 (setup emacs
-  (setq-default case-fold-search t
-                create-lockfiles nil
-                scroll-preserve-screen-position 'always
-                truncate-partial-width-windows nil
-                history-length 1000
+  (setq-default scroll-preserve-screen-position 'always
                 use-short-answers t
                 ;; Improve CJK wrapping
                 word-wrap-by-category t
