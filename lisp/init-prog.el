@@ -227,27 +227,14 @@
             (markdown        . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
             (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))
 
-    (defun +treesit--install-languages-async (languages)
-      "Asynchronously install LANGUAGES one by one without blocking Emacs."
-      (when languages
-        (let ((lang (car languages))
-              (remaining (cdr languages)))
-          (condition-case err
-              (progn
-                (message "Installing `%s' parser..." lang)
-                (treesit-install-language-grammar lang)
-                (message "`%s' parser installed. %d remaining."
-                         lang (length remaining)))
-            (error (message "Failed to install `%s': %s" lang err)))
-          (when remaining
-            (run-with-timer 0.1 nil #'+treesit--install-languages-async remaining)))))
-
     (defun +treesit-install-all-languages ()
       "Install all languages specified by `treesit-language-source-alist'."
       (interactive)
-      (let ((languages (mapcar #'car treesit-language-source-alist)))
-        (message "Starting installation of %d language parsers..." (length languages))
-        (+treesit--install-languages-async languages)))))
+      (let ((languages (mapcar 'car treesit-language-source-alist)))
+        (dolist (lang languages)
+          (treesit-install-language-grammar lang)
+          (message "`%s' parser was installed." lang)
+          (sit-for 0.75))))))
 
 (setup indent-bars
   (:with-mode (java-ts-mode python-ts-mode vue-mode typescript-mode typescript-ts-mode js-mode)
