@@ -173,12 +173,12 @@
     (global-telega-mnz-mode 1)
 
     ;; Linux settings
-    (when IS-LINUX
-      (setq telega-proxies (list '(:server "127.0.0.1"
-                                           :port 7897
-                                           :enable t
-                                           :type (:@type "proxyTypeSocks5"
-                                                         :username "" :password "")))))
+    ;; (when IS-LINUX
+    ;;   (setq telega-proxies (list '(:server "127.0.0.1"
+    ;;                                        :port 7897
+    ;;                                        :enable t
+    ;;                                        :type (:@type "proxyTypeSocks5"
+    ;;                                                      :username "" :password "")))))
     ;; Opening files using external programs
     (if IS-MAC
         (progn

@@ -395,7 +395,7 @@
 
 (setup webpaste
   (:defer (:require webpaste)
-          (setopt webpaste-provider-priority '("paste.rs" "dpaste.org"))))
+          (setopt webpaste-provider-priority '("paste.rs" "dpaste.com"))))
 
 (setup eshell
   (keymap-global-set "<f8>" 'eshell)
