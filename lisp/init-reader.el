@@ -92,7 +92,7 @@
                                       google/gemini-2.5-pro
                                       google/gemini-2.5-pro-flash)
                             :stream t)
-            gptel-proxy (if IS-MAC "" "socks://127.0.0.1:7897")
+            gptel-proxy (if IS-MAC "" "socks://127.0.0.1:7890")
             gptel-directives (get-gptel-directives)
             gptel-temperature 0.7)
     (setq gptel-tools +gptel-tools)
