@@ -40,7 +40,7 @@
 
 (setup custom
   (:when-loaded
-    (:also-load lib-appearance)
+    (:also-load lib-ui)
     ;; Modifiers have to be specified in this order:
     ;; A-C-H-M-S-s
     ;; which is
