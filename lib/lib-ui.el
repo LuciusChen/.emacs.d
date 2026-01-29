@@ -1,4 +1,4 @@
-;;; lib-appearance.el --- theme setup -*- lexical-binding: t; -*-
+;;; lib-ui.el --- theme setup -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -77,5 +77,5 @@ optional and is used to specify which frame's opacity to change."
   (interactive)
   (apply-theme dark-theme (if IS-MAC 75 90)))
 
-(provide 'lib-appearance)
-;;; lib-appearance.el ends here
+(provide 'lib-ui)
+;;; lib-ui.el ends here
