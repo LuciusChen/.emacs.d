@@ -6,9 +6,9 @@
 (defun reapply-themes ()
   "Forcibly load the themes listed in `custom-enabled-themes'."
   (dolist (theme custom-enabled-themes)
-    (unless (custom-theme-p theme)
-      (load-theme theme t)))
-  (custom-set-variables `(custom-enabled-themes (quote ,custom-enabled-themes))))
+    (if (custom-theme-p theme)
+        (enable-theme theme)
+      (load-theme theme t))))
 
 (defun set-dividers-and-fringe-color ()
   "Set the color of dividers and fringe to match the current theme."
