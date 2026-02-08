@@ -16,11 +16,11 @@
 
 (defun find-toot-text-bounds ()
   "Find the bounds of the text content of the toot at point, excluding media."
-  (find-text-bounds
-   (lambda ()
-     (let ((toot (mastodon-tl--property 'item-json)))
-       (when toot
-         (mastodon-tl--render-text (mastodon-tl--field 'content toot) toot))))))
+  (when-let* ((_ (mastodon-tl--property 'item-json))
+              (item-range (mastodon-tl--find-property-range 'item-json (point)))
+              (body-range (mastodon-tl--find-property-range 'toot-body (car item-range))))
+    (when (<= (cdr body-range) (cdr item-range))
+      (list body-range))))
 
 (defun find-profile-note-bounds ()
   "Find the bounds of the profile note of the user in the current buffer."
