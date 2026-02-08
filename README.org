@@ -50,7 +50,7 @@
 sudo mkdir -p /Library/Preferences/FeatureFlags/Domain && sudo /usr/libexec/PlistBuddy -c "Add 'redesigned_text_cursor:Enabled' bool false" /Library/Preferences/FeatureFlags/Domain/UIKit.plist && sudo shutdown -r now
 #+end_src
 *** LaTeX 预览及导出
-LaTeX 预览的场景不局限于 Emacs 当中，导出到 Web 时，一部分简单的用 [[https://www.mathjax.org/][MathJax]]，另一部分复杂的代码块（尤其是自定义关键字）则需要利用 =org-babel= 生成图片后嵌入文中（如下，GitHub 中 Raw 格式查看全部）。
+导出到 Web 时，简单公式用 [[https://www.mathjax.org/][MathJax]]，复杂代码块（自定义关键字等）通过 =org-babel= 生成 SVG 嵌入。
 
 #+header: :headers '("\\usepackage[ruled, linesnumbered]{algorithm2e}")
 #+begin_src latex :results file raw :file assets/lamport-clocks-algorithm.svg :exports none
@@ -68,14 +68,14 @@ LaTeX 预览的场景不局限于 Emacs 当中，导出到 Web 时，一部分�
 \end{algorithm}
 #+end_src
 
-Emacs 内的预览最初选择的是 [[https://github.com/dandavison/xenops][xenops]]，后切换到 [[https://abode.karthinks.com/org-latex-preview/][org-latex-preview]]，但由于下面的问题导致 =org-babel= 无法执行后放弃。
+Emacs 内预览曾尝试 [[https://github.com/dandavison/xenops][xenops]] 和 [[https://abode.karthinks.com/org-latex-preview/][org-latex-preview]]，但后者因 [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 异步编译导致 =org-babel= 执行失败（[[https://github.com/tecosaur/org-latex-preview-todos/issues/28][#28]]），暂未采用。
 
-2024-03-08: [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本中 =org-latex-compile= 改为异步生成 PDF，Inkscape 转换 PDF 为 SVG 时，PDF 还未生成，导致报错。相关参考如下。
-
-- [[https://github.com/tecosaur/org-latex-preview-todos/issues/28][#28 Convention for Org mode functions to support org-async]]
-- [[https://list.orgmode.org/87frysk0tp.fsf@gmail.com/T/#ma03ea00706247732a7c772dcdcdf27cfa8d76024][{Pre-PATCH} Overhaul of the LaTeX preview system]]
-
-依旧有兴趣的可以安装 [[https://git.tecosaur.net/tec/org-mode][tec/org-mode]] 版本的 org，配置 [[https://abode.karthinks.com/org-latex-preview/][org-latex-preview]] 进行尝试。
+配置要点：
+- 编译器 =xelatex= ，通过 =latexmk= 驱动；代码高亮使用 =minted=
+- 预览：=xelatex= + =dvisvgm= 生成 SVG
+- 中文字体 =LXGW WenKai= ，文档类 =ctexart=
+- 自定义 class： =Notes= （基于 [[https://github.com/Adhumunt/NotesTeX][NotesTeX]]）、 =article_cn= （中文文章，超链接 Maroon 配色）
+- 常用包：数学（ =amsmath= / =mathtools= ）、绘图（ =tikz= / =tikz-cd= ）、算法（ =algorithm2e= ）等
 **** 常见问题
 - 用 Homebrew 安装的 texlive，dvisvgm 包含在 texlive 当中，需要从 =/Library/TeX/texbin/= 复制到 =/opt/homebrew/bin/= 。
 *** 翻译
