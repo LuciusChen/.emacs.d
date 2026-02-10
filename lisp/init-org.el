@@ -126,6 +126,7 @@
      'org-babel-load-languages '((plantuml . t)
                                  (python . t)
                                  (shell . t)
+                                 (sql . t)
                                  (verb . t)
                                  (latex . t)))))
 
