@@ -11,6 +11,7 @@ request/
 dirvish/
 straight/
 eln-cache/
+tutorial/
 transient/
 speed-type/
 tree-sitter/
@@ -30,4 +31,5 @@ org-clock-save.el
 .bookmarks.el
 forge*.sqlite
 *.eld
+*.db
 .aider*
