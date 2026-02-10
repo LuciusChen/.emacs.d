@@ -25,19 +25,33 @@
 
 ;; pinyinlib-build-regexp-string expands every ASCII letter into a
 ;; character class of all Chinese characters sharing that pinyin initial
-;; (e.g. "D" -> "[大打达...]").  When added unconditionally to
-;; `orderless-matching-styles', long inputs like deep Java file paths
-;; produce a regex that exceeds Emacs' size limit, causing
-;; "Regular expression too big".  Limit pinyin matching to short
-;; components only, since pinyin initials are inherently brief.
+;; (e.g. "D" -> "[大打达...]").  The Emacs regex engine enforces
+;; MAX_BUF_SIZE (1<<15 = 32768 bytes) in regex-emacs.c, so long inputs
+;; easily overflow.  Instead of limiting input length, cap the generated
+;; regex at the byte level.
+;; https://github.com/emacs-mirror/emacs/blob/master/src/regex-emacs.c#L832
 (setup pinyinlib
   (:load-after orderless)
   (:when-loaded
+    (defvar pinyinlib-regex-max-size 3000)
+
+    (define-advice pinyinlib-build-regexp-string
+        (:override (str &rest args) limit-size)
+      (let ((result ""))
+        (catch 'stop
+          (mapc (lambda (c)
+                  (let ((piece (apply #'pinyinlib-build-regexp-char c args)))
+                    (when (> (+ (string-bytes result) (string-bytes piece))
+                             pinyinlib-regex-max-size)
+                      (throw 'stop nil))
+                    (setq result (concat result piece))))
+                str))
+        result))
+
     (add-to-list 'orderless-matching-styles
                  (lambda (str)
-                   (when (<= (length str) 6)
-                     (orderless-regexp
-                      (pinyinlib-build-regexp-string str)))))))
+                   (orderless-regexp
+                    (pinyinlib-build-regexp-string str))))))
 
 (setup corfu
   (:defer (:require corfu))
