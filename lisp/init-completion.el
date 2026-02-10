@@ -23,14 +23,22 @@
                    orderless+basic-all
                    "Unholy mix of Orderless and Basic."))))
 
-;; pinyinlib.el 用于匹配简体/繁体汉字拼音首字母
+;; pinyinlib-build-regexp-string expands every ASCII letter into a
+;; character class of all Chinese characters sharing that pinyin initial
+;; (e.g. "D" -> "[大打达...]").  When added unconditionally to
+;; `orderless-matching-styles', long inputs like deep Java file paths
+;; produce a regex that exceeds Emacs' size limit, causing
+;; "Regular expression too big".  Use a style dispatcher with a "`"
+;; prefix so pinyin matching is only activated on demand.
 (setup pinyinlib
   (:load-after orderless)
   (:when-loaded
-    (add-to-list 'orderless-matching-styles
-                 (lambda (str)
-                   (orderless-regexp
-                    (pinyinlib-build-regexp-string str))))))
+    (add-to-list 'orderless-style-dispatchers
+                 (lambda (component _index _total)
+                   (when (string-prefix-p "`" component)
+                     `(orderless-regexp
+                       . ,(pinyinlib-build-regexp-string
+                           (substring component 1))))))))
 
 (setup corfu
   (:defer (:require corfu))
