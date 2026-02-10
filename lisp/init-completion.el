@@ -28,17 +28,16 @@
 ;; (e.g. "D" -> "[大打达...]").  When added unconditionally to
 ;; `orderless-matching-styles', long inputs like deep Java file paths
 ;; produce a regex that exceeds Emacs' size limit, causing
-;; "Regular expression too big".  Use a style dispatcher with a "`"
-;; prefix so pinyin matching is only activated on demand.
+;; "Regular expression too big".  Limit pinyin matching to short
+;; components only, since pinyin initials are inherently brief.
 (setup pinyinlib
   (:load-after orderless)
   (:when-loaded
-    (add-to-list 'orderless-style-dispatchers
-                 (lambda (component _index _total)
-                   (when (string-prefix-p "`" component)
-                     `(orderless-regexp
-                       . ,(pinyinlib-build-regexp-string
-                           (substring component 1))))))))
+    (add-to-list 'orderless-matching-styles
+                 (lambda (str)
+                   (when (<= (length str) 6)
+                     (orderless-regexp
+                      (pinyinlib-build-regexp-string str)))))))
 
 (setup corfu
   (:defer (:require corfu))
