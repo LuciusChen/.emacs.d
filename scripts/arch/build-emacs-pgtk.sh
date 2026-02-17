@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Define paths
-EMACS_D="$HOME/.emacs.d/scripts/arch/emacs-pgtk-igc"
-BUILD_DIR="$HOME/emacs-pgtk-igc"
+EMACS_D="$HOME/.emacs.d/scripts/arch/emacs-pgtk"
+BUILD_DIR="$HOME/emacs-pgtk"
 
 # Create the build directory if it doesn't exist
 mkdir -p "$BUILD_DIR"
