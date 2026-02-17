@@ -1,6 +1,6 @@
 # Based on emacs-igc-git: https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=emacs-igc-git
 # ----------------- Configuration Section -----------------
-_branch="feature/igc" # <- "master" or "feature/igc"
+_branch="master" # <- "master" or "feature/igc"
 _commit="" # Leave empty if not needed
 # ---------------------------------------------------------
 
