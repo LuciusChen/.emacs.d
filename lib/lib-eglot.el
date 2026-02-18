@@ -126,7 +126,12 @@ Returns:
 ;; The following code is used when starting a Spring + Servlet (Tomcat) container.
 (defcustom tomcat-port 8080
   "The port number that Tomcat server listens on."
-  :type 'integer
+  :type 'natnum
+  :group 'tomcat)
+
+(defcustom tomcat-startup-timeout 60
+  "Seconds to wait for Tomcat to become ready before giving up."
+  :type 'natnum
   :group 'tomcat)
 
 ;; Multiple JDK versions are installed locally,
@@ -260,10 +265,9 @@ If no matching version is found, prompt the user to choose."
 
 (defun detect-project-home-and-name ()
   "Detect the project home directory and the project name based on the current project."
-  (let ((project (project-current)))
-    (if project
-        (list :name (project-name project) :home (cdr project))
-      (error "Could not determine the project root"))))
+  (if-let* ((project (project-current)))
+      (list :name (project-name project) :home (project-root project))
+    (error "Could not determine the project root")))
 
 (defun tomcat--get-pid ()
   "Return Tomcat PID string if running, else nil."
@@ -286,6 +290,7 @@ If no matching version is found, prompt the user to choose."
                            (point))))))))
 
 (defun port-open-p (host port)
+  "Return non-nil if HOST:PORT accepts a TCP connection."
   (condition-case nil
       (let ((proc (make-network-process
                    :name "check-port" :host host :service port
@@ -293,97 +298,144 @@ If no matching version is found, prompt the user to choose."
         (when proc (delete-process proc) t))
     (error nil)))
 
+(defun tomcat--startup-filter (debug)
+  "Return a process filter that streams output and notifies on Tomcat startup.
+Watches for 'Server startup in' in logs — the same signal IDEA uses.
+DEBUG non-nil means JPDA mode is active."
+  (let ((notified nil))
+    (lambda (proc output)
+      (with-current-buffer (process-buffer proc)
+        (let ((inhibit-read-only t))
+          (goto-char (point-max))
+          (insert output)
+          (tomcat-truncate-buffer (current-buffer) 5000)))
+      (when (and (not notified)
+                 (string-match-p "Server startup in" output))
+        (setq notified t)
+        (message "Tomcat ready%s → http://localhost:%d"
+                 (if debug " [JPDA :8000]" "")
+                 tomcat-port)))))
+
+(defun tomcat--poll-ready (remaining debug buf-name)
+  "Async fallback: poll port every second up to REMAINING times, then give up."
+  (cond
+   ((port-open-p "localhost" tomcat-port)
+    (message "Tomcat running%s → http://localhost:%d"
+             (if debug " [JPDA :8000]" "")
+             tomcat-port))
+   ((> remaining 0)
+    (run-with-timer 1 nil #'tomcat--poll-ready (1- remaining) debug buf-name))
+   (t
+    (message "Tomcat may have failed to start. Check %s buffer." buf-name))))
+
+(defun tomcat--do-start (proc-name buf-name start-cmd debug)
+  "Start Tomcat process PROC-NAME in BUF-NAME using START-CMD.
+Sets up log-watching filter and async port poll as fallback."
+  (message "Starting Tomcat%s..." (if debug " with JPDA" ""))
+  (let ((proc (start-process-shell-command proc-name buf-name start-cmd)))
+    (set-process-filter proc (tomcat--startup-filter debug))
+    (run-with-timer 3 nil #'tomcat--poll-ready tomcat-startup-timeout debug buf-name)))
+
+(defun tomcat--wait-shutdown-then-start (proc-name buf-name start-cmd debug remaining)
+  "Poll until Tomcat port closes, then call `tomcat--do-start'.
+Retries every second up to REMAINING times before giving up."
+  (cond
+   ((not (port-open-p "localhost" tomcat-port))
+    (tomcat--do-start proc-name buf-name start-cmd debug))
+   ((> remaining 0)
+    (run-with-timer 1 nil #'tomcat--wait-shutdown-then-start
+                    proc-name buf-name start-cmd debug (1- remaining)))
+   (t
+    (message "Tomcat did not stop within timeout. Aborting deploy."))))
+
 (defun copy-war-and-manage-tomcat (debug)
-  "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
-If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground).
-Otherwise also run Tomcat in foreground, logs go to *tomcat-start* buffer."
+  "Deploy the project WAR to Tomcat, restarting it if already running.
+If DEBUG is non-nil, enable JPDA remote debugging on port 8000.
+Startup detection is async — Emacs is never blocked."
   (interactive "P")
   (let* ((tomcat-home (or (detect-tomcat-home)
                           (error "Unable to detect Tomcat home directory")))
-         (project-details (detect-project-home-and-name))
-         (project-name (plist-get project-details :name))
-         (project-home (plist-get project-details :home))
-         (webapps-path (concat tomcat-home "/webapps/"))
-         (war-file (concat project-home "/target/" project-name ".war"))
-         (startup-script (concat tomcat-home "/bin/catalina.sh"))
-         (startup-command (if debug
-                              (concat "CATALINA_OPTS='-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n' "
-                                      startup-script " run")
-                            (concat startup-script " run"))))
-    ;; Remove existing WAR and exploded directory
-    (ignore-errors (delete-file (concat webapps-path project-name ".war")))
-    (ignore-errors (delete-directory (concat webapps-path project-name) t))
+         (details (detect-project-home-and-name))
+         (project-name (plist-get details :name))
+         (project-home (plist-get details :home))
+         (webapps (concat tomcat-home "/webapps/"))
+         (war-src (concat project-home "target/" project-name ".war"))
+         (catalina (concat tomcat-home "/bin/catalina.sh"))
+         (buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
+         (proc-name (if debug "tomcat-debug" "tomcat-start"))
+         (start-cmd (if debug
+                        (concat "CATALINA_OPTS='-agentlib:jdwp=transport=dt_socket,"
+                                "address=8000,server=y,suspend=n' " catalina " run")
+                      (concat catalina " run"))))
+    (ignore-errors (delete-file (concat webapps project-name ".war")))
+    (ignore-errors (delete-directory (concat webapps project-name) t))
+    (copy-file war-src webapps t)
+    (if (port-open-p "localhost" tomcat-port)
+        (progn
+          (tomcat-safe-shutdown)
+          (tomcat--wait-shutdown-then-start proc-name buf-name start-cmd debug 30))
+      (tomcat--do-start proc-name buf-name start-cmd debug))))
 
-    ;; Copy the new WAR file
-    (copy-file war-file webapps-path t)
-
-    ;; Shutdown Tomcat if running
-    (when (port-open-p "localhost" tomcat-port)
-      (tomcat-safe-shutdown)
-      (sleep-for 2))
-
-    ;; Startup Tomcat
-    (let* ((buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
-           (proc (start-process-shell-command
-                  (if debug "tomcat-debug" "tomcat-start")
-                  buf-name
-                  startup-command)))
-      (set-process-filter proc
-                          (lambda (p output)
-                            (with-current-buffer (process-buffer p)
-                              (goto-char (point-max))
-                              (insert output)
-                              (tomcat-truncate-buffer (current-buffer) 5000)))))
-
-    ;; Retry loop for port availability
-    (let ((tries 40) (ok nil))
-      (while (and (> tries 0) (not ok))
-        (sleep-for 1)
-        (setq tries (1- tries))
-        (setq ok (port-open-p "localhost" tomcat-port)))
-      (if ok
-          (message "Deployment successful, Tomcat running%s."
-                   (if debug " with JPDA debugging" ""))
-        (message "Tomcat may have failed to start. Check %s buffer for logs."
-                 (if debug "*tomcat-debug*" "*tomcat-start*"))))))
-
-(defun tomcat-safe-shutdown ()
-  "Safely shutdown Tomcat, like IDEA does.
-Try catalina.sh stop first, wait 2s, then kill process group if needed."
-  (interactive)
-  (let* ((home (or (detect-tomcat-home)
-                   (error "Unable to detect Tomcat home directory")))
-         (catalina-script (expand-file-name "bin/catalina.sh" home))
-         (buffer-name "*tomcat-stop*")
-         (shutdown-command (concat catalina-script " stop"))
-         (pid (tomcat--get-pid)))
-    (unless (file-exists-p catalina-script)
-      (error "catalina.sh not found at %s" catalina-script))
-    (if (not pid)
-        (message ">>> No Tomcat process found.")
-      (progn
-        (message ">>> Trying catalina.sh stop...")
-        (start-process-shell-command "tomcat-stop" buffer-name shutdown-command)
-        (sleep-for 2)
-        (if (not (tomcat--get-pid))
-            (message ">>> Tomcat stopped gracefully.")
-          (let* ((pgid (string-trim
-                        (with-output-to-string
-                          (with-current-buffer standard-output
-                            (call-process "ps" nil t nil "-o" "pgid=" "-p" pid))))))
-            (message ">>> Tomcat still running, killing process group %s..." pgid)
-            ;; macOS kill 没有 GNU -- 参数，所以区分一下
-            (if (eq system-type 'darwin)
-                (call-process "kill" nil nil nil "-TERM" (concat "-" pgid))
-              (call-process "kill" nil nil nil "--" (concat "-" pgid)))
-            (sleep-for 1)
-            (when (tomcat--get-pid)
-              (if (eq system-type 'darwin)
-                  (call-process "kill" nil nil nil "-9" (concat "-" pgid))
-                (call-process "kill" nil nil nil "-9" (concat "-" pgid))))
+(defun tomcat--shutdown-escalate (pgid attempt)
+  "Async escalation: send TERM then SIGKILL to process group PGID if Tomcat lingers.
+ATTEMPT 0 sends SIGTERM and schedules ATTEMPT 1; ATTEMPT 1 sends SIGKILL."
+  (when (tomcat--get-pid)
+    (if (= attempt 0)
+        (progn
+          (message ">>> Tomcat still running, sending TERM to PGID %s..." pgid)
+          ;; macOS kill has no GNU -- flag
+          (if (eq system-type 'darwin)
+              (call-process "kill" nil nil nil "-TERM" (concat "-" pgid))
+            (call-process "kill" nil nil nil "--" (concat "-" pgid)))
+          (run-with-timer 2 nil #'tomcat--shutdown-escalate pgid 1))
+      (when (tomcat--get-pid)
+        (call-process "kill" nil nil nil "-9" (concat "-" pgid))
+        (run-with-timer 0.5 nil
+          (lambda ()
             (if (tomcat--get-pid)
                 (message ">>> Failed to stop Tomcat.")
               (message ">>> Tomcat force killed."))))))))
+
+(defun tomcat-safe-shutdown ()
+  "Gracefully shut down Tomcat; escalate to SIGKILL asynchronously if needed.
+Mirrors IDEA's shutdown sequence: catalina.sh stop → TERM → KILL."
+  (interactive)
+  (let* ((home (or (detect-tomcat-home)
+                   (error "Unable to detect Tomcat home directory")))
+         (catalina (expand-file-name "bin/catalina.sh" home))
+         (pid (tomcat--get-pid)))
+    (unless (file-exists-p catalina)
+      (error "catalina.sh not found at %s" catalina))
+    (if (not pid)
+        (message ">>> No Tomcat process found.")
+      (let ((pgid (string-trim
+                   (with-output-to-string
+                     (with-current-buffer standard-output
+                       (call-process "ps" nil t nil "-o" "pgid=" "-p" pid))))))
+        (message ">>> Sending catalina.sh stop...")
+        (start-process-shell-command "tomcat-stop" "*tomcat-stop*"
+                                     (concat catalina " stop"))
+        (run-with-timer 3 nil #'tomcat--shutdown-escalate pgid 0)))))
+
+(defun tomcat-build-and-deploy (debug)
+  "Run 'mvn package -DskipTests' then deploy the WAR to Tomcat.
+With prefix argument DEBUG, enable JPDA remote debugging on port 8000.
+Mirrors IDEA's Run button: build in background, then hot-deploy."
+  (interactive "P")
+  (let* ((details (detect-project-home-and-name))
+         (home (plist-get details :home))
+         (build-buf "*tomcat-mvn-build*")
+         (cmd (format "cd %s && mvn package -DskipTests"
+                      (shell-quote-argument (directory-file-name home)))))
+    (message "Building project (mvn package -DskipTests)...")
+    (set-process-sentinel
+     (start-process-shell-command "tomcat-mvn-build" build-buf cmd)
+     (lambda (proc _event)
+       (if (= 0 (process-exit-status proc))
+           (progn
+             (message "Build succeeded. Deploying to Tomcat...")
+             (copy-war-and-manage-tomcat debug))
+         (message "Maven build FAILED. See %s for details." build-buf))))))
 
 
 (defun tkj/java-decompile-class ()
