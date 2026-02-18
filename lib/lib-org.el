@@ -3,10 +3,8 @@
 ;;; Code:
 
 ;; Save the corresponding buffers
-(defun log-todo-next-creation-date (&rest ignore)
-  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'.
-
-IGNORE is a placeholder for any arguments passed to this function."
+(defun log-todo-next-creation-date (&rest _)
+  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'."
   (when (and (string= (org-get-todo-state) "NEXT")
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))

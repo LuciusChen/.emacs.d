@@ -86,7 +86,7 @@ the built-in VC log view instead."
   (apply orig-fun args)
   (delete-other-windows))
 
-(defun magit-restore-screen (&rest args)
+(defun magit-restore-screen (&rest _)
   (jump-to-register :magit-fullscreen))
 
 (defun kill-all-blob-next-after-quit (orig-fun &rest args)
