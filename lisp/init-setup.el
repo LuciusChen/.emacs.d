@@ -24,10 +24,10 @@ See `advice-add' for more details."
 
 (setup-define :load-after
   (lambda (&rest features)
-    (let ((body `(require ',(setup-get 'feature))))
-      (dolist (feature (nreverse features))
-        (setq body `(with-eval-after-load ',feature ,body)))
-      body))
+    (cl-loop with body = `(require ',(setup-get 'feature))
+             for feature in (nreverse features)
+             do (setq body `(with-eval-after-load ',feature ,body))
+             finally return body))
   :documentation "Load the current feature after FEATURES.")
 
 (setup-define :face
