@@ -189,13 +189,16 @@ E.g. \"1.8\" -> \"8\", \"11\" -> \"11\", \"17\" -> \"17\"."
 (defun mapper-find-xml ()
   "Jump from a Java mapper file to the corresponding XML mapper file.
 If the cursor is on a method name in the Java file, jump to the corresponding
-method definition in the XML file."
+method definition in the XML file.
+The origin position is pushed onto the xref marker stack so \\[xref-go-back]
+returns here, consistent with `eglot-find-implementation'."
   (interactive)
   (let* ((java-file (buffer-file-name))
          (xml-file (concat (file-name-sans-extension java-file) ".xml"))
          (method-name (thing-at-point 'symbol t)))
     (if (file-exists-p xml-file)
         (progn
+          (xref-push-marker-stack)
           (find-file xml-file)
           (goto-char (point-min))
           (if (re-search-forward (concat "id=\"\\(" method-name "\\)\"") nil t)
