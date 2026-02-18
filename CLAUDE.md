@@ -1,0 +1,44 @@
+# Elisp Best Practices for Emacs Config
+
+## No Side Effects on Load
+
+Loading a file should not alter Emacs behavior. All behavior activation must be explicit (user calls a command or enables a mode).
+
+## Naming
+
+- **Public functions**: use a consistent personal prefix (e.g., `my/` or `my-`). No double dash for public symbols.
+- **Internal/private**: double-dash prefix (e.g., `my--helper`). Never call from outside the defining file.
+- **Predicates**: multi-word names end in `-p` (e.g., `my--buffer-visible-p`).
+- **Unused args**: prefix with `_` (e.g., `(_event)`).
+
+## Control Flow
+
+- Avoid deep `let` → `if` → `let` chains. Favor flat, linear control flow using `if-let*`, `when-let*`, or similar constructs whenever possible.
+- Use `pcase`/`pcase-let` for structured destructuring instead of nested `car`/`cdr`/`nth`.
+- Prefer `cl-loop` over manual `dolist` + accumulator, or `cl-reduce`, when building lists with complex iteration logic. `cl-reduce` is acceptable for simple single-operation folds (e.g., summing a list), but `cl-loop` is clearer when the logic involves multiple steps, conditionals, or accumulating into a non-trivial structure.
+
+## Error Handling
+
+- **`user-error`** for user-caused problems. Does NOT trigger `debug-on-error`.
+- **`error`** for programmer bugs only.
+- **`condition-case`** to handle recoverable errors. Wrap non-essential operations so errors never block primary results.
+- Error messages should state what is wrong, not what should be (e.g., "Not connected" not "Must be connected").
+
+## State Management
+
+- **`defvar-local`** for all per-buffer state. Set with `setq-local` in mode bodies.
+- **Plain `defvar`** for global/shared state.
+- **`defcustom`** for all user-configurable values. Always specify `:type` precisely (`natnum`, `string`, `boolean`, `(choice ...)`) and `:group`.
+
+## Function Design
+
+- Keep functions under ~30 lines. Extract helpers when a function exceeds this.
+- Name extracted helpers to describe WHAT they compute, not WHERE they're called from.
+- Pure computation (no side effects) should be separate from display (buffer mutation).
+- Interactive commands should be thin wrappers: validate input, call internal function, show feedback.
+
+## Quality Checks
+
+- Every file starts with `;;; -*- lexical-binding: t; -*-`.
+- Run `byte-compile-file` to ensure no warnings.
+- All public functions have docstrings.
