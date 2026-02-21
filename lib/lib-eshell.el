@@ -79,7 +79,6 @@ Stole from aweshell"
     (unless existing-buffer
       (kill-buffer buffer))
     nil))
-(advice-add 'eshell/cat :override #'eshell/cat-with-syntax-highlighting)
 
 (defun +sync-dir-in-buffer-name ()
   "Update eshell buffer to show directory path using built-in project.el."

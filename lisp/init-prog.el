@@ -404,6 +404,7 @@
     (:also-load esh-mode)
     (:also-load lib-eshell)
     (:also-load nerd-icons)
+    (advice-add 'eshell/cat :override #'eshell/cat-with-syntax-highlighting)
     (setopt eshell-prompt-function 'eshell-prompt-multiline
             eshell-highlight-prompt nil
             eshell-banner-message ""
