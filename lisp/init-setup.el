@@ -7,8 +7,10 @@
 (setup-define :defer
   (lambda (features)
     `(run-with-idle-timer 1 nil
-                          (lambda ()
-                            ,features)))
+       (lambda ()
+         (let ((gc-cons-threshold most-positive-fixnum)
+               (inhibit-message t))
+           ,features))))
   :documentation "Delay loading the feature until a certain amount of idle time has passed."
   :repeatable t)
 
@@ -28,7 +30,8 @@ See `advice-add' for more details."
              for feature in (nreverse features)
              do (setq body `(with-eval-after-load ',feature ,body))
              finally return body))
-  :documentation "Load the current feature after FEATURES.")
+  :documentation "Load the current feature after FEATURES have been loaded."
+  :debug '(&rest symbolp))
 
 (setup-define :face
   (lambda (face spec) `(custom-set-faces (quote (,face ,spec))))
