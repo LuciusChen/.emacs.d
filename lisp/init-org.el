@@ -89,7 +89,6 @@
 (setup org-archive
   (:when-loaded
     (:also-load lib-org-archive-hierachical)
-    (setq org-archive-default-command 'org-archive-subtree-hierarchical)
     (setopt org-archive-mark-done nil
             org-archive-location "%s_archive::* Archive"
             org-archive-default-command 'org-archive-subtree-hierarchical)))
