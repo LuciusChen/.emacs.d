@@ -20,7 +20,7 @@
           (add-to-list 'yank-media-preferred-types 'image/tiff)))
     (setopt org-directory ORG-PATH
             org-image-actual-width nil
-            org-edit-src-content-indentation 0
+            org-src-content-indentation 0
             org-goto-interface 'outline-path-completion
             org-log-done 'time
             org-edit-timestamp-down-means-later t
