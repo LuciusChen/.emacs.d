@@ -4,15 +4,67 @@
 
 (require 'setup)
 
+(defvar setup--defer-queue nil
+  "Queue of thunks to run incrementally during idle time.")
+
+(defvar setup--defer-timer nil
+  "The currently scheduled idle timer for draining `setup--defer-queue'.")
+
+(defun setup--run-deferred ()
+  "Process one item from `setup--defer-queue', yielding to user input.
+Reschedules itself until the queue is empty."
+  (when-let* ((thunk (pop setup--defer-queue)))
+    (condition-case err
+        (when (while-no-input
+                (let ((gc-cons-threshold most-positive-fixnum)
+                      (inhibit-message t))
+                  (funcall thunk))
+                nil)
+          ;; Interrupted by input: put it back and retry later.
+          (push thunk setup--defer-queue))
+      (error (message "Deferred load error: %s" err)))
+    (when setup--defer-queue
+      (setq setup--defer-timer
+            (run-with-idle-timer 0.5 nil #'setup--run-deferred)))))
+
+(defun setup--preload-packages (packages)
+  "Incrementally preload PACKAGES during idle time.
+Each package is loaded one at a time, chained via idle timers.
+Yields to user input via `while-no-input'."
+  (when-let* ((req (pop packages)))
+    (condition-case err
+        (when (while-no-input
+                (let ((gc-cons-threshold most-positive-fixnum)
+                      (inhibit-message t)
+                      (file-name-handler-alist
+                       (list (rassq 'jka-compr-handler
+                                    file-name-handler-alist))))
+                  (require req nil t))
+                nil)
+          (push req packages))
+      (error
+       (message "Preload error: failed to load %S: %s" req err)))
+    (when packages
+      (run-with-idle-timer 1.5 nil #'setup--preload-packages packages))))
+
 (setup-define :defer
-  (lambda (features)
-    `(run-with-idle-timer 1 nil
-       (lambda ()
-         (let ((gc-cons-threshold most-positive-fixnum)
-               (inhibit-message t))
-           ,features))))
-  :documentation "Delay loading the feature until a certain amount of idle time has passed."
+  (lambda (body)
+    `(progn
+       (setq setup--defer-queue
+             (nconc setup--defer-queue (list (lambda () ,body))))
+       (unless (and setup--defer-timer
+                    (memq setup--defer-timer timer-idle-list))
+         (setq setup--defer-timer
+               (run-with-idle-timer 1 nil #'setup--run-deferred)))))
+  :documentation "Queue BODY to run during idle time, one item at a time, yielding to user input."
   :repeatable t)
+
+(setup-define :preload
+  (lambda (&rest packages)
+    `(run-with-idle-timer 1.5 nil #'setup--preload-packages ',packages))
+  :documentation "After the current feature loads, incrementally preload PACKAGES during idle time."
+  :debug '(&rest symbolp)
+  :after-loaded t)
 
 (setup-define :advice
   (lambda (symbol where function)
@@ -40,33 +92,6 @@ See `advice-add' for more details."
   :debug '(setup)
   :repeatable t
   :after-loaded t)
-
-;; :set-font 来自下面这两个函数
-;;
-;; (defun set-buffer-font (font face-name)
-;;   "Set the current buffer's font to FONT using FACE-NAME."
-;;   (unless (facep face-name)
-;;     (make-face face-name))
-;;   (set-face-attribute face-name nil :font font)
-;;   (setq buffer-face-mode-face face-name)
-;;   (buffer-face-mode))
-;;
-;; (defun set-font-for-modes (font-alist)
-;;   "Set fonts for different modes based on FONT-ALIST."
-;;   (dolist (entry font-alist)
-;;     (let ((mode (car entry))
-;;           (font (cdr entry)))
-;;       (add-hook (intern (format "%s-hook" mode))
-;;                 (lambda ()
-;;                   (let ((face-name (intern (format "%s-font-face" mode))))
-;;                     (set-buffer-font font face-name)))))))
-;;
-;; (set-font-for-modes
-;;    `((vterm-mode . ,*term-default-font*)
-;;      (nxml-mode  . ,*prog-font*)
-;;      (org-mode   . ,ORG-FONT)
-;;      (latex-mode . ,*prog-font*)
-;;      (prog-mode  . ,*prog-font*)))
 
 (setup-define :set-font
   (lambda (font)
