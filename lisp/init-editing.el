@@ -241,8 +241,6 @@
               goggles--delta 0))))
   (:advice goggles--post-command :override #'+goggles--post-command))
 
-(setup speed-type (:defer (:require speed-type)))
-
 (setup ultra-scroll
   (:defer (:require ultra-scroll))
   (:when-loaded

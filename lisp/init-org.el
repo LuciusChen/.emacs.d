@@ -4,6 +4,7 @@
 
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
+  (:defer (:require org))
   (keymap-global-set "C-c L"       'org-store-link)
   (keymap-global-set "C-c C-o"     'org-open-at-point)
   (keymap-global-set "C-M-<up>"    'org-up-element)
@@ -11,9 +12,9 @@
   ;; Wrong type argument: commandp, dired-copy-images-links
   (keymap-global-set "C-c n m"     'dired-copy-images-links)
   (keymap-global-set "C-c b"       'org-cite-insert)
+  (:preload ob-core org-clock ox-latex bibtex org-agenda org-habit)
   (:when-loaded
     (:also-load lib-org)
-    (:also-load image-slicing)
     (:with-feature yank-media
         (:when-loaded
           (:with-mode org-mode (:bind "C-c C-v" yank-media))
@@ -94,7 +95,6 @@
             org-archive-default-command 'org-archive-subtree-hierarchical)))
 
 (setup org-clock
-  (:load-after org)
   (keymap-global-set "C-c o j" 'org-clock-goto)
   (keymap-global-set "C-c o l" 'org-clock-in-last)
   (keymap-global-set "C-c o i" 'org-clock-in)
@@ -111,7 +111,6 @@
     (org-clock-persistence-insinuate)))
 
 (setup ob-core
-  (:load-after org)
   (:when-loaded
     (:also-load ob-plantuml
                 ob-python
@@ -217,7 +216,6 @@
         (:hook org-sort-second-level-entries-by-time)))))
 
 (setup ox-latex
-  (:load-after org)
   (:when-loaded
     (setopt
      org-latex-pdf-process '("latexmk -f -xelatex -shell-escape -output-directory=%o %F")
@@ -436,7 +434,6 @@
       (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t)))))
 
 (setup org-habit
-  (:load-after org-agenda)
   (:when-loaded
     (setopt org-habit-following-days 1
             org-habit-preceding-days 7
@@ -451,7 +448,6 @@
         (setcdr agenda-sorting-strategy (remove 'habit-down (cdr agenda-sorting-strategy)))))))
 
 (setup bibtex
-  (:load-after org)
   (:when-loaded
     (setopt bibtex-file-path (concat ORG-PATH "/bib/")
             bibtex-files '("bibtex.bib")

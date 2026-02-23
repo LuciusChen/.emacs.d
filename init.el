@@ -80,7 +80,6 @@
         (gt :host github :repo "LuciusChen/gt.el")
         (telega :host github :repo "LuciusChen/telega.el")
         (panel :host github :repo "LuciusChen/panel")
-        (image-slicing :host github :repo "ginqi7/image-slicing")
         (emt :host github :repo "roife/emt")
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
