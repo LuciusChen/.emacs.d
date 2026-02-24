@@ -428,5 +428,18 @@
   (:load-after esh-mode)
   (:when-loaded (eshell-syntax-highlighting-global-mode +1)))
 
+(setup clutch
+  (setopt clutch-connection-alist
+          '(("zj_test" .
+             (:host "192.168.1.225"
+                    :port 3306
+                    :user "cjh_test_225"
+                    :database "zj_test"))
+            ("zj_oil" .
+             (:host "47.102.194.129"
+                    :port 3306
+                    :user "zj_oil"
+                    :database "zj_oil")))))
+
 (provide 'init-prog)
 ;;; init-prog.el ends here
