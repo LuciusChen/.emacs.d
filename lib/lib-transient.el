@@ -1,6 +1,7 @@
 ;; lib-transient.el --- Initialize org	-*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
+
 ;; 打开当前日期对应的 daily log 文件
 (defun +delete-archived-daily-log-files ()
   "Delete Daily log files that have no titles in them."
@@ -21,14 +22,6 @@
     (when deleted-files
       (message "Deleted archived daily log file: %s" (string-join deleted-files ", ")))))
 
-(defun agenda-files-switcher (&optional args)
-  "Open an agenda file based on ARGS.
-
-ARGS should be a list where the first element is the name of the agenda file
-to open.  The files are located in the '/agenda/' directory."
-  (interactive (list (transient-args 'agenda-transient)))
-  (find-file  (concat ORG-PATH "/agenda/" (car args))))
-
 (defun journal-options (&optional args)
   "Perform various journal-related actions based on ARGS.
 
@@ -43,8 +36,7 @@ that can include:
 
 The files are located in the directory specified by `file-path-prefix`."
   (interactive (list (transient-args 'journal-transient)))
-  (let ((file-path-prefix (concat ORG-PATH "/denote/daily/"))
-        (today-date-string (format-time-string "%Y-%m-%d" (current-time))))
+  (let ((file-path-prefix (concat ORG-PATH "/denote/daily/")))
     (cond ((member "journal.org" args)
            (find-file (concat file-path-prefix (car args))))
           ((member "delete" args)
