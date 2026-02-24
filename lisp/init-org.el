@@ -130,6 +130,7 @@
 
 (setup denote
   (:defer (:require denote))
+  (:preload denote-journal)
   (:when-loaded
     (keymap-global-set "C-c n n" 'denote-open-or-create)
     (keymap-global-set "C-c n d" 'denote-sort-dired)
@@ -159,7 +160,6 @@
     (denote-rename-buffer-mode 1)))
 
 (setup denote-journal
-  (:load-after denote)
   (:when-loaded
     (:also-load lib-weather)
     (setopt denote-journal-directory (expand-file-name "daily" denote-directory)
@@ -509,9 +509,7 @@
             citar-bibliography org-cite-global-bibliography)))
 
 (setup org-modern
-  (:load-after org)
-  (:when-loaded
-    (:with-mode org-mode
+  (:with-mode org-mode
       (:hook org-modern-mode)
       (:hook (lambda ()
                "Beautify Org Checkbox Symbol"
@@ -519,6 +517,7 @@
                (push '("[X]" . "☑" ) prettify-symbols-alist)
                (push '("[-]" . #("□–" 0 2 (composition ((2))))) prettify-symbols-alist)
                (prettify-symbols-mode))))
+  (:when-loaded
     (setopt org-modern-star 'replace
             org-modern-replace-stars "❑❍❑❍❑❍"
             org-modern-list '((?+ . "◦")

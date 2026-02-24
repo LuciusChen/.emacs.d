@@ -16,6 +16,7 @@
     (diminish 'auto-revert-mode)))
 
 (setup magit
+  (:preload magit-log forge)
   (:when-loaded
     (:also-load lib-magit)
     (:with-map magit-status-mode-map
@@ -59,7 +60,6 @@
 
 (setup magit-log
   ;; When a line or region is selected, =magit-log-buffer-file= displays the Git history of the selected region.
-  (:load-after magit)
   (:when-loaded
     ;; Set `magit-log-margin' value in :init as many other variables will be
     ;; dynamically set based on its value when `magit-log' is loaded.
@@ -76,7 +76,6 @@
   ;; =forge-copy-url-at-point-as-kill= Copy a (web) link to
   ;; the current file if the region isn't active and will copy
   ;; a permalink to the selected lines if the region /is/ active.
-  (:load-after magit)
   (:when-loaded
     ;; Make it easier to see that a topic was closed.
     (:face forge-topic-closed ((t (:strike-through t))))
