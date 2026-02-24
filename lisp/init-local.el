@@ -32,5 +32,17 @@
 ;;     ;; Open in Inkscape
 ;;     (start-process "inkscape" nil "inkscape" fullpath)))
 
+(setup (:if-feature tramp)
+  (:option tramp-default-method "ssh"
+           tramp-chunksize 500
+           tramp-persistency-file-name
+           (expand-file-name "tramp" user-emacs-directory)
+           password-cache-expiry 3600)
+
+  (:option vc-ignore-dir-regexp
+           (format "\\(%s\\)\\|\\(%s\\)"
+                   vc-ignore-dir-regexp
+                   tramp-file-name-regexp)))
+
 (provide 'init-local)
 ;;; init-local.el ends here

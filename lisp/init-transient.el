@@ -59,7 +59,7 @@
         ("si" "Info"         dape-info         :transient t)
         ("sm" "Memory"       dape-read-memory  :transient t)
         ("ss" "Select Stack" dape-select-stack :transient t)
-        ("R" "Repl"          dape-repl         :transient t)]
+        ("sr" "Repl"         dape-repl         :transient t)]
        ["Quit"
         ("qq" "Quit" dape-quit :transient nil)
         ("qk" "Kill" dape-kill :transient nil)]])
