@@ -9,9 +9,12 @@
 
 (defconst IS-MAC (eq system-type 'darwin))
 (defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst DROPBOX-PATH
+  (expand-file-name
+   (cond (IS-MAC "~/Library/CloudStorage/Dropbox")
+         (IS-LINUX "~/Dropbox"))))
 (defconst ORG-PATH
-  (cond (IS-MAC "~/Library/CloudStorage/Dropbox/org")
-        (IS-LINUX "~/Dropbox/org")))
+  (expand-file-name "org" DROPBOX-PATH))
 (defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst FONT-SIZE (if IS-MAC 14 12))
 (defconst DEFAULT-FONT (format "MonoLisa Lucius %d" FONT-SIZE))

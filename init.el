@@ -19,9 +19,11 @@
 
 (defconst IS-MAC (eq system-type 'darwin))
 (defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
-(defconst ORG-PATH
-  (cond (IS-MAC "~/Library/CloudStorage/Dropbox/org")
-        (IS-LINUX "~/Dropbox/org")))
+(defconst DROPBOX-PATH
+  (expand-file-name
+   (cond (IS-MAC "~/Library/CloudStorage/Dropbox")
+         (IS-LINUX "~/Dropbox"))))
+(defconst ORG-PATH (expand-file-name "org" DROPBOX-PATH))
 (defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst FONT-SIZE (if IS-MAC 14 13))
 (defconst DEFAULT-FONT (format "PragmataPro %d" FONT-SIZE))
@@ -77,6 +79,9 @@
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
+        (passages :host github :repo "LuciusChen/passages")
+        (clutch :host github :repo "LuciusChen/clutch")
+        (lexdb :host github :repo "LuciusChen/lexdb")
         (gt :host github :repo "LuciusChen/gt.el")
         (telega :host github :repo "LuciusChen/telega.el")
         (panel :host github :repo "LuciusChen/panel")
