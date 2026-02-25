@@ -126,8 +126,9 @@ Returns:
 ;; The following code is used when starting a Spring + Servlet (Tomcat) container.
 (defcustom tomcat-port 8080
   "The port number that Tomcat server listens on."
-  :type 'integer
+  :type 'natnum
   :group 'tomcat)
+
 
 ;; Multiple JDK versions are installed locally,
 ;; especially when older code cannot be compiled with newer versions,
@@ -299,29 +300,37 @@ If no matching version is found, prompt the user to choose."
 (defvar +tomcat-status nil
   "Current Tomcat server status: nil (off), `starting', `running', or `failed'.")
 
+(defvar +tomcat--mode-line nil
+  "Cached mode-line string for Tomcat status; updated by `tomcat--set-status'.")
+(put '+tomcat--mode-line 'risky-local-variable t)
+
 (defun tomcat--set-status (status)
-  "Set `+tomcat-status' to STATUS and refresh the tab bar."
-  (setq +tomcat-status status)
+  "Set `+tomcat-status' to STATUS and refresh the mode line and tab bar."
+  (setq +tomcat-status status
+        +tomcat--mode-line
+        (pcase status
+          ('starting
+           (concat " "
+                   (nerd-icons-faicon "nf-fa-circle_o_notch"
+                                      :face '(:inherit nerd-icons-yellow))
+                   (propertize " Starting…" 'face '(:inherit nerd-icons-yellow))))
+          ('running
+           (concat " "
+                   (nerd-icons-faicon "nf-fa-cat"
+                                      :face '(:inherit nerd-icons-green))
+                   (propertize (format " :%d" tomcat-port)
+                               'face '(:inherit nerd-icons-green))))
+          ('failed
+           (concat " "
+                   (nerd-icons-faicon "nf-fa-exclamation_triangle"
+                                      :face '(:inherit nerd-icons-red))
+                   (propertize " Failed!" 'face '(:inherit nerd-icons-red))))
+          (_ nil)))
   (force-mode-line-update t))
 
-(defun +tab-bar-tomcat-status ()
-  "Return a tab-bar segment reflecting the current Tomcat status.
-Add `+tab-bar-tomcat-status' to `tab-bar-format' to display a persistent
-server indicator, similar to the Telega icon."
-  (pcase +tomcat-status
-    ('starting
-     (concat (nerd-icons-faicon "nf-fa-circle_o_notch"
-                                :face '(:inherit nerd-icons-yellow))
-             (propertize " Starting…" 'face '(:inherit nerd-icons-yellow))))
-    ('running
-     (concat (nerd-icons-faicon "nf-fa-server"
-                                :face '(:inherit nerd-icons-green))
-             (propertize (format " :%d" tomcat-port)
-                         'face '(:inherit nerd-icons-green))))
-    ('failed
-     (concat (nerd-icons-faicon "nf-fa-exclamation_triangle"
-                                :face '(:inherit nerd-icons-red))
-             (propertize " Tomcat!" 'face '(:inherit nerd-icons-red))))))
+;; Register the mode-line indicator once at load time.
+(add-to-list 'mode-line-misc-info '+tomcat--mode-line t)
+
 
 (defun tomcat--notify-ready (debug)
   "Send a desktop notification that Tomcat is ready.
@@ -355,24 +364,10 @@ DEBUG non-nil means JPDA mode is active."
                  (if debug " [JPDA :8000]" "")
                  tomcat-port)))))
 
-(defun tomcat--poll-ready (remaining debug buf-name)
-  "Async fallback: poll port every second up to REMAINING times, then give up."
-  (cond
-   ((port-open-p "localhost" tomcat-port)
-    (tomcat--set-status 'running)
-    (tomcat--notify-ready debug)
-    (message "Tomcat running%s → http://localhost:%d"
-             (if debug " [JPDA :8000]" "")
-             tomcat-port))
-   ((> remaining 0)
-    (run-with-timer 1 nil #'tomcat--poll-ready (1- remaining) debug buf-name))
-   (t
-    (tomcat--set-status 'failed)
-    (message "Tomcat may have failed to start. Check %s buffer." buf-name))))
-
 (defun tomcat--do-start (proc-name buf-name start-cmd debug)
   "Start Tomcat process PROC-NAME in BUF-NAME using START-CMD.
-Sets up log-watching filter, process exit sentinel, and async port poll fallback."
+Status becomes `running' only when \"Server startup in\" appears in the log.
+Status returns to nil when the process exits (crash or stop)."
   (message "Starting Tomcat%s..." (if debug " with JPDA" ""))
   (tomcat--set-status 'starting)
   (let ((proc (start-process-shell-command proc-name buf-name start-cmd)))
@@ -382,8 +377,7 @@ Sets up log-watching filter, process exit sentinel, and async port poll fallback
                             (when (string-match-p
                                    (rx (or "finished" "exited" "failed" "killed"))
                                    event)
-                              (tomcat--set-status nil))))
-    (run-with-timer 3 nil #'tomcat--poll-ready tomcat-startup-timeout debug buf-name)))
+                              (tomcat--set-status nil))))))
 
 (defun tomcat--wait-shutdown-then-start (proc-name buf-name start-cmd debug remaining)
   "Poll until Tomcat port closes, then call `tomcat--do-start'.
@@ -425,30 +419,10 @@ Otherwise also run Tomcat in foreground, logs go to *tomcat-start* buffer."
       (tomcat-safe-shutdown)
       (sleep-for 2))
 
-    ;; Startup Tomcat
-    (let* ((buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
-           (proc (start-process-shell-command
-                  (if debug "tomcat-debug" "tomcat-start")
-                  buf-name
-                  startup-command)))
-      (set-process-filter proc
-                          (lambda (p output)
-                            (with-current-buffer (process-buffer p)
-                              (goto-char (point-max))
-                              (insert output)
-                              (tomcat-truncate-buffer (current-buffer) 5000)))))
-
-    ;; Retry loop for port availability
-    (let ((tries 40) (ok nil))
-      (while (and (> tries 0) (not ok))
-        (sleep-for 1)
-        (setq tries (1- tries))
-        (setq ok (port-open-p "localhost" tomcat-port)))
-      (if ok
-          (message "Deployment successful, Tomcat running%s."
-                   (if debug " with JPDA debugging" ""))
-        (message "Tomcat may have failed to start. Check %s buffer for logs."
-                 (if debug "*tomcat-debug*" "*tomcat-start*"))))))
+    ;; Startup Tomcat (async; notifies on "Server startup in" log line)
+    (let ((buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
+          (proc-name (if debug "tomcat-debug" "tomcat-start")))
+      (tomcat--do-start proc-name buf-name startup-command debug))))
 
 (defun tomcat-safe-shutdown ()
   "Safely shutdown Tomcat, like IDEA does.
