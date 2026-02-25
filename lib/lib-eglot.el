@@ -346,7 +346,7 @@ Falls back silently if the notification system is unavailable."
 
 (defun tomcat--startup-filter (debug)
   "Return a process filter that streams output and notifies on Tomcat startup.
-Watches for 'Server startup in' in logs — the same signal IDEA uses.
+Watches for \"Server startup in\" in logs — the same signal IDEA uses.
 DEBUG non-nil means JPDA mode is active."
   (let ((notified nil))
     (lambda (proc output)
@@ -464,7 +464,7 @@ Try catalina.sh stop first, wait 2s, then kill process group if needed."
               (message ">>> Tomcat force killed."))))))))
 
 (defun tomcat-build-and-deploy (debug)
-  "Run 'mvn package -DskipTests' then deploy the WAR to Tomcat.
+  "Run \"mvn package -DskipTests\" then deploy the WAR to Tomcat.
 With prefix argument DEBUG, enable JPDA remote debugging on port 8000.
 Mirrors IDEA's Run button: build in background, then hot-deploy."
   (interactive "P")
