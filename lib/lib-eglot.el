@@ -126,8 +126,9 @@ Returns:
 ;; The following code is used when starting a Spring + Servlet (Tomcat) container.
 (defcustom tomcat-port 8080
   "The port number that Tomcat server listens on."
-  :type 'integer
+  :type 'natnum
   :group 'tomcat)
+
 
 ;; Multiple JDK versions are installed locally,
 ;; especially when older code cannot be compiled with newer versions,
@@ -189,13 +190,16 @@ E.g. \"1.8\" -> \"8\", \"11\" -> \"11\", \"17\" -> \"17\"."
 (defun mapper-find-xml ()
   "Jump from a Java mapper file to the corresponding XML mapper file.
 If the cursor is on a method name in the Java file, jump to the corresponding
-method definition in the XML file."
+method definition in the XML file.
+The origin position is pushed onto the xref marker stack so \\[xref-go-back]
+returns here, consistent with `eglot-find-implementation'."
   (interactive)
   (let* ((java-file (buffer-file-name))
          (xml-file (concat (file-name-sans-extension java-file) ".xml"))
          (method-name (thing-at-point 'symbol t)))
     (if (file-exists-p xml-file)
         (progn
+          (xref-push-marker-stack)
           (find-file xml-file)
           (goto-char (point-min))
           (if (re-search-forward (concat "id=\"\\(" method-name "\\)\"") nil t)
@@ -293,6 +297,99 @@ If no matching version is found, prompt the user to choose."
         (when proc (delete-process proc) t))
     (error nil)))
 
+(defvar +tomcat-status nil
+  "Current Tomcat server status: nil (off), `starting', `running', or `failed'.")
+
+(defvar +tomcat--mode-line nil
+  "Cached mode-line string for Tomcat status; updated by `tomcat--set-status'.")
+(put '+tomcat--mode-line 'risky-local-variable t)
+
+(defun tomcat--set-status (status)
+  "Set `+tomcat-status' to STATUS and refresh the mode line and tab bar."
+  (setq +tomcat-status status
+        +tomcat--mode-line
+        (pcase status
+          ('starting
+           (concat " "
+                   (nerd-icons-faicon "nf-fa-circle_o_notch"
+                                      :face '(:inherit nerd-icons-yellow))
+                   (propertize " Starting…" 'face '(:inherit nerd-icons-yellow))))
+          ('running
+           (concat " "
+                   (nerd-icons-faicon "nf-fa-cat"
+                                      :face '(:inherit nerd-icons-green))
+                   (propertize (format " :%d" tomcat-port)
+                               'face '(:inherit nerd-icons-green))))
+          ('failed
+           (concat " "
+                   (nerd-icons-faicon "nf-fa-exclamation_triangle"
+                                      :face '(:inherit nerd-icons-red))
+                   (propertize " Failed!" 'face '(:inherit nerd-icons-red))))
+          (_ nil)))
+  (force-mode-line-update t))
+
+;; Register the mode-line indicator once at load time.
+(add-to-list 'mode-line-misc-info '+tomcat--mode-line t)
+
+
+(defun tomcat--notify-ready (debug)
+  "Send a desktop notification that Tomcat is ready.
+Falls back silently if the notification system is unavailable."
+  (condition-case nil
+      (notifications-notify
+       :title "Tomcat"
+       :body (format "Server ready%s → http://localhost:%d"
+                     (if debug " [JPDA :8000]" "")
+                     tomcat-port)
+       :urgency 'normal)
+    (error nil)))
+
+(defun tomcat--startup-filter (debug)
+  "Return a process filter that streams output and notifies on Tomcat startup.
+Watches for 'Server startup in' in logs — the same signal IDEA uses.
+DEBUG non-nil means JPDA mode is active."
+  (let ((notified nil))
+    (lambda (proc output)
+      (with-current-buffer (process-buffer proc)
+        (let ((inhibit-read-only t))
+          (goto-char (point-max))
+          (insert output)
+          (tomcat-truncate-buffer (current-buffer) 5000)))
+      (when (and (not notified)
+                 (string-match-p "Server startup in" output))
+        (setq notified t)
+        (tomcat--set-status 'running)
+        (tomcat--notify-ready debug)
+        (message "Tomcat ready%s → http://localhost:%d"
+                 (if debug " [JPDA :8000]" "")
+                 tomcat-port)))))
+
+(defun tomcat--do-start (proc-name buf-name start-cmd debug)
+  "Start Tomcat process PROC-NAME in BUF-NAME using START-CMD.
+Status becomes `running' only when \"Server startup in\" appears in the log.
+Status returns to nil when the process exits (crash or stop)."
+  (message "Starting Tomcat%s..." (if debug " with JPDA" ""))
+  (tomcat--set-status 'starting)
+  (let ((proc (start-process-shell-command proc-name buf-name start-cmd)))
+    (set-process-filter proc (tomcat--startup-filter debug))
+    (set-process-sentinel proc
+                          (lambda (_proc event)
+                            (when (string-match-p
+                                   (rx (or "finished" "exited" "failed" "killed"))
+                                   event)
+                              (tomcat--set-status nil))))))
+
+(defun tomcat--wait-shutdown-then-start (proc-name buf-name start-cmd debug remaining)
+  "Poll until Tomcat port closes, then call `tomcat--do-start'.
+Retries every second up to REMAINING times before giving up."
+  (cond
+   ((not (port-open-p "localhost" tomcat-port))
+    (tomcat--do-start proc-name buf-name start-cmd debug))
+   ((> remaining 0)
+    (run-with-timer 1 nil #'tomcat--wait-shutdown-then-start
+                    proc-name buf-name start-cmd debug (1- remaining)))
+   (t
+    (message "Tomcat did not stop within timeout. Aborting deploy."))))
 (defun copy-war-and-manage-tomcat (debug)
   "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
 If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground).
@@ -322,30 +419,10 @@ Otherwise also run Tomcat in foreground, logs go to *tomcat-start* buffer."
       (tomcat-safe-shutdown)
       (sleep-for 2))
 
-    ;; Startup Tomcat
-    (let* ((buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
-           (proc (start-process-shell-command
-                  (if debug "tomcat-debug" "tomcat-start")
-                  buf-name
-                  startup-command)))
-      (set-process-filter proc
-                          (lambda (p output)
-                            (with-current-buffer (process-buffer p)
-                              (goto-char (point-max))
-                              (insert output)
-                              (tomcat-truncate-buffer (current-buffer) 5000)))))
-
-    ;; Retry loop for port availability
-    (let ((tries 40) (ok nil))
-      (while (and (> tries 0) (not ok))
-        (sleep-for 1)
-        (setq tries (1- tries))
-        (setq ok (port-open-p "localhost" tomcat-port)))
-      (if ok
-          (message "Deployment successful, Tomcat running%s."
-                   (if debug " with JPDA debugging" ""))
-        (message "Tomcat may have failed to start. Check %s buffer for logs."
-                 (if debug "*tomcat-debug*" "*tomcat-start*"))))))
+    ;; Startup Tomcat (async; notifies on "Server startup in" log line)
+    (let ((buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
+          (proc-name (if debug "tomcat-debug" "tomcat-start")))
+      (tomcat--do-start proc-name buf-name startup-command debug))))
 
 (defun tomcat-safe-shutdown ()
   "Safely shutdown Tomcat, like IDEA does.
@@ -362,6 +439,7 @@ Try catalina.sh stop first, wait 2s, then kill process group if needed."
     (if (not pid)
         (message ">>> No Tomcat process found.")
       (progn
+        (tomcat--set-status nil)
         (message ">>> Trying catalina.sh stop...")
         (start-process-shell-command "tomcat-stop" buffer-name shutdown-command)
         (sleep-for 2)
@@ -384,6 +462,26 @@ Try catalina.sh stop first, wait 2s, then kill process group if needed."
             (if (tomcat--get-pid)
                 (message ">>> Failed to stop Tomcat.")
               (message ">>> Tomcat force killed."))))))))
+
+(defun tomcat-build-and-deploy (debug)
+  "Run 'mvn package -DskipTests' then deploy the WAR to Tomcat.
+With prefix argument DEBUG, enable JPDA remote debugging on port 8000.
+Mirrors IDEA's Run button: build in background, then hot-deploy."
+  (interactive "P")
+  (let* ((details (detect-project-home-and-name))
+         (home (plist-get details :home))
+         (build-buf "*tomcat-mvn-build*")
+         (cmd (format "cd %s && mvn package -DskipTests"
+                      (shell-quote-argument (directory-file-name home)))))
+    (message "Building project (mvn package -DskipTests)...")
+    (set-process-sentinel
+     (start-process-shell-command "tomcat-mvn-build" build-buf cmd)
+     (lambda (proc _event)
+       (if (= 0 (process-exit-status proc))
+           (progn
+             (message "Build succeeded. Deploying to Tomcat...")
+             (copy-war-and-manage-tomcat debug))
+         (message "Maven build FAILED. See %s for details." build-buf))))))
 
 
 (defun tkj/java-decompile-class ()
