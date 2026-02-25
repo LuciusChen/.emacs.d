@@ -25,7 +25,7 @@
          (IS-LINUX "~/Dropbox"))))
 (defconst ORG-PATH (expand-file-name "org" DROPBOX-PATH))
 (defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
-(defconst FONT-SIZE (if IS-MAC 14 13))
+(defconst FONT-SIZE (if IS-MAC 14 12))
 (defconst DEFAULT-FONT (format "PragmataPro %d" FONT-SIZE))
 (defconst ORG-FONT (format "PragmataPro %d" FONT-SIZE))
 (defconst ZH-DEFAULT-FONT "LXGW WenKai Screen")
