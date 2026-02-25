@@ -38,21 +38,21 @@ else
   git fetch
 fi
 
+BUILT_COMMIT_FILE="$TARGET_DIR/.built_commit"
+
 # If a commit hash is provided as an argument, checkout that commit
 if [ -n "$1" ]; then
   git checkout "$1"
 else
   git checkout master
+  git pull
   LOCAL=$(git rev-parse HEAD)
-  REMOTE=$(git rev-parse @{u})
+  BUILT=$(cat "$BUILT_COMMIT_FILE" 2>/dev/null)
 
-  # Check if local and remote are the same
-  if [ "$LOCAL" = "$REMOTE" ]; then
-    echo "Already up-to-date. No build needed."
+  if [ "$LOCAL" = "$BUILT" ]; then
+    echo "Already up-to-date and successfully built. No build needed."
     exit 0
   fi
-
-  git pull
 fi
 
 # Request sudo access only if build is required
@@ -73,4 +73,4 @@ else
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
 fi
 
-sudo cmake --build . --target install
+sudo cmake --build . --target install && git rev-parse HEAD > "$BUILT_COMMIT_FILE"
