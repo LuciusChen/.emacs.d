@@ -140,14 +140,14 @@
         (:chat-id "!JDky93zy3mmuljy6WwXNcsXIS2y1SbvDnwXjz7ZINsY" :type :matrix))
        -1001154313178                ; @coder_ot
        (6332621450                   ; @yamatrix_bridge_bot
-        (:chat-id "!hYCtHBRcjEMzEgnBOE:matrix.org" :type :matrix))
+        (:chat-id "!FYpmc5j4dCu8SywBUqi1IaaJ49XMOIL9iz0NZW5R6Ko" :type :matrix))
        -1001873425044                ; @Emacs_CN Lite
-       (420415423
+       (420415423                    ; @yamatrix_bridge_bot
         (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))
-       -1001031857103
+       -1001031857103                ; @archlinuxcn_group
        (5296957089                   ; @nichi_matrix_bot
         (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
-       -1001179606678
+       -1001179606678                ; @ArchlinuxCN_Appearance
        (5296957089                   ; @nichi_matrix_bot
         (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))))
     ;; ignore messages from blocked senders (users or chats)
