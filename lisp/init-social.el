@@ -146,10 +146,10 @@
         (:chat-id "!rWYkGlkTdVlOsniLSh:matrix.org" :type :matrix))
        -1001031857103                ; @archlinuxcn_group
        (5296957089                   ; @nichi_matrix_bot
-        (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
+        (:chat-id "!YkBCOsxHJvtzDSJCGa:nichi.co" :type :matrix))
        -1001179606678                ; @ArchlinuxCN_Appearance
        (5296957089                   ; @nichi_matrix_bot
-        (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))))
+        (:chat-id "!UdcRVLCUPlBpwjoUET:nichi.co" :type :matrix))))
     ;; ignore messages from blocked senders (users or chats)
     (:with-hook telega-msg-ignore-predicates
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))
