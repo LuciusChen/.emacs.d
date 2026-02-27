@@ -5,7 +5,7 @@
 (defun get-pass-entry (entry)
   "Get the first line of the pass entry.
 ENTRY is the name of the password store entry to retrieve."
-  (let ((output (shell-command-to-string (concat "pass show " entry " | head -n 1"))))
+  (let ((output (car (process-lines "pass" "show" entry))))
     (replace-regexp-in-string "\\`[ \t\n\r]+\\|[ \t\n\r]+\\'" "" output)))
 
 (defun check-and-update-authinfo (entries)
