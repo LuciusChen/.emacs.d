@@ -212,22 +212,5 @@
     ;; mu4e address completion
     (add-hook 'mu4e-compose-mode-hook 'company-mode)))
 
-(setup consult-mu
-  (:load-after mu4e)
-  (:when-loaded
-    (keymap-global-set "M-g m" 'consult-mu)
-    (setopt consult-mu-maxnum 200
-            consult-mu-preview-key 'any
-            consult-mu-mark-previewed-as-read nil
-            consult-mu-mark-viewed-as-read nil
-            consult-mu-action #'consult-mu--view-action
-            consult-mu-headers-template (lambda ()
-                                          (concat "%f"
-                                                  (number-to-string
-                                                   (floor (* (frame-width) 0.15)))
-                                                  "%s"
-                                                  (number-to-string
-                                                   (floor (* (frame-width) 0.5)))
-                                                  "%d13" "%g" "%x")))))
 (provide 'init-mu4e)
 ;;; init-mu4e.el ends here

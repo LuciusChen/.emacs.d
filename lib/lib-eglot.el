@@ -34,16 +34,17 @@
 
 (defun get-latest-lombok-jar ()
   "Return the path to the latest Lombok JAR file."
-  (let* ((lombok-dir (expand-file-name "~/.m2/repository/org/projectlombok/lombok/"))
-         (versions (directory-files lombok-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$"))
-         (latest-version-dir (car (last (sort versions
-                                              (lambda (a b)
-                                                (version< (file-name-nondirectory a)
-                                                          (file-name-nondirectory b))))))))
-    (when latest-version-dir
-      (car (directory-files latest-version-dir t "lombok-[0-9.]+\\.jar$")))))
+  (let ((lombok-dir (expand-file-name "~/.m2/repository/org/projectlombok/lombok/")))
+    (when (file-directory-p lombok-dir)
+      (let* ((versions (directory-files lombok-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$"))
+             (latest-version-dir (car (last (sort versions
+                                                  (lambda (a b)
+                                                    (version< (file-name-nondirectory a)
+                                                              (file-name-nondirectory b))))))))
+        (when latest-version-dir
+          (car (directory-files latest-version-dir t "lombok-[0-9.]+\\.jar$")))))))
 
-(defun custom-eglot-java-init-opts (server eglot-java-eclipse-jdt)
+(defun custom-eglot-java-init-opts (_server _eglot-java-eclipse-jdt)
   "Return custom initialization options for the Java language server.
 
 SERVER and EGLOT-JAVA-ECLIPSE-JDT are passed by Eglot."
@@ -54,18 +55,20 @@ SERVER and EGLOT-JAVA-ECLIPSE-JDT are passed by Eglot."
                   t "com.microsoft.java.debug.plugin-[0-9.]+\\.jar$" t)))]))
 
 (defvar jdtls-install-dir
-  (let ((base-dir (cond
-                   (IS-MAC "/opt/homebrew/Cellar/jdtls/")
-                   (IS-LINUX "~/.local/share/jdtls/"))))
-    (car (last (sort
-                (directory-files base-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$")
-                (lambda (a b)
-                  (version< (file-name-nondirectory a)
-                            (file-name-nondirectory b)))))))
+  (let* ((base-dir (cond
+                    (IS-MAC "/opt/homebrew/Cellar/jdtls/")
+                    (IS-LINUX "~/.local/share/jdtls/")))
+         (base-dir (and base-dir (expand-file-name base-dir))))
+    (when (and base-dir (file-directory-p base-dir))
+      (car (last (sort
+                  (directory-files base-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+                  (lambda (a b)
+                    (version< (file-name-nondirectory a)
+                              (file-name-nondirectory b))))))))
   "The installation directory of the latest jdtls version.")
 
 
-(defun jdtls-command-contact (&optional interactive)
+(defun jdtls-command-contact (&optional _interactive)
   "Construct the command to start JDTLS with appropriate options and arguments.
 
 Sets up JVM arguments, Lombok agent, and Java Debug plugin.
@@ -195,16 +198,20 @@ The origin position is pushed onto the xref marker stack so \\[xref-go-back]
 returns here, consistent with `eglot-find-implementation'."
   (interactive)
   (let* ((java-file (buffer-file-name))
-         (xml-file (concat (file-name-sans-extension java-file) ".xml"))
+         (xml-file (and java-file (concat (file-name-sans-extension java-file) ".xml")))
          (method-name (thing-at-point 'symbol t)))
-    (if (file-exists-p xml-file)
+    (if (and xml-file (file-exists-p xml-file))
         (progn
           (xref-push-marker-stack)
           (find-file xml-file)
           (goto-char (point-min))
-          (if (re-search-forward (concat "id=\"\\(" method-name "\\)\"") nil t)
-              (message "Jumped to method: %s" method-name)
-            (message "Method '%s' not found in XML file." method-name)))
+          (if method-name
+              (if (re-search-forward
+                   (concat "id=\"\\(" (regexp-quote method-name) "\\)\"")
+                   nil t)
+                  (message "Jumped to method: %s" method-name)
+                (message "Method '%s' not found in XML file." method-name))
+            (message "Opened XML file. Put point on Java method and retry to jump by id.")))
       (message "No corresponding XML file found."))))
 
 (defun select-java-home ()
@@ -217,8 +224,14 @@ updated so that the chosen JDK's `bin/` directory comes first."
          (choice (completing-read "Select JAVA_HOME: " candidates nil t)))
     ;; Set JAVA_HOME environment variable
     (setenv "JAVA_HOME" choice)
-    ;; Prepend its bin/ to PATH
-    (setenv "PATH" (concat (expand-file-name "bin/" choice) ":" (getenv "PATH")))
+    ;; Keep PATH stable when switching JAVA_HOME repeatedly.
+    (let* ((java-bin (directory-file-name (expand-file-name "bin/" choice)))
+           (path-list (split-string (or (getenv "PATH") "") path-separator t))
+           (path-list (seq-remove (lambda (p)
+                                    (string= (directory-file-name (expand-file-name p))
+                                             java-bin))
+                                  path-list)))
+      (setenv "PATH" (mapconcat #'identity (cons java-bin path-list) path-separator)))
     (message "JAVA_HOME set to %s" choice)))
 
 (defun maven-auto-select-java-home (&rest _)
@@ -241,7 +254,13 @@ If no matching version is found, prompt the user to choose."
                       candidates nil t))))
     (when choice
       (setenv "JAVA_HOME" choice)
-      (setenv "PATH" (concat (expand-file-name "bin/" choice) ":" (getenv "PATH")))
+      (let* ((java-bin (directory-file-name (expand-file-name "bin/" choice)))
+             (path-list (split-string (or (getenv "PATH") "") path-separator t))
+             (path-list (seq-remove (lambda (p)
+                                      (string= (directory-file-name (expand-file-name p))
+                                               java-bin))
+                                    path-list)))
+        (setenv "PATH" (mapconcat #'identity (cons java-bin path-list) path-separator)))
       (message "JAVA_HOME set to %s%s"
                choice
                (if jdk-version
@@ -266,8 +285,8 @@ If no matching version is found, prompt the user to choose."
   "Detect the project home directory and the project name based on the current project."
   (let ((project (project-current)))
     (if project
-        (list :name (project-name project) :home (cdr project))
-      (error "Could not determine the project root"))))
+        (list :name (project-name project) :home (project-root project))
+      (user-error "Could not determine the project root"))))
 
 (defun tomcat--get-pid ()
   "Return Tomcat PID string if running, else nil."
@@ -414,15 +433,15 @@ Otherwise also run Tomcat in foreground, logs go to *tomcat-start* buffer."
     ;; Copy the new WAR file
     (copy-file war-file webapps-path t)
 
-    ;; Shutdown Tomcat if running
-    (when (port-open-p "localhost" tomcat-port)
-      (tomcat-safe-shutdown)
-      (sleep-for 2))
-
     ;; Startup Tomcat (async; notifies on "Server startup in" log line)
     (let ((buf-name (if debug "*tomcat-debug*" "*tomcat-start*"))
           (proc-name (if debug "tomcat-debug" "tomcat-start")))
-      (tomcat--do-start proc-name buf-name startup-command debug))))
+      (if (port-open-p "localhost" tomcat-port)
+          (progn
+            (tomcat-safe-shutdown)
+            (tomcat--wait-shutdown-then-start
+             proc-name buf-name startup-command debug 30))
+        (tomcat--do-start proc-name buf-name startup-command debug)))))
 
 (defun tomcat-safe-shutdown ()
   "Safely shutdown Tomcat, like IDEA does.

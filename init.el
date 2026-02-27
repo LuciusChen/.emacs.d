@@ -91,7 +91,6 @@
         ;; (telega :host github :repo "zevlg/telega.el")
         (yasnippet :host github :repo "joaotavora/yasnippet")
         (indent-bars :host github :repo "jdtsmith/indent-bars")
-        (consult-mu :host github :repo "armindarvish/consult-mu")
         (eglot-booster :host github :repo "jdtsmith/eglot-booster")
         ;; (beancount-mode :host github :repo "beancount/beancount-mode")
         (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))))

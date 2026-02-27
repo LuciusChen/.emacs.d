@@ -319,21 +319,25 @@
       (:bind "C-c C-b" eglot-java-project-build-task
              "C-c C-B" (lambda () (interactive)(eglot-java-run-test t))
              "C-c C-t" eglot-code-actions
-             "C-c C-T" (lambda () (interactive)(copy-war-and-manage-tomcat t))
+             "C-c C-d" tomcat-build-and-deploy
              "C-c C-s" tomcat-safe-shutdown))
     ;; 对于低版本 JDK 需要先执行 select-java-home 设置 JAVA_HOME 后 build
     (setopt eglot-java-server-install-dir jdtls-install-dir
             eglot-java-default-task "clean install" ;; fork 了提了 pr 还未合并
             eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
-            eglot-java-eclipse-jdt-config-directory (concat jdtls-install-dir (if IS-MAC "/config_mac_arm/" "/config_linux/"))
-            eglot-java-eclipse-jdt-args `(,(concat "-javaagent:" (get-latest-lombok-jar))
-                                          "-Xmx8G"
-                                          ;; "-XX:+UseG1GC"
-                                          "-XX:+UseZGC"
-                                          "-XX:+UseStringDeduplication"
-                                          ;; "-XX:FreqInlineSize=325"
-                                          ;; "-XX:MaxInlineLevel=9"
-                                          "-XX:+UseCompressedOops")
+            eglot-java-eclipse-jdt-config-directory (when jdtls-install-dir
+                                                      (concat jdtls-install-dir
+                                                              (if IS-MAC "/config_mac_arm/" "/config_linux/")))
+            eglot-java-eclipse-jdt-args (let ((lombok (get-latest-lombok-jar)))
+                                          (append (when lombok
+                                                    (list (concat "-javaagent:" lombok)))
+                                                  '("-Xmx8G"
+                                                    ;; "-XX:+UseG1GC"
+                                                    "-XX:+UseZGC"
+                                                    "-XX:+UseStringDeduplication"
+                                                    ;; "-XX:FreqInlineSize=325"
+                                                    ;; "-XX:MaxInlineLevel=9"
+                                                    "-XX:+UseCompressedOops")))
             eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)
     ;; 项目利用 apheleia + google-java-format 格式化的是需要 JDK>17
     ;; 但是老项目需要 JAVA_HOME 设置低版本
