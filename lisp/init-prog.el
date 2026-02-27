@@ -435,7 +435,8 @@
                     :port 3306
                     :user "cjh_test_225"
                     :database "zj_test"))
-            ("zj_oil"    . (:backend mysql  :profile-entry "mysql/zj_oil")))))
+            ("zj_oil"    . (:backend mysql  :profile-entry "mysql/zj_oil"))
+            ("zj_online" . (:backend mysql  :profile-entry "mysql/zj_online")))))
 
 (provide 'init-prog)
 ;;; init-prog.el ends here
