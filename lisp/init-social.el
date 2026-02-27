@@ -62,6 +62,8 @@
      telega-emoji-use-images nil
      telega-notifications-msg-temex '(and (not outgoing)
                                           (not (chat (or (type channel))))
+                                          (not (type ChatAddMembers ChatJoinByLink ChatJoinByRequest))
+                                          (not (sender (user (username "MissRose_bot"))))
                                           (contains "dape\\|jdtls\\|eglot\\|meow\\|[eE]macs\\|telega\\|@Lucius_Chen"))
      ;; telega-msg-heading-with-date-and-status t
      ;; telega-debug t
