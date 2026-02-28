@@ -445,7 +445,7 @@
                     :user "zj_oil"
                     :database "zj_oil"))
             ("zj_online" .
-             (:host "rdsz3b1lqo3e15991sd7public.mysql.rds.aliyuncs.com"
+             (:host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com"
                     :port 3306
                     :user "zj_user"
                     :database "zj")))))
