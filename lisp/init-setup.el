@@ -30,22 +30,22 @@ Reschedules itself until the queue is empty."
 (defun setup--preload-packages (packages)
   "Incrementally preload PACKAGES during idle time.
 Each package is loaded one at a time, chained via idle timers.
-Yields to user input via `while-no-input'."
+Yields to user input between packages, never during `require'."
   (when-let* ((req (pop packages)))
-    (condition-case err
-        (when (while-no-input
-                (let ((gc-cons-threshold most-positive-fixnum)
-                      (inhibit-message t)
-                      (file-name-handler-alist
-                       (list (rassq 'jka-compr-handler
-                                    file-name-handler-alist))))
-                  (require req nil t))
-                nil)
-          (push req packages))
-      (error
-       (message "Preload error: failed to load %S: %s" req err)))
-    (when packages
-      (run-with-idle-timer 1.5 nil #'setup--preload-packages packages))))
+    (if (input-pending-p)
+        (run-with-idle-timer 1.5 nil #'setup--preload-packages (cons req packages))
+      (condition-case err
+          (unless (featurep req)
+            (let ((gc-cons-threshold most-positive-fixnum)
+                  (inhibit-message t)
+                  (file-name-handler-alist
+                   (list (rassq 'jka-compr-handler
+                                file-name-handler-alist))))
+              (require req nil t)))
+        (error
+         (message "Preload error: failed to load %S: %s" req err)))
+      (when packages
+        (run-with-idle-timer 1.5 nil #'setup--preload-packages packages)))))
 
 (setup-define :defer
   (lambda (body)
