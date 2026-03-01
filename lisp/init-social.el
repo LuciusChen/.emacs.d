@@ -80,7 +80,7 @@
      telega-symbols-emojify
      (cl-reduce (lambda (emojify key)
                   (assq-delete-all key emojify))
-                '(verified vertical-bar checkmark forum heavy-checkmark reply reply-quote horizontal-bar forward button-close)
+                '(verified vertical-bar checkmark forum heavy-checkmark reply reply-quote horizontal-bar forward button-close summarize-in summarize-out)
                 :initial-value telega-symbols-emojify)
      telega-symbol-button-close (nerd-icons-mdicon "nf-md-close_box_outline")
      telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
@@ -94,6 +94,8 @@
      telega-symbol-forward (nerd-icons-faicon "nf-fa-mail_forward")
      telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
+     telega-symbol-summarize-in (nerd-icons-octicon "nf-oct-fold")
+     telega-symbol-summarize-out (nerd-icons-octicon "nf-oct-unfold")
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
