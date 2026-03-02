@@ -167,7 +167,6 @@
     (:advice telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)
 
     (:with-mode telega-chat-mode
-      (:require company)
       (:hook +telega-completion-setup)
       (:hook (lambda () (electric-pair-local-mode -1))))
     (:with-mode telega-image-mode (:hook image-transform-fit-to-window))

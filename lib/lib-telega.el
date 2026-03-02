@@ -77,13 +77,22 @@ members whose candidates don't prefix-match the typed input."
               :exit-function #'+telega-username--exit)))))
 
 (defun +telega-completion-setup ()
-  (setq-local completion-at-point-functions
-              (append
-               (cons #'+telega-username-capf
-                     (mapcar #'cape-company-to-capf
-                             (remq 'telega-company-username telega-company-backends)))
-               completion-at-point-functions))
-  (corfu-mode 1))
+  (let ((capfs nil))
+    (when (fboundp '+telega-username-capf)
+      (push #'+telega-username-capf capfs))
+    ;; Convert telega company backends only when cape is available.
+    (when (and (require 'cape nil t)
+               (fboundp 'cape-company-to-capf)
+               (boundp 'telega-company-backends))
+      (dolist (backend (remq 'telega-company-username telega-company-backends))
+        (when (or (functionp backend)
+                  (and (symbolp backend) (fboundp backend)))
+          (push (cape-company-to-capf backend) capfs))))
+    (setq-local completion-at-point-functions
+          (append (nreverse capfs)
+                  completion-at-point-functions)))
+  (when (fboundp 'corfu-mode)
+    (corfu-mode 1)))
 
 (defun +telega-save-file-to-clipboard (msg)
   "Save file at point to clipboard.
