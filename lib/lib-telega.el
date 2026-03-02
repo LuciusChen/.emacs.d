@@ -8,11 +8,81 @@
     (xwidget-webkit-browse-url entry-link)))
 
 ;; 补全
+(defvar-local +telega-username-capf--cache nil
+  "Buffer-local cache for username CAPF.
+Persists across CAPF re-invocations so corfu re-triggers don't cause
+redundant telega--searchChatMembers calls on every keystroke.")
+
+(defun +telega-username--refresh-cache (str)
+  "Refresh username CAPF cache for STR when needed."
+  (let ((cached-str (plist-get +telega-username-capf--cache :str)))
+    (unless (equal str cached-str)
+      (let* ((cands (when (> (length str) 0)
+                      (telega-company-username 'candidates str)))
+             (lookup (make-hash-table :test #'equal)))
+        (dolist (cand cands)
+          ;; Keep first candidate for a display string, matching old `cl-find' behavior.
+          (puthash (substring-no-properties cand) cand lookup))
+        (setq +telega-username-capf--cache
+              (list :str str :cands cands :lookup lookup))))))
+
+(defun +telega-username--cached-candidate (c)
+  "Find original candidate object for completion string C."
+  (let ((lookup (plist-get +telega-username-capf--cache :lookup)))
+    (and (hash-table-p lookup)
+         (gethash c lookup))))
+
+(defun +telega-username--table (str pred action)
+  "Completion table for telega @-username CAPF."
+  (if (eq action 'metadata)
+      '(metadata (category . telega-username))
+    (+telega-username--refresh-cache str)
+    (let ((cands (plist-get +telega-username-capf--cache :cands)))
+      (if (eq action t)
+          (if pred (seq-filter pred cands) cands)
+        (complete-with-action action cands str pred)))))
+
+(defun +telega-username--annotate (c)
+  "Return annotation string for username candidate C."
+  (let* ((orig (+telega-username--cached-candidate c))
+         (member (or (and orig (get-text-property 0 'telega-member orig))
+                     (and (string-prefix-p "@" c)
+                          (telega-user--by-username c)))))
+    (when member
+      (telega-ins--as-string
+       (telega-ins "  ")
+       (telega-ins--msg-sender
+        member :with-avatar-p telega-company-username-show-avatars)))))
+
+(defun +telega-username--exit (c status)
+  "Run telega post-completion for candidate C given STATUS."
+  (when (memq status '(finished sole))
+    (let ((orig (+telega-username--cached-candidate c)))
+      (telega-company-username 'post-completion (or orig c)))))
+
+(defun +telega-username-capf ()
+  "CAPF for telega @-username completion.
+Unlike `cape-company-to-capf', handles @@ admin mentions and no-username
+members whose candidates don't prefix-match the typed input."
+  (when (and (boundp 'telega-chatbuf--chat) telega-chatbuf--chat)
+    (when-let* ((raw-prefix (telega-company-username 'prefix))
+                (prefix (if (consp raw-prefix) (car raw-prefix) raw-prefix))
+                ((> (length prefix) 0)))
+      (let* ((end (point))
+             (start (- end (length prefix))))
+        (list start end #'+telega-username--table
+              :exclusive 'no
+              :company-prefix-length t
+              :annotation-function #'+telega-username--annotate
+              :exit-function #'+telega-username--exit)))))
+
 (defun +telega-completion-setup ()
-  (make-variable-buffer-local 'completion-at-point-functions)
-  (setq completion-at-point-functions
-        (append (mapcar #'cape-company-to-capf telega-company-backends)
-                completion-at-point-functions))
+  (setq-local completion-at-point-functions
+              (append
+               (cons #'+telega-username-capf
+                     (mapcar #'cape-company-to-capf
+                             (remq 'telega-company-username telega-company-backends)))
+               completion-at-point-functions))
   (corfu-mode 1))
 
 (defun +telega-save-file-to-clipboard (msg)
