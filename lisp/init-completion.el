@@ -35,8 +35,16 @@
   (:defer (:require corfu))
   (:when-loaded
     (:with-feature nerd-icons-corfu
-      ;; Using VS Code icons as an alternative
       (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+    ;; Symbols Nerd Font Mono glyphs are 1-2px taller than the default font.
+    ;; corfu sizes the child frame as n × (default-line-height), so adding a
+    ;; small line-spacing *only* in the corfu buffer makes that value reflect
+    ;; the true rendered line height without touching anything else.
+    (advice-add #'corfu--make-buffer :filter-return
+                (lambda (buf)
+                  (with-current-buffer buf
+                    (setq-local line-spacing 2))
+                  buf))
     (global-corfu-mode)
     (setopt corfu-cycle t
             corfu-auto t
@@ -56,8 +64,6 @@
 (setup kind-icon
   (:load-after corfu)
   (:when-loaded
-    (add-to-list 'corfu-margin-formatters
-                 #'kind-icon-margin-formatter)
     (advice-add 'reapply-themes :after 'kind-icon-reset-cache)))
 
 (setup cape
