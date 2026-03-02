@@ -19,18 +19,38 @@ redundant telega--searchChatMembers calls on every keystroke.")
     (unless (equal str cached-str)
       (let* ((cands (when (> (length str) 0)
                       (telega-company-username 'candidates str)))
-             (lookup (make-hash-table :test #'equal)))
+             (lookup-key (make-hash-table :test #'equal))
+             (lookup-display (make-hash-table :test #'equal))
+             (idx 0))
         (dolist (cand cands)
-          ;; Keep first candidate for a display string, matching old `cl-find' behavior.
-          (puthash (substring-no-properties cand) cand lookup))
+          (let* ((display (substring-no-properties cand))
+                 (member (get-text-property 0 'telega-member cand))
+                 (key (cond
+                       ((string-prefix-p "@" display)
+                        (concat "u:" (downcase display)))
+                       (member
+                        (format "m:%s" (prin1-to-string member)))
+                       (t
+                        (format "d:%s#%d" display idx)))))
+            (put-text-property 0 (length cand) '+telega-key key cand)
+            (puthash key cand lookup-key)
+            ;; For duplicate display strings, keep first match as fallback.
+            (unless (gethash display lookup-display)
+              (puthash display cand lookup-display))
+            (setq idx (1+ idx))))
         (setq +telega-username-capf--cache
-              (list :str str :cands cands :lookup lookup))))))
+              (list :str str :cands cands
+                    :lookup-key lookup-key
+                    :lookup-display lookup-display))))))
 
 (defun +telega-username--cached-candidate (c)
   "Find original candidate object for completion string C."
-  (let ((lookup (plist-get +telega-username-capf--cache :lookup)))
-    (and (hash-table-p lookup)
-         (gethash c lookup))))
+  (let* ((lookup-key (plist-get +telega-username-capf--cache :lookup-key))
+         (lookup-display (plist-get +telega-username-capf--cache :lookup-display))
+         (key (and (stringp c) (get-text-property 0 '+telega-key c)))
+         (display (and (stringp c) (substring-no-properties c))))
+    (or (and (hash-table-p lookup-key) key (gethash key lookup-key))
+        (and (hash-table-p lookup-display) display (gethash display lookup-display)))))
 
 (defun +telega-username--table (str pred action)
   "Completion table for telega @-username CAPF."
