@@ -281,11 +281,29 @@ If no matching version is found, prompt the user to choose."
      "    echo $HOME/tomcat9;\n"
      "fi )"))))
 
-(defun detect-project-home-and-name ()
-  "Detect the project home directory and the project name based on the current project."
-  (let ((project (project-current)))
-    (if project
-        (list :name (project-name project) :home (project-root project))
+(defun detect-project-home-and-name (&optional dir)
+  "Detect project home/name from DIR, current file, or `default-directory'.
+Falls back to marker-file lookup when `project-current' cannot resolve."
+  (let* ((base-dir (or dir
+                       (and (buffer-file-name) (file-name-directory (buffer-file-name)))
+                       default-directory))
+         (project (and base-dir (project-current nil base-dir)))
+         (home (or (and project (project-root project))
+                   (and base-dir
+                        (locate-dominating-file
+                         base-dir
+                         (lambda (d)
+                           (or (file-exists-p (expand-file-name "pom.xml" d))
+                               (file-directory-p (expand-file-name ".git" d))
+                               (file-exists-p (expand-file-name "build.gradle" d))
+                               (file-exists-p (expand-file-name "build.gradle.kts" d))
+                               (file-exists-p (expand-file-name "settings.gradle" d))
+                               (file-exists-p (expand-file-name "settings.gradle.kts" d))))))))
+         (home (and home (directory-file-name (expand-file-name home))))
+         (name (or (and project (project-name project))
+                   (and home (file-name-nondirectory home)))))
+    (if (and home name)
+        (list :name name :home home)
       (user-error "Could not determine the project root"))))
 
 (defun tomcat--get-pid ()
@@ -324,7 +342,7 @@ If no matching version is found, prompt the user to choose."
            (concat " "
                    (nerd-icons-faicon "nf-fa-cat"
                                       :face '(:inherit nerd-icons-green))
-                   (propertize (format " :%d" tomcat-port)
+                   (propertize (format "[%d]" tomcat-port)
                                'face '(:inherit nerd-icons-green))))
           ('failed
            (concat " "
@@ -405,14 +423,14 @@ Retries every second up to REMAINING times before giving up."
                     proc-name buf-name start-cmd debug (1- remaining)))
    (t
     (message "Tomcat did not stop within timeout. Aborting deploy."))))
-(defun copy-war-and-manage-tomcat (debug)
+(defun copy-war-and-manage-tomcat (debug &optional project-details)
   "Copy the WAR file to Tomcat's webapps directory and manage Tomcat.
 If DEBUG is non-nil, start Tomcat with JPDA debugging enabled (foreground).
 Otherwise also run Tomcat in foreground, logs go to *tomcat-start* buffer."
   (interactive "P")
   (let* ((tomcat-home (or (detect-tomcat-home)
                           (error "Unable to detect Tomcat home directory")))
-         (project-details (detect-project-home-and-name))
+         (project-details (or project-details (detect-project-home-and-name)))
          (project-name (plist-get project-details :name))
          (project-home (plist-get project-details :home))
          (webapps-path (concat tomcat-home "/webapps/"))
@@ -491,12 +509,15 @@ Mirrors IDEA's Run button: build in background, then hot-deploy."
     (message "Building project (mvn package -DskipTests)...")
     (set-process-sentinel
      (start-process-shell-command "tomcat-mvn-build" build-buf cmd)
-     (lambda (proc _event)
-       (if (= 0 (process-exit-status proc))
-           (progn
-             (message "Build succeeded. Deploying to Tomcat...")
-             (copy-war-and-manage-tomcat debug))
-         (message "Maven build FAILED. See %s for details." build-buf))))))
+     (let ((captured-details details)
+           (captured-debug debug)
+           (captured-build-buf build-buf))
+       (lambda (proc _event)
+         (if (= 0 (process-exit-status proc))
+             (progn
+               (message "Build succeeded. Deploying to Tomcat...")
+               (copy-war-and-manage-tomcat captured-debug captured-details))
+           (message "Maven build FAILED. See %s for details." captured-build-buf)))))))
 
 
 (defun tkj/java-decompile-class ()
