@@ -295,19 +295,6 @@ If no matching version is found, prompt the user to choose."
                "pgrep -f 'org.apache.catalina.startup.Bootstrap'"))))
     (unless (string-empty-p pid) pid)))
 
-(defun tomcat-truncate-buffer (buffer max-lines)
-  "Keep only the last MAX-LINES lines in BUFFER."
-  (when (buffer-live-p buffer)
-    (with-current-buffer buffer
-      (let ((inhibit-read-only t))
-        (goto-char (point-max))
-        (when (> (count-lines (point-min) (point-max)) max-lines)
-          (delete-region (point-min)
-                         (save-excursion
-                           (goto-char (point-min))
-                           (forward-line (- (count-lines (point-min) (point-max)) max-lines))
-                           (point))))))))
-
 (defun port-open-p (host port)
   (condition-case nil
       (let ((proc (make-network-process
@@ -367,13 +354,22 @@ Falls back silently if the notification system is unavailable."
   "Return a process filter that streams output and notifies on Tomcat startup.
 Watches for \"Server startup in\" in logs — the same signal IDEA uses.
 DEBUG non-nil means JPDA mode is active."
-  (let ((notified nil))
+  (let ((notified nil)
+        (line-count 0)
+        (call-count 0))
     (lambda (proc output)
       (with-current-buffer (process-buffer proc)
         (let ((inhibit-read-only t))
           (goto-char (point-max))
           (insert output)
-          (tomcat-truncate-buffer (current-buffer) 5000)))
+          (cl-incf line-count (cl-count ?\n output))
+          (cl-incf call-count)
+          (when (and (zerop (mod call-count 50))
+                     (> line-count 5000))
+            (goto-char (point-min))
+            (forward-line (- line-count 5000))
+            (delete-region (point-min) (point))
+            (setq line-count 5000))))
       (when (and (not notified)
                  (string-match-p "Server startup in" output))
         (setq notified t)
