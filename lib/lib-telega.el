@@ -204,17 +204,17 @@ This string includes:
 
 The function uses `nerd-icons-faicon` for the Telegram icon and applies
 specific faces to the counts for visual differentiation."
-  (ignore rest)
   (setq +tab-bar-telega-indicator-cache
         (when (and (fboundp 'telega-server-live-p)
                    (telega-server-live-p)
                    (buffer-live-p telega-server--buffer))
-          (let* ((keyword-count (ring-length telega--notification-messages-ring))
+          (let* ((me-user (telega-user-me 'locally))
+                 (online-p (and me-user (telega-user-online-p me-user)))
+                 (keyword-count (length (ring-elements telega--notification-messages-ring)))
                  (unread-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
-                 (mentioned-count
-                  (let ((sum 0))
-                    (dolist (chat (telega-filter-chats (telega-chats-list) '(mention)) sum)
-                      (setq sum (+ sum (or (plist-get chat :unread_mention_count) 0))))))
+                 (mentioned-count (apply '+ (mapcar (telega--tl-prop :unread_mention_count)
+                                                    (telega-filter-chats (telega-chats-list)
+                                                      '(mention)))))
                  (notification-count (+ mentioned-count unread-count keyword-count)))
             (when (> notification-count 0)
               (concat (nerd-icons-faicon "nf-fae-telegram" :face '(:inherit nerd-icons-purple))
