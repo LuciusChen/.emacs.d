@@ -8,6 +8,10 @@
     (xwidget-webkit-browse-url entry-link)))
 
 ;; 补全
+;; Telega's company backend reads this var in prefix detection.
+;; Keep a fallback binding so username CAPF works even when company isn't loaded.
+(defvar company-minimum-prefix-length 0)
+
 (defvar-local +telega-username-capf--cache nil
   "Buffer-local cache for username CAPF.
 Persists across CAPF re-invocations so corfu re-triggers don't cause
@@ -85,7 +89,10 @@ redundant telega--searchChatMembers calls on every keystroke.")
 Unlike `cape-company-to-capf', handles @@ admin mentions and no-username
 members whose candidates don't prefix-match the typed input."
   (when (and (boundp 'telega-chatbuf--chat) telega-chatbuf--chat)
-    (when-let* ((raw-prefix (telega-company-username 'prefix))
+    (when-let* ((raw-prefix
+                 (condition-case nil
+                     (telega-company-username 'prefix)
+                   (void-variable nil)))
                 (prefix (if (consp raw-prefix) (car raw-prefix) raw-prefix))
                 ((> (length prefix) 0)))
       (let* ((end (point))
