@@ -107,9 +107,12 @@ members whose candidates don't prefix-match the typed input."
   (let ((capfs nil))
     (when (fboundp '+telega-username-capf)
       (push #'+telega-username-capf capfs))
-    ;; Convert telega company backends only when cape is available.
+    ;; Convert telega company backends only when both cape and company are available.
+    ;; Some telega company backends call helpers like `company-grab' directly.
     (when (and (require 'cape nil t)
+               (require 'company nil t)
                (fboundp 'cape-company-to-capf)
+               (fboundp 'company-grab)
                (boundp 'telega-company-backends))
       (dolist (backend (remq 'telega-company-username telega-company-backends))
         (when (or (functionp backend)
