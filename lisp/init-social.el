@@ -140,7 +140,7 @@
        (5296957089                   ; @nichi_matrix_bot
         (:chat-id "!2KhbxzkrlqGS6zMD:nichi.co" :type :matrix))
        -1001480067069                ; @keyboard_cn
-       (6332621450                   ; @matrix_t2bot
+       (6332621450                   ; @yamatrix_bridge_bot
         (:chat-id "!JDky93zy3mmuljy6WwXNcsXIS2y1SbvDnwXjz7ZINsY" :type :matrix))
        -1001154313178                ; @coder_ot
        (6332621450                   ; @yamatrix_bridge_bot
@@ -153,7 +153,10 @@
         (:chat-id "!YkBCOsxHJvtzDSJCGa:nichi.co" :type :matrix))
        -1001179606678                ; @ArchlinuxCN_Appearance
        (5296957089                   ; @nichi_matrix_bot
-        (:chat-id "!UdcRVLCUPlBpwjoUET:nichi.co" :type :matrix))))
+        (:chat-id "!UdcRVLCUPlBpwjoUET:nichi.co" :type :matrix))
+       -1001066867565                ; ～现代前端魔法部～
+       (420415423                    ; @matrix_t2bot
+        (:chat-id "!kkriwaRKIBYFoYfXjb:matrix.org" :type :matrix))))
     ;; ignore messages from blocked senders (users or chats)
     (:with-hook telega-msg-ignore-predicates
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))

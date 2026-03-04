@@ -33,7 +33,11 @@ redundant telega--searchChatMembers calls on every keystroke.")
                        ((string-prefix-p "@" display)
                         (concat "u:" (downcase display)))
                        (member
-                        (format "m:%s" (prin1-to-string member)))
+                        (let ((member-id (plist-get member :id))
+                              (member-type (plist-get member :@type)))
+                          (if member-id
+                              (format "m:%s:%s" member-type member-id)
+                            (format "m:%s#%d" member-type idx))))
                        (t
                         (format "d:%s#%d" display idx)))))
             (put-text-property 0 (length cand) '+telega-key key cand)
@@ -104,10 +108,34 @@ members whose candidates don't prefix-match the typed input."
               :annotation-function #'+telega-username--annotate
               :exit-function #'+telega-username--exit)))))
 
+(defun +telega-botcmd--table (str pred action)
+  "Completion table for telega / bot commands."
+  (if (eq action 'metadata)
+      '(metadata (category . telega-botcmd))
+    (let ((cands (ignore-errors (telega-company--bot-commands))))
+      (complete-with-action action cands str pred))))
+
+(defun +telega-botcmd--annotate (c)
+  "Return annotation string for bot command candidate C."
+  (get-text-property 0 'telega-annotation c))
+
+(defun +telega-botcmd-capf ()
+  "CAPF for telega / bot command completion."
+  (when (and (boundp 'telega-chatbuf--chat) telega-chatbuf--chat)
+    (when-let* ((raw-prefix (ignore-errors (telega-company-grab-botcmd)))
+                (prefix (if (consp raw-prefix) (car raw-prefix) raw-prefix))
+                (prefix-len (if (stringp prefix) (length prefix) 0))
+                ((> prefix-len 0)))
+      (let ((start (copy-marker (- (point) prefix-len)))
+            (end (copy-marker (point) t)))
+        (list start end #'+telega-botcmd--table
+              :exclusive 'no
+              :annotation-function #'+telega-botcmd--annotate)))))
+
 (defun +telega-completion-setup ()
   (let ((capfs nil))
-    (when (fboundp '+telega-username-capf)
-      (push #'+telega-username-capf capfs))
+    (push #'+telega-username-capf capfs)
+    (push #'+telega-botcmd-capf capfs)
     ;; Convert telega company backends only when both cape and company are available.
     ;; Some telega company backends call helpers like `company-grab' directly.
     (when (and (require 'cape nil t)
@@ -115,7 +143,8 @@ members whose candidates don't prefix-match the typed input."
                (fboundp 'cape-company-to-capf)
                (fboundp 'company-grab)
                (boundp 'telega-company-backends))
-      (dolist (backend (remq 'telega-company-username telega-company-backends))
+      (dolist (backend (remq 'telega-company-botcmd
+                             (remq 'telega-company-username telega-company-backends)))
         (when (or (functionp backend)
                   (and (symbolp backend) (fboundp backend)))
           (push (cape-company-to-capf backend) capfs))))
