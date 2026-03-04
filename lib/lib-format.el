@@ -5,8 +5,31 @@
 ;;; Code:
 
 (require 'sql)
+(require 'subr-x)
 
 ;;; Utility functions
+
+(defgroup +mybatis-sql nil
+  "MyBatis SQL extract/edit/copy utilities."
+  :group 'tools)
+
+(defcustom +mybatis-roundtrip-mode 'format
+  "Roundtrip strategy for MyBatis SQL edit/commit.
+`strict` keeps extract/edit/restore as reversible as possible.
+`format` keeps legacy behavior that normalizes entities/indentation."
+  :type '(choice (const :tag "Strict reversible mode" strict)
+                 (const :tag "Format-friendly mode" format))
+  :group '+mybatis-sql)
+
+(defcustom +mybatis-strict-xml-operator-policy 'ask
+  "How strict roundtrip handles raw `<`/`>` operators before XML writeback.
+`ask` prompts and can encode in one step.
+`auto` encodes without prompting.
+`ignore` keeps raw operators unchanged."
+  :type '(choice (const :tag "Ask before encoding" ask)
+                 (const :tag "Auto encode" auto)
+                 (const :tag "Ignore" ignore))
+  :group '+mybatis-sql)
 
 (defun +mybatis--replace-all (from to &optional literal)
   "Replace all occurrences of FROM with TO in current buffer.
@@ -133,6 +156,21 @@ Content inside <if>, <foreach>, etc. is also indented."
   (while (re-search-forward "\n\n\n+" nil t)
     (replace-match "\n\n")))
 
+(defun +mybatis--remove-blank-lines ()
+  "Remove blank lines (including whitespace-only lines)."
+  (goto-char (point-min))
+  (while (re-search-forward "^[ \t]*\n" nil t)
+    (replace-match "" t t)))
+
+(defun +mybatis--normalize-where-leading-conj ()
+  "For runnable SQL, remove leading AND/OR right after WHERE."
+  (let ((case-fold-search t))
+    (goto-char (point-min))
+    (while (re-search-forward
+            "\\b\\(where\\)\\b\\([[:space:]\n\r]+\\)\\(and\\|or\\)\\b"
+            nil t)
+      (replace-match "\\1\\2" t))))
+
 (defun +mybatis--get-base-indent ()
   "Get base indentation level for current SQL block."
   (save-excursion
@@ -143,10 +181,11 @@ Content inside <if>, <foreach>, etc. is also indented."
 
 ;;; Main encoding/decoding functions
 
-(defun +mybatis--encode-sql-for-editing (content base-indent)
+(defun +mybatis--encode-sql-for-editing (content base-indent &optional mode)
   "Encode MyBatis SQL CONTENT for editing.
 BASE-INDENT is stored but not applied yet.
 Return cons of (encoded-content . placeholder-maps-alist)."
+  (setq mode (or mode +mybatis-roundtrip-mode))
   (with-temp-buffer
     (insert content)
 
@@ -155,17 +194,21 @@ Return cons of (encoded-content . placeholder-maps-alist)."
                         "<!--\\(.*?\\)-->"
                         "/* __COMMENT_%d__ */")))
 
-      ;; Replace MyBatis parameters - use unique column-like names
-      (let ((param-map (+mybatis--replace-with-placeholders
-                        "\\(#\\|\\$\\){[^}]+}"
-                        "__PARAM_%d__")))
+      ;; Replace MyBatis parameters with separate maps.
+      ;; `#{...}` and `${...}` have different semantics and must not be mixed.
+      (let ((hash-param-map (+mybatis--replace-with-placeholders
+                             "#[{][^}]+}"
+                             "__HASH_PARAM_%d__"))
+            (dollar-param-map (+mybatis--replace-with-placeholders
+                               "[$][{][^}]+}"
+                               "__DOLLAR_PARAM_%d__")))
 
         ;; Replace opening tags (including self-closing <include/>)
         (goto-char (point-min))
         (let ((counter 0)
               (tag-map '()))
           (while (re-search-forward
-                  "<\\(if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\|where\\|include\\)\\(\\s-+[^/>]*\\)\\(/?>\\)"
+                  "<\\(if\\|foreach\\|set\\|trim\\|choose\\|when\\|otherwise\\|where\\|include\\)\\(\\s-+[^/>]*\\)?\\(/?>\\)"
                   nil t)
             (let* ((full-tag (match-string 0))
                    (tag-name (match-string 1))
@@ -199,44 +242,108 @@ Return cons of (encoded-content . placeholder-maps-alist)."
               (replace-match placeholder t t)
               (setq counter (1+ counter))))
 
-          ;; Decode XML entities
-          (+mybatis--decode-xml-entities)
-
-          ;; Clean up extra newlines
-          (+mybatis--clean-extra-newlines)
+          (when (eq mode 'format)
+            ;; Legacy formatting-friendly path.
+            (+mybatis--decode-xml-entities)
+            (+mybatis--clean-extra-newlines))
 
           (cons (buffer-substring-no-properties (point-min) (point-max))
                 (list :comments comment-map
-                      :params param-map
+                      :hash-params hash-param-map
+                      :dollar-params dollar-param-map
                       :tags tag-map)))))))
 
-(defun +mybatis--decode-sql-from-editing (content placeholder-maps base-indent)
+(defun +mybatis--decode-sql-from-editing (content placeholder-maps base-indent &optional mode)
   "Decode edited SQL CONTENT back to MyBatis format.
-PLACEHOLDER-MAPS is a plist containing :comments, :params, and :tags maps.
+PLACEHOLDER-MAPS is a plist containing parameter/tag/comment maps.
 BASE-INDENT is the indentation level to apply."
+  (setq mode (or mode +mybatis-roundtrip-mode))
   (with-temp-buffer
     (insert content)
 
-    ;; Encode comparison operators
-    (+mybatis--encode-xml-entities)
-
     ;; Restore placeholders in order: comments, params, tags
     (+mybatis--restore-placeholders (plist-get placeholder-maps :comments))
-    (+mybatis--restore-placeholders (plist-get placeholder-maps :params) t)
+    (+mybatis--restore-placeholders (plist-get placeholder-maps :hash-params) t)
+    (+mybatis--restore-placeholders (plist-get placeholder-maps :dollar-params) t)
     (+mybatis--restore-placeholders (plist-get placeholder-maps :tags))
 
-    ;; Clean up <where> tags
-    (goto-char (point-min))
-    (while (re-search-forward "<where>\\s-*\n?\\s-*WHERE\\s-*\n?" nil t)
-      (replace-match "<where>\n"))
-
-    ;; Add tag-level indentation
-    (+mybatis--add-tag-indentation 0)
-
-    ;; Add base indentation
-    (+mybatis--add-base-indentation base-indent)
+    (when (eq mode 'format)
+      ;; Legacy formatting-friendly path.
+      (+mybatis--encode-xml-entities)
+      (goto-char (point-min))
+      (while (re-search-forward "<where>\\s-*\n?\\s-*WHERE\\s-*\n?" nil t)
+        (replace-match "<where>\n"))
+      (+mybatis--add-tag-indentation 0)
+      (+mybatis--add-base-indentation base-indent))
 
     (buffer-substring-no-properties (point-min) (point-max))))
+
+(defun +mybatis--find-sql-block-bounds ()
+  "Return current MyBatis SQL block bounds as a plist.
+Result includes :tag-type, :tag-start and :tag-end.
+Return nil if no surrounding SQL block is found."
+  (save-excursion
+    (when (re-search-backward "<\\(select\\|insert\\|update\\|delete\\)[^>]*>" nil t)
+      (let ((tag-type (match-string 1))
+            (tag-start (match-end 0)))
+        (when (re-search-forward (format "</%s>" tag-type) nil t)
+          (list :tag-type tag-type
+                :tag-start tag-start
+                :tag-end (match-beginning 0)))))))
+
+(defun +mybatis--raw-xml-operator-count (sql)
+  "Return number of raw XML-sensitive operators in SQL."
+  (let ((count 0))
+    (with-temp-buffer
+      (insert sql)
+      (goto-char (point-min))
+      (while (re-search-forward "\\(?:<=\\|>=\\|<>\\|<\\|>\\)" nil t)
+        (setq count (1+ count))))
+    count))
+
+(defun +mybatis--encode-raw-xml-operators (sql)
+  "Encode raw XML-sensitive operators in SQL and return new string."
+  (with-temp-buffer
+    (insert sql)
+    ;; Replace longer operators first.
+    (goto-char (point-min))
+    (while (search-forward "<=" nil t) (replace-match "&lt;=" t t))
+    (goto-char (point-min))
+    (while (search-forward ">=" nil t) (replace-match "&gt;=" t t))
+    (goto-char (point-min))
+    (while (search-forward "<>" nil t) (replace-match "&lt;&gt;" t t))
+    (goto-char (point-min))
+    (while (search-forward "<" nil t) (replace-match "&lt;" t t))
+    (goto-char (point-min))
+    (while (search-forward ">" nil t) (replace-match "&gt;" t t))
+    (buffer-substring-no-properties (point-min) (point-max))))
+
+(defun +mybatis--export-sql-for-client (sql-content)
+  "Convert MyBatis SQL-CONTENT to executable client SQL.
+This is a one-way export path for copy/query usage only.
+All `#{...}` and `${...}` parameters are replaced by `?`."
+  (let* ((encoded (+mybatis--encode-sql-for-editing sql-content 0 'format))
+         (export-sql (car encoded))
+         (placeholder-maps (cdr encoded)))
+    (with-temp-buffer
+      (insert export-sql)
+      ;; Keep XML comments unchanged in export output.
+      ;; This preserves comment text (including any #{...}/${...} inside comments).
+      (+mybatis--restore-placeholders (plist-get placeholder-maps :comments))
+      (goto-char (point-min))
+      (while (re-search-forward "__HASH_PARAM_[0-9]+__" nil t)
+        (replace-match "?" t t))
+      (goto-char (point-min))
+      (while (re-search-forward "__DOLLAR_PARAM_[0-9]+__" nil t)
+        (replace-match "?" t t))
+      ;; Export output should be runnable SQL, not roundtrip markers.
+      (goto-char (point-min))
+      (while (re-search-forward "/\\* __\\(TAG_OPEN\\|TAG_CLOSE\\|WHERE_OPEN\\|WHERE_CLOSE\\|INCLUDE\\)_[0-9]+__ \\*/\\s-*\n?" nil t)
+        (replace-match "" t t))
+      (+mybatis--normalize-where-leading-conj)
+      (+mybatis--clean-extra-newlines)
+      (+mybatis--remove-blank-lines)
+      (string-trim (buffer-substring-no-properties (point-min) (point-max))))))
 
 ;;; Interactive commands
 
@@ -245,25 +352,22 @@ BASE-INDENT is the indentation level to apply."
   "Edit MyBatis SQL block in a separate buffer with sql-mode."
   (interactive)
   (save-excursion
-    (unless (re-search-backward "<\\(select\\|insert\\|update\\|delete\\)[^>]*>" nil t)
-      (user-error "No MyBatis SQL block found before point"))
+    (let ((bounds (+mybatis--find-sql-block-bounds)))
+      (unless bounds
+        (user-error "No MyBatis SQL block found before point"))
 
-    (let* ((tag-type (match-string 1))
-           (tag-start (match-end 0))
-           (original-buffer (current-buffer))
-           (original-window (selected-window))
-           (window-config (current-window-configuration)))
-
-      (unless (re-search-forward (format "</%s>" tag-type) nil t)
-        (user-error "Could not find closing tag for <%s>" tag-type))
-
-      (let* ((tag-end (match-beginning 0))
+      (let* ((tag-type (plist-get bounds :tag-type))
+             (tag-start (plist-get bounds :tag-start))
+             (tag-end (plist-get bounds :tag-end))
+             (original-buffer (current-buffer))
+             (original-window (selected-window))
+             (window-config (current-window-configuration))
              (sql-content (buffer-substring-no-properties tag-start tag-end))
              (edit-buffer (generate-new-buffer (format "*MyBatis SQL: %s*" tag-type)))
              (base-indent (progn
                             (goto-char tag-start)
                             (+mybatis--get-base-indent)))
-             (encoded (+mybatis--encode-sql-for-editing sql-content base-indent)))
+             (encoded (+mybatis--encode-sql-for-editing sql-content base-indent +mybatis-roundtrip-mode)))
 
         (with-current-buffer edit-buffer
           (insert (car encoded))
@@ -289,6 +393,23 @@ BASE-INDENT is the indentation level to apply."
         (pop-to-buffer edit-buffer)))))
 
 ;;;###autoload
+(defun +mybatis-copy-sql-for-client ()
+  "Copy current MyBatis SQL block as client-executable SQL.
+The copied SQL is extracted from mapper XML and parameters are replaced with `?`.
+This does not modify the current buffer."
+  (interactive)
+  (save-excursion
+    (let ((bounds (+mybatis--find-sql-block-bounds)))
+      (unless bounds
+        (user-error "No MyBatis SQL block found before point"))
+      (let* ((tag-start (plist-get bounds :tag-start))
+             (tag-end (plist-get bounds :tag-end))
+             (sql-content (buffer-substring-no-properties tag-start tag-end))
+             (client-sql (+mybatis--export-sql-for-client sql-content)))
+        (kill-new client-sql)
+        (message "Copied MyBatis SQL for client execution (%d chars)" (length client-sql))))))
+
+;;;###autoload
 (defun +mybatis-commit-sql-block ()
   "Commit the edited SQL back to the original MyBatis XML."
   (interactive)
@@ -306,9 +427,21 @@ BASE-INDENT is the indentation level to apply."
     (unless (buffer-live-p original-buffer)
       (user-error "Original buffer no longer exists"))
 
-    (let ((decoded-sql (+mybatis--decode-sql-from-editing
-                        edited-sql placeholder-maps base-indent)))
+    (when (eq +mybatis-roundtrip-mode 'strict)
+      (let ((raw-op-count (+mybatis--raw-xml-operator-count edited-sql)))
+        (when (> raw-op-count 0)
+          (pcase +mybatis-strict-xml-operator-policy
+            ('auto
+             (setq edited-sql (+mybatis--encode-raw-xml-operators edited-sql)))
+            ('ask
+             (if (y-or-n-p (format "Detected %d raw < or > operators. Encode to XML entities now? "
+                                   raw-op-count))
+                 (setq edited-sql (+mybatis--encode-raw-xml-operators edited-sql))
+               (user-error "Aborted: raw < or > operators are not XML-safe")))
+            ('ignore nil))))))
 
+    (let ((decoded-sql (+mybatis--decode-sql-from-editing
+                        edited-sql placeholder-maps base-indent +mybatis-roundtrip-mode)))
       (with-current-buffer original-buffer
         (save-excursion
           (goto-char tag-start)
@@ -321,9 +454,9 @@ BASE-INDENT is the indentation level to apply."
             (delete-horizontal-space)
             (insert (make-string (- base-indent 4) ?\s))))))
 
-    (kill-buffer)
-    (set-window-configuration window-config)
-    (message "SQL block updated")))
+      (kill-buffer)
+      (set-window-configuration window-config)
+      (message "SQL block updated"))
 
 ;;;###autoload
 (defun +mybatis-abort-sql-block ()

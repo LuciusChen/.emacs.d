@@ -94,9 +94,10 @@ members whose candidates don't prefix-match the typed input."
                      (telega-company-username 'prefix)
                    (void-variable nil)))
                 (prefix (if (consp raw-prefix) (car raw-prefix) raw-prefix))
-                ((> (length prefix) 0)))
-      (let* ((end (point))
-             (start (- end (length prefix))))
+                (prefix-len (if (stringp prefix) (length prefix) 0))
+                ((> prefix-len 0)))
+      (let* ((end (copy-marker (point) t))
+             (start (copy-marker (- (point) prefix-len))))
         (list start end #'+telega-username--table
               :exclusive 'no
               :company-prefix-length t
@@ -177,10 +178,10 @@ NOTE: macOS only."
             (message (format "Saved to cloud: %s" fname))))))))
 
 ;; telega notification
-(defvar +tab-bar-telega-indicator-cache nil)
+(defvar +mode-line-telega-indicator-cache nil)
 
-(defun +tab-bar-telega-icon-update (&rest rest)
-  "Update the Telega icon in the tab bar, reflecting notification counts.
+(defun +mode-line-telega-icon-update (&rest _rest)
+  "Update the Telega icon in the mode line, reflecting notification counts.
 This function takes REST as an optional argument, though it is not used
 within the function body.
 
@@ -204,15 +205,21 @@ This string includes:
 
 The function uses `nerd-icons-faicon` for the Telegram icon and applies
 specific faces to the counts for visual differentiation."
-  (setq +tab-bar-telega-indicator-cache
+  (setq +mode-line-telega-indicator-cache
         (when (and (fboundp 'telega-server-live-p)
                    (telega-server-live-p)
                    (buffer-live-p telega-server--buffer))
           (let* ((me-user (telega-user-me 'locally))
                  (online-p (and me-user (telega-user-online-p me-user)))
-                 (keyword-count (length (ring-elements telega--notification-messages-ring)))
+                 (keyword-count
+                  (let ((cnt 0))
+                    (dotimes (idx (ring-length telega--notification-messages-ring) cnt)
+                      (unless (telega-msg-seen-p
+                               (ring-ref telega--notification-messages-ring idx))
+                        (setq cnt (1+ cnt))))))
                  (unread-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
-                 (mentioned-count (apply '+ (mapcar (telega--tl-prop :unread_mention_count)
+                 (mentioned-count (apply '+ (mapcar (lambda (chat)
+                                                      (or (plist-get chat :unread_mention_count) 0))
                                                     (telega-filter-chats (telega-chats-list)
                                                       '(mention)))))
                  (notification-count (+ mentioned-count unread-count keyword-count)))
@@ -228,15 +235,17 @@ specific faces to the counts for visual differentiation."
                       (when (> keyword-count 0)
                         (propertize (concat " #​​​" (number-to-string keyword-count))
                                     'face 'telega-unmuted-count))
-                      "]"))))))
+                      "]")))))
+  (force-mode-line-update t)
+  +mode-line-telega-indicator-cache)
 
-(defun +tab-bar-telega-icon ()
-  "Return the Telega icon for the tab bar, updating if necessary.
-This function checks if `+tab-bar-telega-indicator-cache` is set.  If it is,
-the cached value is returned.  Otherwise, it calls `+tab-bar-telega-icon-update`
+(defun +mode-line-telega-icon ()
+  "Return the Telega icon for the mode line, updating if necessary.
+This function checks if `+mode-line-telega-indicator-cache` is set.  If it is,
+the cached value is returned.  Otherwise, it calls `+mode-line-telega-icon-update`
 to refresh the icon and returns the updated value."
-  (or +tab-bar-telega-indicator-cache
-      (+tab-bar-telega-icon-update)))
+  (or +mode-line-telega-indicator-cache
+      (+mode-line-telega-icon-update)))
 
 (provide 'lib-telega)
 ;;; lib-telega.el ends here

@@ -159,12 +159,13 @@
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))
 
     ;; telega-notifications
-    (:with-hook telega-connection-state-hook (:hook +tab-bar-telega-icon-update))
-    (:with-hook telega-kill-hook (:hook +tab-bar-telega-icon-update))
-    (:advice telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
-    (:advice telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
-    (:advice telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)
-    (:advice telega-msg-observable-p :after  #'+tab-bar-telega-icon-update)
+    (:with-hook telega-connection-state-hook (:hook +mode-line-telega-icon-update))
+    (:with-hook telega-kill-hook (:hook +mode-line-telega-icon-update))
+    (:advice telega--on-updateUnreadChatCount :after #'+mode-line-telega-icon-update)
+    (:advice telega--on-updateChatReadInbox :after #'+mode-line-telega-icon-update)
+    (:advice telega--on-updateChatUnreadMentionCount :after #'+mode-line-telega-icon-update)
+    (:advice telega--on-updateChatUnreadReactionCount :after #'+mode-line-telega-icon-update)
+    (:advice telega-msg-observable-p :after  #'+mode-line-telega-icon-update)
 
     (:with-mode telega-chat-mode
       (:hook +telega-completion-setup)

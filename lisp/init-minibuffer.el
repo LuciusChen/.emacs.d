@@ -35,7 +35,7 @@
 (setup doom-modeline
   (:defer (:require doom-modeline))
   (:when-loaded
-    ;; (:with-function +tab-bar-telega-icon (:autoload-this))
+    ;; (:with-function +mode-line-telega-icon (:autoload-this))
     (setopt doom-modeline-height 18
             doom-modeline-buffer-file-name-style 'auto
             doom-modeline-buffer-modification-icon t
@@ -56,7 +56,7 @@
            (doom-modeline--buffer-mode-icon)
            (doom-modeline--buffer-state-icon)
            buffer-name)))
-      (doom-modeline-def-segment telega (+tab-bar-telega-icon))
+      (doom-modeline-def-segment telega (+mode-line-telega-icon))
       (doom-modeline-def-modeline 'disable-modification-indication
         '(bar workspace-name window-number modals +buffer-info selection-info)
         '(telega misc-info minor-modes buffer-encoding major-mode time))

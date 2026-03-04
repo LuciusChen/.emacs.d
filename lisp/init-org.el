@@ -12,7 +12,7 @@
   ;; Wrong type argument: commandp, dired-copy-images-links
   (keymap-global-set "C-c n m"     'dired-copy-images-links)
   (keymap-global-set "C-c b"       'org-cite-insert)
-  (:preload ob-core org-clock ox-latex bibtex org-agenda org-habit)
+  (:preload org-agenda org-habit org-clock ob-core ox-latex bibtex)
   (:when-loaded
     (:also-load lib-org)
     (:with-feature yank-media
