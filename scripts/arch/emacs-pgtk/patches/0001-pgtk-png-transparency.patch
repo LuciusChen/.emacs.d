@@ -1,0 +1,45 @@
+diff --git a/src/image.c b/src/image.c
+index 3268c77f2a1..265c6db87cd 100644
+--- a/src/image.c
++++ b/src/image.c
+@@ -8249,6 +8249,12 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+   png_byte channels;
+   png_uint_32 row_bytes;
+   bool transparent_p;
++  bool preserve_alpha_p
++#ifdef USE_CAIRO
++    = NILP (image_spec_value (img->spec, QCbackground, NULL));
++#else
++    = false;
++#endif
+   struct png_memory_storage tbr;  /* Data to be read */
+   ptrdiff_t nbytes;
+   Emacs_Pix_Container ximg;
+@@ -8426,7 +8432,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+   /* Handle alpha channel by combining the image with a background
+      color.  Do this only if a real alpha channel is supplied.  For
+      simple transparency, we prefer a clipping mask.  */
+-  if (!transparent_p)
++  if (!transparent_p && !preserve_alpha_p)
+     {
+       Lisp_Object specified_bg
+ 	= image_spec_value (img->spec, QCbackground, NULL);
+@@ -8492,7 +8498,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+      contains an alpha channel.  */
+   Emacs_Pix_Container mask_img = NULL;
+   if (channels == 4
+-      && transparent_p
++      && (transparent_p || preserve_alpha_p)
+       && !image_create_x_image_and_pixmap (f, img, width, height, 1,
+ 					   &mask_img, 1))
+     {
+@@ -8535,7 +8541,8 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+ 	  if (channels == 4)
+ 	    {
+ 	      if (mask_img)
+-		PUT_PIXEL (mask_img, x, y, *p > 0 ? PIX_MASK_DRAW : PIX_MASK_RETAIN);
++		PUT_PIXEL (mask_img, x, y,
++			   *p > 0 ? PIX_MASK_DRAW : PIX_MASK_RETAIN);
+ 	      ++p;
+ 	    }
+ 	}
