@@ -89,6 +89,7 @@
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
         ;; (telega :host github :repo "zevlg/telega.el")
+        (tramp-rpc :host github :repo "ArthurHeymans/emacs-tramp-rpc")
         (yasnippet :host github :repo "joaotavora/yasnippet")
         (indent-bars :host github :repo "jdtsmith/indent-bars")
         (eglot-booster :host github :repo "jdtsmith/eglot-booster")
