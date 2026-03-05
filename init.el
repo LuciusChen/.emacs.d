@@ -85,7 +85,7 @@
         (gt :host github :repo "LuciusChen/gt.el")
         (telega :host github :repo "LuciusChen/telega.el")
         (panel :host github :repo "LuciusChen/panel")
-        (emt :host github :repo "roife/emt")
+        (emt :host github :repo "LuciusChen/emt")
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
         ;; (telega :host github :repo "zevlg/telega.el")

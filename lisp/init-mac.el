@@ -31,13 +31,6 @@
   (:require lib-ime)
   (keymap-global-set "<f13>" 'toggle-ime))
 
-(setup emt
-  (:defer (:require emt))
-  (:when-loaded
-    (keymap-global-set "M-f" 'emt-forward-word)
-    (keymap-global-set "M-b" 'emt-backward-word)
-    (emt-ensure)))
-
 (setup (:only-if (not (display-graphic-p)))
   (defun +paste-from-osx ()
     "Paste clipboard using pbpaste."
