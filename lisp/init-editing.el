@@ -65,7 +65,14 @@
                       map))
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
-(when IS-MAC (setup meow-cjk (:hook-into meow-mode)))
+(setup emt
+  (:defer (:require emt))
+  (:when-loaded
+    (keymap-global-set "M-f" 'emt-forward-word)
+    (keymap-global-set "M-b" 'emt-backward-word)
+    (emt-ensure)))
+
+(setup meow-cjk (:hook-into meow-mode))
 
 (setup sis
   (:defer (:require sis))
