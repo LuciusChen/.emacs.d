@@ -34,7 +34,7 @@
            return (set-fontset-font t 'emoji (font-spec :family font :size (* FONT-SIZE 0.85)) nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
-  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (dolist (charset '(kana han cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family ZH-DEFAULT-FONT)))
   ;; Setting fall-back fonts
