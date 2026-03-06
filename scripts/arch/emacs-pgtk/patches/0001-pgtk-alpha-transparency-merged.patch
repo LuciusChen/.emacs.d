@@ -1,0 +1,376 @@
+diff --git a/lisp/image-mode.el b/lisp/image-mode.el
+index 2f4162660b8..284c97a99bd 100644
+--- a/lisp/image-mode.el
++++ b/lisp/image-mode.el
+@@ -706,7 +706,10 @@ image-mode--display
+           (image-mode--setup-mode)))
+     ;; Set next vars when image is already displayed but local
+     ;; variables were cleared by kill-all-local-variables
+-    (setq cursor-type nil truncate-lines t
++    (setq-local cursor-type nil)
++    ;; Avoid stretching the block cursor over the entire image glyph.
++    (setq-local x-stretch-cursor nil)
++    (setq truncate-lines t
+ 	  image-type (plist-get (cdr (image-get-display-property)) :type))
+     (image-mode--setup-mode)))
+ 
+@@ -978,7 +981,9 @@ image-toggle-display-image
+       (restore-buffer-modified-p modified))
+     ;; Inhibit the cursor when the buffer contains only an image,
+     ;; because cursors look very strange on top of images.
+-    (setq cursor-type nil)
++    (setq-local cursor-type nil)
++    ;; Avoid stretching the block cursor over the entire image glyph.
++    (setq-local x-stretch-cursor nil)
+     ;; This just makes the arrow displayed in the right fringe
+     ;; area look correct when the image is wider than the window.
+     (setq truncate-lines t)
+@@ -997,11 +1002,14 @@ image-toggle-display-image
+ 	(message "Repeat this command to go back to displaying the file as text"))))
+ 
+ (defun image--imagemagick-wanted-p (filename)
+-  (and (fboundp 'imagemagick-types)
+-       (not (eq imagemagick-types-inhibit t))
+-       (not (and filename (file-name-extension filename)
+-                 (memq (intern (upcase (file-name-extension filename)) obarray)
+-                       imagemagick-types-inhibit)))))
++  (let* ((ext (and filename (file-name-extension filename)))
++         (ext-sym (and ext (intern (upcase ext) obarray))))
++    (and (fboundp 'imagemagick-types)
++         (not (eq imagemagick-types-inhibit t))
++         ;; Prefer native loaders for formats where we rely on their
++         ;; transparency/background behavior in pgtk.
++         (not (memq ext-sym '(PNG PNG8 PNG24 PNG32 SVG SVGZ)))
++         (not (memq ext-sym imagemagick-types-inhibit)))))
+ 
+ (declare-function hexl-mode-exit "hexl" (&optional arg))
+ 
+diff --git a/src/image.c b/src/image.c
+index 9d0a620188f..4831edfbf0f 100644
+--- a/src/image.c
++++ b/src/image.c
+@@ -8262,6 +8262,13 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+   png_byte channels;
+   png_uint_32 row_bytes;
+   bool transparent_p;
++  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
++  bool preserve_alpha_p
++#ifdef USE_CAIRO
++    = (NILP (specified_bg) || EQ (specified_bg, Qunspecified));
++#else
++    = false;
++#endif
+   struct png_memory_storage tbr;  /* Data to be read */
+   ptrdiff_t nbytes;
+   Emacs_Pix_Container ximg;
+@@ -8439,10 +8446,8 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+   /* Handle alpha channel by combining the image with a background
+      color.  Do this only if a real alpha channel is supplied.  For
+      simple transparency, we prefer a clipping mask.  */
+-  if (!transparent_p)
++  if (!transparent_p && !preserve_alpha_p)
+     {
+-      Lisp_Object specified_bg
+-	= image_spec_value (img->spec, QCbackground, NULL);
+       Emacs_Color color;
+ 
+       /* If the user specified a color, try to use it; if not, use the
+@@ -8505,7 +8510,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+      contains an alpha channel.  */
+   Emacs_Pix_Container mask_img = NULL;
+   if (channels == 4
+-      && transparent_p
++      && (transparent_p || preserve_alpha_p)
+       && !image_create_x_image_and_pixmap (f, img, width, height, 1,
+ 					   &mask_img, 1))
+     {
+@@ -8548,7 +8553,12 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+ 	  if (channels == 4)
+ 	    {
+ 	      if (mask_img)
+-		PUT_PIXEL (mask_img, x, y, *p > 0 ? PIX_MASK_DRAW : PIX_MASK_RETAIN);
++#ifdef USE_CAIRO
++		PUT_PIXEL (mask_img, x, y, *p);
++#else
++		PUT_PIXEL (mask_img, x, y,
++			   *p > 0 ? PIX_MASK_DRAW : PIX_MASK_RETAIN);
++#endif
+ 	      ++p;
+ 	    }
+ 	}
+@@ -11209,6 +11219,13 @@ imagemagick_load_image (struct frame *f, struct image *img,
+   PixelWand **pixels, *bg_wand = NULL;
+   MagickPixelPacket  pixel;
+   Lisp_Object image;
++  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
++  bool preserve_alpha_p
++#ifdef USE_CAIRO
++    = (NILP (specified_bg) || EQ (specified_bg, Qunspecified));
++#else
++    = false;
++#endif
+ #ifndef DONT_CREATE_TRANSFORMED_IMAGEMAGICK_IMAGE
+   Lisp_Object value;
+ #endif
+@@ -11218,6 +11235,7 @@ imagemagick_load_image (struct frame *f, struct image *img,
+ #ifndef DONT_CREATE_TRANSFORMED_IMAGEMAGICK_IMAGE
+   double rotation;
+ #endif
++  Emacs_Pix_Container mask_img = NULL;
+   char hint_buffer[MaxTextExtent];
+   char *filename_hint = NULL;
+   imagemagick_initialize ();
+@@ -11318,9 +11336,6 @@ imagemagick_load_image (struct frame *f, struct image *img,
+   /* Retrieve the frame's background color, for use later.  */
+   {
+     Emacs_Color bgcolor;
+-    Lisp_Object specified_bg;
+-
+-    specified_bg = image_spec_value (img->spec, QCbackground, NULL);
+     if (!STRINGP (specified_bg)
+ 	|| !FRAME_TERMINAL (f)->defined_color_hook (f,
+                                                     SSDATA (specified_bg),
+@@ -11410,18 +11425,19 @@ imagemagick_load_image (struct frame *f, struct image *img,
+      background, and flatten the image.  Note: as of ImageMagick
+      6.6.0, SVG image transparency is not handled properly
+      (e.g. etc/images/splash.svg shows a white background always).  */
+-  {
+-    MagickWand *new_wand;
+-    MagickSetImageBackgroundColor (image_wand, bg_wand);
++  if (!preserve_alpha_p)
++    {
++      MagickWand *new_wand;
++      MagickSetImageBackgroundColor (image_wand, bg_wand);
+ #if defined HAVE_MAGICKMERGEIMAGELAYERS		\
+   || HAVE_DECL_MAGICKMERGEIMAGELAYERS
+-    new_wand = MagickMergeImageLayers (image_wand, MergeLayer);
++      new_wand = MagickMergeImageLayers (image_wand, MergeLayer);
+ #else
+-    new_wand = MagickFlattenImages (image_wand);
++      new_wand = MagickFlattenImages (image_wand);
+ #endif
+-    DestroyMagickWand (image_wand);
+-    image_wand = new_wand;
+-  }
++      DestroyMagickWand (image_wand);
++      image_wand = new_wand;
++    }
+ 
+   /* Finally we are done manipulating the image.  Figure out the
+      resulting width/height and transfer ownership to Emacs.  */
+@@ -11446,7 +11462,7 @@ imagemagick_load_image (struct frame *f, struct image *img,
+ #if (defined (HAVE_MAGICKEXPORTIMAGEPIXELS)	     \
+      || HAVE_DECL_MAGICKEXPORTIMAGEPIXELS)	     \
+   && ! defined (HAVE_NS) && ! defined (HAVE_HAIKU)
+-  if (imagemagick_render_type != 0)
++  if (imagemagick_render_type != 0 && !preserve_alpha_p)
+     {
+       /* Magicexportimage is normally faster than pixelpushing.  This
+          method is also well tested.  Some aspects of this method are
+@@ -11506,6 +11522,19 @@ imagemagick_load_image (struct frame *f, struct image *img,
+           goto imagemagick_error;
+         }
+ 
++      if (preserve_alpha_p
++	  && !image_create_x_image_and_pixmap (f, img, width, height, 1,
++					       &mask_img, 1))
++	{
++#ifdef COLOR_TABLE_SUPPORT
++	  free_color_table ();
++#endif
++	  image_destroy_x_image (ximg);
++	  image_clear_image_1 (f, img, CLEAR_IMAGE_PIXMAP);
++	  image_error ("Imagemagick X mask allocation failure");
++	  goto imagemagick_error;
++	}
++
+       /* Copy imagemagick image to x with primitive yet robust pixel
+          pusher loop.  This has been tested a lot with many different
+          images.  */
+@@ -11517,6 +11546,11 @@ imagemagick_load_image (struct frame *f, struct image *img,
+ #ifdef COLOR_TABLE_SUPPORT
+ 	  free_color_table ();
+ #endif
++	  if (mask_img)
++	    {
++	      image_destroy_x_image (mask_img);
++	      image_clear_image_1 (f, img, CLEAR_IMAGE_MASK);
++	    }
+ 	  image_destroy_x_image (ximg);
+           image_error ("Imagemagick pixel iterator creation failed");
+           goto imagemagick_error;
+@@ -11532,7 +11566,15 @@ imagemagick_load_image (struct frame *f, struct image *img,
+ 	  int xlim = min (row_width, width);
+ 	  for (x = 0; x < xlim; x++)
+             {
++	      unsigned long alpha = PIX_MASK_DRAW;
+               PixelGetMagickColor (pixels[x], &pixel);
++	      if (mask_img)
++		{
++		  /* PixelGetAlpha returns normalized opacity in [0..1].  */
++		  double a = PixelGetAlpha (pixels[x]);
++		  alpha = a >= 1.0 ? 255 : (unsigned long) (a * 255.0 + 0.5);
++		  PUT_PIXEL (mask_img, x, y, alpha);
++		}
+               PUT_PIXEL (ximg, x, y,
+                          lookup_rgb_color (f,
+ 					   color_scale * pixel.red,
+@@ -11555,6 +11597,12 @@ imagemagick_load_image (struct frame *f, struct image *img,
+   /* Put ximg into the image.  */
+   image_put_x_image (f, img, ximg, 0);
+ 
++  if (mask_img)
++    {
++      image_background_transparent (img, f, (Emacs_Pix_Context)mask_img);
++      image_put_x_image (f, img, mask_img, 1);
++    }
++
+   /* Final cleanup. image_wand should be the only resource left. */
+   DestroyMagickWand (image_wand);
+   if (bg_wand) DestroyPixelWand (bg_wand);
+@@ -12138,6 +12186,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+   bool empty_errmsg = true;
+   const char *errmsg = "";
+   ptrdiff_t errlen = 0;
++  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
++  bool preserve_alpha_p
++#ifdef USE_CAIRO
++    = (NILP (specified_bg) || EQ (specified_bg, Qunspecified));
++#else
++    = false;
++#endif
+ 
+ #if ! GLIB_CHECK_VERSION (2, 36, 0)
+   /* g_type_init is a glib function that must be called prior to
+@@ -12353,7 +12408,7 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+        background color, before including the original image.  This
+        acts to set the background color, instead of leaving it
+        transparent.  */
+-    static char const wrapper[] =
++    static char const wrapper_with_bg[] =
+       "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
+       "xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
+       "style=\"color: #%06X;\" "
+@@ -12362,12 +12417,21 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+       "<rect width=\"100%%\" height=\"100%%\" fill=\"#%06X\"/>"
+       "<xi:include href=\"data:image/svg+xml;base64,%s\"></xi:include>"
+       "</svg>";
++    static char const wrapper_no_bg[] =
++      "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
++      "xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
++      "style=\"color: #%06X;\" "
++      "width=\"%d\" height=\"%d\" preserveAspectRatio=\"none\" "
++      "viewBox=\"0 0 %f %f\">"
++      "<rect width=\"100%%\" height=\"100%%\" fill=\"none\"/>"
++      "<xi:include href=\"data:image/svg+xml;base64,%s\"></xi:include>"
++      "</svg>";
+ 
+     value = image_spec_value (img->spec, QCforeground, NULL);
+     if (!NILP (value))
+       foreground = image_alloc_image_color (f, img, value, img->face_foreground);
+-    value = image_spec_value (img->spec, QCbackground, NULL);
+-    if (!NILP (value))
++    value = specified_bg;
++    if (!NILP (value) && !EQ (value, Qunspecified))
+       {
+         background = image_alloc_image_color (f, img, value, img->face_background);
+         img->background = background;
+@@ -12388,7 +12452,14 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+ 
+     unsigned int color = foreground & 0xFFFFFF, fill = background & 0xFFFFFF;
+     wrapped_contents
+-      = make_formatted_string (wrapper, color, width, height,
++      = preserve_alpha_p
++      ? make_formatted_string (wrapper_no_bg,
++			       color,
++			       width, height,
++			       viewbox_width, viewbox_height,
++			       SSDATA (encoded_contents))
++      : make_formatted_string (wrapper_with_bg,
++			       color, width, height,
+ 			       viewbox_width, viewbox_height,
+ 			       fill, SSDATA (encoded_contents));
+   }
+@@ -12472,12 +12543,23 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+   {
+     /* Try to create a x pixmap to hold the svg pixmap.  */
+     Emacs_Pix_Container ximg;
++    Emacs_Pix_Container mask_img = NULL;
+     if (!image_create_x_image_and_pixmap (f, img, width, height, 0, &ximg, 0))
+       {
+ 	g_object_unref (pixbuf);
+ 	return false;
+       }
+ 
++    if (preserve_alpha_p
++	&& !image_create_x_image_and_pixmap (f, img, width, height, 1,
++					     &mask_img, 1))
++      {
++	image_destroy_x_image (ximg);
++	g_object_unref (pixbuf);
++	image_clear_image_1 (f, img, CLEAR_IMAGE_PIXMAP);
++	return false;
++      }
++
+     init_color_table ();
+ 
+     /* This loop handles opacity values, since Emacs assumes
+@@ -12491,11 +12573,19 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+ 	    int red     = *pixels++;
+ 	    int green   = *pixels++;
+ 	    int blue    = *pixels++;
++	    int alpha   = *pixels++;
+ 
+-            /* Skip opacity.  */
+-	    pixels++;
++	    if (mask_img)
++#ifdef USE_CAIRO
++	      /* Preserve full alpha (0-255) for cairo A8 mask.  */
++	      PUT_PIXEL (mask_img, x, y, alpha);
++#else
++	      PUT_PIXEL (mask_img, x, y,
++			 alpha > 0 ? PIX_MASK_DRAW : PIX_MASK_RETAIN);
++#endif
+ 
+-	    PUT_PIXEL (ximg, x, y, lookup_rgb_color (f, red << 8, green << 8, blue << 8));
++	    PUT_PIXEL (ximg, x, y,
++		       lookup_rgb_color (f, red << 8, green << 8, blue << 8));
+ 	  }
+ 
+ 	pixels += rowstride - 4 * width;
+@@ -12518,6 +12608,14 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+ 
+     /* Put ximg into the image.  */
+     image_put_x_image (f, img, ximg, 0);
++
++    if (mask_img)
++      {
++	/* Fill in the background_transparent field while we have the
++	   mask handy.  */
++	image_background_transparent (img, f, (Emacs_Pix_Context)mask_img);
++	image_put_x_image (f, img, mask_img, 1);
++      }
+   }
+ 
+   eassume (err == NULL);
+diff --git a/src/pgtkterm.c b/src/pgtkterm.c
+index bf482590bc5..a703b95ce87 100644
+--- a/src/pgtkterm.c
++++ b/src/pgtkterm.c
+@@ -3012,7 +3012,15 @@ pgtk_draw_window_cursor (struct window *w, struct glyph_row *glyph_row, int x,
+ 	      break;
+ 
+ 	    case FILLED_BOX_CURSOR:
+-	      draw_phys_cursor_glyph (w, glyph_row, DRAW_CURSOR);
++	      {
++		struct glyph *cursor_glyph = get_phys_cursor_glyph (w);
++		/* Avoid inverting the entire image glyph; match the
++		   rectangle-style cursor behavior seen on NS builds.  */
++		if (cursor_glyph && cursor_glyph->type == IMAGE_GLYPH)
++		  pgtk_draw_hollow_cursor (w, glyph_row);
++		else
++		  draw_phys_cursor_glyph (w, glyph_row, DRAW_CURSOR);
++	      }
+ 	      break;
+ 
+ 	    case BAR_CURSOR:

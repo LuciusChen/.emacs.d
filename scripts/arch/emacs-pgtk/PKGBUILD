@@ -14,7 +14,7 @@ else
   conflicts=('emacs' 'emacs-pgtk')
 fi
 
-pkgver=31.0.50.r189126.
+pkgver=31.0.50.r189126
 pkgrel=1
 pkgdesc="GNU Emacs. Branch: $_branch. With PGTK support."
 arch=('x86_64')
@@ -55,25 +55,29 @@ pkgver() {
   cd "$srcdir/emacs"
   local version
   version=$(awk -F',' '/AC_INIT/{gsub("[ \\[\\]]","",$2); print $2}' configure.ac)
-  printf "%s.r%s.%s" "$version" "$(git rev-list --count HEAD)"
+  printf "%s.r%s" "$version" "$(git rev-list --count HEAD)"
 }
 
 prepare() {
   cd "$srcdir/emacs"
-  git fetch --all --prune
   git checkout "$_branch"
-  git reset --hard "origin/$_branch"
   if [[ -n "$_commit" ]]; then
     git checkout "$_commit"
   fi
-  git clean -fdx
 
   # Apply patches from build directory root
   local patch
   for patch in "$srcdir"/../*.patch; do
     if [[ -f "$patch" ]]; then
       msg2 "Applying $(basename "$patch")..."
-      patch -Np1 -i "$patch"
+      # Validate first and abort prepare() on malformed/incompatible patches.
+      if patch -Np1 --batch --dry-run --forward -i "$patch" >/dev/null 2>&1; then
+        # --forward: skip if already applied; keeps repeated makepkg runs working.
+        patch -Np1 --batch --forward -i "$patch"
+      else
+        error "Invalid or incompatible patch: $(basename "$patch")"
+        return 1
+      fi
     fi
   done
 

@@ -28,6 +28,10 @@ fi
 # Copy PKGBUILD to the build directory
 cp "$EMACS_D/PKGBUILD" "$BUILD_DIR/"
 
+# Read branch from PKGBUILD (fallback to master)
+BRANCH="$(sed -n 's/^_branch="\([^"]*\)".*/\1/p' "$BUILD_DIR/PKGBUILD" | head -n1)"
+BRANCH="${BRANCH:-master}"
+
 # Copy patches to build directory root if they exist
 if [[ -d "$EMACS_D/patches" ]]; then
   # Remove old patch files
@@ -47,6 +51,14 @@ fi
 
 # Change to the build directory
 cd "$BUILD_DIR"
+
+# Always update local emacs source to latest before build (if present)
+if [[ -d "$BUILD_DIR/src/emacs/.git" ]]; then
+  echo "Updating emacs source branch '$BRANCH'..."
+  git -C "$BUILD_DIR/src/emacs" fetch --all --prune
+  git -C "$BUILD_DIR/src/emacs" checkout "$BRANCH"
+  git -C "$BUILD_DIR/src/emacs" pull --ff-only origin "$BRANCH"
+fi
 
 # Show current directory structure
 echo "Build directory structure:"
