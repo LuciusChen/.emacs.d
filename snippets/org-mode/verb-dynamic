@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: verb-dynamic
+# key: <verb-dyn
+# --
+#+begin_src verb :wrap src ob-verb-response
+${1:GET} ${2:https://}{{${3:(verb-var var-name)}}}
+${4:Authorization: Bearer {{(verb-var token)}}}
+$0
+#+end_src
