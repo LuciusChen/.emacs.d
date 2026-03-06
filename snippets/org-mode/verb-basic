@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: verb-basic
+# key: <verb
+# --
+#+begin_src verb :wrap src ob-verb-response
+${1:GET} ${2:https://}$0
+#+end_src

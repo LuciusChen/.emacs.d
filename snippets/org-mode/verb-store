@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: verb-store
+# key: <verb-store
+# --
+#+begin_src verb :wrap src ob-verb-response
+:Verb-Store ${1:var-name}
+
+${2:POST} ${3:https://}
+${4:Content-Type: application/json}
+
+$0
+#+end_src

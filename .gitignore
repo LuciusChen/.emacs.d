@@ -14,6 +14,7 @@ eln-cache/
 tutorial/
 transient/
 speed-type/
+tramp-rpc/
 tree-sitter/
 auto-save-list/
 debug-adapters/
