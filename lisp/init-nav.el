@@ -61,40 +61,5 @@
        "C-x C-d" consult-dir
        "C-x C-j" consult-dir-jump-file))))
 
-(setup dirvish
-  (:defer (:require dirvish))
-  (:when-loaded
-    (keymap-global-set "C-c f f" 'dirvish)
-    (keymap-global-set "C-c f s" 'dirvish-side)
-    (dirvish-override-dired-mode)
-    (setopt dirvish-quick-access-entries
-            '(("h" "~/" "Home")
-              ("e" "~/.emacs.d/" "Emacs")
-              ("p" "~/IdeaProjects/" "Projects"))
-            dirvish-side-width 50
-            dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state)
-            dirvish-side-attributes '(vc-state collapse)
-            dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
-            dirvish-mode-line-height 15
-            dirvish-header-line-height '(15 . 25))
-    (:with-map dirvish-mode-map
-      (:bind "a"    dirvish-quick-access
-             "q"    dirvish-quit
-             "f"    dirvish-file-info-menu
-             "y"    dirvish-yank-menu
-             "N"    dirvish-narrow
-             "h"    dirvish-history-jump
-             "s"    dirvish-quicksort
-             "TAB"  dirvish-subtree-toggle
-             "M-f"  dirvish-history-go-forward
-             "M-b"  dirvish-history-go-backward
-             "M-l"  dirvish-ls-switches-menu
-             "M-m"  dirvish-mark-menu
-             "M-t"  dirvish-layout-toggle
-             "M-s"  dirvish-setup-menu
-             "M-e"  dirvish-emerge-menu
-             "M-j"  dirvish-fd-jump))
-    (:with-mode dirvish-directory-view-mode (:hook diredfl-mode))))
-
 (provide 'init-nav)
 ;;; init-nav.el ends here
