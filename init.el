@@ -63,7 +63,7 @@
         corfu forge verb elfeed popper embark bibtex vertico clojure-mode
         diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
         diff-hl company goggles flymake web-mode js2-mode move-dup
-        doom-modeline webpaste apheleia mastodon pdf-tools dirvish
+        doom-modeline webpaste apheleia mastodon pdf-tools consult-dir
         macrostep json-mode orderless kind-icon git-modes git-blamed
         org-modern ace-pinyin marginalia org-remark elfeed-tube dape
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
@@ -73,7 +73,7 @@
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile eat
-        consult-dir too-wide-minibuffer-mode org-edna
+        too-wide-minibuffer-mode org-edna
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
@@ -83,7 +83,7 @@
         (clutch :host github :repo "LuciusChen/clutch")
         (lexdb :host github :repo "LuciusChen/lexdb")
         (gt :host github :repo "LuciusChen/gt.el")
-        (telega :host github :repo "LuciusChen/telega.el")
+        (telega :host github :repo "LuciusChen/telega.el" :branch "feat/telega-completions")
         (panel :host github :repo "LuciusChen/panel")
         (emt :host github :repo "LuciusChen/emt")
         (meow :host github :repo "meow-edit/meow")
