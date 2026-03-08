@@ -39,9 +39,7 @@
    '("1" . meow-expand-1)
    '("-" . negative-argument)
    '("/" . find-file)
-   (if IS-MAC
-       '(";" . sis-meow-reverse)
-     '(";" . meow-reverse))
+   '(";" . meow-reverse)
    '("," . meow-inner-of-thing)
    '("." . meow-bounds-of-thing)
    '("[" . meow-beginning-of-thing)
@@ -97,13 +95,5 @@
          (telega-chat-mode . normal)))
     (add-to-list 'meow-mode-state-list state)))
 
-;; sis-global-respect-mode 使得 meow-reverse 无效
-(defun sis-meow-reverse ()
-  "Just exchange point and mark.
-This command supports `meow-selection-command-fallback'."
-  (interactive)
-  (sis-global-respect-mode 0)
-  (meow-reverse)
-  (sis-global-respect-mode t))
 (provide 'lib-meow)
 ;;; lib-meow.el ends here
