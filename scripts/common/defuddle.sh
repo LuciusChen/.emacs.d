@@ -15,20 +15,20 @@ if ! command_exists npm && ! command_exists pnpm; then
   exit 1
 fi
 
-# Install defuddle-cli if not already installed
+# Install defuddle if not already installed
 if ! [ -x "$DEFUDDLE_PATH" ]; then
   if command_exists pnpm; then
-    echo "Installing defuddle-cli using pnpm..."
-    pnpm add -g defuddle-cli
+    echo "Installing defuddle using pnpm..."
+    pnpm add -g defuddle
   elif command_exists npm; then
-    echo "Installing defuddle-cli using npm..."
-    npm install -g defuddle-cli
+    echo "Installing defuddle using npm..."
+    npm install -g defuddle
   fi
 
   # Recheck the installation
   DEFUDDLE_PATH=$(command -v defuddle)
   if ! [ -x "$DEFUDDLE_PATH" ]; then
-    echo "Failed to install defuddle-cli. Please check for errors."
+    echo "Failed to install defuddle. Please check for errors."
     exit 1
   fi
 fi
