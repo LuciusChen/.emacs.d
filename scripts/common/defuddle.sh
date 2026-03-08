@@ -1,131 +1,216 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Full paths to ensure the script uses the correct executables
-DEFUDDLE_PATH=$(command -v defuddle)
-PANDOC_PATH=$(command -v pandoc)
+set -euo pipefail
 
-# Function to check if a command exists
 command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
-# Check if npm or pnpm is installed
-if ! command_exists npm && ! command_exists pnpm; then
-  echo "Neither npm nor pnpm is installed. Please install one of them first."
-  exit 1
-fi
+usage() {
+  cat <<'EOF'
+Usage: defuddle.sh [--stdout] [--output FILE | --output-dir DIR] <source>
 
-# Install defuddle if not already installed
-if ! [ -x "$DEFUDDLE_PATH" ]; then
-  if command_exists pnpm; then
-    echo "Installing defuddle using pnpm..."
-    pnpm add -g defuddle
-  elif command_exists npm; then
-    echo "Installing defuddle using npm..."
-    npm install -g defuddle
-  fi
+Convert a URL or local HTML file to Org using defuddle + pandoc.
 
-  # Recheck the installation
-  DEFUDDLE_PATH=$(command -v defuddle)
-  if ! [ -x "$DEFUDDLE_PATH" ]; then
-    echo "Failed to install defuddle. Please check for errors."
-    exit 1
-  fi
-fi
+Options:
+  --stdout           Write Org to stdout instead of a file
+  --output FILE      Write Org to FILE
+  --output-dir DIR   Write an auto-named Org file into DIR
+  -h, --help         Show this help
 
-# Check if pandoc is installed
-if ! [ -x "$PANDOC_PATH" ]; then
-  echo "pandoc is not installed. Please install it first."
-  exit 1
-fi
+If no output option is given, the script keeps the old behavior and writes
+to the default denote clipping directory.
+EOF
+}
 
-# Check for URL parameter
-if [ -z "$1" ]; then
-  echo "Usage: $0 <url>"
-  exit 1
-fi
-
-URL="$1"
-
-# Temporary files for intermediate steps
-MD_TEMP_FILE=$(mktemp)
-ORG_TEMP_FILE=$(mktemp)
-
-# Extract the webpage title
-TITLE=$("$DEFUDDLE_PATH" parse "$URL" -p title)
-
-# Check if title extraction was successful
-if [ -z "$TITLE" ]; then
-  echo "Failed to extract title from $URL"
-  exit 1
-fi
-
-# Function to safely extract properties
-safe_extract_property() {
-  local url=$1
-  local property=$2
-  local value
-  value=$("$DEFUDDLE_PATH" parse "$url" --property "$property" 2>/dev/null)
-  if [[ "$value" != *"Error:"* && -n "$value" ]]; then
-    echo "$value"
+default_output_dir() {
+  if [[ "${OSTYPE:-}" == darwin* ]]; then
+    printf '%s\n' "$HOME/Library/CloudStorage/Dropbox/org/denote/clipping/"
   else
-    echo ""
+    printf '%s\n' "$HOME/Dropbox/org/denote/clipping/"
   fi
 }
 
-# Extract additional properties safely
-AUTHOR=$(safe_extract_property "$URL" "author")
-DESCRIPTION=$(safe_extract_property "$URL" "description")
-SOURCE=$(safe_extract_property "$URL" "source")
+sanitize_filename_component() {
+  local value="$1"
+  value=${value//$'\n'/ }
+  value=${value//$'\r'/ }
+  value=${value//$'\t'/ }
+  value=$(printf '%s' "$value" | sed 's#[/:*?"<>|\\]#-#g; s/[[:space:]]\{1,\}/ /g; s/^ //; s/ $//')
+  if [[ -z "$value" ]]; then
+    value="untitled"
+  fi
+  printf '%s\n' "$value"
+}
 
-# Extract Markdown content
-"$DEFUDDLE_PATH" parse "$URL" --md > "$MD_TEMP_FILE"
+json_get() {
+  local file="$1"
+  local key="$2"
+  node -e '
+const fs = require("fs");
+const [file, key] = process.argv.slice(1);
+const data = JSON.parse(fs.readFileSync(file, "utf8"));
+const value = data[key];
+if (value === undefined || value === null) {
+  process.exit(0);
+}
+if (typeof value === "string") {
+  process.stdout.write(value);
+} else {
+  process.stdout.write(JSON.stringify(value));
+}
+' "$file" "$key"
+}
 
-# Check if content extraction was successful
-if [ ! -s "$MD_TEMP_FILE" ]; then
-  echo "Failed to extract content from $URL"
+build_org_header() {
+  local title="$1"
+  local author="$2"
+  local description="$3"
+  local published="$4"
+  local site="$5"
+  local domain="$6"
+  local source="$7"
+
+  printf '#+title: %s\n' "$title"
+  [[ -n "$author" ]] && printf '#+author: %s\n' "$author"
+  [[ -n "$description" ]] && printf '#+description: %s\n' "$description"
+  [[ -n "$published" ]] && printf '#+date: %s\n' "$published"
+  [[ -n "$site" ]] && printf '#+site: %s\n' "$site"
+  [[ -n "$domain" ]] && printf '#+domain: %s\n' "$domain"
+  printf '#+source: %s\n' "$source"
+  printf '#+filetags: :clipping:\n\n'
+}
+
+OUTPUT_MODE="default"
+OUTPUT_FILE=""
+OUTPUT_DIR=""
+SOURCE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --stdout)
+      OUTPUT_MODE="stdout"
+      shift
+      ;;
+    --output)
+      [[ $# -ge 2 ]] || { echo "--output requires a file path" >&2; exit 1; }
+      OUTPUT_MODE="file"
+      OUTPUT_FILE="$2"
+      shift 2
+      ;;
+    --output-dir)
+      [[ $# -ge 2 ]] || { echo "--output-dir requires a directory path" >&2; exit 1; }
+      OUTPUT_MODE="dir"
+      OUTPUT_DIR="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+    *)
+      if [[ -n "$SOURCE" ]]; then
+        echo "Only one source is supported" >&2
+        exit 1
+      fi
+      SOURCE="$1"
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$SOURCE" && $# -gt 0 ]]; then
+  SOURCE="$1"
+  shift
+fi
+
+if [[ -z "$SOURCE" || $# -gt 0 ]]; then
+  usage >&2
   exit 1
 fi
 
-# Convert Markdown to org format using pandoc
-"$PANDOC_PATH" --wrap=none -f markdown -t org "$MD_TEMP_FILE" -o "$ORG_TEMP_FILE"
+for cmd in defuddle pandoc node; do
+  if ! command_exists "$cmd"; then
+    echo "$cmd is not installed or not in PATH" >&2
+    exit 1
+  fi
+done
 
-# Check the org content for completeness
-if [ ! -s "$ORG_TEMP_FILE" ]; then
-  echo "Conversion to Org format failed"
+JSON_TEMP_FILE=$(mktemp)
+HTML_TEMP_FILE=$(mktemp)
+ORG_TEMP_FILE=$(mktemp)
+
+cleanup() {
+  rm -f "$JSON_TEMP_FILE" "$HTML_TEMP_FILE" "$ORG_TEMP_FILE"
+}
+trap cleanup EXIT
+
+defuddle parse "$SOURCE" --json >"$JSON_TEMP_FILE"
+
+if [[ ! -s "$JSON_TEMP_FILE" ]]; then
+  echo "Failed to extract content from $SOURCE" >&2
   exit 1
 fi
 
-# Create org file header
-ORG_HEADER="#+title: $TITLE\n"
+TITLE=$(json_get "$JSON_TEMP_FILE" "title")
+AUTHOR=$(json_get "$JSON_TEMP_FILE" "author")
+DESCRIPTION=$(json_get "$JSON_TEMP_FILE" "description")
+PUBLISHED=$(json_get "$JSON_TEMP_FILE" "published")
+SITE=$(json_get "$JSON_TEMP_FILE" "site")
+DOMAIN=$(json_get "$JSON_TEMP_FILE" "domain")
+CONTENT=$(json_get "$JSON_TEMP_FILE" "content")
 
-# Create properties block only if any properties are present
-if [ -n "$AUTHOR" ] || [ -n "$DESCRIPTION" ] || [ -n "$SOURCE" ]; then
-  [ -n "$AUTHOR" ] && ORG_HEADER+=":author: $AUTHOR\n"
-  [ -n "$DESCRIPTION" ] && ORG_HEADER+=":description: $DESCRIPTION\n"
-  [ -n "$SOURCE" ] && ORG_HEADER+=":source: $SOURCE\n"
+if [[ -z "$TITLE" ]]; then
+  TITLE=$(basename "$SOURCE")
 fi
 
-# Determine output directory based on OS
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  # macOS
-  OUTPUT_DIR="$HOME/Library/CloudStorage/Dropbox/org/denote/clipping/"
-else
-  # Assume Linux
-  OUTPUT_DIR="$HOME/Dropbox/org/denote/clipping/"
+if [[ -z "$CONTENT" ]]; then
+  echo "Failed to extract article content from $SOURCE" >&2
+  exit 1
 fi
 
-mkdir -p "$OUTPUT_DIR"  # Create directory if it doesn't exist
+printf '%s' "$CONTENT" >"$HTML_TEMP_FILE"
+pandoc --wrap=none -f html -t org "$HTML_TEMP_FILE" -o "$ORG_TEMP_FILE"
 
-# Save the org content to the specified directory with a timestamp prefix
-TIMESTAMP=$(date +"%Y%m%dT%H%M%S")
-FILENAME="${OUTPUT_DIR}${TIMESTAMP}--${TITLE}__clipping.org"
-{
-  echo -e "$ORG_HEADER"
-  cat "$ORG_TEMP_FILE"
-} > "$FILENAME"
+if [[ ! -s "$ORG_TEMP_FILE" ]]; then
+  echo "Conversion to Org format failed" >&2
+  exit 1
+fi
 
-echo "Content saved to $FILENAME"
-
-# Clean up temporary files
-rm -f "$MD_TEMP_FILE" "$ORG_TEMP_FILE"
+case "$OUTPUT_MODE" in
+  stdout)
+    build_org_header "$TITLE" "$AUTHOR" "$DESCRIPTION" "$PUBLISHED" "$SITE" "$DOMAIN" "$SOURCE"
+    cat "$ORG_TEMP_FILE"
+    ;;
+  file)
+    mkdir -p "$(dirname "$OUTPUT_FILE")"
+    {
+      build_org_header "$TITLE" "$AUTHOR" "$DESCRIPTION" "$PUBLISHED" "$SITE" "$DOMAIN" "$SOURCE"
+      cat "$ORG_TEMP_FILE"
+    } >"$OUTPUT_FILE"
+    printf 'Content saved to %s\n' "$OUTPUT_FILE" >&2
+    ;;
+  dir|default)
+    if [[ "$OUTPUT_MODE" == "default" ]]; then
+      OUTPUT_DIR=$(default_output_dir)
+    fi
+    mkdir -p "$OUTPUT_DIR"
+    TIMESTAMP=$(date +"%Y%m%dT%H%M%S")
+    SAFE_TITLE=$(sanitize_filename_component "$TITLE")
+    OUTPUT_FILE="${OUTPUT_DIR%/}/${TIMESTAMP}--${SAFE_TITLE}__clipping.org"
+    {
+      build_org_header "$TITLE" "$AUTHOR" "$DESCRIPTION" "$PUBLISHED" "$SITE" "$DOMAIN" "$SOURCE"
+      cat "$ORG_TEMP_FILE"
+    } >"$OUTPUT_FILE"
+    printf 'Content saved to %s\n' "$OUTPUT_FILE" >&2
+    ;;
+esac

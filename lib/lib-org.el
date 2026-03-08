@@ -182,6 +182,92 @@ If DEST, a buffer, is provided, insert the markup there."
     (pop-to-buffer buff)
     (goto-char (point-min))))
 
+(defconst +org-defuddle-process-buffer "*defuddle*"
+  "Buffer name for `defuddle.sh' process output.")
+
+(defun +org-defuddle-script-path ()
+  "Return the absolute path to `defuddle.sh'."
+  (expand-file-name "scripts/common/defuddle.sh" user-emacs-directory))
+
+(defun +org-defuddle-clipping-directory ()
+  "Return the Org clipping directory."
+  (expand-file-name
+   "clipping"
+   (or (and (boundp 'denote-directory) denote-directory)
+       (expand-file-name "denote" ORG-PATH))))
+
+(defun +org-defuddle-sanitize-title (title)
+  "Turn TITLE into a clipping-safe filename component."
+  (let ((value (replace-regexp-in-string "[\n\r\t]+" " " (or title ""))))
+    (setq value (replace-regexp-in-string "[/:*?\"<>|\\\\]" "-" value))
+    (setq value (replace-regexp-in-string "[[:space:]]+" " " value))
+    (setq value (string-trim value))
+    (if (string-empty-p value) "untitled" value)))
+
+(defun +org-defuddle-extract-title (content source)
+  "Extract a title from CONTENT, falling back to SOURCE."
+  (if (string-match "^#\\+title:[[:space:]]*\\(.+\\)$" content)
+      (string-trim (match-string 1 content))
+    (file-name-base source)))
+
+(defun +org-defuddle-output-file (title)
+  "Build a unique clipping file path for TITLE."
+  (let* ((dir (+org-defuddle-clipping-directory))
+         (timestamp (format-time-string "%Y%m%dT%H%M%S"))
+         (safe-title (+org-defuddle-sanitize-title title))
+         (candidate (expand-file-name
+                     (format "%s--%s__clipping.org" timestamp safe-title)
+                     dir))
+         (counter 1))
+    (make-directory dir t)
+    (while (file-exists-p candidate)
+      (setq candidate (expand-file-name
+                       (format "%s--%s-%d__clipping.org"
+                               timestamp safe-title counter)
+                       dir))
+      (setq counter (1+ counter)))
+    candidate))
+
+(defun +org-defuddle-to-clipping (source)
+  "Fetch SOURCE with `defuddle.sh', save it to clipping, and open the file."
+  (interactive
+   (let ((default-source (thing-at-point 'url t)))
+     (list (read-string "Defuddle URL or file: " nil nil default-source))))
+  (unless (and source (not (string-empty-p source)))
+    (user-error "No URL or file provided"))
+  (let ((script (+org-defuddle-script-path)))
+    (unless (file-executable-p script)
+      (user-error "Missing executable script: %s" script))
+    (let ((buffer (get-buffer-create +org-defuddle-process-buffer)))
+      (with-current-buffer buffer
+        (erase-buffer))
+      (make-process
+       :name "defuddle"
+       :buffer buffer
+       :stderr buffer
+       :command (list script "--stdout" source)
+       :coding 'utf-8-unix
+       :noquery t
+       :sentinel
+       (lambda (process _event)
+         (when (memq (process-status process) '(exit signal))
+           (let ((output-buffer (process-buffer process)))
+             (if (zerop (process-exit-status process))
+                 (let* ((content (with-current-buffer output-buffer
+                                   (buffer-string)))
+                        (title (+org-defuddle-extract-title content source))
+                        (output-file (+org-defuddle-output-file title)))
+                   (with-temp-file output-file
+                     (insert content))
+                   (when (buffer-live-p output-buffer)
+                     (kill-buffer output-buffer))
+                   (find-file output-file)
+                   (message "Saved clipping to %s" output-file))
+               (progn
+                 (display-buffer output-buffer)
+                 (message "defuddle failed for %s" source)))))))
+      (message "Running defuddle for %s..." source))))
+
 (defun get-today-heading ()
   "Return today's date as a headline in the format 'Sat, 08 Mar 2025', creating it if necessary."
   (let ((date-headline (format-time-string "%a, %d %b %Y")))

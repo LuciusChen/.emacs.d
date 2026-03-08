@@ -139,6 +139,7 @@
     (keymap-global-set "C-c n b" 'denote-backlinks)
     (keymap-global-set "C-c n r" 'denote-rename-file)
     (keymap-global-set "C-c n R" 'denote-rename-file-using-front-matter)
+    (keymap-global-set "C-c n w" '+org-defuddle-to-clipping)
     (setopt denote-directory (expand-file-name "denote" ORG-PATH)
             denote-save-buffers nil
             denote-known-keywords '("emacs" "private")
