@@ -79,8 +79,6 @@ the built-in VC log view instead."
    '("--no-walk" "--color" "--decorate" "--follow")'
    nil))
 
-(transient-append-suffix 'magit-log "s" '("d" "dangling" magit-log-dangling))
-
 (defun magit-fullscreen (orig-fun &rest args)
   (window-configuration-to-register :magit-fullscreen)
   (apply orig-fun args)

@@ -30,6 +30,7 @@
       (:bind "C-c C-c" +magit-blob-save
              "C-n"     magit-blob-next
              "C-p"     magit-blob-previous))
+    (transient-append-suffix 'magit-log "s" '("d" "dangling" magit-log-dangling))
     ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
     ;; quickly open magit on any one of your projects.
     (keymap-global-set "C-x g" 'magit-status)
