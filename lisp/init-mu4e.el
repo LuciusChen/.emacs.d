@@ -200,12 +200,9 @@
 
     (add-hook 'message-send-mail-hook '+set-msmtp-account)
 
-    ;; mu4e cc & bcc
-    ;; this is custom as well
+    ;; Automatically add Cc & Bcc headers in mu4e compose mode.
     (add-hook 'mu4e-compose-mode-hook
-              (defun timu/add-cc-and-bcc ()
-                "My Function to automatically add Cc & Bcc: headers.
-    This is in the mu4e compose mode."
+              (lambda ()
                 (save-excursion (message-add-header "Cc:\n"))
                 (save-excursion (message-add-header "Bcc:\n"))))
 
