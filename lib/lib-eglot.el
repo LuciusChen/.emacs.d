@@ -520,7 +520,7 @@ Mirrors IDEA's Run button: build in background, then hot-deploy."
            (message "Maven build FAILED. See %s for details." captured-build-buf)))))))
 
 
-(defun tkj/java-decompile-class ()
+(defun +java-decompile-class ()
   "Run the FernFlower decompiler on the current .class file using
  fernflower, and opens the decompiled Java file."
   (interactive)
