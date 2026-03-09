@@ -36,6 +36,9 @@
                    vc-ignore-dir-regexp
                    tramp-file-name-regexp)))
 
+;; `tramp-revert-buffer-with-sudo' is built-in, but it does not handle
+;; `rpc:' buffers from `emacs-tramp-rpc' correctly. Force RPC buffers to
+;; elevate via `ssh|sudo' instead of the broken `rpc|sudo' path.
 (setup tramp-cmds
   (:load-after tramp)
   (:when-loaded
