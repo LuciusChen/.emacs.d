@@ -160,7 +160,22 @@
     ;; ignore messages from blocked senders (users or chats)
     (:with-hook telega-msg-ignore-predicates
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))
-
+    ;; Normalize the heart reaction to the emoji variant so both the
+    ;; message bubble and `!' completion candidates use ❤️ instead of ❤.
+    (:with-feature telega-ins
+      (:advice telega-ins--msg-reaction-type :around
+               (lambda (fn rt)
+                 (if (eq (telega--tl-type rt) 'reactionTypeEmoji)
+                     (telega-ins
+                      (if (equal (telega-tl-str rt :emoji) "❤") "❤️"
+                        (telega-tl-str rt :emoji)))
+                   (funcall fn rt)))))
+      (:with-feature telega-util
+        (:advice telega-msg-reaction-title-for-completion :filter-return
+                 (lambda (s)
+                   (if (string-prefix-p "❤" s)
+                       (concat "❤️" (substring s 1))
+                     s))))
     ;; telega-notifications
     (:with-hook telega-connection-state-hook (:hook +mode-line-telega-icon-update))
     (:with-hook telega-kill-hook (:hook +mode-line-telega-icon-update))

@@ -43,8 +43,7 @@
             doom-modeline-hud t
             doom-modeline-hud-min-height 1)
     (:with-feature telega
-      (:when-loaded
-        (doom-modeline-def-segment +buffer-info
+      (doom-modeline-def-segment +buffer-info
         "Customize doom-modeline to remove modification indication"
         (let ((buffer-name (doom-modeline--buffer-name)))
           (when (derived-mode-p 'telega-root-mode 'telega-chat-mode 'org-agenda-mode)
@@ -65,7 +64,7 @@
 
       (add-to-list 'doom-modeline-mode-alist '(telega-root-mode . disable-modification-indication))
       (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disable-modification-indication))
-      (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disable-modification-indication))))
+      (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disable-modification-indication)))
 
     (doom-modeline-mode)))
 
