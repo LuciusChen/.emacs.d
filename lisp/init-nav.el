@@ -25,6 +25,47 @@
                                   dired-hide-details-mode
                                   diredfl-mode))))
 
+(setup tramp
+  (:option tramp-default-method "ssh"
+           tramp-chunksize 500
+           tramp-persistency-file-name
+           (expand-file-name "tramp" user-emacs-directory)
+           password-cache-expiry 3600
+           vc-ignore-dir-regexp
+           (format "\\(%s\\)\\|\\(%s\\)"
+                   vc-ignore-dir-regexp
+                   tramp-file-name-regexp)))
+
+(setup tramp-cmds
+  (:load-after tramp)
+  (:when-loaded
+    (defun +tramp-rpc-file-name-with-sudo-via-ssh (filename)
+      "Build a sudo Tramp file name for RPC-backed FILENAME via SSH."
+      (with-parsed-tramp-file-name (expand-file-name filename) nil
+        (let* ((sudo-method (tramp-get-file-name-with-method))
+               (ssh-hop
+                (tramp-make-tramp-hop-name
+                 (make-tramp-file-name :method "ssh" :user user :host host))))
+          (let ((tramp-show-ad-hoc-proxies t))
+            (tramp-make-tramp-file-name
+             (make-tramp-file-name
+              :method (tramp-find-method sudo-method nil host)
+              :user (tramp-find-user sudo-method nil host)
+              :host (tramp-find-host sudo-method nil host)
+              :localname localname
+              :hop ssh-hop))))))
+
+    (defun +tramp-file-name-with-sudo-rpc-a (orig-fun filename)
+      "Route RPC-backed sudo elevation through SSH for FILENAME."
+      (let ((filename (expand-file-name filename)))
+        (if (and (tramp-tramp-file-p filename)
+                 (with-parsed-tramp-file-name filename nil
+                   (string= method "rpc")))
+            (+tramp-rpc-file-name-with-sudo-via-ssh filename)
+          (funcall orig-fun filename))))
+
+    (advice-add 'tramp-file-name-with-sudo :around #'+tramp-file-name-with-sudo-rpc-a)))
+
 (setup bookmark ;; C-x r b
   (:when-loaded
     (setopt bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
