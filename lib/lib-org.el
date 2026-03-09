@@ -402,23 +402,6 @@ If FILE-PATH is non-nil, sort entries in that file. Otherwise, sort in the curre
           (replace-match (concat "\\1" (car pair) "\\2") t))))
     (message "Smart punctuation and quotes fixed in the region.")))
 
-(defun +org-scan-tags (match)
-  "Scan tags in the current buffer using MATCH and print matching headings."
-  (interactive "sTag match: ")
-  (let ((matcher (org-make-tags-matcher match))
-        (results '()))
-    (org-scan-tags
-     (lambda ()
-       (let ((heading (org-get-heading t t t t)))
-         (and (org-match-sparse-tree nil match)
-              (push heading results))))
-     matcher nil)
-    (if results
-        (progn
-          (message "Matching headings:")
-          (dolist (res (reverse results))
-            (message "%s" res)))
-      (message "No matching headings found."))))
 
 (defun +org-emphasize-below-point (&optional char)
   "Emphasize region with CHAR.
