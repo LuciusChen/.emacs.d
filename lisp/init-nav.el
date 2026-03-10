@@ -22,7 +22,6 @@
     (let ((gls (executable-find "gls")))
       (when gls (setq insert-directory-program gls)))
     (:with-mode dired-mode (:hook diff-hl-dired-mode
-                                  dired-hide-details-mode
                                   diredfl-mode))))
 
 (setup tramp
