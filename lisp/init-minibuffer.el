@@ -42,7 +42,8 @@
             doom-modeline-hud t
             doom-modeline-hud-min-height 1)
     (:with-feature telega
-      (add-to-list 'global-mode-string '("" (:eval (+mode-line-telega-icon))) t))
+      (:when-loaded
+        (add-to-list 'global-mode-string '("" (:eval (+mode-line-telega-icon))) t)))
 
     (doom-modeline-mode)))
 
