@@ -35,7 +35,6 @@
 (setup doom-modeline
   (:defer (:require doom-modeline))
   (:when-loaded
-    ;; (:with-function +mode-line-telega-icon (:autoload-this))
     (setopt doom-modeline-height 18
             doom-modeline-buffer-file-name-style 'auto
             doom-modeline-buffer-modification-icon t
@@ -43,28 +42,7 @@
             doom-modeline-hud t
             doom-modeline-hud-min-height 1)
     (:with-feature telega
-      (doom-modeline-def-segment +buffer-info
-        "Customize doom-modeline to remove modification indication"
-        (let ((buffer-name (doom-modeline--buffer-name)))
-          (when (derived-mode-p 'telega-root-mode 'telega-chat-mode 'org-agenda-mode)
-            (setq buffer-name
-                  (propertize buffer-name 'face
-                              `(:inherit doom-modeline))))
-          (concat
-           (doom-modeline-spc)
-           (doom-modeline--buffer-mode-icon)
-           (doom-modeline--buffer-state-icon)
-           buffer-name)))
-      (doom-modeline-def-segment telega (+mode-line-telega-icon))
-      (doom-modeline-def-modeline 'disable-modification-indication
-        '(bar workspace-name window-number modals +buffer-info selection-info)
-        '(telega misc-info minor-modes buffer-encoding major-mode time))
-      (:with-hook doom-modeline-mode-hook
-        (:hook (lambda ()(doom-modeline-set-modeline 'disable-modification-indication 'default))))
-
-      (add-to-list 'doom-modeline-mode-alist '(telega-root-mode . disable-modification-indication))
-      (add-to-list 'doom-modeline-mode-alist '(telega-chat-mode . disable-modification-indication))
-      (add-to-list 'doom-modeline-mode-alist '(org-agenda-mode . disable-modification-indication)))
+      (add-to-list 'global-mode-string '("" (:eval (+mode-line-telega-icon))) t))
 
     (doom-modeline-mode)))
 

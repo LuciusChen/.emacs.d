@@ -26,10 +26,12 @@
 (setup pinyinlib
   (:load-after orderless)
   (:when-loaded
-    (add-to-list 'orderless-matching-styles
-                 (lambda (str)
-                   (orderless-regexp
-                    (pinyinlib-build-regexp-string str nil nil t))))))
+    (add-to-list 'orderless-style-dispatchers
+                 (lambda (component _index _total)
+                   (when (string-prefix-p "`" component)
+                     `(orderless-regexp
+                       . ,(pinyinlib-build-regexp-string
+                           (substring component 1) nil nil t)))))))
 
 (setup corfu
   (:defer (:require corfu))
