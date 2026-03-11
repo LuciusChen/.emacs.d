@@ -433,7 +433,9 @@
   (:when-loaded (eshell-syntax-highlighting-global-mode +1)))
 
 (setup clutch
-  (setopt clutch-connection-alist
+  (:when-loaded
+    (:require clutch-db-jdbc)
+    (setopt clutch-connection-alist
           '(("zj_test" .
              (:host "192.168.1.225"
                     :port 3306
@@ -448,7 +450,19 @@
              (:host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com"
                     :port 3306
                     :user "zj_user"
-                    :database "zj")))))
+                    :database "zj"))
+            ("nc_online" .
+             (:backend oracle
+                       :host "47.96.188.6"
+                       :port 1521
+                       :user "zjsy"
+                       :database "ORCL"))
+            ("nc_test" .
+             (:backend oracle
+                       :host "192.168.1.226"
+                       :port 1521
+                       :user "zj530"
+                       :sid "zjerp"))))))
 
 (provide 'init-prog)
 ;;; init-prog.el ends here
