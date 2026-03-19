@@ -52,12 +52,19 @@ fi
 # Change to the build directory
 cd "$BUILD_DIR"
 
-# Always update local emacs source to latest before build (if present)
-if [[ -d "$BUILD_DIR/src/emacs/.git" ]]; then
-  echo "Updating emacs source branch '$BRANCH'..."
-  git -C "$BUILD_DIR/src/emacs" fetch --all --prune
-  git -C "$BUILD_DIR/src/emacs" checkout "$BRANCH"
-  git -C "$BUILD_DIR/src/emacs" pull --ff-only origin "$BRANCH"
+# Remove a stale working tree left behind by a previous failed makepkg run.
+# makepkg expects $BUILD_DIR/src/emacs to be a git working copy for VCS
+# sources; a plain directory there will make the next run fail with
+# "not a git repository" during extraction.
+if [[ -d "$BUILD_DIR/src/emacs" && ! -e "$BUILD_DIR/src/emacs/.git" ]]; then
+  echo "Removing stale non-git working tree: $BUILD_DIR/src/emacs"
+  rm -rf "$BUILD_DIR/src/emacs"
+fi
+
+# Update the cached bare repository that makepkg uses for the VCS source.
+if git --git-dir="$BUILD_DIR/emacs" rev-parse --is-bare-repository >/dev/null 2>&1; then
+  echo "Updating cached emacs git repo..."
+  git --git-dir="$BUILD_DIR/emacs" fetch --all --prune
 fi
 
 # Show current directory structure
