@@ -20,6 +20,8 @@ clutch-jdbc/
 tree-sitter/
 auto-save-list/
 debug-adapters/
+clutch/
+clutch-jdbc/
 eglot-java-eclipse-jdt-cache/
 tramp
 history

@@ -319,9 +319,8 @@
       (:bind "C-c C-b" eglot-java-project-build-task
              "C-c C-B" (lambda () (interactive)(eglot-java-run-test t))
              "C-c C-t" eglot-code-actions
-             "C-c C-d" tomcat-build-and-deploy
-             "C-c C-s" tomcat-safe-shutdown))
-    ;; 对于低版本 JDK 需要先执行 select-java-home 设置 JAVA_HOME 后 build
+             "C-c C-d" java-server-tomcat-deploy
+             "C-c C-s" java-server-tomcat-stop))
     (setopt eglot-java-server-install-dir jdtls-install-dir
             eglot-java-default-task "clean install" ;; fork 了提了 pr 还未合并
             eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
@@ -338,12 +337,7 @@
                                                     ;; "-XX:FreqInlineSize=325"
                                                     ;; "-XX:MaxInlineLevel=9"
                                                     "-XX:+UseCompressedOops")))
-            eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)
-    ;; 项目利用 apheleia + google-java-format 格式化的是需要 JDK>17
-    ;; 但是老项目需要 JAVA_HOME 设置低版本
-    ;; 因此暂时注释，手动执行 select-java-home
-    ;; (:with-hook eglot-connect-hook (:hook maven-auto-select-java-home))
-    ))
+            eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster
 ;; Download the executable file from the address above and place it in your exec-path.
@@ -436,33 +430,21 @@
   (:when-loaded
     (:require clutch-db-jdbc)
     (setopt clutch-connection-alist
-          '(("zj_test" .
-             (:host "192.168.1.225"
-                    :port 3306
-                    :user "cjh_test_225"
-                    :database "zj_test"))
-            ("zj_oil" .
-             (:host "47.102.194.129"
-                    :port 3306
-                    :user "zj_oil"
-                    :database "zj_oil"))
-            ("zj_online" .
-             (:host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com"
-                    :port 3306
-                    :user "zj_user"
-                    :database "zj"))
-            ("nc_online" .
-             (:backend oracle
-                       :host "47.96.188.6"
-                       :port 1521
-                       :user "zjsy"
-                       :database "ORCL"))
-            ("nc_test" .
-             (:backend oracle
-                       :host "192.168.1.226"
-                       :port 1521
-                       :user "zj530"
-                       :sid "zjerp"))))))
+            '(("zj_test"
+               :host "192.168.1.225" :port 3306
+               :user "cjh_test_225" :database "zj_test")
+              ("zj_oil"
+               :host "47.102.194.129" :port 3306
+               :user "zj_oil" :database "zj_oil")
+              ("zj_online"
+               :host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com" :port 3306
+               :user "zj_user" :database "zj")
+              ("nc_online"
+               :backend oracle :host "47.96.188.6" :port 1521
+               :user "zjsy" :database "ORCL")
+              ("nc_test"
+               :backend oracle :host "192.168.1.226" :port 1521
+               :user "zj530" :sid "zjerp")))))
 
 (provide 'init-prog)
 ;;; init-prog.el ends here
