@@ -26,7 +26,7 @@
 (defconst ORG-PATH (expand-file-name "org" DROPBOX-PATH))
 (defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst FONT-SIZE (if IS-MAC 14 12))
-(defconst DEFAULT-FONT (format "PragmataPro %d" FONT-SIZE))
+(defconst DEFAULT-FONT (format "PragmataPro Mono %d" FONT-SIZE))
 (defconst ORG-FONT (format "PragmataPro %d" FONT-SIZE))
 (defconst ZH-DEFAULT-FONT "LXGW WenKai Screen")
 (defconst NERD-ICONS-FONT "PragmataPro")
@@ -73,7 +73,7 @@
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile eat
-        too-wide-minibuffer-mode org-edna
+        too-wide-minibuffer-mode org-edna indent-bars
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
@@ -81,6 +81,7 @@
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (passages :host github :repo "LuciusChen/passages")
         (clutch :host github :repo "LuciusChen/clutch")
+        (java-server :host github :repo "LuciusChen/java-server")
         (lexdb :host github :repo "LuciusChen/lexdb")
         (gt :host github :repo "LuciusChen/gt.el")
         (telega :host github :repo "LuciusChen/telega.el" :branch "feat/telega-completions")
@@ -88,10 +89,8 @@
         (emt :host github :repo "LuciusChen/emt")
         (meow :host github :repo "meow-edit/meow")
         (gptel :host github :repo "karthink/gptel")
-        ;; (telega :host github :repo "zevlg/telega.el")
         (tramp-rpc :host github :repo "ArthurHeymans/emacs-tramp-rpc")
         (yasnippet :host github :repo "joaotavora/yasnippet")
-        (indent-bars :host github :repo "jdtsmith/indent-bars")
         (eglot-booster :host github :repo "jdtsmith/eglot-booster")
         ;; (beancount-mode :host github :repo "beancount/beancount-mode")
         (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))))
