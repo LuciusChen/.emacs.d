@@ -60,22 +60,7 @@
     ;; To avoid unnecessary settings on non-Linux systems, the `when` conditional
     ;; is used to apply this rule only in a Linux environment.
     ;; https://t.me/emacs_china/297476
-    (set-char-table-range composition-function-table #xFE0F '(["\\c.\\c^+" 1 compose-gstring-for-graphic])))
-  ;; Some characters are not being covered, so this workaround is used. 2025-04-07
-  ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
-  (let ((ranges '((#xE5FA . #xE6B7)    ;; Seti-UI + Custom
-                  (#xE700 . #xE8EF)    ;; Devicons
-                  (#xED00 . #xF2FF)    ;; Font Awesome
-                  (#xE200 . #xE2A9)    ;; Font Awesome Extension
-                  (#xF0001 . #xF1AF0)  ;; Material Design Icons
-                  (#xE300 . #xE3E3)    ;; Weather
-                  (#xF400 . #xF533)    ;; Octicons
-                  (#x2665 . #x2665)    ;; Octicons
-                  (#x26A1 . #x26A1)    ;; Octicons
-                  (#xE000 . #xE00A)    ;; Pomicons
-                  (#xEA60 . #xEC1E)))) ;; Codicons
-    (dolist (range ranges)
-      (set-fontset-font t range NERD-ICONS-FONT))))
+    (set-char-table-range composition-function-table #xFE0F '(["\\c.\\c^+" 1 compose-gstring-for-graphic]))))
 
 (defun +suggest-other-faces (func &rest args)
   "Temporarily disable `global-hl-line-mode' while executing FUNC with ARGS."
