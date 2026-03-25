@@ -249,12 +249,5 @@
               goggles--delta 0))))
   (:advice goggles--post-command :override #'+goggles--post-command))
 
-(setup ultra-scroll
-  (:defer (:require ultra-scroll))
-  (:when-loaded
-    (setq scroll-conservatively 101 ; important!
-          scroll-margin 0)
-    (ultra-scroll-mode 1)))
-
 (provide 'init-editing)
 ;;; init-editing.el ends here
