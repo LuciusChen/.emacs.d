@@ -102,8 +102,7 @@
   (:when-loaded
     (when (and (display-graphic-p)
                (not (find-font (font-spec :name nerd-icons-font-family))))
-      (nerd-icons-install-fonts t))
-    (nerd-icons-set-font NERD-ICONS-FONT)))
+      (nerd-icons-install-fonts t))))
 
 (setup window-navigation
   (:defer (:require window-navigation))
