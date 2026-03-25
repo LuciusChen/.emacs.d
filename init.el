@@ -66,12 +66,12 @@
         macrostep json-mode orderless kind-icon git-modes git-blamed
         org-modern ace-pinyin marginalia org-remark elfeed-tube dape
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
-        org-cliplink language-detection ox-pandoc breadcrumb ultra-scroll
+        org-cliplink language-detection ox-pandoc breadcrumb eat
         markdown-mode mode-line-bell embark-consult speed-type diminish
         elfeed-tube-mpv typescript-mode command-log-mode password-store
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
-        default-text-scale eshell-syntax-highlighting projectile eat
+        default-text-scale eshell-syntax-highlighting projectile
         too-wide-minibuffer-mode org-edna indent-bars
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
