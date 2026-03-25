@@ -22,7 +22,6 @@
 (defconst *term-default-font* (format "Aporetic Serif Mono %d" FONT-SIZE))
 (defconst *prog-font* (format "Aporetic Serif Mono %d" FONT-SIZE))
 (defconst ZH-DEFAULT-FONT "LXGW WenKai")
-(defconst NERD-ICONS-FONT "Symbols Nerd Font Mono")
 (defconst EMOJI-FONTS '("Apple Color Emoji"
                         "Noto Color Emoji"
                         "Noto Emoji"

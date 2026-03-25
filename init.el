@@ -29,7 +29,6 @@
 (defconst DEFAULT-FONT (format "PragmataPro Mono %d" FONT-SIZE))
 (defconst ORG-FONT (format "PragmataPro %d" FONT-SIZE))
 (defconst ZH-DEFAULT-FONT "LXGW WenKai Screen")
-(defconst NERD-ICONS-FONT "PragmataPro")
 (defconst EMOJI-FONTS '("Apple Color Emoji"
                         "Noto Color Emoji"
                         "Noto Emoji"
