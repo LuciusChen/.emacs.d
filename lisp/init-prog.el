@@ -64,7 +64,10 @@
             (apheleia-formatters-indent "--tabs" "--spaces" 'tab-width)
             (apheleia-formatters-fill-column "--wrap-limit")))
     (setf (alist-get 'sql-formatter apheleia-formatters)
-          '("sql-formatter" "-l" "mysql"))
+        '("sql-formatter"
+          "-l" "mysql"
+          "-c" "{\"tabWidth\":4,\"useTabs\":false,\"keywordCase\":\"upper\",\"dataTypeCase\":\"upper\",\"functionCase\":\"upper\",\"identifierCase\":\"preserve\",
+  \"logicalOperatorNewline\":\"before\",\"expressionWidth\":80,\"linesBetweenQueries\":1,\"denseOperators\":false,\"newlineBeforeSemicolon\":false}"))
 
     (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black)) ;; isort black
     (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html) ;; prettier
@@ -358,25 +361,15 @@
   (:defer (:require dape))
   (:when-loaded
     (keymap-global-set "<f5>" 'dape)
-    (setopt dape-buffer-window-arrangement 'right)
-    ;; https://github.com/svaante/dape/issues/108
-    (add-to-list 'dape-configs
-                 `(jdtls-extra
-                   modes (java-mode java-ts-mode)
-                   fn (lambda (config)
-                        (with-current-buffer
-                            (find-file-noselect (expand-file-name (plist-get config :program)
-                                                                  (project-root (project-current))))
-                          (thread-first
-                            config
-                            (plist-put 'hostname "localhost")
-                            (plist-put 'port (eglot-execute-command (eglot-current-server)
-                                                                    "vscode.java.startDebugSession" nil))
-                            (plist-put :projectName (project-name (project-current))))))
-                   :program dape-buffer-default
-                   :request "attach"
-                   :hostname "localhost"
-                   :port 8000))
+    ;; Java is easier to inspect when locals/watch expand a bit by default.
+    (setopt dape-buffer-window-arrangement 'right
+            dape-info-hide-mode-line nil
+            dape-info-variable-table-aligned t
+            dape-variable-auto-expand-alist '((hover . 2)
+                                              (watch . 2)
+                                              (repl . 1)
+                                              (0 . 2))
+            dape-inlay-hints t)
     ;; Save buffers on startup, useful for interpreted languages
     (:hook dape-start-hook (lambda () (save-some-buffers t t)))))
 

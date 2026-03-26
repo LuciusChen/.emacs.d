@@ -54,9 +54,11 @@
         ("bb" "Toggle"     dape-breakpoint-toggle          :transient t)
         ("bd" "Delete"     dape-breakpoint-remove-at-point :transient t)
         ("bD" "Delete all" dape-breakpoint-remove-all      :transient t)
-        ("bl" "Log"        dape-breakpoint-log             :transient t)]
+       ("bl" "Log"        dape-breakpoint-log             :transient t)]
        ["Info"
         ("si" "Info"         dape-info         :transient t)
+        ("sw" "Watch"        dape-watch-dwim   :transient t)
+        ("sx" "Eval"         dape-evaluate-expression :transient t)
         ("sm" "Memory"       dape-read-memory  :transient t)
         ("ss" "Select Stack" dape-select-stack :transient t)
         ("sr" "Repl"         dape-repl         :transient t)]
