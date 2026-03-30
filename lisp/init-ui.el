@@ -100,10 +100,10 @@
 
 (setup nerd-icons
   (:when-loaded
-    (when (and (display-graphic-p)
-               (not (find-font (font-spec :name nerd-icons-font-family))))
-      (nerd-icons-install-fonts t))
-    (nerd-icons-set-font)))
+    (when (display-graphic-p)
+      (unless (find-font (font-spec :name nerd-icons-font-family))
+        (nerd-icons-install-fonts t))
+      (nerd-icons-set-font))))
 
 (setup window-navigation
   (:defer (:require window-navigation))
