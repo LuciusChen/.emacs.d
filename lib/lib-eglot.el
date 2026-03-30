@@ -54,6 +54,32 @@ SERVER and EGLOT-JAVA-ECLIPSE-JDT are passed by Eglot."
                   (expand-file-name "~/.emacs.d/debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/")
                   t "com.microsoft.java.debug.plugin-[0-9.]+\\.jar$" t)))]))
 
+(defun jdtls-find-java-program ()
+  "Find the best java executable for running jdtls (Java 17-21, highest first).
+On Linux, scans /usr/lib/jvm/java-NN-openjdk directories.
+On macOS, tries /usr/libexec/java_home for versions 21 down to 17."
+  (cond
+   (IS-LINUX
+    (let* ((candidates (seq-filter
+                        (lambda (dir)
+                          (let ((ver (string-to-number
+                                      (nth 1 (split-string (file-name-nondirectory dir) "-")))))
+                            (and (<= 17 ver) (<= ver 21))))
+                        (directory-files "/usr/lib/jvm/" t "^java-[0-9]+-openjdk$")))
+           (sorted (sort candidates
+                         (lambda (a b)
+                           (> (string-to-number (nth 1 (split-string (file-name-nondirectory a) "-")))
+                              (string-to-number (nth 1 (split-string (file-name-nondirectory b) "-")))))))
+           (best (car sorted)))
+      (when best (concat best "/bin/java"))))
+   (IS-MAC
+    (cl-loop for ver from 21 downto 17
+             for home = (string-trim
+                         (shell-command-to-string
+                          (format "/usr/libexec/java_home -v %d 2>/dev/null" ver)))
+             when (and (not (string-empty-p home)) (file-exists-p (concat home "/bin/java")))
+             return (concat home "/bin/java")))))
+
 (defvar jdtls-install-dir
   (let* ((base-dir (cond
                     (IS-MAC "/opt/homebrew/Cellar/jdtls/")
