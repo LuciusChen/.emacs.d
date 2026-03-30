@@ -325,6 +325,7 @@
              "C-c C-d" java-server-tomcat-deploy
              "C-c C-s" java-server-tomcat-stop))
     (setopt eglot-java-server-install-dir jdtls-install-dir
+            eglot-java-java-program (jdtls-find-java-program)
             eglot-java-default-task "clean install" ;; fork 了提了 pr 还未合并
             eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
             eglot-java-eclipse-jdt-config-directory (when jdtls-install-dir
@@ -339,7 +340,7 @@
                                                     "-XX:+UseStringDeduplication"
                                                     ;; "-XX:FreqInlineSize=325"
                                                     ;; "-XX:MaxInlineLevel=9"
-                                                    "-XX:+UseCompressedOops")))
+                                                    )))
             eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
 
 ;; https://github.com/blahgeek/emacs-lsp-booster
