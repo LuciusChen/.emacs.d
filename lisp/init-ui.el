@@ -77,18 +77,19 @@
                          (line-beginning-position 2))))
   (global-hl-line-mode))
 
-(when window-system
-  (setup panel
-    (setopt panel-latitude 32.09703
-            panel-longitude 118.77969
-            panel-path-max-length 35
-            panel-min-left-padding 10
-            panel-image-file "~/.emacs.d/assets/bitmap.png"
-            panel-image-width 400
-            panel-image-height 169
-            panel-title "Happy hacking, lucius - Emacs ♥ you")
-    (panel-create-hook))
+(setup panel
+  (setopt panel-latitude 32.09703
+          panel-longitude 118.77969
+          panel-path-max-length 35
+          panel-min-left-padding 10
+          panel-intro-display 'tty
+          panel-image-file "~/.emacs.d/assets/bitmap.png"
+          panel-image-width 400
+          panel-image-height 169
+          panel-title "")
+  (panel-create-hook))
 
+(when window-system
   (setup faces
     (:also-load lib-face)
     (:with-hook (window-setup-hook
