@@ -72,14 +72,20 @@
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale eshell-syntax-highlighting projectile
-        too-wide-minibuffer-mode org-edna indent-bars
+        too-wide-minibuffer-mode org-edna indent-bars package-lint
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (passages :host github :repo "LuciusChen/passages")
-        (clutch :host github :repo "LuciusChen/clutch")
+        (emacs-smart-input-source :host github :repo "LuciusChen/emacs-smart-input-source")
+        (chirp :host github :repo "LuciusChen/chirp")
+        (ghostel :host github :repo "dakra/ghostel")
+        (mysql :host github :repo "LuciusChen/mysql.el")
+        (pg :host github :repo "emarsden/pg-el")
+        (clutch :host github :repo "LuciusChen/clutch" :branch "feature/package-split")
+        (ob-clutch :host github :repo "LuciusChen/ob-clutch")
         (java-server :host github :repo "LuciusChen/java-server")
         (lexdb :host github :repo "LuciusChen/lexdb")
         (gt :host github :repo "LuciusChen/gt.el")
