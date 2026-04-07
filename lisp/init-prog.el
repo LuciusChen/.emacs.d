@@ -430,5 +430,8 @@
                 ("nc_online" . (:backend oracle :profile-entry "oracle/nc_online"))
                 ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp"))))))
 
+(setup ob-clutch
+    (:load-after org))
+
 (provide 'init-prog)
 ;;; init-prog.el ends here
