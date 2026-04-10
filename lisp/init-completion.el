@@ -54,11 +54,9 @@
     (:with-mode prog-mode (:hook corfu-mode))
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
-             "<right>" corfu-quit
              "TAB"  corfu-next
              [tab]  corfu-next
-             "S-TAB"  corfu-previous
-             [backtab]  corfu-previous))
+             "S-TAB"  corfu-previous))
     (:with-mode eshell-mode
       (:local-set corfu-auto nil)
       (corfu-mode))))
