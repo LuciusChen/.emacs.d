@@ -32,7 +32,6 @@
                 telega-bridge-bot
                 telega-mnz
                 lib-telega
-                cl-lib
                 telega-notifications
                 ;; If language-detection is available,
                 ;; then laguage could be detected automatically
@@ -156,7 +155,12 @@
         (:chat-id "!UdcRVLCUPlBpwjoUET:nichi.co" :type :matrix))
        -1001066867565                ; ～现代前端魔法部～
        (420415423                    ; @matrix_t2bot
-        (:chat-id "!kkriwaRKIBYFoYfXjb:matrix.org" :type :matrix))))
+        (:chat-id "!kkriwaRKIBYFoYfXjb:matrix.org" :type :matrix)))
+     telega-box-button-styles (let ((styles (copy-tree telega-box-button-styles)))
+                                (setf (alist-get 'admin-sender-tag styles)
+                                      '(:inherit owner-sender-tag
+                                                 :passive-face telega-shadow))
+                                styles))
     ;; ignore messages from blocked senders (users or chats)
     (:with-hook telega-msg-ignore-predicates
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))
@@ -170,12 +174,12 @@
                       (if (equal (telega-tl-str rt :emoji) "❤") "❤️"
                         (telega-tl-str rt :emoji)))
                    (funcall fn rt)))))
-      (:with-feature telega-util
-        (:advice telega-msg-reaction-title-for-completion :filter-return
-                 (lambda (s)
-                   (if (string-prefix-p "❤" s)
-                       (concat "❤️" (substring s 1))
-                     s))))
+    (:with-feature telega-util
+      (:advice telega-msg-reaction-title-for-completion :filter-return
+               (lambda (s)
+                 (if (string-prefix-p "❤" s)
+                     (concat "❤️" (substring s 1))
+                   s))))
     ;; telega-notifications
     (:with-hook telega-connection-state-hook (:hook +mode-line-telega-icon-update))
     (:with-hook telega-kill-hook (:hook +mode-line-telega-icon-update))
@@ -186,8 +190,10 @@
     (:advice telega-msg-observable-p :after  #'+mode-line-telega-icon-update)
 
     (:with-mode telega-chat-mode
-      (:hook +telega-completion-setup)
-      (:hook (lambda () (electric-pair-local-mode -1))))
+      (:hook telega-completions-setup-capf)
+      (:hook (lambda ()
+               (setq-local completion-cycle-threshold nil)
+               (electric-pair-local-mode -1))))
     (:with-mode telega-image-mode (:hook image-transform-fit-to-window))
     ;; telega-url-shorten
     (global-telega-url-shorten-mode 1)
