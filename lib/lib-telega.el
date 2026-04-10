@@ -7,17 +7,6 @@
              (telega-url-at-point))))
     (xwidget-webkit-browse-url entry-link)))
 
-;; Completion is handled by upstream telega CAPF/company path in telega-chat.el.
-(defun +telega-completion-setup ()
-  "Enable telega CAPF path with company loaded."
-  ;; `telega-chatbuf-complete-at-point' is gated by (featurep 'company).
-  (require 'company nil t)
-  (setq-local completion-at-point-functions
-              (cons #'telega-chatbuf-complete-at-point
-                    completion-at-point-functions))
-  (when (fboundp 'corfu-mode)
-    (corfu-mode 1)))
-
 (defun +telega-save-file-to-clipboard (msg)
   "Save file at point to clipboard.
 NOTE: macOS only."
