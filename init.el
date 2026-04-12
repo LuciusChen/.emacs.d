@@ -89,7 +89,6 @@
         (java-server :host github :repo "LuciusChen/java-server")
         (lexdb :host github :repo "LuciusChen/lexdb")
         (gt :host github :repo "LuciusChen/gt.el")
-        (telega :host github :repo "LuciusChen/telega.el" :branch "feat/telega-completions")
         (telega :host github :repo "LuciusChen/telega.el")
         (panel :host github :repo "LuciusChen/panel")
         (emt :host github :repo "LuciusChen/emt")
