@@ -39,6 +39,7 @@ else
 fi
 
 BUILT_COMMIT_FILE="$TARGET_DIR/.built_commit"
+SYSTEM_BUILT_COMMIT_FILE="$TARGET_DIR/.built_commit_usr_local"
 
 # If a commit hash is provided as an argument, checkout that commit
 if [ -n "$1" ]; then
@@ -48,8 +49,15 @@ else
   git pull
   LOCAL=$(git rev-parse HEAD)
   BUILT=$(cat "$BUILT_COMMIT_FILE" 2>/dev/null)
+  SYSTEM_BUILT=$(cat "$SYSTEM_BUILT_COMMIT_FILE" 2>/dev/null)
 
-  if [ "$LOCAL" = "$BUILT" ]; then
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    UP_TO_DATE=true
+  else
+    UP_TO_DATE=$([ "$LOCAL" = "$SYSTEM_BUILT" ] && echo true || echo false)
+  fi
+
+  if [ "$LOCAL" = "$BUILT" ] && [ "$UP_TO_DATE" = true ]; then
     echo "Already up-to-date and successfully built. No build needed."
     exit 0
   fi
@@ -69,8 +77,13 @@ cd build
 # Set CMake command based on OS
 if [[ "$OSTYPE" == "darwin"* ]]; then
   cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ -DCMAKE_INSTALL_PREFIX:PATH=/usr/local ..
+  sudo cmake --build . --target install && git rev-parse HEAD > "$BUILT_COMMIT_FILE"
 else
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=../tdlib ..
-fi
+  cmake --build . --target install
 
-sudo cmake --build . --target install && git rev-parse HEAD > "$BUILT_COMMIT_FILE"
+  # Keep /usr/local in sync for consumers like telega that link against it.
+  sudo cmake --install . --prefix /usr/local
+  git rev-parse HEAD > "$BUILT_COMMIT_FILE"
+  git rev-parse HEAD > "$SYSTEM_BUILT_COMMIT_FILE"
+fi
