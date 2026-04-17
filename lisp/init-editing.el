@@ -41,8 +41,6 @@
           blink-matching-paren-highlight-offscreen t))
 
 (setup simple
-  (keymap-global-set "C-." 'set-mark-command)
-  (keymap-global-set "C-x C-." 'pop-global-mark)
   ;; 从光标位置删除到行首第一个非空格字符。
   (keymap-global-set "C-M-<backspace>" (lambda ()
                                          (interactive)
