@@ -20,16 +20,20 @@
          (executable-find "wl-copy")
          (executable-find "wl-paste")))
 
-  (defun wl-copy (text)
+  (defun +wl-copy (text)
     "Used to copy TEXT to the clipboard."
     (let ((process-connection-type nil))
       (let ((proc (start-process "wl-copy" "*Messages*" "wl-copy" "-f" "-n")))
         (process-send-string proc text)
         (process-send-eof proc))))
 
-  (defun wl-paste ()
-    "Paste text from clipboard."
-    (shell-command-to-string "wl-paste -n | tr -d \r"))
+  (defun +wl-paste ()
+    "Return text from the Wayland clipboard, or nil when unavailable."
+    (with-temp-buffer
+      (when (zerop (call-process "wl-paste" nil t nil "-n"))
+        (let ((text (replace-regexp-in-string "\r" "" (buffer-string))))
+          (unless (equal text "")
+            text)))))
 
   (defun +osc52-copy (text &optional _)
     "Copy TEXT to the local terminal clipboard using OSC 52."
@@ -54,11 +58,11 @@
     ;; On remote SSH ttys, prefer the local terminal clipboard for copy, and
     ;; leave paste to Emacs' own kill-ring so `C-y` doesn't get replaced by an
     ;; empty or unrelated remote system clipboard.
-    (setq interprogram-cut-function #'+osc52-copy
+   (setq interprogram-cut-function #'+osc52-copy
           interprogram-paste-function nil))
    ((+wayland-clipboard-available-p)
-    (setq interprogram-cut-function #'wl-copy
-          interprogram-paste-function #'wl-paste))))
+    (setq interprogram-cut-function #'+wl-copy
+          interprogram-paste-function #'+wl-paste))))
 
 (provide 'init-linux)
 ;;; init-linux.el ends here
