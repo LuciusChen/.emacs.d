@@ -66,7 +66,7 @@
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
 (setup emt
-  (:defer (:require emt))
+  (:idle)
   (:when-loaded
     (keymap-global-set "M-f" 'emt-forward-word)
     (keymap-global-set "M-b" 'emt-backward-word)
@@ -77,7 +77,7 @@
 (setup meow-cjk (:hook-into meow-mode))
 
 (setup sis
-  (:defer (:require sis))
+  (:idle)
   (:when-loaded
     (:also-load lib-sis)
     (setq sis-english-source "com.apple.keylayout.ABC"
@@ -131,7 +131,7 @@
          (setq sis--prefix-override-map-enable t))))))
 
 (setup auto-space
-  (:defer (:require auto-space))
+  (:idle)
   (:when-loaded (auto-space-mode)))
 
 (setup browse-kill-ring

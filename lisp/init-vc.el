@@ -7,7 +7,7 @@
           ediff-window-setup-function 'ediff-setup-windows-plain))
 
 (setup autorevert
-  (:defer (:require autorevert))
+  (:idle)
   (:when-loaded
     (setopt  global-auto-revert-non-file-buffers t
              auto-revert-verbose nil)
@@ -16,7 +16,7 @@
     (diminish 'auto-revert-mode)))
 
 (setup magit
-  (:preload magit-log forge)
+  (:idle magit-log forge)
   (:when-loaded
     (:also-load lib-magit)
     (:with-map magit-status-mode-map

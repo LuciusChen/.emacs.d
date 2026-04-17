@@ -4,7 +4,7 @@
 
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup org
-  (:defer (:require org))
+  (:idle)
   (keymap-global-set "C-c L"       'org-store-link)
   (keymap-global-set "C-c C-o"     'org-open-at-point)
   (keymap-global-set "C-M-<up>"    'org-up-element)
@@ -12,7 +12,7 @@
   ;; Wrong type argument: commandp, dired-copy-images-links
   (keymap-global-set "C-c n m"     'dired-copy-images-links)
   (keymap-global-set "C-c b"       'org-cite-insert)
-  (:preload org-agenda org-habit org-clock ob-core ox-latex bibtex)
+  (:idle org-agenda org-habit org-clock ob-core ox-latex bibtex)
   (:when-loaded
     (:also-load lib-org)
     (:with-feature yank-media
@@ -129,8 +129,8 @@
                                  (latex . t)))))
 
 (setup denote
-  (:defer (:require denote))
-  (:preload denote-journal)
+  (:idle)
+  (:idle denote-journal)
   (:when-loaded
     (keymap-global-set "C-c n n" 'denote-open-or-create)
     (keymap-global-set "C-c n d" 'denote-sort-dired)

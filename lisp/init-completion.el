@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (setup orderless
-  (:defer (:require orderless))
+  (:idle)
   (:when-loaded
     (setopt completion-styles '(orderless basic))
     (setq completion-category-defaults nil
@@ -34,7 +34,7 @@
                            (substring component 1) nil nil t)))))))
 
 (setup corfu
-  (:defer (:require corfu))
+  (:idle)
   (:when-loaded
     (:with-feature nerd-icons-corfu
       (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
@@ -42,11 +42,11 @@
     ;; corfu sizes the child frame as n × (default-line-height), so adding a
     ;; small line-spacing *only* in the corfu buffer makes that value reflect
     ;; the true rendered line height without touching anything else.
-    (advice-add #'corfu--make-buffer :filter-return
-                (lambda (buf)
-                  (with-current-buffer buf
-                    (setq-local line-spacing 2))
-                  buf))
+    (:advice corfu--make-buffer :filter-return
+             (lambda (buf)
+               (with-current-buffer buf
+                 (setq-local line-spacing 2))
+               buf))
     (global-corfu-mode)
     (setopt corfu-cycle t
             corfu-auto t
@@ -64,7 +64,7 @@
 (setup kind-icon
   (:load-after corfu)
   (:when-loaded
-    (advice-add 'reapply-themes :after 'kind-icon-reset-cache)))
+    (:advice reapply-themes :after kind-icon-reset-cache)))
 
 (setup cape
   (:load-after corfu)
@@ -74,7 +74,7 @@
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
 (setup yasnippet
-  (:defer (:require yasnippet))
+  (:idle)
   (:when-loaded
     (yas-global-mode)
     (setopt yas-keymap-disable-hook

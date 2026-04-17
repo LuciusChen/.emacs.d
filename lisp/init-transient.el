@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (setup transient
-  (:defer (require 'transient))
+  (:idle)
   (:when-loaded
     (:also-load lib-transient)
     (keymap-global-set "C-c e j" 'journal-transient)

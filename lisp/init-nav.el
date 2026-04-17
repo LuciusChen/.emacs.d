@@ -10,7 +10,7 @@
     (setopt trusted-content '("~/.emacs.d/"))))
 
 (setup dired
-  (:defer (:require dired))
+  (:idle)
   (:when-loaded
     (:with-map ctl-x-map (:bind "\C-j" 'dired-jump))
     (:with-map ctl-x-4-map (:bind "\C-j" 'dired-jump-other-window))
@@ -40,7 +40,7 @@
     (setopt bookmark-default-file (locate-user-emacs-file ".bookmarks.el"))))
 
 (setup consult
-  (:defer (:require consult))
+  (:idle)
   (:when-loaded
     (keymap-global-set "M-g l" 'consult-line)
     (keymap-global-set "M-g i" 'consult-imenu)

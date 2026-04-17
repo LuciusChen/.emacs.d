@@ -21,7 +21,7 @@
     (setenv "GPG_AGENT_INFO" nil)))                  ; Unset GPG_AGENT_INFO environment variable
 
 (setup password-store
-  (:defer (:require password-store))
+  (:idle)
   (:when-loaded
     (defun +password-store-insert (entry &optional password)
       "Insert a new ENTRY containing PASSWORD or the current region if selected."

@@ -33,7 +33,7 @@
           completion-cycle-threshold 4))
 
 (setup doom-modeline
-  (:defer (:require doom-modeline))
+  (:idle)
   (:when-loaded
     (setopt doom-modeline-height 18
             doom-modeline-buffer-file-name-style 'auto
@@ -48,7 +48,7 @@
     (doom-modeline-mode)))
 
 (setup vertico
-  (:defer (:require vertico))
+  (:idle)
   (:when-loaded (setopt vertico-cycle t)
                 (vertico-mode)))
 
@@ -58,7 +58,7 @@
           isearch-motion-changes-direction t))
 
 (setup embark
-  (:defer (:require embark))
+  (:idle)
   (:when-loaded
     (:also-load embark-consult)
 

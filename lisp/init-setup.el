@@ -5,93 +5,108 @@
 (require 'setup)
 (require 'cl-lib)
 
-(defgroup setup-preload nil
-  "Idle preload controls for setup extensions."
+(defgroup setup-idle nil
+  "Idle queue controls for setup extensions."
   :group 'convenience)
 
-(defcustom setup-preload-verbose nil
-  "When non-nil, log enqueue/run/skip events for deferred preloads."
+(defcustom setup-idle-verbose nil
+  "When non-nil, log enqueue/run/skip events for idle work."
   :type 'boolean
-  :group 'setup-preload)
+  :group 'setup-idle)
 
-(defvar setup--defer-queue nil
-  "Queue of deferred entries run incrementally during idle time.
+(defcustom setup-idle-initial-delay 1.0
+  "How long Emacs must stay idle before running the first queued item."
+  :type 'number
+  :group 'setup-idle)
+
+(defcustom setup-idle-interval 0.5
+  "How long Emacs must stay idle between queued idle items."
+  :type 'number
+  :group 'setup-idle)
+
+(define-obsolete-variable-alias
+  'setup-preload-verbose
+  'setup-idle-verbose
+  "2026-04")
+
+(defvar setup--idle-queue nil
+  "Queue of idle entries run incrementally during idle time.
 Each entry is a plist with keys:
 - :fn (thunk)
 - :id (symbol or nil)
 - :kind (symbol)
 - :label (string).")
 
-(defvar setup--defer-timer nil
-  "The currently scheduled idle timer for draining `setup--defer-queue'.")
+(defvar setup--idle-timer nil
+  "The currently scheduled idle timer for draining `setup--idle-queue'.")
 
-(defun setup--log (fmt &rest args)
-  "Log FMT with ARGS when `setup-preload-verbose' is non-nil."
-  (when setup-preload-verbose
-    (apply #'message (concat "setup-preload: " fmt) args)))
+(defun setup--idle-log (fmt &rest args)
+  "Log FMT with ARGS when `setup-idle-verbose' is non-nil."
+  (when setup-idle-verbose
+    (apply #'message (concat "setup-idle: " fmt) args)))
 
-(defun setup--queue-has-id-p (id)
+(defun setup--idle-queue-has-id-p (id)
   "Return non-nil when queue already contains entry ID."
   (and id
        (cl-find-if (lambda (entry)
                      (eq (plist-get entry :id) id))
-                   setup--defer-queue)))
+                   setup--idle-queue)))
 
-(defun setup--enqueue-deferred-entries (entries)
+(defun setup--schedule-idle-run (delay)
+  "Schedule the idle queue to run after DELAY seconds of idleness."
+  (unless (and setup--idle-timer
+               (memq setup--idle-timer timer-idle-list))
+    (setq setup--idle-timer
+          (run-with-idle-timer delay nil #'setup--run-idle))))
+
+(defun setup--enqueue-idle-entries (entries)
   "Insert ENTRIES into queue with dedupe."
   (dolist (entry entries)
     (let ((id (plist-get entry :id)))
-      (if (setup--queue-has-id-p id)
-          (setup--log "skip duplicate id=%S" id)
-        (setq setup--defer-queue (nconc setup--defer-queue (list entry)))
-        (setup--log "enqueue kind=%S id=%S label=%s"
-                    (plist-get entry :kind)
-                    id
-                    (or (plist-get entry :label) "<nil>")))))
-  (unless (and setup--defer-timer
-               (memq setup--defer-timer timer-idle-list))
-    (setq setup--defer-timer
-          (run-with-idle-timer 1 nil #'setup--run-deferred))))
+      (if (setup--idle-queue-has-id-p id)
+          (setup--idle-log "skip duplicate id=%S" id)
+        (setq setup--idle-queue (nconc setup--idle-queue (list entry)))
+        (setup--idle-log "enqueue kind=%S id=%S label=%s"
+                         (plist-get entry :kind)
+                         id
+                         (or (plist-get entry :label) "<nil>")))))
+  (setup--schedule-idle-run setup-idle-initial-delay))
 
-(defun setup--enqueue-deferred-thunks (thunks)
-  "Enqueue plain THUNKS with default metadata."
-  (setup--enqueue-deferred-entries
-   (mapcar (lambda (thunk)
-             (list :fn thunk
-                   :id nil
-                   :kind 'defer
-                   :label "defer thunk"))
-           thunks)))
+(defun setup--make-idle-thunk-entry (thunk)
+  "Create a queue entry for THUNK."
+  (list :fn thunk
+        :id nil
+        :kind 'call
+        :label "idle thunk"))
 
-(defun setup--run-deferred ()
-  "Process one item from `setup--defer-queue', yielding to user input.
+(defun setup--run-idle ()
+  "Process one item from `setup--idle-queue', yielding to user input.
 Reschedules itself until the queue is empty."
-  (when-let* ((entry (pop setup--defer-queue))
+  (when-let* ((entry (pop setup--idle-queue))
               (thunk (plist-get entry :fn)))
-    (setup--log "run kind=%S id=%S label=%s"
-                (plist-get entry :kind)
-                (plist-get entry :id)
-                (or (plist-get entry :label) "<nil>"))
+    (setup--idle-log "run kind=%S id=%S label=%s"
+                     (plist-get entry :kind)
+                     (plist-get entry :id)
+                     (or (plist-get entry :label) "<nil>"))
     ;; Do not interrupt an in-flight `require' with `while-no-input':
     ;; partial loads can cause recursive require errors on retry.
     (if (input-pending-p)
         (progn
-          (push entry setup--defer-queue)
-          (setup--log "requeue due to pending input kind=%S id=%S"
-                      (plist-get entry :kind)
-                      (plist-get entry :id)))
+          (push entry setup--idle-queue)
+          (setup--idle-log "requeue due to pending input kind=%S id=%S"
+                           (plist-get entry :kind)
+                           (plist-get entry :id)))
       (condition-case err
           (let ((gc-cons-threshold most-positive-fixnum)
                 (inhibit-message t))
             (funcall thunk))
         (error
-         (message "Deferred load error: %s" err))))
-    (when setup--defer-queue
-      (setq setup--defer-timer
-            (run-with-idle-timer 0.5 nil #'setup--run-deferred)))))
+         (message "Idle queue error: %s" err))))
+    (when setup--idle-queue
+      (setup--schedule-idle-run setup-idle-interval))))
 
-(defun setup--make-preload-entry (req)
-  "Create a queue entry that preloads feature REQ safely."
+(defun setup--make-idle-require-entry (req)
+  "Create a queue entry that requires feature REQ safely."
   (list :fn
         (lambda ()
           (condition-case err
@@ -103,24 +118,53 @@ Reschedules itself until the queue is empty."
                                     file-name-handler-alist))))
                   (require req nil t)))
             (error
-             (message "Preload error: failed to load %S: %s" req err))))
+             (message "Idle load error: failed to load %S: %s" req err))))
         :id req
-        :kind 'preload
+        :kind 'require
         :label (symbol-name req)))
 
-(setup-define :defer
-  (lambda (body)
-    `(setup--enqueue-deferred-thunks (list (lambda () ,body))))
-  :documentation "Queue BODY to run during idle time, one item at a time, yielding to user input."
-  :repeatable t)
+(defun setup-idle-enqueue (&rest thunks)
+  "Enqueue THUNKS to run during idle time, one item at a time."
+  (setup--enqueue-idle-entries
+   (mapcar #'setup--make-idle-thunk-entry thunks)))
 
-(setup-define :preload
-  (lambda (&rest packages)
-    `(setup--enqueue-deferred-entries
-      (mapcar #'setup--make-preload-entry ',packages)))
-  :documentation "After the current feature loads, incrementally preload PACKAGES during idle time."
-  :debug '(&rest symbolp)
-  :after-loaded t)
+(defun setup-idle-require (&rest features)
+  "Enqueue FEATURES to be required during idle time."
+  (setup--enqueue-idle-entries
+   (mapcar #'setup--make-idle-require-entry features)))
+
+(defun setup--run-now-or-after-load (feature thunk)
+  "Run THUNK now if FEATURE is loaded, otherwise after FEATURE loads."
+  (if (featurep feature)
+      (funcall thunk)
+    (with-eval-after-load feature
+      (funcall thunk))))
+
+(defun setup-idle-enqueue-after-load (feature &rest thunks)
+  "Enqueue THUNKS during idle time once FEATURE has loaded."
+  (setup--run-now-or-after-load
+   feature
+   (lambda ()
+     (apply #'setup-idle-enqueue thunks))))
+
+(defun setup-idle-require-after-load (feature &rest features)
+  "Enqueue FEATURES during idle time once FEATURE has loaded."
+  (setup--run-now-or-after-load
+   feature
+   (lambda ()
+     (apply #'setup-idle-require features))))
+
+(setup-define :idle
+  (lambda (&rest features)
+    (if features
+        `(setup-idle-require-after-load
+          ',(setup-get 'feature)
+          ,@(mapcar (lambda (feature) `',feature) features))
+      `(setup-idle-require ',(setup-get 'feature))))
+  :documentation "Queue the current feature or related FEATURES for serial idle loading.
+When called without arguments, enqueue the current feature.
+When FEATURES are provided, enqueue them once the current feature has loaded."
+  :debug '(&rest symbolp))
 
 (setup-define :advice
   (lambda (symbol where function)

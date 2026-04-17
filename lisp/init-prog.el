@@ -141,13 +141,13 @@
     (setq-default sql-product 'mysql)))
 
 (setup projectile
-  (:defer (:require projectile))
+  (:idle)
   (:when-loaded
     (projectile-mode +1)
     (setopt projectile-project-search-path '("~/IdeaProjects/"))))
 
 (setup flymake
-  (:defer (:require flymake))
+  (:idle)
   (:when-loaded
     ;; 注意：当 `flymake-no-changes-timeout` 被设置为 nil 时，
     ;; 需要实现 `eglot-handle-notification` 的 `:after` 方法。
@@ -281,10 +281,10 @@
 ;; $ npm install -g typescript-language-server
 
 (setup eglot
+  (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
+      (:hook eglot-ensure))
   (:when-loaded
     (:also-load lib-eglot)
-    (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
-      (:hook eglot-ensure))
     (:with-map eglot-mode-map
       (:bind "C-c C-i" eglot-find-implementation
              "C-c C-x" mapper-find-xml
@@ -299,7 +299,7 @@
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
     (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
-    (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+    (:advice eglot-completion-at-point :around cape-wrap-buster)
     ;; https://github.com/joaotavora/eglot/discussions/898
     (:with-hook eglot-managed-mode-hook
       (:hook (lambda ()
@@ -359,7 +359,7 @@
 ;; Python
 ;; $ pipx install debugpy
 (setup dape
-  (:defer (:require dape))
+  (:idle)
   (:when-loaded
     (keymap-global-set "<f5>" 'dape)
     ;; Java is easier to inspect when locals/watch expand a bit by default.
@@ -375,7 +375,7 @@
     (:hook dape-start-hook (lambda () (save-some-buffers t t)))))
 
 (setup pyvenv
-  (:defer (:require pyvenv))
+  (:idle)
   (:when-loaded
     (pyvenv-mode t)
     (setq pyvenv-post-activate-hooks
@@ -386,47 +386,17 @@
                   (setq python-shell-interpreter "python3"))))))
 
 (setup webpaste
-  (:defer (:require webpaste)
-          (setopt webpaste-provider-priority '("paste.rs" "dpaste.com"))))
-
-(setup eshell
-  (keymap-global-set "<f8>" 'eshell)
+  (:idle)
   (:when-loaded
-    (:require eshell)
-    (:also-load esh-mode)
-    (:also-load lib-eshell)
-    (:also-load nerd-icons)
-    (advice-add 'eshell/cat :override #'eshell/cat-with-syntax-highlighting)
-    (setopt eshell-prompt-function 'eshell-prompt-multiline
-            eshell-highlight-prompt nil
-            eshell-banner-message ""
-            eshell-cmpl-ignore-case t)
-    (:with-map eshell-mode-map
-      (:bind "C-l"  +eshell-clear
-             "<tab>" completion-at-point
-             "C-c l" +consult-eshell-history))
-    (:with-mode eshell-mode
-      (:hook (lambda ()
-               (+set-eshell-aliases +aliases)
-               (display-line-numbers-mode -1)
-               (eshell-cmpl-mode -1)))
-      (:with-hook eshell-directory-change-hook (:hook +sync-dir-in-buffer-name)))
-    (add-hook 'eshell-load-hook (lambda () (message "Eshell loaded"))))
-  (:with-hook eshell-load-hook
-    (:hook eat-eshell-mode)
-    (:hook eat-eshell-visual-command-mode)))
-
-(setup eshell-syntax-highlighting
-  (:load-after esh-mode)
-  (:when-loaded (eshell-syntax-highlighting-global-mode +1)))
+    (setopt webpaste-provider-priority '("paste.rs" "dpaste.com"))))
 
 (setup clutch
     (:when-loaded
       (:require clutch-db-jdbc)
       (setopt clutch-connection-alist
-              '(("zj_test"   . (:host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
-                ("zj_oil"    . (:host "47.102.194.129" :port 3306 :user "zj_oil" :database "zj_oil"))
-                ("zj_online" . (:host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com" :port 3306 :user "zj_user" :database "zj"))
+              '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
+                ("zj_oil"    . (:backend mysql :host "47.102.194.129" :port 3306 :user "zj_oil" :database "zj_oil"))
+                ("zj_online" . (:backend mysql :host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com" :port 3306 :user "zj_user" :database "zj"))
                 ("nc_online" . (:backend oracle :host "47.96.188.6" :port 1521 :user "zjsy" :database "ORCL"))
                 ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp"))))))
 

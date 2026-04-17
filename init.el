@@ -58,7 +58,8 @@
 
 ;; install packages
 (defvar USE-PACKAGE-LIST
-  '(nov sis plz avy mpv cape citar wgrep setup nerd-icons citar-denote
+  '(nov ;; sis
+        plz avy mpv cape citar wgrep setup nerd-icons citar-denote
         corfu forge verb elfeed popper embark bibtex vertico clojure-mode
         diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
         diff-hl company goggles flymake web-mode js2-mode move-dup
@@ -66,13 +67,13 @@
         macrostep json-mode orderless kind-icon git-modes git-blamed
         org-modern ace-pinyin marginalia org-remark elfeed-tube dape
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
-        org-cliplink language-detection ox-pandoc breadcrumb eat
+        org-cliplink language-detection ox-pandoc breadcrumb indent-bars
         markdown-mode mode-line-bell embark-consult speed-type diminish
         elfeed-tube-mpv typescript-mode command-log-mode password-store
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
-        default-text-scale eshell-syntax-highlighting projectile
-        too-wide-minibuffer-mode org-edna indent-bars package-lint
+        default-text-scale projectile too-wide-minibuffer-mode org-edna
+        package-lint
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")

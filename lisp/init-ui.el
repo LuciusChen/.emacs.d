@@ -107,7 +107,7 @@
       (nerd-icons-set-font))))
 
 (setup window-navigation
-  (:defer (:require window-navigation))
+  (:idle)
   (:when-loaded (window-navigation-mode)))
 
 (setup popper
@@ -134,9 +134,11 @@
             "\\*Telegram Message Info\\*"
             "\\*Telegram Sticker Set\\*"
             "\\*Telegram Notification Messages\\*"))
-  (:defer (popper-mode +1)
-          ;; (popper-echo-mode +1)
-          (popper-tab-line-mode +1))
+  (:idle)
+  (:when-loaded
+    (popper-mode +1)
+    ;; (popper-echo-mode +1)
+    (popper-tab-line-mode +1))
   ;; HACK: close popper window with `C-g'
   (defun +popper-close-window-hack (&rest _)
     "Close popper window via `C-g'."
@@ -146,10 +148,10 @@
       (let ((window (caar popper-open-popup-alist)))
         (when (window-live-p window)
           (delete-window window)))))
-  (advice-add #'keyboard-quit :before #'+popper-close-window-hack))
+  (:advice keyboard-quit :before +popper-close-window-hack))
 
 (setup tab-bar
-  (:defer (:require tab-bar))
+  (:idle)
   (keymap-global-set "C-c r t" 'tab-bar-new-tab)
   (keymap-global-set "C-c r w" 'tab-bar-close-tab)
   (keymap-global-set "C-c r s" 'tab-bar-switch-to-tab)
@@ -173,7 +175,7 @@
                              tab-bar-format-align-right))))
 
 (setup too-wide-minibuffer-mode
-  (:defer (:require too-wide-minibuffer-mode))
+  (:idle)
   (:when-loaded
     (setopt too-wide-minibuffer-max-width 200)
     (setq minibuffer-follows-selected-frame nil)))
