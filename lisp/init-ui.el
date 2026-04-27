@@ -124,7 +124,6 @@
             "\\*Async Shell Command\\*"
             help-mode
             compilation-mode
-            eshell-mode
             "\\*xref\\*"
             "\\*OpenRouter\\*"
             "\\*compilation\\*"

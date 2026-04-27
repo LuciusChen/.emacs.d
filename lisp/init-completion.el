@@ -56,10 +56,7 @@
       (:bind "<escape>" corfu-quit
              "TAB"  corfu-next
              [tab]  corfu-next
-             "S-TAB"  corfu-previous))
-    (:with-mode eshell-mode
-      (:local-set corfu-auto nil)
-      (corfu-mode))))
+             "S-TAB"  corfu-previous))))
 
 (setup kind-icon
   (:load-after corfu)
