@@ -396,7 +396,7 @@
       (setopt clutch-connection-alist
               '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
                 ("zj_oil"    . (:backend mysql :host "47.102.194.129" :port 3306 :user "zj_oil" :database "zj_oil"))
-                ("zj_online" . (:backend mysql :host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com" :port 3306 :user "zj_user" :database "zj"))
+                ("zj_online" . (:backend mysql :host "rm-uf69g20yd7ik0j427wo.mysql.rds.aliyuncs.com" :port 3306 :user "zj_user" :database "zj" :ssh-host "arch"))
                 ("nc_online" . (:backend oracle :host "47.96.188.6" :port 1521 :user "zjsy" :database "ORCL"))
                 ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp"))))))
 

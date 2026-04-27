@@ -85,7 +85,7 @@
         (ghostel :host github :repo "dakra/ghostel")
         (mysql :host github :repo "LuciusChen/mysql.el")
         (pg :host github :repo "emarsden/pg-el")
-        (clutch :host github :repo "LuciusChen/clutch" :branch "feature/package-split")
+        (clutch :host github :repo "LuciusChen/clutch" :branch "feature/prefixed-mysql-protocol")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch")
         (java-server :host github :repo "LuciusChen/java-server")
         (lexdb :host github :repo "LuciusChen/lexdb")
