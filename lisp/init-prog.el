@@ -296,6 +296,10 @@
             ;; ignore lsp formatting provider, format with apheleia.
             eglot-ignored-server-capabilities '(:documentFormattingProvider
                                                 :documentRangeFormattingProvider))
+    ;; JDTLS can ask Eglot to watch the parent workspace folder; keep watchers
+    ;; inside the project root to avoid recursively watching ~/repos.
+    (when (boundp 'eglot-watch-files-outside-project-root)
+      (setopt eglot-watch-files-outside-project-root nil))
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
     (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
