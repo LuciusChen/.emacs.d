@@ -69,8 +69,7 @@
     (keymap-global-set "M-f" 'emt-forward-word)
     (keymap-global-set "M-b" 'emt-backward-word)
     (keymap-global-set "M-d" #'emt-kill-word)
-    (keymap-global-set "M-DEL" #'emt-backward-kill-word)
-    (emt-ensure)))
+    (keymap-global-set "M-DEL" #'emt-backward-kill-word)))
 
 (setup meow-cjk (:hook-into meow-mode))
 
