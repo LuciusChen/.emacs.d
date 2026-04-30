@@ -60,7 +60,7 @@
 (defvar USE-PACKAGE-LIST
   '(nov ;; sis
         plz avy mpv cape citar wgrep setup nerd-icons citar-denote
-        corfu forge verb elfeed popper embark bibtex vertico clojure-mode
+        corfu forge elfeed popper embark bibtex vertico clojure-mode
         diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
         diff-hl company goggles flymake web-mode js2-mode move-dup
         doom-modeline webpaste apheleia mastodon pdf-tools consult-dir
@@ -75,6 +75,7 @@
         default-text-scale projectile too-wide-minibuffer-mode org-edna
         package-lint
         (eglot-java :host github :repo "LuciusChen/eglot-java")
+        (courier :host github :repo "LuciusChen/courier")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")

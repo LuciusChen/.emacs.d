@@ -114,8 +114,7 @@
   (:when-loaded
     (:also-load ob-plantuml
                 ob-python
-                ob-latex
-                ob-verb)
+                ob-latex)
     (setopt org-plantuml-jar-path
             (expand-file-name (concat ORG-PATH "/plantuml/plantuml.jar"))
             ;; 这里应该就是 .zshrc 里面配置的 python
@@ -125,7 +124,6 @@
                                  (python . t)
                                  (shell . t)
                                  (sql . t)
-                                 (verb . t)
                                  (latex . t)))))
 
 (setup denote
