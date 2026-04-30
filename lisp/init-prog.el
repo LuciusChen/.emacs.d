@@ -43,8 +43,6 @@
           web-mode-code-indent-offset 2
           web-mode-enable-current-column-highlight t))
 
-(setup verb (setopt verb-babel-timeout 60.0))
-
 (setup python
   (setopt python-indent-guess-indent-offset t
           python-indent-guess-indent-offset-verbose nil))
@@ -68,11 +66,13 @@
           "-l" "mysql"
           "-c" "{\"tabWidth\":4,\"useTabs\":false,\"keywordCase\":\"upper\",\"dataTypeCase\":\"upper\",\"functionCase\":\"upper\",\"identifierCase\":\"preserve\",
   \"logicalOperatorNewline\":\"before\",\"expressionWidth\":80,\"linesBetweenQueries\":1,\"denseOperators\":false,\"newlineBeforeSemicolon\":false}"))
+    (setf (alist-get 'sql-neatfmt apheleia-formatters)
+          '("sql-neatfmt" "--dialect" "mysql"))
 
     (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black)) ;; isort black
     (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html) ;; prettier
     ;; (setf (alist-get 'sql-mode           apheleia-mode-alist) 'pgformatter) ;; pgformatter
-    (setf (alist-get 'sql-mode           apheleia-mode-alist) 'sql-formatter) ;; sql-formatter
+    (setf (alist-get 'sql-mode           apheleia-mode-alist) 'sql-neatfmt) ;; sql-neatfmt
     (setf (alist-get 'xml-mode           apheleia-mode-alist) 'xmllint)
     (setf (alist-get 'css-mode           apheleia-mode-alist) 'prettier)
     (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'prettier)
@@ -83,13 +83,13 @@
     ;; in =.dir-locals.el':
     ;;   ((sql-mode . ((sql-product . postgres))))
     ;; This allows Apheleia to use the correct formatter (=pgformatter' for PostgreSQL,
-    ;; =sql-formatter' for MySQL/others).
+    ;; =sql-neatfmt' for MySQL, =sql-formatter' for others).
     (defun +setup-sql-formatter ()
       "Setup SQL formatter based on sql-product."
       (setq-local apheleia-formatter
                   (pcase sql-product
                     ('postgres 'pgformatter)
-                    ('mysql 'sql-formatter)
+                    ('mysql 'sql-neatfmt)
                     (_ 'sql-formatter))))
     (:with-mode sql-mode (:hook +setup-sql-formatter))))
 
