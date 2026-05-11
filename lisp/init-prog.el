@@ -363,7 +363,6 @@
 ;; Python
 ;; $ pipx install debugpy
 (setup dape
-  (:idle)
   (:when-loaded
     (keymap-global-set "<f5>" 'dape)
     ;; Java is easier to inspect when locals/watch expand a bit by default.
@@ -379,7 +378,6 @@
     (:hook dape-start-hook (lambda () (save-some-buffers t t)))))
 
 (setup pyvenv
-  (:idle)
   (:when-loaded
     (pyvenv-mode t)
     (setq pyvenv-post-activate-hooks
@@ -395,14 +393,14 @@
     (setopt webpaste-provider-priority '("paste.rs" "dpaste.com"))))
 
 (setup clutch
-    (:when-loaded
-      (:require clutch-db-jdbc)
-      (setopt clutch-connection-alist
-              '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
-                ("zj_oil"    . (:backend mysql  :profile-entry "mysql/zj_oil"))
-                ("zj_online" . (:backend mysql  :profile-entry "mysql/zj_online"))
-                ("nc_online" . (:backend oracle :profile-entry "oracle/nc_online"))
-                ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp"))))))
+  (:when-loaded
+    (:require clutch-db-jdbc)
+    (setopt clutch-connection-alist
+            '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
+              ("zj_oil"    . (:backend mysql  :profile-entry "mysql/zj_oil"))
+              ("zj_online" . (:backend mysql  :profile-entry "mysql/zj_online"))
+              ("nc_online" . (:backend oracle :profile-entry "oracle/nc_online"))
+              ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp"))))))
 
 (setup ob-clutch
     (:load-after org))

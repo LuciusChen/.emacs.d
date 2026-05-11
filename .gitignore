@@ -36,7 +36,7 @@ mastodon.plstore
 .java-version
 org-clock-save.el
 .bookmarks.el
-forge*.sqlite
+*.sqlite
 *.eld
 *.db
 .aider*
