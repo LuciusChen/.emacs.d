@@ -395,6 +395,7 @@
 (setup clutch
   (:when-loaded
     (:require clutch-db-jdbc)
+    (:with-mode clutch-mode (:match-file "*.sql"))
     (setopt clutch-connection-alist
             '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
               ("zj_oil"    . (:backend mysql :host "47.102.194.129" :port 3306 :user "zj_oil" :database "zj_oil"))
