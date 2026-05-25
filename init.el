@@ -73,7 +73,7 @@
         password-store-otp browse-kill-ring rainbow-delimiters denote
         nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
         default-text-scale projectile too-wide-minibuffer-mode org-edna
-        package-lint
+        package-lint clutch
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (courier :host github :repo "LuciusChen/courier")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
@@ -85,7 +85,6 @@
         (emacs-smart-input-source :host github :repo "LuciusChen/emacs-smart-input-source")
         (chirp :host github :repo "LuciusChen/chirp")
         (ghostel :host github :repo "dakra/ghostel")
-        (clutch :host github :repo "LuciusChen/clutch")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch")
         (java-server :host github :repo "LuciusChen/java-server")
         (lexdb :host github :repo "LuciusChen/lexdb")
