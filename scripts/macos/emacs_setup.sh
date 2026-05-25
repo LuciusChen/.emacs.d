@@ -156,7 +156,8 @@ inject_patches() {
       echo "Added patch $patch_name to the formula."
       inserted=true
     else
-      echo "Patch $patch_name already exists."
+      sed -i '' "s|local_patch \"$patch_name\", sha: \"[^\"]*\".*# user_patch|local_patch \"$patch_name\", sha: \"$sha\" # user_patch|" "$FORMULA_PATH"
+      echo "Updated SHA for existing user patch $patch_name."
     fi
 
     ln -sf "$patch" "$TARGET_PATCH_DIR/${patch_name}.patch"
