@@ -3,8 +3,7 @@
 ;;; Code:
 
 (setup (:with-hook after-init-hook
-         (:hook savehist-mode)
-         (:hook mode-line-bell-mode)))
+         (:hook savehist-mode)))
 
 (setup recentf
   (:hook-into after-init)
