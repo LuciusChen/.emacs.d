@@ -133,7 +133,7 @@
     (setq gt-preset-translators
           `((default . ,(gt-translator
                          :taker (list (gt-taker :pick nil :if 'selection)
-                                      (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode elfeed-show-mode))
+                                      (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode))
                                       (gt-taker :text 'word))
                          :engines (list (gt-chatgpt-engine :if 'not-word
                                                            :headers `(("Content-Type" . "application/json")
@@ -142,7 +142,7 @@
                                                                       ("X-Title" . "emacs/gt.el")))
                                         (gt-google-engine :if 'word)
                                         (gt-youdao-suggest-engine :if '(and word src:en)))
-                         :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode helpful-mode devdocs-mode elfeed-show-mode))
+                         :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode helpful-mode devdocs-mode))
                                         (gt-insert-render :if '(telega-chat-mode) :type 'replace)
                                         (gt-buffer-render))))
             ;; gt-insert-render
@@ -181,40 +181,6 @@
         ;; 调用 espeak-ng 命令来朗读文本
         (let ((command (format "espeak-ng -v %s \"%s\"" lang text)))
           (start-process-shell-command "espeak-ng" nil command))))))
-
-(setup elfeed
-  (keymap-global-set "C-x w" 'elfeed)
-  (:when-loaded
-    (:also-load lib-elfeed)
-    (setopt elfeed-feeds +elfeed-feeds)
-    (setq elfeed-search-print-entry-function #'+elfeed-search-print-entry--better-default)
-    (:with-map elfeed-show-mode-map
-      (:bind "N" +menu-dwim--org-capture-elfeed-show
-             "o" +open-link-with-mpv))
-    (:with-map elfeed-search-mode-map (:bind "L" +elfeed-overview))))
-
-(setup elfeed-tube
-  (:load-after elfeed)
-  (:when-loaded
-    (:with-map elfeed-show-mode-map
-      (:bind "F" elfeed-tube-fetch
-             [remap save-buffer] elfeed-tube-save))
-    (:with-map elfeed-search-mode-map
-      (:bind "F" elfeed-tube-fetch
-             [remap save-buffer] elfeed-tube-save)))
-  (:when-loaded
-    (setopt elfeed-tube-captions-languages
-            '("zh" "en" "english (auto generated)")
-            ;; mpv-default-options '("--http-proxy=http://127.0.0.1:7897"
-            ;;                       "--ytdl-raw-options-append=proxy=http://127.0.0.1:7897")
-            )
-    (elfeed-tube-setup)))
-
-(setup elfeed-tube-mpv
-  (:load-after elfeed)
-  (:with-map elfeed-show-mode-map
-    (:bind "C-c C-f"  elfeed-tube-mpv-follow-mode
-           "C-c C-w"  elfeed-tube-mpv-where)))
 
 (setup markdown-mode
   (setopt markdown-command "pandoc --standalone --css=GTD.css"))

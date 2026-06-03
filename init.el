@@ -59,21 +59,20 @@
 ;; install packages
 (defvar USE-PACKAGE-LIST
   '(nov ;; sis
-        plz avy mpv cape citar wgrep setup nerd-icons citar-denote
-        corfu forge elfeed popper embark bibtex vertico clojure-mode
+        plz avy mpv cape citar wgrep setup nerd-icons corfu forge
+        elfeed popper embark bibtex vertico nerd-icons-corfu denote
         diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
         diff-hl company goggles flymake web-mode js2-mode move-dup
         doom-modeline webpaste apheleia mastodon pdf-tools consult-dir
         macrostep json-mode orderless kind-icon git-modes git-blamed
-        org-modern ace-pinyin marginalia org-remark elfeed-tube dape
+        org-modern ace-pinyin marginalia org-remark dape citar-denote
         denote-org denote-journal denote-markdown rainbow-mode ox-hugo
         org-cliplink language-detection ox-pandoc breadcrumb indent-bars
-        markdown-mode mode-line-bell embark-consult speed-type diminish
-        elfeed-tube-mpv typescript-mode command-log-mode password-store
-        password-store-otp browse-kill-ring rainbow-delimiters denote
-        nerd-icons-corfu nerd-icons-completion whitespace-cleanup-mode
+        markdown-mode embark-consult speed-type diminish rainbow-delimiters
+        typescript-mode command-log-mode password-store nerd-icons-completion
+        password-store-otp browse-kill-ring rainbow-delimiters clutch
         default-text-scale projectile too-wide-minibuffer-mode org-edna
-        package-lint clutch
+        package-lint whitespace-cleanup-mode
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (courier :host github :repo "LuciusChen/courier")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
