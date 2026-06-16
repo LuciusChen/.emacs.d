@@ -2,23 +2,23 @@
 
 # Function to print usage
 usage() {
-  echo "Usage: $0 [HOMEBREW_EMACS_PLUS_31_REVISION=<commit>] [normal|mps] [30|31]"
+  echo "Usage: $0 [HOMEBREW_EMACS_PLUS_32_REVISION=<commit>] [normal|mps] [31|32]"
   echo "  normal: Install the normal version (default)"
   echo "  mps: Install the MPS version"
-  echo "  30: Install emacs-plus@30"
-  echo "  31: Install emacs-plus@31 (default)"
+  echo "  31: Install emacs-plus@31"
+  echo "  32: Install emacs-plus@32 (default)"
   exit 1
 }
 
 # Set default version type and emacs version
 VERSION_TYPE="normal"
-EMACS_VERSION="31"
+EMACS_VERSION="32"
 REVISION=""
 
 # Process arguments
 for arg in "$@"; do
   case $arg in
-    HOMEBREW_EMACS_PLUS_31_REVISION=*)
+    HOMEBREW_EMACS_PLUS_32_REVISION=*)
       REVISION="${arg#*=}"
       shift
       ;;
@@ -26,7 +26,7 @@ for arg in "$@"; do
       VERSION_TYPE=$arg
       shift
       ;;
-    30|31)
+    31|32)
       EMACS_VERSION=$arg
       shift
       ;;
@@ -175,9 +175,9 @@ inject_patches
 
 # Install emacs-plus with specified options
 if [ -n "$REVISION" ]; then
-  HOMEBREW_EMACS_PLUS_31_REVISION=$REVISION brew install emacs-plus@$EMACS_VERSION --with-xwidgets
+  HOMEBREW_EMACS_PLUS_32_REVISION=$REVISION brew install emacs-plus@$EMACS_VERSION --with-xwidgets || exit 1
 else
-  brew install emacs-plus@$EMACS_VERSION --with-xwidgets
+  brew install emacs-plus@$EMACS_VERSION --with-xwidgets || exit 1
 fi
 
 osascript -e "tell application \"Finder\" to make alias file to posix file \"/opt/homebrew/opt/emacs-plus@$EMACS_VERSION/Emacs.app\" at posix file \"/Applications\" with properties {name:\"Emacs.app\"}"
