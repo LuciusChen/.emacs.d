@@ -276,7 +276,7 @@ index 3c012ca8f05..0167e07f73c 100644
 +		}
 +	    }
 +
-+	  for (i = ARRAYELTS (keys); i > 0; i--)
++	  for (i = (int) (sizeof keys / sizeof keys[0]); i > 0; i--)
 +	    if (EQ (format, Qt)
 +		|| (SYMBOLP (format) ? EQ (format, keys[i-1].sym)
 +		    : !NILP (Fmemq (keys[i-1].sym, format))))
