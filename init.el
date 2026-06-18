@@ -71,8 +71,12 @@
         markdown-mode embark-consult speed-type diminish rainbow-delimiters
         typescript-mode command-log-mode password-store nerd-icons-completion
         password-store-otp browse-kill-ring rainbow-delimiters clutch
-        default-text-scale projectile too-wide-minibuffer-mode org-edna
-        package-lint whitespace-cleanup-mode
+        default-text-scale projectile package-lint whitespace-cleanup-mode
+        clutch mysql pg
+        (clutch :host github :repo "LuciusChen/clutch" :branch "feature/mongodb-document-backend")
+        (ob-clutch :host github :repo "LuciusChen/ob-clutch" :branch "feature/mongodb-document-backend")
+        (mongodb :host github :repo "LuciusChen/mongodb.el")
+        (redis :host github :repo "LuciusChen/redis.el")
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (courier :host github :repo "LuciusChen/courier")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
@@ -84,7 +88,6 @@
         (emacs-smart-input-source :host github :repo "LuciusChen/emacs-smart-input-source")
         (chirp :host github :repo "LuciusChen/chirp")
         (ghostel :host github :repo "dakra/ghostel")
-        (ob-clutch :host github :repo "LuciusChen/ob-clutch")
         (java-server :host github :repo "LuciusChen/java-server")
         (lexdb :host github :repo "LuciusChen/lexdb")
         (gt :host github :repo "LuciusChen/gt.el")

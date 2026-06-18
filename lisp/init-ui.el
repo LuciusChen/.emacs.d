@@ -173,11 +173,5 @@
                              tab-bar-format-add-tab
                              tab-bar-format-align-right))))
 
-(setup too-wide-minibuffer-mode
-  (:idle)
-  (:when-loaded
-    (setopt too-wide-minibuffer-max-width 200)
-    (setq minibuffer-follows-selected-frame nil)))
-
 (provide 'init-ui)
 ;;; init-ui.el ends here
