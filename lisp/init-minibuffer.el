@@ -102,11 +102,11 @@
                                              nil)))
     (marginalia-mode)))
 
-(setup wgrep
-  (:with-map grep-mode-map
-    (:bind "e" wgrep-change-to-wgrep-mode
-           "C-x C-q" wgrep-change-to-wgrep-mode
-           "C-c C-c" wgrep-finish-edit)))
+(setup grep
+  (:with-map grep-menu-map
+    (:bind "e" grep-change-to-grep-edit-mode
+           "C-x C-q" grep-change-to-grep-edit-mode
+           "C-c C-c" grep-edit-save-changes)))
 
 (setup nerd-icons-completion
   (:load-after marginalia)
