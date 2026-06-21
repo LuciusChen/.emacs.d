@@ -160,14 +160,6 @@
                  '("0[xX][0-9a-fA-F]\\{2\\}\\([0-9A-Fa-f]\\{6\\}\\)\\b"
                    (0 (rainbow-colorize-hexadecimal-without-sharp))))))
 
-;; 手动开启 hs-minor-mode
-(setup hideshow
-  (:also-load lib-hs)
-  (:with-function hs-global-cycle (:autoload-this))
-  (:with-map hs-minor-mode-map
-    (:bind "C-<tab>" hs-cycle
-           "C-S-<tab>" hs-global-cycle)))
-
 (setup whitespace-cleanup-mode
   (keymap-global-set "<remap> <just-one-space>" 'cycle-spacing)
   (setq-default show-trailing-whitespace nil)
