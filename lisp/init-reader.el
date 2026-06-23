@@ -182,9 +182,6 @@
         (let ((command (format "espeak-ng -v %s \"%s\"" lang text)))
           (start-process-shell-command "espeak-ng" nil command))))))
 
-(setup markdown-mode
-  (setopt markdown-command "pandoc --standalone --css=GTD.css"))
-
 (setup citar-denote
   (:load-after denote)
   (:when-loaded

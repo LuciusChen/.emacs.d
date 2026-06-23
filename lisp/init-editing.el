@@ -63,6 +63,7 @@
       (transpose-lines 1)
       (forward-line -1)))
 
+  (keymap-global-set "M-Y" 'yank-from-kill-ring)
   (keymap-global-set "C-M-<backspace>" '+kill-backward-to-indentation)
   (keymap-global-set "M-<up>"   '+transpose-line-up)
   (keymap-global-set "M-<down>" '+transpose-line-down)
@@ -151,16 +152,6 @@
   (:idle)
   (:when-loaded (auto-space-mode)))
 
-(setup browse-kill-ring
-  (:with-map browse-kill-ring-mode-map
-    (:bind
-     "M-Y" browse-kill-ring
-     "C-g" browse-kill-ring-quit
-     "M-n" browse-kill-ring-forward
-     "M-p" browse-kill-ring-previous))
-  (setopt browse-kill-ring-separator "\f"))
-
-;; 彩虹括号
 (setup rainbow-delimiters
   (:with-mode prog-mode (:hook rainbow-delimiters-mode)))
 
