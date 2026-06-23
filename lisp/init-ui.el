@@ -91,8 +91,7 @@
   (setup faces
     (:also-load lib-face)
     (:with-hook (window-setup-hook
-                 server-after-make-frame-hook
-                 default-text-scale-mode-hook)
+                 server-after-make-frame-hook)
       (:hook +setup-fonts))
     (:with-mode org-mode (:set-font ORG-FONT))
     (:advice face-at-point :around #'+suggest-other-faces)))
