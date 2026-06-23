@@ -5,8 +5,6 @@
 (setup tool-bar (:when-loaded (tool-bar-mode -1)))
 (setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
 (setup tooltip (:when-loaded (setopt tooltip-delay 2.5)))
-;; Change global font size easily
-(setup default-text-scale (:hook-into after-init))
 ;; Don't scale font on trackpad pinch!
 (global-unset-key (kbd "<pinch>"))
 

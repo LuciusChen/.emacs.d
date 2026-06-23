@@ -41,12 +41,32 @@
           blink-matching-paren-highlight-offscreen t))
 
 (setup simple
-  ;; 从光标位置删除到行首第一个非空格字符。
-  (keymap-global-set "C-M-<backspace>" (lambda ()
-                                         (interactive)
-                                         (let ((prev-pos (point)))
-                                           (back-to-indentation)
-                                           (kill-region (point) prev-pos))))
+  (defun +kill-backward-to-indentation ()
+    "Kill backward from point to the first non-whitespace character."
+    (interactive)
+    (let ((prev-pos (point)))
+      (back-to-indentation)
+      (kill-region (point) prev-pos)))
+
+  (defun +transpose-line-up ()
+    "Move the current line up."
+    (interactive "*")
+    (unless (bobp)
+      (transpose-lines 1)
+      (forward-line -2)))
+
+  (defun +transpose-line-down ()
+    "Move the current line down."
+    (interactive "*")
+    (forward-line 1)
+    (unless (eobp)
+      (transpose-lines 1)
+      (forward-line -1)))
+
+  (keymap-global-set "C-M-<backspace>" '+kill-backward-to-indentation)
+  (keymap-global-set "M-<up>"   '+transpose-line-up)
+  (keymap-global-set "M-<down>" '+transpose-line-down)
+  (keymap-global-set "C-c d"    'duplicate-dwim)
   (setopt indent-tabs-mode nil
           save-interprogram-paste-before-kill t
           set-mark-command-repeat-pop t))
@@ -140,15 +160,6 @@
      "M-p" browse-kill-ring-previous))
   (setopt browse-kill-ring-separator "\f"))
 
-;; Shift lines up and down with M-up and M-down. When paredit is enabled,
-;; it will use those keybindings. For this reason, you might prefer to
-;; use M-S-up and M-S-down, which will work even in lisp modes.
-(setup move-dup
-  (keymap-global-set "M-<up>"   'move-dup-move-lines-up)
-  (keymap-global-set "M-<down>" 'move-dup-move-lines-down)
-  (keymap-global-set "C-c d"    'move-dup-duplicate-down)
-  (keymap-global-set "C-c u"    'move-dup-duplicate-up))
-
 ;; 彩虹括号
 (setup rainbow-delimiters
   (:with-mode prog-mode (:hook rainbow-delimiters-mode)))
@@ -160,13 +171,12 @@
                  '("0[xX][0-9a-fA-F]\\{2\\}\\([0-9A-Fa-f]\\{6\\}\\)\\b"
                    (0 (rainbow-colorize-hexadecimal-without-sharp))))))
 
-(setup whitespace-cleanup-mode
+(setup whitespace
   (keymap-global-set "<remap> <just-one-space>" 'cycle-spacing)
   (setq-default show-trailing-whitespace nil)
   (:with-mode (prog-mode text-mode conf-mode)
     (:local-set show-trailing-whitespace t))
-  (global-whitespace-cleanup-mode)
-  (diminish 'whitespace-cleanup-mode))
+  (add-hook 'before-save-hook #'delete-trailing-whitespace))
 
 (setup imenu
   (:when-loaded

@@ -59,20 +59,19 @@
 ;; install packages
 (defvar USE-PACKAGE-LIST
   '(nov ;; sis
-        plz avy mpv cape citar wgrep setup nerd-icons corfu forge
-        elfeed popper embark bibtex vertico nerd-icons-corfu denote
-        diredfl cdlatex pyvenv consult mmm-mode scratch swift-mode
-        diff-hl company goggles flymake web-mode js2-mode move-dup
-        doom-modeline webpaste apheleia mastodon pdf-tools consult-dir
-        macrostep json-mode orderless kind-icon git-modes git-blamed
-        org-modern ace-pinyin marginalia org-remark dape citar-denote
-        denote-org denote-journal denote-markdown rainbow-mode ox-hugo
+        plz avy mpv cape citar setup nerd-icons corfu forge denote
+        elfeed popper embark bibtex vertico nerd-icons-corfu diredfl
+        cdlatex pyvenv consult mmm-mode scratch swift-mode citar-denote
+        diff-hl company goggles flymake web-mode js2-mode doom-modeline
+        webpaste apheleia mastodon pdf-tools consult-dir denote-org
+        macrostep orderless kind-icon git-modes git-blamed denote-journal
+        org-modern ace-pinyin marginalia org-remark dape denote-markdown
         org-cliplink language-detection ox-pandoc breadcrumb indent-bars
-        markdown-mode embark-consult speed-type diminish rainbow-delimiters
-        typescript-mode command-log-mode password-store nerd-icons-completion
+        embark-consult speed-type diminish rainbow-delimiters rainbow-mode
+        command-log-mode password-store nerd-icons-completion ox-hugo
         password-store-otp browse-kill-ring rainbow-delimiters clutch
-        default-text-scale projectile package-lint whitespace-cleanup-mode
-        clutch mysql pg
+        projectile package-lint clutch mysql pg
+        (org-defuddle :host github :repo "LuciusChen/org-defuddle")
         (clutch :host github :repo "LuciusChen/clutch" :branch "feature/mongodb-document-backend")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch" :branch "feature/mongodb-document-backend")
         (mongodb :host github :repo "LuciusChen/mongodb.el")
