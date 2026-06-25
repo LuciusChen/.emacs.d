@@ -30,9 +30,8 @@
    #b01100000])
 
 (setup window
-  (:also-load lib-window)
-  (keymap-global-set "C-x |" 'split-window-horizontally-instead)
-  (keymap-global-set "C-x _" 'split-window-vertically-instead)
+  (keymap-global-set "C-x |" 'window-layout-rotate-clockwise)
+  (keymap-global-set "C-x _" 'window-layout-rotate-anticlockwise)
   (keymap-global-set "C-x 3" (lambda () (interactive)(select-window (split-window-horizontally))))
   (keymap-global-set "C-x 2" (lambda () (interactive)(select-window (split-window-vertically)))))
 
