@@ -71,6 +71,7 @@
         command-log-mode password-store nerd-icons-completion ox-hugo
         password-store-otp rainbow-delimiters clutch
         projectile package-lint clutch mysql pg
+        (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
         (clutch :host github :repo "LuciusChen/clutch" :branch "feature/mongodb-document-backend")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch" :branch "feature/mongodb-document-backend")
