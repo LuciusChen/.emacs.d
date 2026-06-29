@@ -83,6 +83,7 @@
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (emt :host github :repo "LuciusChen/emt")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")
+        (hnview :host github :repo "LuciusChen/hnview")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (passages :host github :repo "LuciusChen/passages")
         (emacs-smart-input-source :host github :repo "LuciusChen/emacs-smart-input-source")
