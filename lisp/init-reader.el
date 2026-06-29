@@ -216,6 +216,15 @@
                    :priority 3)))
     (lexdb-init)))
 
+(setup hnview
+  (:require llm-deepseek)
+  (setopt hnview-llm-provider
+          (make-llm-deepseek
+           :key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
+           :chat-model "deepseek-v4-flash")
+          hnview-translate-target-language "zh-CN"
+          hnview-username "LuciusChen"))
+
 (setup passages
   (:when-loaded
     (setopt passages-search-paths
