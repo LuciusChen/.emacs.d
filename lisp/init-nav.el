@@ -18,6 +18,15 @@
             dired-dwim-target t
             dired-recursive-copies 'always
             dired-kill-when-opening-new-dired-buffer t)
+    (when (boundp 'dired-auto-toggle-b-switch)
+      (setopt dired-auto-toggle-b-switch t))
+    (when (boundp 'dired-check-symlinks)
+      (connection-local-set-profile-variables
+       'remote-dired-performance
+       '((dired-check-symlinks . nil)))
+      (connection-local-set-profiles
+       '(:application tramp)
+       'remote-dired-performance))
     ;; Prefer g-prefixed coreutils version of standard utilities when available
     (let ((gls (executable-find "gls")))
       (when gls (setq insert-directory-program gls)))
@@ -33,7 +42,12 @@
            vc-ignore-dir-regexp
            (format "\\(%s\\)\\|\\(%s\\)"
                    vc-ignore-dir-regexp
-                   tramp-file-name-regexp)))
+                   tramp-file-name-regexp))
+  (:when-loaded
+    (when (boundp 'tramp-propagate-emacsclient-tramp)
+      (setopt tramp-propagate-emacsclient-tramp t))
+    (when (fboundp 'tramp-cleanup-bufferless-connections)
+      (keymap-global-set "C-c t c" #'tramp-cleanup-bufferless-connections))))
 
 (setup bookmark ;; C-x r b
   (:when-loaded

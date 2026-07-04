@@ -111,7 +111,7 @@ If prefix ARG is given, delete the window instead of selecting it."
       (let ((window (aref windows i)))
         (unless window
           (push (% (1+ i) 10) left)))
-      (cl-decf i))
+      (setq i (1- i)))
     left))
 
 (defvar window-navigation-windows nil

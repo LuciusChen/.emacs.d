@@ -7,6 +7,9 @@
 (keymap-global-set "<mouse-3>" #'mouse-save-then-kill)
 
 (setup (:only-if (not (display-graphic-p)))
+  (xterm-mouse-mode 1)
+  (mouse-wheel-mode 1)
+
   (defun +ssh-terminal-p ()
     "Return non-nil when Emacs runs inside an SSH terminal session."
     (or (getenv "SSH_CONNECTION")
