@@ -152,9 +152,8 @@
     ;; 注意：当 `flymake-no-changes-timeout` 被设置为 nil 时，
     ;; 需要实现 `eglot-handle-notification` 的 `:after` 方法。
     (setopt flymake-no-changes-timeout nil
-            flymake-fringe-indicator-position 'right-fringe)
-    (when (version<= "31" emacs-version)
-      (setopt flymake-show-diagnostics-at-end-of-line t))
+            flymake-fringe-indicator-position 'right-fringe
+            flymake-show-diagnostics-at-end-of-line t)
     (:with-mode prog-mode (:hook flymake-mode))
     (:with-mode emacs-lisp-mode (:hook (lambda()(flymake-mode -1))))))
 
@@ -298,8 +297,7 @@
                                                 :documentRangeFormattingProvider))
     ;; JDTLS can ask Eglot to watch the parent workspace folder; keep watchers
     ;; inside the project root to avoid recursively watching ~/repos.
-    (when (boundp 'eglot-watch-files-outside-project-root)
-      (setopt eglot-watch-files-outside-project-root nil))
+    (setopt eglot-watch-files-outside-project-root nil)
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
     (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
     (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))

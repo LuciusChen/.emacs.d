@@ -15,13 +15,10 @@
                                   "^/ssh:" "^/scp:" "^/sudo:" "^/rsync:" "^/ftp:" "^/sftp:" ;; TRAMP
                                   (lambda (file) (file-in-directory-p file package-user-dir))
                                   (expand-file-name recentf-save-file))
-            recentf-keep nil)
-    (when (boundp 'recentf-autosave-interval)
-      (setopt recentf-autosave-interval 300))
-    (when (boundp 'recentf-show-messages)
-      (setopt recentf-show-messages nil))
-    (when (fboundp 'recentf-exclude-file-by-extension-p)
-      (add-to-list 'recentf-exclude #'recentf-exclude-file-by-extension-p))
+            recentf-keep nil
+            recentf-autosave-interval 300
+            recentf-show-messages nil)
+    (add-to-list 'recentf-exclude #'recentf-exclude-file-by-extension-p)
     ;; Add dired directories to recentf file list.
     (:with-mode dired-mode
       (:hook (lambda () (recentf-add-file default-directory))))

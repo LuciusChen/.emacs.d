@@ -175,8 +175,7 @@
   ;; (menu-bar-mode -1)
   (setq menu-bar-mode nil))
 
-(when (fboundp 'horizontal-scroll-bar-mode)
-  (horizontal-scroll-bar-mode -1))
+(horizontal-scroll-bar-mode -1)
 
 ;; tab-bar
 (setq tab-bar-mode t)
