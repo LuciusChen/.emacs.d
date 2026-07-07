@@ -166,14 +166,13 @@
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))
     ;; Normalize the heart reaction to the emoji variant so both the
     ;; message bubble and `!' completion candidates use ❤️ instead of ❤.
-    (:with-feature telega-ins
-      (:advice telega-ins--msg-reaction-type :around
-               (lambda (fn rt)
-                 (if (eq (telega--tl-type rt) 'reactionTypeEmoji)
-                     (telega-ins
-                      (if (equal (telega-tl-str rt :emoji) "❤") "❤️"
-                        (telega-tl-str rt :emoji)))
-                   (funcall fn rt)))))
+    (:advice telega-ins--msg-reaction-type :around
+             (lambda (fn rt)
+               (if (eq (telega--tl-type rt) 'reactionTypeEmoji)
+                   (telega-ins
+                    (if (equal (telega-tl-str rt :emoji) "❤") "❤️"
+                      (telega-tl-str rt :emoji)))
+                 (funcall fn rt))))
     (:with-feature telega-util
       (:advice telega-msg-reaction-title-for-completion :filter-return
                (lambda (s)
