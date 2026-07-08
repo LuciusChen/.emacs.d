@@ -58,7 +58,7 @@
         cdlatex pyvenv consult mmm-mode scratch swift-mode citar-denote
         diff-hl company goggles flymake web-mode js2-mode doom-modeline
         webpaste apheleia mastodon pdf-tools consult-dir denote-org
-        macrostep orderless kind-icon git-modes git-blamed denote-journal
+        macrostep orderless git-modes git-blamed denote-journal
         org-modern ace-pinyin marginalia org-remark dape denote-markdown
         org-cliplink language-detection ox-pandoc breadcrumb indent-bars
         embark-consult speed-type diminish rainbow-delimiters rainbow-mode

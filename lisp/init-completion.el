@@ -58,11 +58,6 @@
              [tab]  corfu-next
              "S-TAB"  corfu-previous))))
 
-(setup kind-icon
-  (:load-after corfu)
-  (:when-loaded
-    (:advice reapply-themes :after kind-icon-reset-cache)))
-
 (setup cape
   (:load-after corfu)
   (:when-loaded
