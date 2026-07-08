@@ -51,18 +51,8 @@
 
 (setup vertico
   (:idle)
-  (:when-loaded
-    (:also-load vertico-buffer)
-    (:also-load vertico-multiform)
-    (setopt vertico-cycle t
-            vertico-multiform-categories
-            '((t buffer (mode-line-format . nil)))
-            vertico-buffer-display-action
-            `(display-buffer-in-direction
-              (direction . below)
-              (window-height . ,(+ 3 vertico-count))))
-    (vertico-mode)
-    (vertico-multiform-mode)))
+  (:when-loaded (setopt vertico-cycle t)
+                (vertico-mode)))
 
 (setup isearch
   (setopt isearch-lazy-count t
