@@ -67,7 +67,7 @@
         projectile package-lint clutch mysql pg
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
-        (ob-clutch :host github :repo "LuciusChen/ob-clutch" :branch "feature/mongodb-document-backend")
+        (ob-clutch :host github :repo "LuciusChen/ob-clutch")
         (mongodb :host github :repo "LuciusChen/mongodb.el")
         (redis :host github :repo "LuciusChen/redis.el")
         (eglot-java :host github :repo "LuciusChen/eglot-java")
