@@ -6,6 +6,35 @@
 (keymap-global-set "S-<mouse-1>" #'mouse-save-then-kill)
 (keymap-global-set "<mouse-3>" #'mouse-save-then-kill)
 
+(defun +usb--mountpoint (device)
+  "Return the mount point for DEVICE, or nil when it is not mounted."
+  (with-temp-buffer
+    (when (zerop (call-process "findmnt" nil t nil
+                               "-n" "-o" "TARGET" "--source" device))
+      (goto-char (point-min))
+      (buffer-substring-no-properties
+       (line-beginning-position)
+       (line-end-position)))))
+
+(defun +open-usb ()
+  "Mount /dev/sda1 and open it in Dired."
+  (interactive)
+  (let* ((device "/dev/sda1")
+         (output-buffer (get-buffer-create "*udisksctl*"))
+         (mountpoint (+usb--mountpoint device)))
+    (unless (file-exists-p device)
+      (user-error "Device %s does not exist" device))
+    (unless mountpoint
+      (with-current-buffer output-buffer
+        (erase-buffer))
+      (call-process "udisksctl" nil output-buffer nil
+                    "mount" "-b" device)
+      (setq mountpoint (+usb--mountpoint device)))
+    (if mountpoint
+        (dired mountpoint)
+      (user-error "Failed to mount %s; see %s"
+                  device (buffer-name output-buffer)))))
+
 (setup (:only-if (not (display-graphic-p)))
   (xterm-mouse-mode 1)
   (mouse-wheel-mode 1)
