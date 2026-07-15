@@ -32,21 +32,20 @@ cp "$EMACS_D/PKGBUILD" "$BUILD_DIR/"
 BRANCH="$(sed -n 's/^_branch="\([^"]*\)".*/\1/p' "$BUILD_DIR/PKGBUILD" | head -n1)"
 BRANCH="${BRANCH:-master}"
 
-# Copy patches to build directory root if they exist
-if [[ -d "$EMACS_D/patches" ]]; then
-  # Remove old patch files
-  rm -f "$BUILD_DIR"/*.patch
+# Copy patches to the build directory root.  Accept both the PKGBUILD
+# directory and the legacy patches/ subdirectory.
+patch_sources=()
+for patch in "$EMACS_D"/*.patch "$EMACS_D/patches"/*.patch; do
+  [[ -f "$patch" ]] && patch_sources+=("$patch")
+done
 
-  # Copy all patch files to build root
-  if compgen -G "$EMACS_D/patches/*.patch" > /dev/null; then
-    cp "$EMACS_D/patches"/*.patch "$BUILD_DIR/"
-    echo "Copied patches:"
-    ls -1 "$BUILD_DIR"/*.patch
-  else
-    echo "No patch files found in $EMACS_D/patches/"
-  fi
+rm -f "$BUILD_DIR"/*.patch
+if (( ${#patch_sources[@]} )); then
+  cp "${patch_sources[@]}" "$BUILD_DIR/"
+  echo "Copied patches:"
+  ls -1 "$BUILD_DIR"/*.patch
 else
-  echo "No patches directory found at $EMACS_D/patches/"
+  echo "No patch files found in $EMACS_D or $EMACS_D/patches"
 fi
 
 # Change to the build directory

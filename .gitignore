@@ -20,7 +20,7 @@ clutch-jdbc/
 tree-sitter/
 auto-save-list/
 debug-adapters/
-java-server-hcr/
+java-server-tomcat/
 chirp/
 clutch/
 clutch-jdbc/
