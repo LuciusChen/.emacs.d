@@ -106,8 +106,10 @@
           sis-other-cursor-color "orange"
           sis-context-hooks '(meow-insert-enter-hook))
     (:with-feature meow
-        (:with-hook meow-insert-exit-hook (:hook sis-set-english))
-        (:advice meow-quit :after (lambda (&rest _) (sis-set-english))))
+        (:with-hook meow-switch-state-hook
+          (:hook +sis-set-english-outside-meow-insert))
+        (:with-hook meow-insert-exit-hook
+          (:hook +sis-set-english-outside-meow-insert)))
     (if IS-MAC
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
@@ -127,12 +129,8 @@
     ;; If characters are present, the input method switches
     ;; automatically based on context.
     (add-to-list 'sis-context-detectors #'+context-detector-function)
-    ;; Fix: Ensure input method switches to English for both keyboard and mouse focus on macOS.
-    ;; Problem: On macOS, mouse clicks don't trigger input method switch in after-focus-change-function
-    ;; due to event processing timing differences. Linux doesn't have this issue.
-    ;; Solution: Defer the switch to pre-command-hook, which runs after all focus events.
+    ;; Switch once after the macOS mouse focus event has settled.
     (add-function :after after-focus-change-function #'+handle-focus-change)
-    (:with-hook pre-command-hook #'+pre-command-hook-function)
     ;; Disables prefix key override maps during keyboard macro recording
     ;; when `sis-global-respect-mode' is active to prevent conflicts.
     ;; This is achieved by advising `sis--auto-refresh-timer-function'

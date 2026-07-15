@@ -79,7 +79,7 @@
         (hnview :host github :repo "LuciusChen/hnview")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (passages :host github :repo "LuciusChen/passages")
-        (emacs-smart-input-source :host github :repo "LuciusChen/emacs-smart-input-source")
+        (emacs-smart-input-source :host github :repo "laishulu/emacs-smart-input-source")
         (chirp :host github :repo "LuciusChen/chirp")
         (ghostel :host github :repo "dakra/ghostel")
         (java-server :host github :repo "LuciusChen/java-server")

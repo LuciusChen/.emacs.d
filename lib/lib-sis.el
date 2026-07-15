@@ -2,7 +2,11 @@
 ;;; Commentary:
 ;;; Code:
 
-(defvar +should-switch-to-english nil)
+(defun +sis-set-english-outside-meow-insert (&optional state)
+  "Switch to English when Meow enters a non-insert STATE."
+  (when (and (not (eq state 'insert))
+             (not (bound-and-true-p meow-insert-mode)))
+    (sis-set-english)))
 
 (defun +context-detector-function (&rest _)
   "Detect context for input method switching."
@@ -16,17 +20,11 @@
 
 
 (defun +handle-focus-change ()
-  "Handle actions after focus change."
+  "Keep the input source consistent with Meow after focus changes."
   (if (frame-focus-state)
-      (setq +should-switch-to-english t)
+      ;; Run once after the macOS mouse focus event has settled.
+      (run-with-timer 0.05 nil #'+sis-set-english-outside-meow-insert)
     (meow-insert-exit)))
-
-(defun +pre-command-hook-function ()
-  "Switch to English input method if needed."
-  (when +should-switch-to-english
-    (setq +should-switch-to-english nil)
-    (sis-set-english)
-    (message (mac-input-source))))
 
 (provide 'lib-sis)
 ;;; lib-sis.el ends here
