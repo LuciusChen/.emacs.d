@@ -21,7 +21,25 @@
     (setenv "GPG_AGENT_INFO" nil)))                  ; Unset GPG_AGENT_INFO environment variable
 
 (setup password-store
-  (:idle)
+  (defun password-store-generate-password (&optional length no-symbols)
+    "Interactively generate a random password.
+If LENGTH is provided, it specifies the password length.
+If NO-SYMBOLS is non-nil, the password will not contain symbols.
+The default LENGTH is 16."
+    (interactive
+     (list (read-number "Password length: " 16)
+           (not (y-or-n-p "Include symbols? "))))
+    (let* ((chars (concat "abcdefghijklmnopqrstuvwxyz"
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                          "0123456789"
+                          (unless no-symbols "!@#$%^&*()-_=+[]{}|;:,.<>?")))
+           (password ""))
+      (dotimes (_ length password)
+        (setq password (concat password (string (elt chars (random (length chars)))))))
+      (kill-new password)
+      (message "Generated password: %s (Copied to clipboard)" password)
+      password))
+
   (:when-loaded
     (defun +password-store-insert (entry &optional password)
       "Insert a new ENTRY containing PASSWORD or the current region if selected."
@@ -39,25 +57,6 @@
         (if (zerop ret)
             (message "Successfully inserted entry for %s" entry)
           (message "Cannot insert entry for %s" entry))))
-
-    (defun password-store-generate-password (&optional length no-symbols)
-      "Interactively generate a random password.
-If LENGTH is provided, it specifies the password length.
-If NO-SYMBOLS is non-nil, the password will not contain symbols.
-The default LENGTH is 16."
-      (interactive
-       (list (read-number "Password length: " 16)
-             (not (y-or-n-p "Include symbols? "))))
-      (let* ((chars (concat "abcdefghijklmnopqrstuvwxyz"
-                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                            "0123456789"
-                            (unless no-symbols "!@#$%^&*()-_=+[]{}|;:,.<>?")))
-             (password ""))
-        (dotimes (_ length password)
-          (setq password (concat password (string (elt chars (random (length chars)))))))
-        (kill-new password)
-        (message "Generated password: %s (Copied to clipboard)" password)
-        password))
 
     (:advice password-store-insert :override +password-store-insert)))
 

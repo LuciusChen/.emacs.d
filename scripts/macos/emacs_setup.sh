@@ -180,4 +180,9 @@ else
   brew install emacs-plus@$EMACS_VERSION --with-xwidgets || exit 1
 fi
 
-osascript -e "tell application \"Finder\" to make alias file to posix file \"/opt/homebrew/opt/emacs-plus@$EMACS_VERSION/Emacs.app\" at posix file \"/Applications\" with properties {name:\"Emacs.app\"}"
+APP_SOURCE="/opt/homebrew/opt/emacs-plus@$EMACS_VERSION/Emacs.app"
+APP_TARGET="/Applications/Emacs.app"
+
+echo "Installing Emacs.app in /Applications..."
+rm -rf "$APP_TARGET" || exit 1
+ditto "$APP_SOURCE" "$APP_TARGET" || exit 1

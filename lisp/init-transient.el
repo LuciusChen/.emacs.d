@@ -1,8 +1,7 @@
 ;;; init-transient.el --- Insert description here -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(setup transient
-  (:idle)
+(setup (:warm transient)
   (:when-loaded
     (:also-load lib-transient)
     (keymap-global-set "C-c e j" 'journal-transient)

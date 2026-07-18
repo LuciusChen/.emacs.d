@@ -140,22 +140,22 @@
     (:with-map sql-mode-map (:bind "C-c '" +mybatis-edit-sql-block))
     (setq-default sql-product 'mysql)))
 
-(setup projectile
-  (:idle)
+(setup (:warm projectile)
   (:when-loaded
     (projectile-mode +1)
     (setopt projectile-project-search-path '("~/IdeaProjects/"))))
 
 (setup flymake
-  (:idle)
+  (:with-mode prog-mode
+    (:hook (lambda ()
+             (unless (derived-mode-p 'emacs-lisp-mode)
+               (flymake-mode 1)))))
   (:when-loaded
     ;; 注意：当 `flymake-no-changes-timeout` 被设置为 nil 时，
     ;; 需要实现 `eglot-handle-notification` 的 `:after` 方法。
     (setopt flymake-no-changes-timeout nil
             flymake-fringe-indicator-position 'right-fringe
-            flymake-show-diagnostics-at-end-of-line t)
-    (:with-mode prog-mode (:hook flymake-mode))
-    (:with-mode emacs-lisp-mode (:hook (lambda()(flymake-mode -1))))))
+            flymake-show-diagnostics-at-end-of-line t)))
 
 (setup js
   (:also-load lib-js)
@@ -386,23 +386,20 @@
                   (setq python-shell-interpreter "python3"))))))
 
 (setup webpaste
-  (:idle)
   (:when-loaded
     (setopt webpaste-provider-priority '("paste.rs" "dpaste.com"))))
 
 (setup clutch
+  (:with-mode clutch-mode (:match-file "*.sql"))
   (:when-loaded
-    (:require clutch-db-jdbc)
-    (:with-mode clutch-mode (:match-file "*.sql"))
     (setopt clutch-connection-alist
             '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
               ("zj_oil"    . (:backend mysql  :profile-entry "mysql/zj_oil"))
               ("zj_online" . (:backend mysql  :profile-entry "mysql/zj_online"))
               ("nc_online" . (:backend oracle :profile-entry "oracle/nc_online"))
-              ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp"))))))
-
-(setup ob-clutch
-    (:load-after org))
+              ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp")))
+            clutch-cell-preview-style 'child-frame
+            clutch-cell-preview-max-size '(0.65 . 0.45))))
 
 (provide 'init-prog)
 ;;; init-prog.el ends here

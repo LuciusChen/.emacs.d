@@ -34,8 +34,7 @@
           ;; 将阈值设置为 4 表示只有当需要补全的字符数大于 4 时才会执行循环补全
           completion-cycle-threshold 4))
 
-(setup doom-modeline
-  (:idle)
+(setup (:warm doom-modeline)
   (:when-loaded
     (setopt doom-modeline-height 18
             doom-modeline-buffer-file-name-style 'auto
@@ -49,8 +48,7 @@
 
     (doom-modeline-mode)))
 
-(setup vertico
-  (:idle)
+(setup (:require vertico)
   (:when-loaded (setopt vertico-cycle t)
                 (vertico-mode)))
 
@@ -59,11 +57,8 @@
           isearch-allow-motion t
           isearch-motion-changes-direction t))
 
-(setup embark
-  (:idle)
+(setup (:warm embark)
   (:when-loaded
-    (:also-load embark-consult)
-
     (defun +embark-open-in-finder (file)
       "Open FILE in macOS Finder."
       (interactive "fFile: ")
@@ -94,8 +89,12 @@
                                 embark-highlight-indicator
                                 embark-isearch-highlight-indicator)
             embark-cycle-key "."
-            embark-help-key "?")
-    (:with-hook embark-collect-mode-hook (:hook consult-preview-at-point-mode))))
+            embark-help-key "?")))
+
+(setup embark-consult
+  (:when-loaded
+    (:with-mode embark-collect-mode
+      (:hook consult-preview-at-point-mode))))
 
 (setup marginalia
   (:load-after vertico)

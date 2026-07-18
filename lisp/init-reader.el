@@ -20,14 +20,11 @@
 
 ;; pdf-view-themed-minor
 ;; Synchronize color filter with the present Emacs theme.
-(setup pdf-tools
-  (:idle)
-  (:when-loaded
-    (:require pdf-view)
-    (:with-mode pdf-view-mode
-      (:match-file "*.PDF")
-      (:hook pdf-view-themed-minor-mode)
-      (:hook pdf-tools-enable-minor-modes))))
+(setup pdf-loader
+  (:with-function pdf-loader-install (:autoload-this))
+  (pdf-loader-install)
+  (:with-mode pdf-view-mode
+    (:hook pdf-view-themed-minor-mode)))
 
 (setup org-remark
   (keymap-global-set "C-c i m" 'org-remark-mark)

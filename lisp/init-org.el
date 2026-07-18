@@ -3,8 +3,7 @@
 ;;; Code:
 
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
-(setup org
-  (:idle)
+(setup (:warm org)
   (keymap-global-set "C-c L"       'org-store-link)
   (keymap-global-set "C-c C-o"     'org-open-at-point)
   (keymap-global-set "C-M-<up>"    'org-up-element)
@@ -12,8 +11,8 @@
   ;; Wrong type argument: commandp, dired-copy-images-links
   (keymap-global-set "C-c n m"     'dired-copy-images-links)
   (keymap-global-set "C-c b"       'org-cite-insert)
-  (:idle org-agenda org-habit org-clock ob-core ox-latex bibtex)
   (:when-loaded
+    (:warm org-agenda org-habit org-clock)
     (:also-load lib-org)
     (:with-feature yank-media
         (:when-loaded
@@ -112,9 +111,6 @@
 
 (setup ob-core
   (:when-loaded
-    (:also-load ob-plantuml
-                ob-python
-                ob-latex)
     (setopt org-plantuml-jar-path
             (expand-file-name (concat ORG-PATH "/plantuml/plantuml.jar"))
             ;; 这里应该就是 .zshrc 里面配置的 python
@@ -126,10 +122,9 @@
                                  (sql . t)
                                  (latex . t)))))
 
-(setup denote
-  (:idle)
-  (:idle denote-journal)
+(setup (:warm denote)
   (:when-loaded
+    (:warm denote-journal)
     (keymap-global-set "C-c n n" 'denote-open-or-create)
     (keymap-global-set "C-c n d" 'denote-sort-dired)
     (keymap-global-set "C-c n l" 'denote-link)

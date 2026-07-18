@@ -6,8 +6,7 @@
   (setopt ediff-split-window-function 'split-window-horizontally
           ediff-window-setup-function 'ediff-setup-windows-plain))
 
-(setup autorevert
-  (:idle)
+(setup (:warm autorevert)
   (:when-loaded
     (setopt  global-auto-revert-non-file-buffers t
              auto-revert-verbose nil)
@@ -16,7 +15,6 @@
     (diminish 'auto-revert-mode)))
 
 (setup magit
-  (:idle magit-log forge)
   (:when-loaded
     (:also-load lib-magit)
     (:with-map magit-status-mode-map

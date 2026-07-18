@@ -6,6 +6,31 @@
 (setup ns-win
   (setq mac-command-modifier 'meta
         mac-option-modifier 'super))
+
+;; 2026-07-15: Work around a macOS 27 beta LaunchServices/RunningBoard issue.
+;; `restart-emacs' reuses the current PID, which can leave the relaunched Emacs
+;; visible but unable to activate while its Dock icon keeps bouncing.  Wait for
+;; the old process to exit completely, then launch a fresh app process.
+(setup files
+  (defun +restart-emacs-after-exit ()
+    "Launch a new macOS Emacs after the current process exits."
+    (remove-hook 'kill-emacs-hook #'+restart-emacs-after-exit)
+    (call-process
+     "/usr/bin/nohup" nil 0 nil
+     "/bin/sh" "-c"
+     (format
+      "while /bin/kill -0 %d 2>/dev/null; do /bin/sleep 0.1; done; exec /usr/bin/open -na %s"
+      (emacs-pid)
+      (shell-quote-argument "/Applications/Emacs.app"))))
+
+  (define-advice restart-emacs (:override () macos-safe-relaunch)
+    "Restart Emacs without reusing the current process ID."
+    (interactive)
+    (add-hook 'kill-emacs-hook #'+restart-emacs-after-exit 100)
+    (unwind-protect
+        (save-buffers-kill-emacs)
+      (remove-hook 'kill-emacs-hook #'+restart-emacs-after-exit))))
+
 ;; Make mouse wheel / trackpad scrolling less jerky
 (setup mwheel
   (setopt mouse-wheel-scroll-amount '(1 ((shift) . 5) ((control)))))

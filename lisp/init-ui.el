@@ -102,11 +102,10 @@
         (nerd-icons-install-fonts t))
       (nerd-icons-set-font))))
 
-(setup window-navigation
-  (:idle)
+(setup (:warm window-navigation)
   (:when-loaded (window-navigation-mode)))
 
-(setup popper
+(setup (:warm popper)
   (keymap-global-set "M-~"   'popper-cycle)
   (keymap-global-set "C-M-`" 'popper-toggle-type)
   (setopt popper-window-height (lambda (win)
@@ -129,7 +128,6 @@
             "\\*Telegram Message Info\\*"
             "\\*Telegram Sticker Set\\*"
             "\\*Telegram Notification Messages\\*"))
-  (:idle)
   (:when-loaded
     (popper-mode +1)
     ;; (popper-echo-mode +1)
@@ -146,7 +144,6 @@
   (:advice keyboard-quit :before +popper-close-window-hack))
 
 (setup tab-bar
-  (:idle)
   (keymap-global-set "C-c r t" 'tab-bar-new-tab)
   (keymap-global-set "C-c r w" 'tab-bar-close-tab)
   (keymap-global-set "C-c r s" 'tab-bar-switch-to-tab)

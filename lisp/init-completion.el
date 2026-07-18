@@ -1,8 +1,7 @@
 ;;; init-completion.el --- Interactive completion in buffers -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
-(setup orderless
-  (:idle)
+(setup (:warm orderless)
   (:when-loaded
     (setopt completion-styles '(orderless basic))
     (setq completion-category-defaults nil
@@ -33,8 +32,7 @@
                        . ,(pinyinlib-build-regexp-string
                            (substring component 1) nil nil t)))))))
 
-(setup corfu
-  (:idle)
+(setup (:warm corfu)
   (:when-loaded
     (:with-feature nerd-icons-corfu
       (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
@@ -65,8 +63,7 @@
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)))
 
-(setup yasnippet
-  (:idle)
+(setup (:warm yasnippet)
   (:when-loaded
     (yas-global-mode)
     (setopt yas-keymap-disable-hook

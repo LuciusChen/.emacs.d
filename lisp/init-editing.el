@@ -84,8 +84,7 @@
                       map))
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
-(setup emt
-  (:idle)
+(setup (:warm emt)
   (:when-loaded
     (keymap-global-set "M-f" 'emt-forward-word)
     (keymap-global-set "M-b" 'emt-backward-word)
@@ -94,8 +93,7 @@
 
 (setup meow-cjk (:hook-into meow-mode))
 
-(setup sis
-  (:idle)
+(setup (:warm sis)
   (:when-loaded
     (:also-load lib-sis)
     (setq sis-english-source "com.apple.keylayout.ABC"
@@ -146,8 +144,7 @@
         ('other
          (setq sis--prefix-override-map-enable t))))))
 
-(setup auto-space
-  (:idle)
+(setup (:warm auto-space)
   (:when-loaded (auto-space-mode)))
 
 (setup rainbow-delimiters
