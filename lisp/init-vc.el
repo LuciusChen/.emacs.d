@@ -7,6 +7,7 @@
           ediff-window-setup-function 'ediff-setup-windows-plain))
 
 (setup (:warm autorevert)
+  (:once find-file-hook dired-mode-hook)
   (:when-loaded
     (setopt  global-auto-revert-non-file-buffers t
              auto-revert-verbose nil)
@@ -88,13 +89,25 @@
   (:with-mode (prog-mode conf-mode)
     (:hook diff-hl-mode))
   (:when-loaded
-    (setopt diff-hl-update-async t)
-    (:with-hook (magit-post-refresh-hook magit-pre-refresh-hook)
+    (:also-load diff-hl-flydiff
+                diff-hl-show-hunk)
+    (setopt diff-hl-update-async t
+            ;; Use clean bars without borders.
+            diff-hl-draw-borders nil)
+    (:with-hook magit-post-refresh-hook
       (:hook diff-hl-magit-post-refresh))
-    (diff-hl-margin-mode)
-    (:with-hook dired-mode-hook (:hook diff-hl-dired-mode))
-    (:with-map diff-hl-mode-map
-      (:bind "<left-fringe> <mouse-1>" diff-hl-diff-goto-hunk))))
+    ;; Use the fringe; terminals fall back to the margin.
+    (diff-hl-margin-mode -1)
+    (diff-hl-flydiff-mode 1)
+    ;; Keep the right side available for Flymake.
+    (keymap-unset diff-hl-show-hunk-mouse-mode-map
+                  "<right-fringe> <mouse-1>")
+    (keymap-unset diff-hl-show-hunk-mouse-mode-map
+                  "<right-margin> <mouse-1>")
+    (:with-hook diff-hl-mode-hook
+      (:hook (lambda ()
+               (diff-hl-show-hunk-mouse-mode (if diff-hl-mode 1 -1)))))
+    (:with-hook dired-mode-hook (:hook diff-hl-dired-mode))))
 
 (setup blame-reveal
   (keymap-global-set "C-c e b" 'blame-reveal-mode)

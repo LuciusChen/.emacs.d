@@ -5,9 +5,11 @@
 (defun meow-setup ()
   "Meow setup."
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-  (meow-motion-overwrite-define-key
+  (meow-motion-define-key
+   '("h" . meow-left)
    '("j" . meow-next)
    '("k" . meow-prev)
+   '("l" . meow-right)
    '("<escape>" . ignore))
   (meow-leader-define-key
    ;; SPC j/k will run the original command in MOTION state.

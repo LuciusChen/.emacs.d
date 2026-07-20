@@ -85,15 +85,16 @@
   (meow-normal-define-key (cons "\\" wrap-keymap)))
 
 (setup (:warm emt)
-  (:when-loaded
-    (keymap-global-set "M-f" 'emt-forward-word)
-    (keymap-global-set "M-b" 'emt-backward-word)
-    (keymap-global-set "M-d" #'emt-kill-word)
-    (keymap-global-set "M-DEL" #'emt-backward-kill-word)))
+  ;; EMT commands are autoloaded, so these bindings are usable before warming.
+  (keymap-global-set "M-f" 'emt-forward-word)
+  (keymap-global-set "M-b" 'emt-backward-word)
+  (keymap-global-set "M-d" #'emt-kill-word)
+  (keymap-global-set "M-DEL" #'emt-backward-kill-word))
 
 (setup meow-cjk (:hook-into meow-mode))
 
 (setup (:warm sis)
+  (:once pre-command-hook)
   (:when-loaded
     (:also-load lib-sis)
     (setq sis-english-source "com.apple.keylayout.ABC"
@@ -145,6 +146,7 @@
          (setq sis--prefix-override-map-enable t))))))
 
 (setup (:warm auto-space)
+  (:once pre-command-hook)
   (:when-loaded (auto-space-mode)))
 
 (setup rainbow-delimiters

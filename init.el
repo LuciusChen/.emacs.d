@@ -8,9 +8,6 @@
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
 ;; (setq debug-on-error t)
-;; ignore native compile warning
-(setq warning-minimum-level :emergency)
-
 (defconst IS-MAC (eq system-type 'darwin))
 (defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
 (defconst DROPBOX-PATH
@@ -55,15 +52,15 @@
   '(nov ;; sis
         plz avy mpv cape citar setup nerd-icons corfu forge denote
         elfeed popper embark bibtex vertico nerd-icons-corfu diredfl
-        cdlatex pyvenv consult mmm-mode scratch swift-mode citar-denote
+        cdlatex pyvenv consult mmm-mode swift-mode citar-denote
         diff-hl company goggles flymake web-mode js2-mode doom-modeline
         webpaste apheleia mastodon pdf-tools consult-dir denote-org
         macrostep orderless git-modes git-blamed denote-journal
         org-modern ace-pinyin marginalia org-remark dape denote-markdown
         org-cliplink language-detection ox-pandoc breadcrumb indent-bars
-        embark-consult speed-type diminish rainbow-delimiters rainbow-mode
+        embark-consult diminish rainbow-delimiters rainbow-mode hnview
         command-log-mode password-store nerd-icons-completion ox-hugo
-        password-store-otp rainbow-delimiters
+        password-store-otp
         projectile package-lint clutch mysql pg
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
@@ -76,7 +73,6 @@
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (emt :host github :repo "LuciusChen/emt")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")
-        (hnview :host github :repo "LuciusChen/hnview")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (passages :host github :repo "LuciusChen/passages")
         (emacs-smart-input-source :host github :repo "laishulu/emacs-smart-input-source")

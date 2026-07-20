@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (setup (:warm orderless)
+  (:once minibuffer-setup-hook)
   (:when-loaded
     (setopt completion-styles '(orderless basic))
     (setq completion-category-defaults nil
@@ -33,6 +34,9 @@
                            (substring component 1) nil nil t)))))))
 
 (setup (:warm corfu)
+  ;; Avoid the startup scratch buffer's `prog-mode-hook'; visiting a file still
+  ;; makes Corfu available immediately if idle warming has not run yet.
+  (:once find-file-hook)
   (:when-loaded
     (:with-feature nerd-icons-corfu
       (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
@@ -45,11 +49,10 @@
                (with-current-buffer buf
                  (setq-local line-spacing 2))
                buf))
-    (global-corfu-mode)
     (setopt corfu-cycle t
             corfu-auto t
             corfu-quit-no-match 'separator)
-    (:with-mode prog-mode (:hook corfu-mode))
+    (global-corfu-mode)
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
              "TAB"  corfu-next
@@ -59,17 +62,20 @@
 (setup cape
   (:load-after corfu)
   (:when-loaded
-    (add-to-list 'completion-at-point-functions #'cape-emoji)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-file)))
+    (add-hook 'completion-at-point-functions #'cape-emoji)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-file)))
 
 (setup (:warm yasnippet)
+  (:once find-file-hook)
   (:when-loaded
-    (yas-global-mode)
+    ;; Suppress the JIT preparation notice before enabling the global mode.
+    (setq yas-verbosity 0)
     (setopt yas-keymap-disable-hook
-            (list (lambda () (and (frame-live-p corfu--frame)
+            (list (lambda () (and (boundp 'corfu--frame)
+                                  (frame-live-p corfu--frame)
                                   (frame-visible-p corfu--frame)))))
-    (setq yas-verbosity 0)))
+    (yas-global-mode)))
 
 (provide 'init-completion)
 ;;; init-completion.el ends here

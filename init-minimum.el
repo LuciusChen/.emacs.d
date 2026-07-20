@@ -4,8 +4,8 @@
 
 ;; Produce backtraces when errors occur: can be helpful to diagnose startup issues
 (setq debug-on-error t)
-;; ignore native compile warning
-(setq warning-minimum-level :emergency)
+;; Keep useful warnings visible while silencing native compiler internals.
+(add-to-list 'warning-suppress-log-types '(native-compiler))
 
 (defconst IS-MAC (eq system-type 'darwin))
 (defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))

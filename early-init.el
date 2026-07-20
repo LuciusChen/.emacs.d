@@ -35,8 +35,11 @@
 ;; Disable warnings from the legacy advice API. They aren't useful.
 (setq ad-redefinition-action 'accept)
 
-;; Ignore warnings about "existing variables being aliased".
-(setq warning-suppress-types '((defvaralias) (lexical-binding)))
+;; Keep useful warnings visible.  Native compiler diagnostics are especially
+;; noisy for large, mutually-referential packages such as Telega, so do not
+;; log that category at all; merely suppress display for the other two.
+(setq warning-suppress-types '((defvaralias) (lexical-binding))
+      warning-suppress-log-types '((native-compiler)))
 
 ;; Don't ping things that look like domain names.
 (setq ffap-machine-p-known 'reject)
@@ -176,9 +179,6 @@
   (setq menu-bar-mode nil))
 
 (horizontal-scroll-bar-mode -1)
-
-;; tab-bar
-(setq tab-bar-mode t)
 
 (provide 'early-init)
 ;;; early-init.el ends here

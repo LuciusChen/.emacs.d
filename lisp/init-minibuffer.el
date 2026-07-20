@@ -49,8 +49,8 @@
     (doom-modeline-mode)))
 
 (setup (:require vertico)
-  (:when-loaded (setopt vertico-cycle t)
-                (vertico-mode)))
+  (setopt vertico-cycle t)
+  (vertico-mode))
 
 (setup isearch
   (setopt isearch-lazy-count t
@@ -58,6 +58,12 @@
           isearch-motion-changes-direction t))
 
 (setup (:warm embark)
+  ;; These commands are not marked for autoload by Embark itself.
+  (:with-function (embark-next-symbol embark-previous-symbol)
+    (:autoload-this nil t))
+  (keymap-global-set "C-c ." 'embark-act)
+  (keymap-global-set "M-n"   'embark-next-symbol)
+  (keymap-global-set "M-p"   'embark-previous-symbol)
   (:when-loaded
     (defun +embark-open-in-finder (file)
       "Open FILE in macOS Finder."
@@ -76,9 +82,6 @@
                              (file-remote-p file 'host) ":" (file-remote-p file 'localname))
                    (concat "/sudo:root@localhost:" file))))
 
-    (keymap-global-set "C-c ." 'embark-act)
-    (keymap-global-set "M-n"   'embark-next-symbol)
-    (keymap-global-set "M-p"   'embark-previous-symbol)
     (:with-map embark-file-map
       (if IS-MAC (:bind "o" +embark-open-in-finder)
         (:bind "S" sudo-find-file))
@@ -88,6 +91,7 @@
     (setopt embark-indicators '(embark-minimal-indicator
                                 embark-highlight-indicator
                                 embark-isearch-highlight-indicator)
+            embark-prompter #'embark-completing-read-prompter
             embark-cycle-key "."
             embark-help-key "?")))
 

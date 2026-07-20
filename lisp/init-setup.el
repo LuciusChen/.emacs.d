@@ -42,6 +42,10 @@ Each entry is a plist with keys:
 (defvar setup--idle-running-p nil
   "Non-nil while an idle queue item is being processed.")
 
+(defvar setup--once-registry (make-hash-table :test #'eq)
+  "One-shot feature loaders keyed by feature symbol.
+Each value is a plist with keys :function and :hooks.")
+
 (defun setup--idle-log (fmt &rest args)
   "Log FMT with ARGS when `setup-idle-verbose' is non-nil."
   (when setup-idle-verbose
@@ -53,6 +57,14 @@ Each entry is a plist with keys:
        (cl-find-if (lambda (entry)
                      (eq (plist-get entry :id) id))
                    setup--idle-queue)))
+
+(defun setup--idle-skip-loaded ()
+  "Discard loaded features from the head of the idle queue."
+  (while (and setup--idle-queue
+              (let ((id (plist-get (car setup--idle-queue) :id)))
+                (and id (featurep id))))
+    (let ((entry (pop setup--idle-queue)))
+      (setup--idle-log "skip loaded id=%S" (plist-get entry :id)))))
 
 (defun setup--idle-active-p ()
   "Return non-nil when the idle queue is scheduled or running."
@@ -69,6 +81,7 @@ Each entry is a plist with keys:
 (defun setup--start-idle-run ()
   "Start draining queued work once Emacs startup has completed."
   (remove-hook 'emacs-startup-hook #'setup--start-idle-run)
+  (setup--idle-skip-loaded)
   (when setup--idle-queue
     (setup--schedule-idle-run setup-idle-initial-delay)))
 
@@ -79,10 +92,16 @@ Each entry is a plist with keys:
           (run-at-time setup-idle-interval nil #'setup--resume-idle))))
 
 (defun setup--resume-idle ()
-  "Re-arm the idle gate after the inter-item cooldown."
+  "Continue idle work after the inter-item cooldown.
+Run immediately when Emacs remained idle; otherwise re-arm the full idle gate."
   (setq setup--idle-cooldown-timer nil)
+  (setup--idle-skip-loaded)
   (when setup--idle-queue
-    (setup--schedule-idle-run setup-idle-initial-delay)))
+    (if (and (current-idle-time)
+             (>= (float-time (current-idle-time))
+                 setup-idle-initial-delay))
+        (setup--run-idle)
+      (setup--schedule-idle-run setup-idle-initial-delay))))
 
 (defun setup--enqueue-idle-entries (entries)
   "Insert ENTRIES into queue with dedupe."
@@ -113,6 +132,7 @@ Each entry is a plist with keys:
 (defun setup--run-idle ()
   "Process one item from `setup--idle-queue', yielding between items."
   (setq setup--idle-timer nil)
+  (setup--idle-skip-loaded)
   (let (ran-entry-p)
     (unwind-protect
         (let ((setup--idle-running-p t))
@@ -146,6 +166,52 @@ Each entry is a plist with keys:
         (if ran-entry-p
             (setup--schedule-idle-cooldown)
           (setup--schedule-idle-run setup-idle-initial-delay))))))
+
+(defun setup--once-clear (feature)
+  "Remove all one-shot hook triggers registered for FEATURE."
+  (when-let* ((entry (gethash feature setup--once-registry))
+              (function (plist-get entry :function)))
+    (dolist (hook (plist-get entry :hooks))
+      (remove-hook hook function))
+    (remhash feature setup--once-registry)
+    (setup--idle-log "clear once feature=%S" feature)))
+
+(defun setup--once-require (feature &rest hooks)
+  "Require FEATURE the first time any of HOOKS runs.
+If FEATURE is loaded by another path first, remove the one-shot triggers."
+  (unless (and (symbolp feature)
+               hooks
+               (cl-every #'symbolp hooks))
+    (error "setup--once-require expects a feature and one or more hooks"))
+  (if (featurep feature)
+      (setup--once-clear feature)
+    (let ((entry (gethash feature setup--once-registry)))
+      (unless entry
+        (let ((function
+               (lambda (&rest _)
+                 (condition-case err
+                     (unless (or (featurep feature)
+                                 (require feature nil t))
+                       (message "setup-once: feature %S is unavailable" feature))
+                   (error
+                    (message "setup-once: failed to load %S: %s"
+                             feature (error-message-string err))))
+                 (when (featurep feature)
+                   (setup--once-clear feature)))))
+          (setq entry (list :function function :hooks nil))
+          (puthash feature entry setup--once-registry)
+          (eval-after-load feature
+            (lambda () (setup--once-clear feature)))))
+      (let ((function (plist-get entry :function))
+            (registered-hooks (plist-get entry :hooks)))
+        (dolist (hook hooks)
+          (unless (memq hook registered-hooks)
+            (add-hook hook function)
+            (push hook registered-hooks)))
+        (setq entry (plist-put entry :hooks registered-hooks))
+        (puthash feature entry setup--once-registry)
+        (setup--idle-log "register once feature=%S hooks=%S"
+                         feature hooks)))))
 
 (defun setup--make-idle-require-entry (req)
   "Create a queue entry that requires feature REQ safely."
@@ -181,6 +247,17 @@ This can be used as a setup shorthand, as in `(:warm org)'."
                             (symbolp (cadr form)))
                  (error "A :warm setup shorthand requires one feature"))
                (cadr form))
+  :debug '(&rest symbolp))
+
+(setup-define :once
+  (lambda (&rest hooks)
+    (unless (and hooks (cl-every #'symbolp hooks))
+      (error ":once requires one or more hook symbols"))
+    `(setup--once-require
+      ',(setup-get 'feature)
+      ,@(mapcar (lambda (hook) `',hook) hooks)))
+  :documentation "Require the current feature when any of HOOKS first runs.
+The triggers are removed if the feature is loaded by `:warm' or another path."
   :debug '(&rest symbolp))
 
 (setup-define :advice

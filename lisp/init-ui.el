@@ -102,10 +102,12 @@
         (nerd-icons-install-fonts t))
       (nerd-icons-set-font))))
 
-(setup (:warm window-navigation)
-  (:when-loaded (window-navigation-mode)))
+(setup (:require window-navigation)
+  (window-navigation-mode))
 
 (setup (:warm popper)
+  (:with-function (popper-cycle popper-toggle-type)
+    (:autoload-this nil t))
   (keymap-global-set "M-~"   'popper-cycle)
   (keymap-global-set "C-M-`" 'popper-toggle-type)
   (setopt popper-window-height (lambda (win)
@@ -164,7 +166,9 @@
             tab-bar-tab-name-format-function '+tab-bar-tab-name-format-function
             tab-bar-format '(tab-bar-format-tabs
                              tab-bar-format-add-tab
-                             tab-bar-format-align-right))))
+                             tab-bar-format-align-right)))
+  ;; Setting the variable alone does not update the frame's tab-bar-lines.
+  (tab-bar-mode 1))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

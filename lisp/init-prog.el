@@ -361,8 +361,8 @@
 ;; Python
 ;; $ pipx install debugpy
 (setup dape
+  (keymap-global-set "<f5>" 'dape)
   (:when-loaded
-    (keymap-global-set "<f5>" 'dape)
     ;; Java is easier to inspect when locals/watch expand a bit by default.
     (setopt dape-buffer-window-arrangement 'right
             dape-info-hide-mode-line nil

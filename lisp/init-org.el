@@ -4,11 +4,15 @@
 
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
 (setup (:warm org)
+  (:with-function (org-store-link
+                   org-open-at-point
+                   org-up-element)
+    (:autoload-this nil t))
+  ;; Local commands live in lib-org and should also work before Org is warm.
+  (autoload 'dired-copy-images-links "lib-org" nil t)
   (keymap-global-set "C-c L"       'org-store-link)
   (keymap-global-set "C-c C-o"     'org-open-at-point)
   (keymap-global-set "C-M-<up>"    'org-up-element)
-  ;; 一般这个函数都是在 org 启动后调用，如果 org 没有启动则会报错。
-  ;; Wrong type argument: commandp, dired-copy-images-links
   (keymap-global-set "C-c n m"     'dired-copy-images-links)
   (keymap-global-set "C-c b"       'org-cite-insert)
   (:when-loaded
@@ -94,6 +98,11 @@
             org-archive-default-command 'org-archive-subtree-hierarchical)))
 
 (setup org-clock
+  (:with-function (org-clock-goto
+                   org-clock-in-last
+                   org-clock-in
+                   org-clock-out)
+    (:autoload-this nil t))
   (keymap-global-set "C-c o j" 'org-clock-goto)
   (keymap-global-set "C-c o l" 'org-clock-in-last)
   (keymap-global-set "C-c o i" 'org-clock-in)
@@ -123,16 +132,19 @@
                                  (latex . t)))))
 
 (setup (:warm denote)
+  ;; Denote commands already have upstream autoloads, so install their entry
+  ;; points immediately instead of waiting for idle warming.
+  (keymap-global-set "C-c n n" 'denote-open-or-create)
+  (keymap-global-set "C-c n d" 'denote-sort-dired)
+  (keymap-global-set "C-c n l" 'denote-link)
+  (keymap-global-set "C-c n L" 'denote-add-links)
+  (keymap-global-set "C-c n b" 'denote-backlinks)
+  (keymap-global-set "C-c n r" 'denote-rename-file)
+  (keymap-global-set "C-c n R" 'denote-rename-file-using-front-matter)
+  (autoload '+org-defuddle-to-clipping "lib-org" nil t)
+  (keymap-global-set "C-c n w" '+org-defuddle-to-clipping)
   (:when-loaded
     (:warm denote-journal)
-    (keymap-global-set "C-c n n" 'denote-open-or-create)
-    (keymap-global-set "C-c n d" 'denote-sort-dired)
-    (keymap-global-set "C-c n l" 'denote-link)
-    (keymap-global-set "C-c n L" 'denote-add-links)
-    (keymap-global-set "C-c n b" 'denote-backlinks)
-    (keymap-global-set "C-c n r" 'denote-rename-file)
-    (keymap-global-set "C-c n R" 'denote-rename-file-using-front-matter)
-    (keymap-global-set "C-c n w" '+org-defuddle-to-clipping)
     (setopt denote-directory (expand-file-name "denote" ORG-PATH)
             denote-save-buffers nil
             denote-known-keywords '("emacs" "private")
@@ -154,11 +166,16 @@
     (denote-rename-buffer-mode 1)))
 
 (setup denote-journal
+  (defun +org-capture-loader ()
+    "Load journal capture configuration, then invoke `org-capture'."
+    (interactive)
+    (require 'denote-journal)
+    (call-interactively #'org-capture))
+  (keymap-global-set "C-c c" '+org-capture-loader)
   (:when-loaded
     (:also-load lib-weather)
     (setopt denote-journal-directory (expand-file-name "daily" denote-directory)
             denote-journal-title-format 'day-date-month-year)
-    (keymap-global-set "C-c c" 'org-capture)
     (:with-feature org-capture
       (setq org-capture-templates
             '(("d" "Default           ||" entry
