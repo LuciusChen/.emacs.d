@@ -105,10 +105,6 @@ build() {
 
   ./configure "${_conf_flags[@]}"
 
-  # Since b0d7164edc8, the top-level info/dir target can race with the
-  # Org-to-Texinfo rules on parallel builds.  Build misc Info first so the
-  # generated .texi files exist before the full build examines info/dir.
-  mold -run make NATIVE_FULL_AOT=1 -j"$(nproc)" misc-info
   mold -run make NATIVE_FULL_AOT=1 -j"$(nproc)"
 }
 
