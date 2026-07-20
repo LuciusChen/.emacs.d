@@ -91,7 +91,6 @@
     (setopt embark-indicators '(embark-minimal-indicator
                                 embark-highlight-indicator
                                 embark-isearch-highlight-indicator)
-            embark-prompter #'embark-completing-read-prompter
             embark-cycle-key "."
             embark-help-key "?")))
 
