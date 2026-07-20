@@ -10,13 +10,15 @@
 
 (defun +context-detector-function (&rest _)
   "Detect context for input method switching."
-  (and meow-insert-mode
-       (or (derived-mode-p 'gfm-mode 'org-mode 'telega-chat-mode)
-           (string-match-p "\\*new toot\\*" (buffer-name)))
-       (not (org-in-src-block-p))
-       (not (or (looking-back "[a-zA-Z]\\|\\cc" 1)
-                (looking-at "[a-zA-Z]\\|\\cc")))
-       'other))
+  (when (and (bound-and-true-p meow-insert-mode)
+             (cond
+              ((derived-mode-p 'org-mode)
+               (not (org-in-src-block-p)))
+              ((derived-mode-p 'gfm-mode 'telega-chat-mode))
+              ((string-match-p "\\*new toot\\*" (buffer-name))))
+             (not (or (looking-back "[a-zA-Z]\\|\\cc" 1)
+                      (looking-at-p "[a-zA-Z]\\|\\cc"))))
+    'other))
 
 
 (defun +handle-focus-change ()
