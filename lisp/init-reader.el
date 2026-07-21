@@ -72,7 +72,7 @@
             ;;                           google/gemini-2.5-pro-preview-03-25)
             ;;                 :stream t)
             gptel-backend (gptel-make-openai "OpenRouter"
-                            :header (lambda ()
+                            :header (lambda (_info)
                                       (when-let* ((key (gptel--get-api-key)))
                                         `(("Authorization" . ,(concat "Bearer " key))
                                           ;; https://openrouter.ai/docs/app-attribution
