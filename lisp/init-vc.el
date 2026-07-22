@@ -56,6 +56,10 @@
     (:advice magit-blob-next :around #'kill-all-blob-next-after-quit)
     (:advice magit-blob-previous :around #'kill-all-blob-previous-after-quit)
     (when IS-MAC
+      (when-let ((git (ignore-errors
+                        (car (process-lines
+                              "/usr/bin/xcrun" "--find" "git")))))
+        (setopt magit-git-executable git))
       (add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)]))))))
 
 (setup magit-log
