@@ -14,6 +14,9 @@
   "Setup fonts."
   ;; Setting the default
   (set-face-attribute 'default nil :font DEFAULT-FONT :weight 'normal)
+  ;; Inline code and code blocks commonly inherit `fixed-pitch'.  Keep it in
+  ;; sync with `default' so they use the configured default font too.
+  (set-face-like-default 'fixed-pitch)
   (set-face-like-default 'fixed-pitch-serif)
   (set-face-like-default 'variable-pitch)
 
