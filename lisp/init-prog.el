@@ -396,6 +396,9 @@
             '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
               ("zj_oil"    . (:backend mysql  :profile-entry "mysql/zj_oil"))
               ("zj_online" . (:backend mysql  :profile-entry "mysql/zj_online"))
+              ("zj_online_ssh" . (:backend mysql
+                                   :profile-entry "mysql/zj_online"
+                                   :ssh-host "arch"))
               ("nc_online" . (:backend oracle :profile-entry "oracle/nc_online"))
               ("nc_test"   . (:backend oracle :host "192.168.1.226" :port 1521 :user "zj530" :sid "zjerp")))
             clutch-cell-preview-style 'child-frame
