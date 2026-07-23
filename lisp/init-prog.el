@@ -396,7 +396,7 @@
             '(("zj_test"   . (:backend mysql :host "192.168.1.225" :port 3306 :user "cjh_test_225" :database "zj_test"))
               ("zj_oil"    . (:backend mysql  :profile-entry "mysql/zj_oil"))
               ("zj_online" . (:backend mysql  :profile-entry "mysql/zj_online"))
-              ("zj_online_ssh" . (:backend mysql
+              ("zj_online-ssh" . (:backend mysql
                                    :profile-entry "mysql/zj_online"
                                    :ssh-host "arch"))
               ("nc_online" . (:backend oracle :profile-entry "oracle/nc_online"))
