@@ -61,11 +61,6 @@
             "-W" "1"
             (apheleia-formatters-indent "--tabs" "--spaces" 'tab-width)
             (apheleia-formatters-fill-column "--wrap-limit")))
-    (setf (alist-get 'sql-formatter apheleia-formatters)
-        '("sql-formatter"
-          "-l" "mysql"
-          "-c" "{\"tabWidth\":4,\"useTabs\":false,\"keywordCase\":\"upper\",\"dataTypeCase\":\"upper\",\"functionCase\":\"upper\",\"identifierCase\":\"preserve\",
-  \"logicalOperatorNewline\":\"before\",\"expressionWidth\":80,\"linesBetweenQueries\":1,\"denseOperators\":false,\"newlineBeforeSemicolon\":false}"))
     (setf (alist-get 'sql-neatfmt apheleia-formatters)
           '("sql-neatfmt" "--dialect" "mysql"))
 
