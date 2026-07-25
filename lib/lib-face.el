@@ -37,7 +37,12 @@
            return (set-fontset-font t 'emoji (font-spec :family font :size (* FONT-SIZE 0.85)) nil 'prepend))
   ;; Set Chinese font
   ;; Do not use 'unicode charset, it will cause the English font setting invalid
-  (dolist (charset '(kana han cjk-misc bopomofo))
+  ;; kana       = Japanese Hiragana & Katakana (e.g., あ, ア)
+  ;; han        = Chinese characters used in Chinese/Japanese/Korean (e.g., 中, 日, 韓)
+  ;; cjk-misc   = CJK punctuation & symbols (e.g., 、 。 ① ②)
+  ;; bopomofo   = Taiwanese phonetic symbols (e.g., ㄅ, ㄆ, ㄇ)
+  ;; hangul     = Korean Hangul alphabet (e.g., 가, 나, 한)
+  (dolist (charset '(kana han cjk-misc bopomofo hangul))
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family ZH-DEFAULT-FONT)))
   ;; Setting fall-back fonts
