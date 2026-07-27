@@ -28,8 +28,7 @@
       (:bind
        "C" +telega-save-file-to-clipboard
        "s" +telega-msg-save-to-cloud-copyleft))
-    (:also-load telega-url-shorten
-                telega-bridge-bot
+    (:also-load telega-bridge-bot
                 telega-mnz
                 lib-telega
                 telega-notifications
@@ -98,12 +97,6 @@
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
-     telega-url-shorten-regexps
-     ;; telega-url-shorten
-     (list `(too-long-link
-             :regexp "^\\(https?://\\)\\(.\\{55\\}\\).*?$"
-             :symbol ,(nerd-icons-faicon "nf-fa-link")
-             :replace " \\1\\2..."))
      ;; telega-root
      telega-root-default-view-function 'telega-view-folders
      telega-root-keep-cursor 'track
@@ -194,8 +187,6 @@
                (setq-local completion-cycle-threshold nil)
                (electric-pair-local-mode -1))))
     (:with-mode telega-image-mode (:hook image-transform-fit-to-window))
-    ;; telega-url-shorten
-    (global-telega-url-shorten-mode 1)
     ;; telega-mnz
     (global-telega-mnz-mode 1)
 

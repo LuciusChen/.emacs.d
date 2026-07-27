@@ -6,6 +6,25 @@
 (keymap-global-set "S-<mouse-1>" #'mouse-save-then-kill)
 (keymap-global-set "<mouse-3>" #'mouse-save-then-kill)
 
+(defun +usb--device ()
+  "Return a removable partition, prompting when there are several."
+  (let (devices)
+    (dolist (line (process-lines
+                   "lsblk" "-rpn" "-o" "NAME,TYPE,RM,HOTPLUG"))
+      (pcase (split-string line)
+        (`(,device "part" ,removable ,hotplug)
+         (when (or (equal removable "1")
+                   (equal hotplug "1"))
+           (push device devices)))))
+    (setq devices (nreverse devices))
+    (cond
+     ((null devices)
+      (user-error "No mountable USB storage device found"))
+     ((null (cdr devices))
+      (car devices))
+     (t
+      (completing-read "USB device: " devices nil t)))))
+
 (defun +usb--mountpoint (device)
   "Return the mount point for DEVICE, or nil when it is not mounted."
   (with-temp-buffer
@@ -17,13 +36,11 @@
        (line-end-position)))))
 
 (defun +open-usb ()
-  "Mount /dev/sda1 and open it in Dired."
+  "Mount a USB storage device and open it in Dired."
   (interactive)
-  (let* ((device "/dev/sda1")
+  (let* ((device (+usb--device))
          (output-buffer (get-buffer-create "*udisksctl*"))
          (mountpoint (+usb--mountpoint device)))
-    (unless (file-exists-p device)
-      (user-error "Device %s does not exist" device))
     (unless mountpoint
       (with-current-buffer output-buffer
         (erase-buffer))
