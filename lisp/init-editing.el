@@ -94,6 +94,8 @@
 (setup meow-cjk (:hook-into meow-mode))
 
 (setup (:warm sis)
+  ;; NOT `meow-insert-enter-hook': functions added to a running hook are
+  ;; skipped for that run, so the first insert entry would miss sis.
   (:once pre-command-hook)
   (:when-loaded
     (:also-load lib-sis)
@@ -146,6 +148,7 @@
          (setq sis--prefix-override-map-enable t))))))
 
 (setup (:warm auto-space)
+  ;; Guarantees the mode is on before the first typed character.
   (:once pre-command-hook)
   (:when-loaded (auto-space-mode)))
 

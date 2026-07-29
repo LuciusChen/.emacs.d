@@ -1,0 +1,244 @@
+diff --git a/src/image.c b/src/image.c
+index 9724094f81c..ec16680e58b 100644
+--- a/src/image.c
++++ b/src/image.c
+@@ -2185,6 +2185,17 @@ image_alloc_image_color (struct frame *f, struct image *img,
+   return result;
+ }
+ 
++#ifdef HAVE_NS
++static bool
++image_color_unspecified_p (Lisp_Object color)
++{
++  return (NILP (color)
++	  || EQ (color, Qunspecified)
++	  || (STRINGP (color)
++	      && (!strcmp (SSDATA (color), "unspecified-bg")
++		  || !strcmp (SSDATA (color), "unspecified-fg"))));
++}
++#endif
+ 
+ 
+ /***********************************************************************
+@@ -8262,6 +8273,13 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+   png_byte channels;
+   png_uint_32 row_bytes;
+   bool transparent_p;
++  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
++  bool preserve_alpha_p
++#ifdef HAVE_NS
++    = image_color_unspecified_p (specified_bg);
++#else
++    = false;
++#endif
+   struct png_memory_storage tbr;  /* Data to be read */
+   ptrdiff_t nbytes;
+   Emacs_Pix_Container ximg;
+@@ -8439,10 +8457,8 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+   /* Handle alpha channel by combining the image with a background
+      color.  Do this only if a real alpha channel is supplied.  For
+      simple transparency, we prefer a clipping mask.  */
+-  if (!transparent_p)
++  if (!transparent_p && !preserve_alpha_p)
+     {
+-      Lisp_Object specified_bg
+-	= image_spec_value (img->spec, QCbackground, NULL);
+       Emacs_Color color;
+ 
+       /* If the user specified a color, try to use it; if not, use the
+@@ -8506,6 +8522,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+   Emacs_Pix_Container mask_img = NULL;
+   if (channels == 4
+       && transparent_p
++      && !preserve_alpha_p
+       && !image_create_x_image_and_pixmap (f, img, width, height, 1,
+ 					   &mask_img, 1))
+     {
+@@ -8547,6 +8564,11 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+ 
+ 	  if (channels == 4)
+ 	    {
++#ifdef HAVE_NS
++	      if (preserve_alpha_p)
++		ns_set_alpha (ximg, x, y, *p);
++	      else
++#endif
+ 	      if (mask_img)
+ 		PUT_PIXEL (mask_img, x, y, *p > 0 ? PIX_MASK_DRAW : PIX_MASK_RETAIN);
+ 	      ++p;
+@@ -10731,12 +10753,17 @@ webp_load (struct frame *f, struct image *img)
+ 
+   /* Find the background to use if the WebP image contains an alpha
+      channel.  */
++  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
++  bool preserve_alpha_p
++#ifdef HAVE_NS
++    = ((features.has_alpha || features.has_animation)
++       && image_color_unspecified_p (specified_bg));
++#else
++    = false;
++#endif
+   Emacs_Color bg_color;
+-  if (features.has_alpha)
++  if ((features.has_alpha || features.has_animation) && !preserve_alpha_p)
+     {
+-      Lisp_Object specified_bg
+-	= image_spec_value (img->spec, QCbackground, NULL);
+-
+       /* If the user specified a color, try to use it; if not, use the
+ 	 current frame background, ignoring any default background
+ 	 color set by the image.  */
+@@ -10770,14 +10797,29 @@ webp_load (struct frame *f, struct image *img)
+       for (int x = 0; x < width; ++x)
+ 	{
+ 	  int r, g, b;
++#ifdef HAVE_NS
++	  int alpha = UINT8_MAX;
++#endif
+ 	  /* The WebP alpha channel allows 256 levels of partial
+ 	     transparency.  Blend it with the background manually.  */
+ 	  if (features.has_alpha || features.has_animation)
+ 	    {
+-	      float a = (float) p[3] / UINT8_MAX;
+-	      r = (int)(a * p[0] + (1 - a) * bg_color.red)   << 8;
+-	      g = (int)(a * p[1] + (1 - a) * bg_color.green) << 8;
+-	      b = (int)(a * p[2] + (1 - a) * bg_color.blue)  << 8;
++#ifdef HAVE_NS
++	      alpha = p[3];
++	      if (preserve_alpha_p)
++		{
++		  r = p[0] << 8;
++		  g = p[1] << 8;
++		  b = p[2] << 8;
++		}
++	      else
++#endif
++		{
++		  float a = (float) p[3] / UINT8_MAX;
++		  r = (int)(a * p[0] + (1 - a) * bg_color.red)   << 8;
++		  g = (int)(a * p[1] + (1 - a) * bg_color.green) << 8;
++		  b = (int)(a * p[2] + (1 - a) * bg_color.blue)  << 8;
++		}
+ 	      p += 4;
+ 	    }
+ 	  else
+@@ -10787,6 +10829,10 @@ webp_load (struct frame *f, struct image *img)
+ 	      b = *p++ << 8;
+ 	    }
+ 	  PUT_PIXEL (ximg, x, y, lookup_rgb_color (f, r, g, b));
++#ifdef HAVE_NS
++	  if (preserve_alpha_p)
++	    ns_set_alpha (ximg, x, y, alpha);
++#endif
+ 	}
+     }
+ 
+@@ -12134,6 +12180,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+   bool empty_errmsg = true;
+   const char *errmsg = "";
+   ptrdiff_t errlen = 0;
++  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
++  bool preserve_alpha_p
++#ifdef HAVE_NS
++    = image_color_unspecified_p (specified_bg);
++#else
++    = false;
++#endif
+ 
+ #if ! GLIB_CHECK_VERSION (2, 36, 0)
+   /* g_type_init is a glib function that must be called prior to
+@@ -12349,21 +12402,29 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+        background color, before including the original image.  This
+        acts to set the background color, instead of leaving it
+        transparent.  */
+-    static char const wrapper[] =
++    static char const wrapper_with_bg[] =
+       "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
+       "xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
+       "style=\"color: #%06X;\" "
+       "width=\"%d\" height=\"%d\" preserveAspectRatio=\"none\" "
+       "viewBox=\"0 0 %f %f\">"
+       "<rect width=\"100%%\" height=\"100%%\" fill=\"#%06X\"/>"
++      "<xi:include href=\"data:image/svg+xml;base64,%s\"></xi:include>"
++      "</svg>";
++    static char const wrapper_no_bg[] =
++      "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
++      "xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
++      "style=\"color: #%06X;\" "
++      "width=\"%d\" height=\"%d\" preserveAspectRatio=\"none\" "
++      "viewBox=\"0 0 %f %f\">"
+       "<xi:include href=\"data:image/svg+xml;base64,%s\"></xi:include>"
+       "</svg>";
+ 
+     value = image_spec_value (img->spec, QCforeground, NULL);
+     if (!NILP (value))
+       foreground = image_alloc_image_color (f, img, value, img->face_foreground);
+-    value = image_spec_value (img->spec, QCbackground, NULL);
+-    if (!NILP (value))
++    value = specified_bg;
++    if (!preserve_alpha_p && !NILP (value))
+       {
+         background = image_alloc_image_color (f, img, value, img->face_background);
+         img->background = background;
+@@ -12384,9 +12445,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+ 
+     unsigned int color = foreground & 0xFFFFFF, fill = background & 0xFFFFFF;
+     wrapped_contents
+-      = make_formatted_string (wrapper, color, width, height,
+-			       viewbox_width, viewbox_height,
+-			       fill, SSDATA (encoded_contents));
++      = preserve_alpha_p
++	? make_formatted_string (wrapper_no_bg, color, width, height,
++				 viewbox_width, viewbox_height,
++				 SSDATA (encoded_contents))
++	: make_formatted_string (wrapper_with_bg, color, width, height,
++				 viewbox_width, viewbox_height,
++				 fill, SSDATA (encoded_contents));
+   }
+ 
+   /* Now we parse the wrapped version.  */
+@@ -12487,11 +12552,17 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+ 	    int red     = *pixels++;
+ 	    int green   = *pixels++;
+ 	    int blue    = *pixels++;
+-
+-            /* Skip opacity.  */
++#ifdef HAVE_NS
++	    int alpha   = *pixels++;
++#else
+ 	    pixels++;
++#endif
+ 
+ 	    PUT_PIXEL (ximg, x, y, lookup_rgb_color (f, red << 8, green << 8, blue << 8));
++#ifdef HAVE_NS
++	    if (preserve_alpha_p)
++	      ns_set_alpha (ximg, x, y, alpha);
++#endif
+ 	  }
+ 
+ 	pixels += rowstride - 4 * width;
+diff --git a/src/nsterm.m b/src/nsterm.m
+index a7f3fc292c7..a3daf2e8690 100644
+--- a/src/nsterm.m
++++ b/src/nsterm.m
+@@ -4316,6 +4316,9 @@ ns_draw_image_glyph_string (struct glyph_string *s)
+       NSRect ir = NSMakeRect (0, 0, [img size].width, [img size].height);
+ 
+       NSAffineTransform *setOrigin = [NSAffineTransform transform];
++      bool background_found;
++      Lisp_Object background
++	= image_spec_value (s->img->spec, QCbackground, &background_found);
+ 
+       [[NSGraphicsContext currentContext] saveGraphicsState];
+ 
+@@ -4343,7 +4346,9 @@ ns_draw_image_glyph_string (struct glyph_string *s)
+           setImageInterpolation:NSImageInterpolationNone];
+ 
+       [img drawInRect:ir fromRect:ir
+-            operation:NSCompositingOperationSourceOver
++            operation:(background_found && NILP (background)
++		       ? NSCompositingOperationSourceAtop
++		       : NSCompositingOperationSourceOver)
+              fraction:1.0 respectFlipped:YES hints:nil];
+ 
+       /* Apparently image interpolation is not reset with

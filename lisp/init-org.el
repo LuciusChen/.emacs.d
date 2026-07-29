@@ -28,11 +28,8 @@
             org-goto-interface 'outline-path-completion
             org-log-done 'time
             org-edit-timestamp-down-means-later t
-            org-hide-emphasis-markers t
-            org-fold-catch-invisible-edits 'show
             org-export-coding-system 'utf-8
             org-fast-tag-selection-single-key 'expert
-            org-tags-column 80
             ;; TODO
             ;; HOLD(h@)       ; 进入时添加笔记
             ;; HOLD(h/!)      ; 离开时添加变更信息
@@ -177,6 +174,8 @@
     (setopt denote-journal-directory (expand-file-name "daily" denote-directory)
             denote-journal-title-format 'day-date-month-year)
     (:with-feature org-capture
+      ;; Org accepts function-valued `file+olp' targets here, but its Custom
+      ;; Widget type rejects them during Emacs 32 `setopt' validation.
       (setq org-capture-templates
             '(("d" "Default           ||" entry
                (file+headline
@@ -433,7 +432,7 @@
                      (org-agenda-skip-function
                       (lambda ()
                         (or (org-agenda-skip-subtree-if 'todo '("PROJECT" "HOLD" "WAITING" "DELEGATED"))
-                            (org-agenda-skip-subtree-if 'nottododo '("TODO")))))
+                            (org-agenda-skip-subtree-if 'nottodo '("TODO")))))
                      (org-tags-match-list-sublevels t)
                      (org-agenda-sorting-strategy
                       '(category-keep))))))))
@@ -442,7 +441,9 @@
     (add-to-list 'org-agenda-after-show-hook 'org-show-entry)
     ;; Re-align tags when window shape changes
     (:with-mode org-agenda-mode
-      (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t)))))
+      (:hook (lambda ()
+               (add-hook 'window-configuration-change-hook
+                         #'org-agenda-align-tags nil t))))))
 
 (setup org-habit
   (:when-loaded

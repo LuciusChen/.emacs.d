@@ -66,7 +66,6 @@
 
     (setf (alist-get 'python-ts-mode     apheleia-mode-alist) '(isort black)) ;; isort black
     (setf (alist-get 'my-html-mode       apheleia-mode-alist) 'prettier-html) ;; prettier
-    ;; (setf (alist-get 'sql-mode           apheleia-mode-alist) 'pgformatter) ;; pgformatter
     (setf (alist-get 'sql-mode           apheleia-mode-alist) 'sql-neatfmt) ;; sql-neatfmt
     (setf (alist-get 'xml-mode           apheleia-mode-alist) 'xmllint)
     (setf (alist-get 'css-mode           apheleia-mode-alist) 'prettier)
@@ -89,14 +88,15 @@
     (:with-mode sql-mode (:hook +setup-sql-formatter))))
 
 (setup mmm-mode
-  (:with-mode prog-mode (:require mmm-mode))
+  ;; mmm-mode ships no autoloads; load it in the only mode that uses it.
+  (:with-hook nxml-mode-hook
+    (:hook (lambda () (require 'mmm-mode) (mmm-mode 1))))
   (:when-loaded
     (setq mmm-global-classes nil
           mmm-classes-alist nil)
     (setopt mmm-parse-when-idle t
             mmm-mode-ext-classes-alist nil
             mmm-submode-decoration-level 0)
-    (:hook-into nxml-mode)
     (mmm-add-classes
      '((nxml-sql-select :submode sql-mode
                         :front "<select[^>]*>" :back "</select>")
@@ -116,13 +116,12 @@
     (:with-map emacs-lisp-mode-map
       (:bind "C-x C-e" +eval-last-sexp-or-region
              "C-c C-e" pp-eval-expression
-             "C-c C-l" +load-this-file))
+             "C-c C-l" +load-this-file
+             ;; `macrostep-expand' is autoloaded by the package.
+             "C-c C-m" macrostep-expand))
     (setopt elisp-fontify-semantically t)
     (:advice pp-display-expression :after +make-read-only)
     (:with-hook emacs-lisp-mode-hook (:hook +maybe-set-bundled-elisp-readonly))))
-
-(setup macrostep
-  (:hook-into elisp-mode))
 
 ;; or the product can be set from a comment on the first line
 ;; -- -*- mode: sql; sql-product: mysql; -*-
@@ -234,8 +233,9 @@
           (sit-for 0.75))))))
 
 (setup indent-bars
+  ;; `indent-bars-mode' is autoloaded, so hooking it in suffices; requiring
+  ;; the package here would load it eagerly at startup.
   (:with-mode (java-ts-mode python-ts-mode vue-mode typescript-mode typescript-ts-mode js-mode)
-    (:require indent-bars)
     (:hook indent-bars-mode))
   (:when-loaded
     (setopt indent-bars-color '(highlight :face-bg t :blend 0.15)

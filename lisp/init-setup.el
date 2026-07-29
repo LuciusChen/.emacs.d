@@ -20,7 +20,7 @@
   :type 'number
   :group 'setup-idle)
 
-(defcustom setup-idle-interval 0.5
+(defcustom setup-idle-interval 0.15
   "Minimum real-time pause between queued idle items."
   :type 'number
   :group 'setup-idle)
@@ -29,8 +29,7 @@
   "Queue of idle entries run incrementally during idle time.
 Each entry is a plist with keys:
 - :fn (thunk)
-- :id (symbol or nil)
-- :kind (symbol)
+- :id (feature symbol)
 - :label (string).")
 
 (defvar setup--idle-timer nil
@@ -114,20 +113,12 @@ Run immediately when Emacs remained idle; otherwise re-arm the full idle gate."
         (setup--idle-log "skip duplicate id=%S" id))
        (t
         (setq setup--idle-queue (nconc setup--idle-queue (list entry)))
-        (setup--idle-log "enqueue kind=%S id=%S label=%s"
-                         (plist-get entry :kind)
+        (setup--idle-log "enqueue id=%S label=%s"
                          id
                          (or (plist-get entry :label) "<nil>"))))))
   (if after-init-time
       (setup--start-idle-run)
     (add-hook 'emacs-startup-hook #'setup--start-idle-run)))
-
-(defun setup--make-idle-thunk-entry (thunk)
-  "Create a queue entry for THUNK."
-  (list :fn thunk
-        :id nil
-        :kind 'call
-        :label "idle thunk"))
 
 (defun setup--run-idle ()
   "Process one item from `setup--idle-queue', yielding between items."
@@ -146,8 +137,7 @@ Run immediately when Emacs remained idle; otherwise re-arm the full idle gate."
               (let ((started-at (float-time))
                     (label (or (plist-get entry :label) "<nil>"))
                     succeeded)
-                (setup--idle-log "run kind=%S id=%S label=%s"
-                                 (plist-get entry :kind)
+                (setup--idle-log "run id=%S label=%s"
                                  (plist-get entry :id)
                                  label)
                 (condition-case err
@@ -196,8 +186,8 @@ If FEATURE is loaded by another path first, remove the one-shot triggers."
                    (error
                     (message "setup-once: failed to load %S: %s"
                              feature (error-message-string err))))
-                 (when (featurep feature)
-                   (setup--once-clear feature)))))
+                 ;; One shot either way: a failed load will not succeed later.
+                 (setup--once-clear feature))))
           (setq entry (list :function function :hooks nil))
           (puthash feature entry setup--once-registry)
           (eval-after-load feature
@@ -221,13 +211,7 @@ If FEATURE is loaded by another path first, remove the one-shot triggers."
                       (require req nil t))
             (error "Feature %S is unavailable" req)))
         :id req
-        :kind 'require
         :label (symbol-name req)))
-
-(defun setup-idle-enqueue (&rest thunks)
-  "Enqueue THUNKS to run during idle time, one item at a time."
-  (setup--enqueue-idle-entries
-   (mapcar #'setup--make-idle-thunk-entry thunks)))
 
 (defun setup-idle-require (&rest features)
   "Enqueue FEATURES to be required during idle time."
@@ -295,8 +279,7 @@ See `advice-add' for more details."
                    (unless (facep face-name)
                      (make-face face-name))
                    (set-face-attribute face-name nil :font ,font)
-                   (setq buffer-face-mode-face face-name)
-                   (buffer-face-mode)))))
+                   (buffer-face-set face-name)))))
   :documentation "Set the font for the current mode.
 This will create a unique face for the mode and set the buffer
 font to FONT using that face."

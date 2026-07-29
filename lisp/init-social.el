@@ -197,11 +197,10 @@
     ;;                                        :enable t
     ;;                                        :type (:@type "proxyTypeSocks5"
     ;;                                                      :username "" :password "")))))
-    ;; Opening files using external programs
-    (if IS-MAC
-        (progn
-          (setcdr (assq t org-file-apps-gnu) 'browse-url-default-macosx-browser)
-          (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open)))))
+    ;; Org only consults `org-file-apps-gnu' on GNU systems.
+    (unless IS-MAC
+      (with-eval-after-load 'org
+        (setcdr (assq t org-file-apps-gnu) 'browse-url-xdg-open)))))
 
 (setup mastodon
   (:when-loaded

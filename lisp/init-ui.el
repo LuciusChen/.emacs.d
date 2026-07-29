@@ -105,6 +105,9 @@
 (setup (:require window-navigation)
   (window-navigation-mode))
 
+;; Warm the mode-line ahead of the other `:warm' entries.
+(setup-idle-require 'doom-modeline)
+
 (setup (:warm popper)
   (:with-function (popper-cycle popper-toggle-type)
     (:autoload-this nil t))

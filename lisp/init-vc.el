@@ -16,6 +16,11 @@
     (diminish 'auto-revert-mode)))
 
 (setup magit
+  ;; Bind before Magit loads: both commands are autoloaded, and keeping the
+  ;; bindings inside `:when-loaded' would leave `C-x g' dead until the first
+  ;; `M-x magit-status'.
+  (keymap-global-set "C-x g" 'magit-status)
+  (keymap-global-set "C-x M-g" 'magit-dispatch)
   (:when-loaded
     (:also-load lib-magit)
     (:with-map magit-status-mode-map
@@ -32,8 +37,6 @@
     (transient-append-suffix 'magit-log "s" '("d" "dangling" magit-log-dangling))
     ;; Hint: customize `magit-repository-directories' so that you can use C-u M-F12 to
     ;; quickly open magit on any one of your projects.
-    (keymap-global-set "C-x g" 'magit-status)
-    (keymap-global-set "C-x M-g" 'magit-dispatch)
     (setopt magit-diff-refine-hunk t
             ;; Don't autosave repo buffers. This is too magical, and saving can
             ;; trigger a bunch of unwanted side-effects, like save hooks and
@@ -56,7 +59,7 @@
     (:advice magit-blob-next :around #'kill-all-blob-next-after-quit)
     (:advice magit-blob-previous :around #'kill-all-blob-previous-after-quit)
     (when IS-MAC
-      (when-let ((git (ignore-errors
+      (when-let* ((git (ignore-errors
                         (car (process-lines
                               "/usr/bin/xcrun" "--find" "git")))))
         (setopt magit-git-executable git))
@@ -80,9 +83,10 @@
   ;; =forge-copy-url-at-point-as-kill= Copy a (web) link to
   ;; the current file if the region isn't active and will copy
   ;; a permalink to the selected lines if the region /is/ active.
+  ;; Make it easier to see that a topic was closed.  `:face' already
+  ;; defers itself until the feature loads.
+  (:face forge-topic-closed ((t (:strike-through t))))
   (:when-loaded
-    ;; Make it easier to see that a topic was closed.
-    (:face forge-topic-closed ((t (:strike-through t))))
     (add-to-list 'forge-alist
                  '("192.168.1.220:9081" "192.168.1.220:9081/api/v4"
                    "192.168.1.220:9081" forge-gitlab-repository))
@@ -94,10 +98,15 @@
     (:hook diff-hl-mode))
   (:when-loaded
     (:also-load diff-hl-flydiff
-                diff-hl-show-hunk)
+                diff-hl-show-hunk
+                diffs)
     (setopt diff-hl-update-async t
             ;; Use clean bars without borders.
             diff-hl-draw-borders nil)
+    ;; Upstream documents custom renderers, but its current `defcustom'
+    ;; type enumerates only inline and posframe, so `setopt' would issue
+    ;; a false type warning for this public extension point.
+    (setq diff-hl-show-hunk-function #'diffs-diff-hl-show-hunk)
     (:with-hook magit-post-refresh-hook
       (:hook diff-hl-magit-post-refresh))
     ;; Use the fringe; terminals fall back to the margin.
@@ -110,8 +119,12 @@
                   "<right-margin> <mouse-1>")
     (:with-hook diff-hl-mode-hook
       (:hook (lambda ()
-               (diff-hl-show-hunk-mouse-mode (if diff-hl-mode 1 -1)))))
-    (:with-hook dired-mode-hook (:hook diff-hl-dired-mode))))
+               (diff-hl-show-hunk-mouse-mode (if diff-hl-mode 1 -1)))))))
+;; `diff-hl-dired-mode' is hooked into `dired-mode-hook' in init-nav.el.
+
+(setup diffs
+  (keymap-global-set "C-c e f" 'diffs-file)
+  (keymap-global-set "C-c e c" 'diffs-commit-at-line))
 
 (setup blame-reveal
   (keymap-global-set "C-c e b" 'blame-reveal-mode)

@@ -60,8 +60,7 @@
         org-cliplink language-detection ox-pandoc breadcrumb indent-bars
         embark-consult diminish rainbow-delimiters rainbow-mode hnview
         command-log-mode password-store nerd-icons-completion ox-hugo
-        password-store-otp
-        projectile package-lint clutch mysql pg
+        password-store-otp projectile package-lint clutch mysql pg
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch")
@@ -70,6 +69,7 @@
         (eglot-java :host github :repo "LuciusChen/eglot-java")
         (courier :host github :repo "LuciusChen/courier")
         (blame-reveal :host github :repo "LuciusChen/blame-reveal")
+        (diffs :host github :repo "LuciusChen/diffs.el")
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (emt :host github :repo "LuciusChen/emt")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")

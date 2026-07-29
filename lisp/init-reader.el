@@ -93,6 +93,9 @@
             gptel-proxy (if IS-MAC "" "socks://127.0.0.1:7890")
             gptel-directives (get-gptel-directives)
             gptel-temperature 0.7)
+    ;; `gptel-tools' has a Custom type of `(repeat gptel-tool)', but
+    ;; `gptel-tool' is a struct rather than a Widget type.  Emacs 32's
+    ;; `setopt' validation therefore fails in `widget-apply'.
     (setq gptel-tools +gptel-tools)
 
     ;; (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
@@ -214,16 +217,18 @@
     (lexdb-init)))
 
 (setup hnview
-  (:require llm-deepseek)
-  (setopt hnview-llm-provider
-          (make-llm-deepseek
-           :key (lambda ()
-                  (auth-source-pick-first-password
-                   :host "api.deepseek.com"
-                   :user "deepseek"))
-           :chat-model "deepseek-v4-flash")
-          hnview-translate-target-language "zh-CN"
-          hnview-username "LuciusChen"))
+  ;; Defer so `llm-deepseek' is not required at startup.
+  (:when-loaded
+    (require 'llm-deepseek)
+    (setopt hnview-llm-provider
+            (make-llm-deepseek
+             :key (lambda ()
+                    (auth-source-pick-first-password
+                     :host "api.deepseek.com"
+                     :user "deepseek"))
+             :chat-model "deepseek-v4-flash")
+            hnview-translate-target-language "zh-CN"
+            hnview-username "LuciusChen")))
 
 (setup passages
   (:when-loaded

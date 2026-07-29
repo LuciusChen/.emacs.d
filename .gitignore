@@ -18,6 +18,7 @@ tramp-rpc/
 clutch/
 clutch-jdbc/
 tree-sitter/
+diffs-assets/
 auto-save-list/
 debug-adapters/
 java-server-hcr/

@@ -6,12 +6,15 @@
   (setopt auto-save-default nil
           make-backup-files nil
           enable-local-variables t
+          safe-local-variable-directories
+          (list (expand-file-name "denote/daily/" ORG-PATH))
           trusted-content '("~/.emacs.d/")))
 
 (setup (:warm dired)
+  ;; setup's `:bind' waits for the feature; bind the autoloads eagerly.
+  (keymap-set ctl-x-map "C-j" #'dired-jump)
+  (keymap-set ctl-x-4-map "C-j" #'dired-jump-other-window)
   (:when-loaded
-    (:with-map ctl-x-map (:bind "\C-j" 'dired-jump))
-    (:with-map ctl-x-4-map (:bind "\C-j" 'dired-jump-other-window))
     (setopt dired-recursive-deletes 'top
             dired-dwim-target t
             dired-recursive-copies 'always

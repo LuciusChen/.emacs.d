@@ -5,8 +5,8 @@
   (:once minibuffer-setup-hook)
   (:when-loaded
     (setopt completion-styles '(orderless basic))
-    (setq completion-category-defaults nil
-          completion-ignore-case t)
+    ;; `completion-category-defaults' is already disabled in init-minibuffer.el.
+    (setq completion-ignore-case t)
 
     ;; https://github.com/oantolin/orderless/issues/111#issuecomment-1098763842
     (defun orderless+basic-all (str table pred point)
