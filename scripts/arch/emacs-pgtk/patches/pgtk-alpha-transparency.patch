@@ -1,21 +1,101 @@
+diff --git a/doc/lispref/display.texi b/doc/lispref/display.texi
+index 0d0899e418c..88d0a9c99a1 100644
+--- a/doc/lispref/display.texi
++++ b/doc/lispref/display.texi
+@@ -6444,6 +6444,15 @@ If image transforms are not supported, @code{:rotation}, @code{:crop},
+ @code{:max-height} will only be usable through ImageMagick, if
+ available (@pxref{ImageMagick Images}).
+ @end defun
++
++On PGTK frames, explicitly specifying @code{:background nil} for a
++color image whose type supports that property makes the image respect
++the frame's @code{alpha-background} parameter.  This is useful for
++images which draw shaped extensions of a face background: transparent
++pixels show the underlying background, while opaque pixels retain the
++same background opacity.  Omitting @code{:background} leaves image
++opacity unchanged.
++
+ @node XBM Images
+ @subsection XBM Images
+ @cindex XBM
+@@ -6619,8 +6628,9 @@ color, which is used as the CSS `currentcolor' value.  If the value is
+ @item :background @var{background}
+ @var{background}, if non-@code{nil}, should be a string specifying a
+ color, which is used as the image's background color if the image
+-supports transparency.  If the value is @code{nil}, it defaults to the
+-current face's background color.
++supports transparency.  On displays that use Cairo, a @code{nil} value
++preserves the image's transparency.  On other displays, it defaults to
++the current face's background color.
+ 
+ @item :css @var{css}
+ @var{css}, if non-@code{nil}, should be a string specifying the CSS to
+@@ -7093,6 +7103,10 @@ Image type @code{jpeg}.
+ 
+ @item PNG
+ Image type @code{png}.
++The @code{:background} property can specify a color against which
++transparent pixels are flattened.  On displays that use Cairo, a
++@code{nil} value preserves the image's transparency.  On other
++displays, it defaults to the frame's background color.
+ 
+ @item TIFF
+ Image type @code{tiff}.
+@@ -7101,6 +7115,7 @@ Supports the @code{:index} property.  @xref{Multi-Frame Images}.
+ @item WebP
+ Image type @code{webp}.
+ Supports the @code{:index} property.  @xref{Multi-Frame Images}.
++The @code{:background} property behaves as for PNG images.
+ @end table
+ 
+ @node Defining Images
+diff --git a/etc/NEWS b/etc/NEWS
+index 13810f81054..1f697a657b0 100644
+--- a/etc/NEWS
++++ b/etc/NEWS
+@@ -30,6 +30,24 @@ applies, and please also update docstrings as needed.
+ 
+ * Changes in Emacs 32.1
+ 
+++++
++** Cairo displays preserve native image transparency.
++The PNG, SVG, and WebP image loaders now retain their alpha channels
++when the ':background' image property is nil.  A non-nil background
++color continues to flatten transparent pixels against that color.
++
+++++
++** PGTK images can respect 'alpha-background'.
++A color-image descriptor that explicitly specifies ':background nil'
++is now composited without increasing the alpha of the background
++beneath it.  Omitting the property retains the usual image opacity.
++
++---
++** Image mode now prefers specialized image libraries.
++When a format can be loaded both by a specialized library and by
++ImageMagick, Image mode now follows the usual image loader precedence
++and selects the specialized library.
++
+ ---
+ ** Emacs no longer kills child processes after EPIPE.
+ Previously, Emacs would immediately kill a child process and set its
 diff --git a/lisp/image-mode.el b/lisp/image-mode.el
-index 2f4162660b8..332d5f4f466 100644
+index 2f4162660b8..dbef68b5c7a 100644
 --- a/lisp/image-mode.el
 +++ b/lisp/image-mode.el
-@@ -927,9 +927,9 @@ image-toggle-display-image
+@@ -927,9 +927,9 @@ was inserted."
      (when (and data-p filename)
        (setq data-p (intern (format "image/%s"
                                     (file-name-extension filename)))))
 -    (setq type (if (image--imagemagick-wanted-p filename)
 -		   'imagemagick
 -		 (image-type file-or-data nil data-p)))
-+    ;; Follow the normal loader precedence so native/specialized image
-+    ;; libraries win over ImageMagick when both are available.
++    ;; Follow the normal loader precedence so native image libraries
++    ;; take precedence over ImageMagick when both are available.
 +    (setq type (image-type file-or-data nil data-p))
  
      ;; Get the rotation data from the file, if any.
      (when (zerop image-transform-rotation) ; don't reset modified value
-@@ -996,13 +996,6 @@ image-toggle-display-image
+@@ -996,13 +996,6 @@ was inserted."
      (if (called-interactively-p 'any)
  	(message "Repeat this command to go back to displaying the file as text"))))
  
@@ -30,49 +110,23 @@ index 2f4162660b8..332d5f4f466 100644
  
  (defun image-toggle-hex-display ()
 diff --git a/src/image.c b/src/image.c
-index 1086f474eec..ce73be13fc8 100644
+index 1086f474eec..f98bf6b51e0 100644
 --- a/src/image.c
 +++ b/src/image.c
-@@ -99,6 +99,7 @@ #define PIX_MASK_DRAW	255
- 
- static unsigned long image_alloc_image_color (struct frame *, struct image *,
- 					      Lisp_Object, unsigned long);
-+static bool image_color_unspecified_p (Lisp_Object);
- #endif	/* USE_CAIRO */
- 
- #if defined HAVE_PGTK && defined HAVE_IMAGEMAGICK
-@@ -2185,6 +2186,16 @@ image_alloc_image_color (struct frame *f, struct image *img,
-   return result;
- }
- 
-+static bool
-+image_color_unspecified_p (Lisp_Object color)
-+{
-+  return (NILP (color)
-+          || EQ (color, Qunspecified)
-+          || (STRINGP (color)
-+              && (!strcmp (SSDATA (color), "unspecified-bg")
-+                  || !strcmp (SSDATA (color), "unspecified-fg"))));
-+}
-+
- 
- 
- /***********************************************************************
-@@ -8265,6 +8276,13 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -8265,6 +8265,12 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
    png_byte channels;
    png_uint_32 row_bytes;
    bool transparent_p;
 +  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
-+  bool preserve_alpha_p
 +#ifdef USE_CAIRO
-+    = image_color_unspecified_p (specified_bg);
++  bool preserve_alpha_p = NILP (specified_bg);
 +#else
-+    = false;
++  bool preserve_alpha_p = false;
 +#endif
    struct png_memory_storage tbr;  /* Data to be read */
    ptrdiff_t nbytes;
    Emacs_Pix_Container ximg;
-@@ -8442,10 +8460,8 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -8442,10 +8448,8 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
    /* Handle alpha channel by combining the image with a background
       color.  Do this only if a real alpha channel is supplied.  For
       simple transparency, we prefer a clipping mask.  */
@@ -84,7 +138,7 @@ index 1086f474eec..ce73be13fc8 100644
        Emacs_Color color;
  
        /* If the user specified a color, try to use it; if not, use the
-@@ -8508,7 +8524,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -8508,7 +8512,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
       contains an alpha channel.  */
    Emacs_Pix_Container mask_img = NULL;
    if (channels == 4
@@ -93,7 +147,7 @@ index 1086f474eec..ce73be13fc8 100644
        && !image_create_x_image_and_pixmap (f, img, width, height, 1,
  					   &mask_img, 1))
      {
-@@ -8551,7 +8567,12 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -8551,7 +8555,12 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
  	  if (channels == 4)
  	    {
  	      if (mask_img)
@@ -107,21 +161,20 @@ index 1086f474eec..ce73be13fc8 100644
  	      ++p;
  	    }
  	}
-@@ -10732,14 +10753,30 @@ webp_load (struct frame *f, struct image *img)
+@@ -10732,14 +10741,29 @@ webp_load (struct frame *f, struct image *img)
    if (!image_create_x_image_and_pixmap (f, img, width, height, 0, &ximg, false))
      goto cleanup;
  
++  bool rgba_p = features.has_alpha || features.has_animation;
 +  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
-+  bool preserve_alpha_p
 +#ifdef USE_CAIRO
-+    = image_color_unspecified_p (specified_bg);
++  bool preserve_alpha_p = features.has_alpha && NILP (specified_bg);
 +#else
-+    = false;
++  bool preserve_alpha_p = false;
 +#endif
 +
 +  Emacs_Pix_Container mask_img = NULL;
-+  if ((features.has_alpha || features.has_animation)
-+      && preserve_alpha_p
++  if (preserve_alpha_p
 +      && !image_create_x_image_and_pixmap (f, img, width, height, 1,
 +					   &mask_img, true))
 +    {
@@ -134,7 +187,7 @@ index 1086f474eec..ce73be13fc8 100644
       channel.  */
    Emacs_Color bg_color;
 -  if (features.has_alpha)
-+  if ((features.has_alpha || features.has_animation) && !preserve_alpha_p)
++  if (rgba_p && !preserve_alpha_p)
      {
 -      Lisp_Object specified_bg
 -	= image_spec_value (img->spec, QCbackground, NULL);
@@ -142,9 +195,12 @@ index 1086f474eec..ce73be13fc8 100644
        /* If the user specified a color, try to use it; if not, use the
  	 current frame background, ignoring any default background
  	 color set by the image.  */
-@@ -10777,10 +10814,20 @@ webp_load (struct frame *f, struct image *img)
+@@ -10775,12 +10799,22 @@ webp_load (struct frame *f, struct image *img)
+ 	  int r, g, b;
+ 	  /* The WebP alpha channel allows 256 levels of partial
  	     transparency.  Blend it with the background manually.  */
- 	  if (features.has_alpha || features.has_animation)
+-	  if (features.has_alpha || features.has_animation)
++	  if (rgba_p)
  	    {
 -	      float a = (float) p[3] / UINT8_MAX;
 -	      r = (int)(a * p[0] + (1 - a) * bg_color.red)   << 8;
@@ -160,14 +216,14 @@ index 1086f474eec..ce73be13fc8 100644
 +	      else
 +		{
 +		  float a = (float) p[3] / UINT8_MAX;
-+		  r = (int)(a * p[0] + (1 - a) * bg_color.red)   << 8;
-+		  g = (int)(a * p[1] + (1 - a) * bg_color.green) << 8;
-+		  b = (int)(a * p[2] + (1 - a) * bg_color.blue)  << 8;
++		  r = (int) (a * p[0] + (1 - a) * bg_color.red)   << 8;
++		  g = (int) (a * p[1] + (1 - a) * bg_color.green) << 8;
++		  b = (int) (a * p[2] + (1 - a) * bg_color.blue)  << 8;
 +		}
  	      p += 4;
  	    }
  	  else
-@@ -10805,6 +10852,13 @@ webp_load (struct frame *f, struct image *img)
+@@ -10805,6 +10839,13 @@ webp_load (struct frame *f, struct image *img)
    img->width = width;
    img->height = height;
  
@@ -181,171 +237,47 @@ index 1086f474eec..ce73be13fc8 100644
    if (features.has_animation)
      /* Return animation metadata.  */
      {
-@@ -11208,6 +11262,13 @@ imagemagick_load_image (struct frame *f, struct image *img,
-   PixelWand **pixels, *bg_wand = NULL;
-   MagickPixelPacket  pixel;
-   Lisp_Object image;
-+  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
-+  bool preserve_alpha_p
-+#ifdef USE_CAIRO
-+    = image_color_unspecified_p (specified_bg);
-+#else
-+    = false;
-+#endif
- #ifndef DONT_CREATE_TRANSFORMED_IMAGEMAGICK_IMAGE
-   Lisp_Object value;
- #endif
-@@ -11217,6 +11278,7 @@ imagemagick_load_image (struct frame *f, struct image *img,
- #ifndef DONT_CREATE_TRANSFORMED_IMAGEMAGICK_IMAGE
-   double rotation;
- #endif
-+  Emacs_Pix_Container mask_img = NULL;
-   char hint_buffer[MaxTextExtent];
-   char *filename_hint = NULL;
-   imagemagick_initialize ();
-@@ -11317,9 +11379,6 @@ imagemagick_load_image (struct frame *f, struct image *img,
-   /* Retrieve the frame's background color, for use later.  */
-   {
-     Emacs_Color bgcolor;
--    Lisp_Object specified_bg;
--
--    specified_bg = image_spec_value (img->spec, QCbackground, NULL);
-     if (!STRINGP (specified_bg)
- 	|| !FRAME_TERMINAL (f)->defined_color_hook (f,
-                                                     SSDATA (specified_bg),
-@@ -11409,18 +11468,19 @@ imagemagick_load_image (struct frame *f, struct image *img,
-      background, and flatten the image.  Note: as of ImageMagick
-      6.6.0, SVG image transparency is not handled properly
-      (e.g. etc/images/splash.svg shows a white background always).  */
--  {
--    MagickWand *new_wand;
--    MagickSetImageBackgroundColor (image_wand, bg_wand);
-+  if (!preserve_alpha_p)
-+    {
-+      MagickWand *new_wand;
-+      MagickSetImageBackgroundColor (image_wand, bg_wand);
- #if defined HAVE_MAGICKMERGEIMAGELAYERS		\
-   || HAVE_DECL_MAGICKMERGEIMAGELAYERS
--    new_wand = MagickMergeImageLayers (image_wand, MergeLayer);
-+      new_wand = MagickMergeImageLayers (image_wand, MergeLayer);
- #else
--    new_wand = MagickFlattenImages (image_wand);
-+      new_wand = MagickFlattenImages (image_wand);
- #endif
--    DestroyMagickWand (image_wand);
--    image_wand = new_wand;
--  }
-+      DestroyMagickWand (image_wand);
-+      image_wand = new_wand;
-+    }
- 
-   /* Finally we are done manipulating the image.  Figure out the
-      resulting width/height and transfer ownership to Emacs.  */
-@@ -11445,7 +11505,7 @@ imagemagick_load_image (struct frame *f, struct image *img,
- #if (defined (HAVE_MAGICKEXPORTIMAGEPIXELS)	     \
-      || HAVE_DECL_MAGICKEXPORTIMAGEPIXELS)	     \
-   && ! defined (HAVE_NS) && ! defined (HAVE_HAIKU)
--  if (imagemagick_render_type != 0)
-+  if (imagemagick_render_type != 0 && !preserve_alpha_p)
-     {
-       /* Magicexportimage is normally faster than pixelpushing.  This
-          method is also well tested.  Some aspects of this method are
-@@ -11505,6 +11565,19 @@ imagemagick_load_image (struct frame *f, struct image *img,
-           goto imagemagick_error;
-         }
- 
-+      if (preserve_alpha_p
-+	  && !image_create_x_image_and_pixmap (f, img, width, height, 1,
-+					       &mask_img, 1))
-+	{
-+#ifdef COLOR_TABLE_SUPPORT
-+	  free_color_table ();
-+#endif
-+	  image_destroy_x_image (ximg);
-+	  image_clear_image_1 (f, img, CLEAR_IMAGE_PIXMAP);
-+	  image_error ("Imagemagick X mask allocation failure");
-+	  goto imagemagick_error;
-+	}
-+
-       /* Copy imagemagick image to x with primitive yet robust pixel
-          pusher loop.  This has been tested a lot with many different
-          images.  */
-@@ -11516,6 +11589,11 @@ imagemagick_load_image (struct frame *f, struct image *img,
- #ifdef COLOR_TABLE_SUPPORT
- 	  free_color_table ();
- #endif
-+	  if (mask_img)
-+	    {
-+	      image_destroy_x_image (mask_img);
-+	      image_clear_image_1 (f, img, CLEAR_IMAGE_MASK);
-+	    }
- 	  image_destroy_x_image (ximg);
-           image_error ("Imagemagick pixel iterator creation failed");
-           goto imagemagick_error;
-@@ -11531,7 +11609,15 @@ imagemagick_load_image (struct frame *f, struct image *img,
- 	  int xlim = min (row_width, width);
- 	  for (x = 0; x < xlim; x++)
-             {
-+	      unsigned long alpha = PIX_MASK_DRAW;
-               PixelGetMagickColor (pixels[x], &pixel);
-+	      if (mask_img)
-+		{
-+		  /* PixelGetAlpha returns normalized opacity in [0..1].  */
-+		  double a = PixelGetAlpha (pixels[x]);
-+		  alpha = a >= 1.0 ? 255 : (unsigned long) (a * 255.0 + 0.5);
-+		  PUT_PIXEL (mask_img, x, y, alpha);
-+		}
-               PUT_PIXEL (ximg, x, y,
-                          lookup_rgb_color (f,
- 					   color_scale * pixel.red,
-@@ -11554,6 +11640,13 @@ imagemagick_load_image (struct frame *f, struct image *img,
-   /* Put ximg into the image.  */
-   image_put_x_image (f, img, ximg, 0);
- 
-+  if (mask_img)
-+    {
-+      image_background_transparent (img, f,
-+				    PIX_CONTAINER_TO_CONTEXT (mask_img));
-+      image_put_x_image (f, img, mask_img, 1);
-+    }
-+
-   /* Final cleanup. image_wand should be the only resource left. */
-   DestroyMagickWand (image_wand);
-   if (bg_wand) DestroyPixelWand (bg_wand);
-@@ -12137,6 +12230,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12137,6 +12178,12 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
    bool empty_errmsg = true;
    const char *errmsg = "";
    ptrdiff_t errlen = 0;
 +  Lisp_Object specified_bg = image_spec_value (img->spec, QCbackground, NULL);
-+  bool preserve_alpha_p
 +#ifdef USE_CAIRO
-+    = image_color_unspecified_p (specified_bg);
++  bool preserve_alpha_p = NILP (specified_bg);
 +#else
-+    = false;
++  bool preserve_alpha_p = false;
 +#endif
  
  #if ! GLIB_CHECK_VERSION (2, 36, 0)
    /* g_type_init is a glib function that must be called prior to
-@@ -12352,7 +12452,7 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
-        background color, before including the original image.  This
-        acts to set the background color, instead of leaving it
-        transparent.  */
+@@ -12346,13 +12393,10 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+     Lisp_Object encoded_contents
+       = Fbase64_encode_string (make_unibyte_string (contents, size), Qt);
+ 
+-    /* The wrapper sets the foreground color, width and height, and
+-       viewBox must contain the dimensions of the original image.  It
+-       also draws a rectangle over the whole space, set to the
+-       background color, before including the original image.  This
+-       acts to set the background color, instead of leaving it
+-       transparent.  */
 -    static char const wrapper[] =
++    /* The wrappers set the foreground color, width and height, and
++       viewBox must contain the dimensions of the original image.
++       WRAPPER_WITH_BG also draws a background rectangle.  */
 +    static char const wrapper_with_bg[] =
        "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
        "xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
        "style=\"color: #%06X;\" "
-@@ -12361,12 +12461,21 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12361,11 +12405,19 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
        "<rect width=\"100%%\" height=\"100%%\" fill=\"#%06X\"/>"
        "<xi:include href=\"data:image/svg+xml;base64,%s\"></xi:include>"
        "</svg>";
-+    static char const wrapper_no_bg[] =
++    static char const wrapper_without_bg[] =
 +      "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
 +      "xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
 +      "style=\"color: #%06X;\" "
 +      "width=\"%d\" height=\"%d\" preserveAspectRatio=\"none\" "
 +      "viewBox=\"0 0 %f %f\">"
-+      "<rect width=\"100%%\" height=\"100%%\" fill=\"none\"/>"
 +      "<xi:include href=\"data:image/svg+xml;base64,%s\"></xi:include>"
 +      "</svg>";
  
@@ -353,29 +285,28 @@ index 1086f474eec..ce73be13fc8 100644
      if (!NILP (value))
        foreground = image_alloc_image_color (f, img, value, img->face_foreground);
 -    value = image_spec_value (img->spec, QCbackground, NULL);
--    if (!NILP (value))
 +    value = specified_bg;
-+    if (!image_color_unspecified_p (value))
+     if (!NILP (value))
        {
          background = image_alloc_image_color (f, img, value, img->face_background);
-         img->background = background;
-@@ -12387,7 +12496,14 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12387,9 +12439,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
  
      unsigned int color = foreground & 0xFFFFFF, fill = background & 0xFFFFFF;
      wrapped_contents
 -      = make_formatted_string (wrapper, color, width, height,
-+      = preserve_alpha_p
-+      ? make_formatted_string (wrapper_no_bg,
-+			       color,
-+			       width, height,
-+			       viewbox_width, viewbox_height,
-+			       SSDATA (encoded_contents))
-+      : make_formatted_string (wrapper_with_bg,
-+			       color, width, height,
- 			       viewbox_width, viewbox_height,
- 			       fill, SSDATA (encoded_contents));
+-			       viewbox_width, viewbox_height,
+-			       fill, SSDATA (encoded_contents));
++      = (preserve_alpha_p
++	 ? make_formatted_string (wrapper_without_bg, color, width, height,
++				  viewbox_width, viewbox_height,
++				  SSDATA (encoded_contents))
++	 : make_formatted_string (wrapper_with_bg, color, width, height,
++				  viewbox_width, viewbox_height,
++				  fill, SSDATA (encoded_contents)));
    }
-@@ -12471,12 +12587,23 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+ 
+   /* Now we parse the wrapped version.  */
+@@ -12471,18 +12527,27 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
    {
      /* Try to create a x pixmap to hold the svg pixmap.  */
      Emacs_Pix_Container ximg;
@@ -391,15 +322,23 @@ index 1086f474eec..ce73be13fc8 100644
 +					     &mask_img, 1))
 +      {
 +	image_destroy_x_image (ximg);
-+	g_object_unref (pixbuf);
 +	image_clear_image_1 (f, img, CLEAR_IMAGE_PIXMAP);
++	g_object_unref (pixbuf);
 +	return false;
 +      }
 +
      init_color_table ();
  
-     /* This loop handles opacity values, since Emacs assumes
-@@ -12490,9 +12617,16 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+-    /* This loop handles opacity values, since Emacs assumes
+-       non-transparent images.  Each pixel must be "flattened" by
+-       calculating the resulting color, given the transparency of the
+-       pixel, and the image background color.  */
++    /* Copy the RGB channels and, with Cairo, preserve alpha in an A8
++       mask so the display backend can composite it.  */
+     for (int y = 0; y < height; ++y)
+       {
+ 	for (int x = 0; x < width; ++x)
+@@ -12490,9 +12555,10 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
  	    int red     = *pixels++;
  	    int green   = *pixels++;
  	    int blue    = *pixels++;
@@ -408,25 +347,17 @@ index 1086f474eec..ce73be13fc8 100644
 -            /* Skip opacity.  */
 -	    pixels++;
 +	    if (mask_img)
-+#ifdef USE_CAIRO
-+	      /* Preserve full alpha (0-255) for cairo A8 mask.  */
 +	      PUT_PIXEL (mask_img, x, y, alpha);
-+#else
-+	      PUT_PIXEL (mask_img, x, y,
-+			 alpha > 0 ? PIX_MASK_DRAW : PIX_MASK_RETAIN);
-+#endif
  
  	    PUT_PIXEL (ximg, x, y, lookup_rgb_color (f, red << 8, green << 8, blue << 8));
  	  }
-@@ -12517,6 +12651,15 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12517,6 +12583,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
  
      /* Put ximg into the image.  */
      image_put_x_image (f, img, ximg, 0);
 +
 +    if (mask_img)
 +      {
-+	/* Fill in the background_transparent field while we have the
-+	   mask handy.  */
 +	image_background_transparent (img, f,
 +				      PIX_CONTAINER_TO_CONTEXT (mask_img));
 +	image_put_x_image (f, img, mask_img, 1);
@@ -435,7 +366,7 @@ index 1086f474eec..ce73be13fc8 100644
  
    eassume (err == NULL);
 diff --git a/src/pgtkterm.c b/src/pgtkterm.c
-index 9a9ebef418c..9961330e51d 100644
+index 9a9ebef418c..6d1074c816b 100644
 --- a/src/pgtkterm.c
 +++ b/src/pgtkterm.c
 @@ -2212,7 +2212,8 @@ pgtk_draw_glyph_string_bg_rect (struct glyph_string *s, int x, int y, int w,
@@ -444,20 +375,23 @@ index 9a9ebef418c..9961330e51d 100644
  		    int src_x, int src_y, int width, int height,
 -		    int dest_x, int dest_y, bool overlay_p)
 +		    int dest_x, int dest_y, bool overlay_p,
-+		    bool source_atop_p)
++		    bool respect_alpha_background)
  {
    cairo_t *cr = pgtk_begin_cr_clip (f);
  
-@@ -2232,6 +2233,8 @@ pgtk_cr_draw_image (struct frame *f, Emacs_GC *gc, cairo_pattern_t *image,
+@@ -2232,6 +2233,11 @@ pgtk_cr_draw_image (struct frame *f, Emacs_GC *gc, cairo_pattern_t *image,
    cairo_format_t format = cairo_image_surface_get_format (surface);
    if (format != CAIRO_FORMAT_A8 && format != CAIRO_FORMAT_A1)
      {
-+      if (source_atop_p)
++      /* SOURCE ATOP retains the destination alpha.  This lets an image
++	 used as a shaped background respect `alpha-background' without
++	 making the transparent part of the image rectangular.  */
++      if (respect_alpha_background && f->alpha_background != 1.0)
 +	cairo_set_operator (cr, CAIRO_OPERATOR_ATOP);
        cairo_set_source (cr, image);
        cairo_fill (cr);
      }
-@@ -2252,6 +2255,9 @@ pgtk_draw_image_foreground (struct glyph_string *s)
+@@ -2252,6 +2258,9 @@ pgtk_draw_image_foreground (struct glyph_string *s)
  {
    int x = s->x;
    int y = s->ybase - image_ascent (s->img, s->face, &s->slice);
@@ -467,7 +401,7 @@ index 9a9ebef418c..9961330e51d 100644
  
    /* If first glyph of S has a left box line, start drawing it to the
       right of that line.  */
-@@ -2273,7 +2279,7 @@ pgtk_draw_image_foreground (struct glyph_string *s)
+@@ -2273,7 +2282,7 @@ pgtk_draw_image_foreground (struct glyph_string *s)
        pgtk_set_glyph_string_clipping (s, cr);
        pgtk_cr_draw_image (s->f, &s->xgcv, s->img->cr_data,
  			  s->slice.x, s->slice.y, s->slice.width, s->slice.height,
@@ -476,26 +410,7 @@ index 9a9ebef418c..9961330e51d 100644
        if (!s->img->mask)
  	{
  	  /* When the image has a mask, we can expect that at
-@@ -3049,7 +3055,17 @@ pgtk_draw_window_cursor (struct window *w, struct glyph_row *glyph_row, int x,
- 	      break;
- 
- 	    case FILLED_BOX_CURSOR:
--	      draw_phys_cursor_glyph (w, glyph_row, DRAW_CURSOR);
-+	      {
-+		struct glyph *cursor_glyph = get_phys_cursor_glyph (w);
-+		/* Preserving alpha exposes a pgtk regression here:
-+		   a filled box cursor can cover the entire IMAGE_GLYPH.
-+		   Keep the image visible and draw a hollow cursor
-+		   instead.  */
-+		if (cursor_glyph && cursor_glyph->type == IMAGE_GLYPH)
-+		  pgtk_draw_hollow_cursor (w, glyph_row);
-+		else
-+		  draw_phys_cursor_glyph (w, glyph_row, DRAW_CURSOR);
-+	      }
- 	      break;
- 
- 	    case BAR_CURSOR:
-@@ -3679,7 +3695,7 @@ pgtk_draw_fringe_bitmap (struct window *w, struct glyph_row *row,
+@@ -3679,7 +3688,7 @@ pgtk_draw_fringe_bitmap (struct window *w, struct glyph_row *row,
  			: face->foreground);
        gcv.background = face->background;
        pgtk_cr_draw_image (f, &gcv, fringe_bmp[p->which], 0, p->dh,
@@ -504,3 +419,75 @@ index 9a9ebef418c..9961330e51d 100644
      }
  
    pgtk_end_cr_clip (f);
+diff --git a/test/manual/image-tests.el b/test/manual/image-tests.el
+index 33656cdbcc3..295fd2d5932 100644
+--- a/test/manual/image-tests.el
++++ b/test/manual/image-tests.el
+@@ -54,6 +54,23 @@
+     (xbm . ,(find-image '((:file "gnus/gnus.xbm" :type xbm))))
+     (xpm . ,(find-image '((:file "splash.xpm" :type xpm))))))
+ 
++(defconst image-tests--alpha-png
++  (base64-decode-string
++   "iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAEUlEQVQI12NgYGBg+M/A0AAABIUBgH6tdK4AAAAASUVORK5CYII=")
++  "A 2x1 PNG with transparent and partially transparent pixels.")
++
++(defconst image-tests--alpha-svg
++  "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"2\" height=\"1\">
++     <rect width=\"1\" height=\"1\" fill=\"red\" fill-opacity=\"0\"/>
++     <rect x=\"1\" width=\"1\" height=\"1\" fill=\"red\" fill-opacity=\".5\"/>
++   </svg>"
++  "A 2x1 SVG with transparent and partially transparent pixels.")
++
++(defconst image-tests--alpha-webp
++  (base64-decode-string
++   "UklGRloAAABXRUJQVlA4WAoAAAAQAAAAAQAAAAAAQUxQSAMAAAAAAIAAVlA4IDAAAADQAQCdASoCAAEAAgA0JaACdLoB+AADsAD+8MQL/yC5YXXI1/8gP+QH/ID/+PIAAAA=")
++  "A 2x1 WebP with transparent and partially transparent pixels.")
++
+ 
+ ;;;; Load image
+ 
+@@ -206,11 +223,15 @@
+ 
+ (ert-deftest image-tests-image-mask-p/png ()
+   (image-skip-unless 'png)
+-  (should-not (image-mask-p (cdr (assq 'png image-tests--images)))))
++  (if (featurep 'cairo)
++      (should (image-mask-p (cdr (assq 'png image-tests--images))))
++    (should-not (image-mask-p (cdr (assq 'png image-tests--images))))))
+ 
+ (ert-deftest image-tests-image-mask-p/svg ()
+   (image-skip-unless 'svg)
+-  (should-not (image-mask-p (cdr (assq 'svg image-tests--images)))))
++  (if (featurep 'cairo)
++      (should (image-mask-p (cdr (assq 'svg image-tests--images))))
++    (should-not (image-mask-p (cdr (assq 'svg image-tests--images))))))
+ 
+ (ert-deftest image-tests-image-mask-p/tiff ()
+   (image-skip-unless 'tiff)
+@@ -222,6 +243,25 @@
+   (should-not (image-mask-p (create-image
+                              (cdr (assq 'webp image-tests--images))))))
+ 
++(defun image-tests--check-alpha-mask (type data)
++  "Check the alpha mask of an image with TYPE and DATA."
++  (let ((spec (create-image data type t)))
++    (should (image-mask-p spec))
++    (should-not
++     (image-mask-p (append spec '(:background "black"))))))
++
++(ert-deftest image-tests-image-mask-p/alpha-png ()
++  (image-skip-unless 'png (featurep 'cairo))
++  (image-tests--check-alpha-mask 'png image-tests--alpha-png))
++
++(ert-deftest image-tests-image-mask-p/alpha-svg ()
++  (image-skip-unless 'svg (featurep 'cairo))
++  (image-tests--check-alpha-mask 'svg image-tests--alpha-svg))
++
++(ert-deftest image-tests-image-mask-p/alpha-webp ()
++  (image-skip-unless 'webp (featurep 'cairo))
++  (image-tests--check-alpha-mask 'webp image-tests--alpha-webp))
++
+ (ert-deftest image-tests-image-mask-p/xbm ()
+   (image-skip-unless 'xbm)
+   (should-not (image-mask-p (cdr (assq 'xbm image-tests--images)))))
