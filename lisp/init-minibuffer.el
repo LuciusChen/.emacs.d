@@ -42,10 +42,6 @@
             doom-modeline-bar-width 4
             doom-modeline-hud t
             doom-modeline-hud-min-height 1)
-    (:with-feature telega
-      (:when-loaded
-        (add-to-list 'global-mode-string '("" (:eval (+mode-line-telega-icon))) t)))
-
     (doom-modeline-mode)))
 
 (setup (:require vertico)

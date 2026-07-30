@@ -172,15 +172,6 @@
                  (if (string-prefix-p "❤" s)
                      (concat "❤️" (substring s 1))
                    s))))
-    ;; telega-notifications
-    (:with-hook telega-connection-state-hook (:hook +mode-line-telega-icon-update))
-    (:with-hook telega-kill-hook (:hook +mode-line-telega-icon-update))
-    (:advice telega--on-updateUnreadChatCount :after #'+mode-line-telega-icon-update)
-    (:advice telega--on-updateChatReadInbox :after #'+mode-line-telega-icon-update)
-    (:advice telega--on-updateChatUnreadMentionCount :after #'+mode-line-telega-icon-update)
-    (:advice telega--on-updateChatUnreadReactionCount :after #'+mode-line-telega-icon-update)
-    (:advice telega-msg-observable-p :after  #'+mode-line-telega-icon-update)
-
     (:with-mode telega-chat-mode
       (:hook telega-completions-setup-capf)
       (:hook (lambda ()
