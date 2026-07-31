@@ -58,18 +58,13 @@
             ;;                 :host "ai-gateway.vercel.sh"
             ;;                 :endpoint "/v1/chat/completions"
             ;;                 :key (auth-source-pick-first-password :host "ai-gateway.vercel" :user "vercel")
-            ;;                 :models '(deepseek/deepseek-chat
-            ;;                           deepseek/deepseek-r1
+            ;;                 :models '(deepseek/deepseek-v4-pro
+            ;;                           deepseek/deepseek-v4-flash
             ;;                           qwen/qwen-turbo
             ;;                           qwen/qwen-plus
             ;;                           qwen/qwen-max
             ;;                           openai/gpt-4o
-            ;;                           openai/gpt-5
-            ;;                           anthropic/claude-3.7-sonnet:thinking
-            ;;                           anthropic/claude-3.7-sonnet
-            ;;                           anthropic/claude-4
-            ;;                           google/gemini-2.5-pro-exp-03-25:free
-            ;;                           google/gemini-2.5-pro-preview-03-25)
+            ;;                           openai/gpt-5)
             ;;                 :stream t)
             gptel-backend (gptel-make-openai "OpenRouter"
                             :header (lambda (_info)
@@ -81,14 +76,16 @@
                             :host "openrouter.ai"
                             :endpoint "/api/v1/chat/completions"
                             :key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
-                            :models '(deepseek/deepseek-chat
-                                      deepseek/deepseek-r1
-                                      openai/gpt-4o
-                                      openai/gpt-5
-                                      anthropic/claude-sonnet-4
-                                      anthropic/claude-sonnet-4.5
-                                      google/gemini-2.5-pro
-                                      google/gemini-2.5-pro-flash)
+                            :models '((deepseek/deepseek-v4-pro
+                                       :capabilities (reasoning tool-use json))
+                                      (deepseek/deepseek-v4-flash
+                                       :capabilities (reasoning tool-use json))
+                                      (openai/gpt-4o
+                                       :capabilities (media tool-use json url)
+                                       :mime-types ("image/jpeg" "image/png" "image/gif" "image/webp"))
+                                      (openai/gpt-5
+                                       :capabilities (media tool-use json url)
+                                       :mime-types ("image/jpeg" "image/png" "image/gif" "image/webp")))
                             :stream t)
             gptel-proxy (if IS-MAC "" "socks://127.0.0.1:7890")
             gptel-directives (get-gptel-directives)
@@ -98,16 +95,15 @@
     ;; `setopt' validation therefore fails in `widget-apply'.
     (setq gptel-tools +gptel-tools)
 
-    ;; (gptel-make-gemini "Gemini" :key (auth-source-pick-first-password :host "api.gemini.com" :user "gemini") :stream t)
     ;; (gptel-make-openai "DeepSeek" :host "api.deepseek.com" :endpoint "/chat/completions" :stream t :key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
-    ;;                    :models '(deepseek-chat deepseek-reasoner))
+    ;;                    :models '(deepseek-v4-pro deepseek-v4-flash))
     ;; (gptel-make-openai "vercel-gateway" :host "ai-gateway.vercel.sh" :endpoint "/v1/chat/completions" :stream t :key (auth-source-pick-first-password :host "ai-gateway.vercel" :user "vercel")
     ;;                    :models '(openai/gpt-4o openai/gpt-5))
 
     (:with-hook gptel-post-stream-hook
       (:hook (lambda ()(meow-insert-exit)))
       (:hook gptel-auto-scroll))
-    (:with-hook gptel-post-response-hook (:hook gptel-end-of-response))
+    (:with-hook gptel-post-response-functions (:hook gptel-end-of-response))
     (:with-hook gptel-mode-hook (:hook gptel-set-default-directory))))
 
 (setup gt
@@ -120,11 +116,11 @@
             ;; gt-chatgpt-host "https://api.deepseek.com"
             ;; gt-chatgpt-path "/chat/completions"
             ;; gt-chatgpt-key '(auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
-            ;; gt-chatgpt-model "deepseek-chat"
+            ;; gt-chatgpt-model "deepseek-v4-flash"
             gt-chatgpt-host "https://openrouter.ai"
             gt-chatgpt-path "/api/v1/chat/completions"
             gt-chatgpt-key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
-            gt-chatgpt-model "deepseek/deepseek-chat-v3.1"
+            gt-chatgpt-model "deepseek/deepseek-v4-flash"
             gt-buffer-render-follow-p t
             gt-buffer-render-window-config
             '((display-buffer-reuse-window display-buffer-in-direction)

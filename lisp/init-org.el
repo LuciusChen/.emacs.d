@@ -149,7 +149,7 @@
             denote-sort-keywords t
             denote-prompts '(title file-type keywords)
             denote-excluded-directories-regexp nil
-            denote-excluded-keywords-regexp nil
+            denote-keywords-to-not-infer-regexp nil
             denote-rename-confirmations '(rewrite-front-matter modify-file-name)
             denote-date-prompt-use-org-read-date t)
     (setq denote-org-front-matter
@@ -174,8 +174,8 @@
     (setopt denote-journal-directory (expand-file-name "daily" denote-directory)
             denote-journal-title-format 'day-date-month-year)
     (:with-feature org-capture
-      ;; Org accepts function-valued `file+olp' targets here, but its Custom
-      ;; Widget type rejects them during Emacs 32 `setopt' validation.
+      ;; Org accepts function-valued targets here, but its Custom type still
+      ;; warns during `setopt' validation.
       (setq org-capture-templates
             '(("d" "Default           ||" entry
                (file+headline
@@ -438,7 +438,7 @@
                       '(category-keep))))))))
 
     (:also-load lib-org-agenda)
-    (add-to-list 'org-agenda-after-show-hook 'org-show-entry)
+    (add-to-list 'org-agenda-after-show-hook #'org-fold-show-entry)
     ;; Re-align tags when window shape changes
     (:with-mode org-agenda-mode
       (:hook (lambda ()

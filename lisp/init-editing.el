@@ -7,10 +7,8 @@
                 use-short-answers t
                 ;; Improve CJK wrapping
                 word-wrap-by-category t
-                read-process-output-max (* 1024 1024)
-                ;; Suppress GUI features
-                use-file-dialog nil
-                use-dialog-box nil
+                ;; Avoid emoji-width desynchronization on Kitty TTY frames.
+                auto-composition-mode "xterm-kitty"
                 ;; Window size and features
                 window-resize-pixelwise t
                 frame-resize-pixelwise t

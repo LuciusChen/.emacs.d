@@ -204,10 +204,7 @@
     (add-hook 'mu4e-compose-mode-hook
               (lambda ()
                 (save-excursion (message-add-header "Cc:\n"))
-                (save-excursion (message-add-header "Bcc:\n"))))
-
-    ;; mu4e address completion
-    (add-hook 'mu4e-compose-mode-hook 'company-mode)))
+                (save-excursion (message-add-header "Bcc:\n"))))))
 
 (provide 'init-mu4e)
 ;;; init-mu4e.el ends here

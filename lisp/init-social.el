@@ -29,6 +29,7 @@
        "C" +telega-save-file-to-clipboard
        "s" +telega-msg-save-to-cloud-copyleft))
     (:also-load telega-bridge-bot
+                telega-alert
                 telega-mnz
                 lib-telega
                 telega-notifications
@@ -154,6 +155,15 @@
                                       '(:inherit owner-sender-tag
                                                  :passive-face telega-shadow))
                                 styles))
+    (when IS-MAC
+      (advice-add 'telega-alert--notify :filter-args
+                  #'+telega-alert--strip-text-properties)
+      (alert-define-style
+       'telega-osx-notifier
+       :title "Native macOS notification without echo output"
+       :notifier #'+telega-alert--osx-notifier-notify)
+      (alert-add-rule :mode 'telega-chat-mode :style 'telega-osx-notifier)
+      (telega-alert-mode 1))
     ;; ignore messages from blocked senders (users or chats)
     (:with-hook telega-msg-ignore-predicates
       (:hook (telega-match-gen-predicate 'msg '(sender is-blocked))))

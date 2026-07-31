@@ -1,5 +1,26 @@
 ;;; lib-telega.el  --- Custom configuration -*- lexical-binding: t -*-
 ;;; Commentary
+
+(defun +telega-alert--strip-text-properties (args)
+  "Strip text properties from the notification spec in ARGS.
+`alert-osx-notifier-notify' embeds the title and message in
+AppleScript source, where Emacs string text properties are invalid."
+  (let ((notify-spec (copy-sequence (car args))))
+    (dolist (key '(:title :body))
+      (let ((text (plist-get notify-spec key)))
+        (when (stringp text)
+          (setq notify-spec
+                (plist-put notify-spec key
+                           (substring-no-properties text))))))
+    (cons notify-spec (cdr args))))
+
+(defun +telega-alert--osx-notifier-notify (info)
+  "Display the alert INFO as a macOS notification without echoing it."
+  (do-applescript
+   (format "display notification %S with title %S"
+           (plist-get info :message)
+           (plist-get info :title))))
+
 (defun +telega-webpage-open-url-in-xwidget ()
   (interactive)
   (let ((entry-link

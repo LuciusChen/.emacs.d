@@ -156,7 +156,6 @@
     (:also-load lib-tabbar)
     (setq tab-bar-separator "")
     (setopt tab-bar-close-button-show nil
-            tab-bar-new-button-show nil
             tab-bar-new-tab-to 'rightmost
             tab-bar-tab-hints t
             tab-bar-show 1
@@ -167,8 +166,8 @@
             ;; Add spaces for tab-name
             tab-bar-tab-name-function '+tab-bar-tab-name-function
             tab-bar-tab-name-format-function '+tab-bar-tab-name-format-function
+            ;; Omit `tab-bar-format-add-tab' to hide the new-tab button.
             tab-bar-format '(tab-bar-format-tabs
-                             tab-bar-format-add-tab
                              tab-bar-format-align-right)))
   ;; Setting the variable alone does not update the frame's tab-bar-lines.
   (tab-bar-mode 1))

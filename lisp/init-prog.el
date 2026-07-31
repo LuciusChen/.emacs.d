@@ -136,8 +136,15 @@
 
 (setup (:warm projectile)
   (:when-loaded
+    (:also-load projectile-consult)
     (projectile-mode +1)
-    (setopt projectile-project-search-path '("~/IdeaProjects/"))))
+    (setopt projectile-project-search-path '("~/IdeaProjects/")
+            projectile-per-command-compilation-buffer t)
+    (:with-map projectile-command-map
+      (:bind "f" projectile-consult-find-file))))
+
+;; `flymake-mode-map' captures this value when Flymake is loaded.
+(setq flymake-fringe-indicator-position 'right-fringe)
 
 (setup flymake
   (:with-mode prog-mode
@@ -145,10 +152,7 @@
              (unless (derived-mode-p 'emacs-lisp-mode)
                (flymake-mode 1)))))
   (:when-loaded
-    ;; 注意：当 `flymake-no-changes-timeout` 被设置为 nil 时，
-    ;; 需要实现 `eglot-handle-notification` 的 `:after` 方法。
-    (setopt flymake-no-changes-timeout nil
-            flymake-fringe-indicator-position 'right-fringe
+    (setopt flymake-no-changes-timeout 0.5
             flymake-show-diagnostics-at-end-of-line t)))
 
 (setup js

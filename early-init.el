@@ -24,8 +24,8 @@
 ;; Prefer loading newer compiled files
 (setq load-prefer-newer t)
 
-;; Increase how much is read from processes in a single chunk (default is 4kb).
-(setq read-process-output-max (* 256 1024))  ; 256kb
+;; Increase how much is read from processes in a single chunk (default is 4 KiB).
+(setq read-process-output-max (* 1024 1024)) ; 1 MiB
 
 ;; Reduce rendering/line scan work by not rendering cursors or regions in
 ;; non-focused windows.
@@ -43,9 +43,6 @@
 
 ;; Don't ping things that look like domain names.
 (setq ffap-machine-p-known 'reject)
-
-;; By default, Emacs "updates" its ui more often than it needs to
-(setq idle-update-delay 1.0)
 
 ;; Font compacting can be very resource-intensive, especially when rendering
 ;; icon fonts on Windows. This will increase memory usage.
@@ -171,8 +168,8 @@
 
 ;; Disable GUIs because they're are inconsistent across systems, desktop
 ;; environments, and themes, and they don't match the look of Emacs.
-(setq use-file-dialog nil)
-(setq use-dialog-box nil)
+(setq use-file-dialog nil
+      use-dialog-box nil)
 
 (unless (memq window-system '(mac ns))
   ;; (menu-bar-mode -1)

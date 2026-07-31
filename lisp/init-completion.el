@@ -4,24 +4,13 @@
 (setup (:warm orderless)
   (:once minibuffer-setup-hook)
   (:when-loaded
-    (setopt completion-styles '(orderless basic))
-    ;; `completion-category-defaults' is already disabled in init-minibuffer.el.
-    (setq completion-ignore-case t)
-
-    ;; https://github.com/oantolin/orderless/issues/111#issuecomment-1098763842
-    (defun orderless+basic-all (str table pred point)
-      (or (orderless-all-completions str table pred point)
-          (completion-basic-all-completions str table pred point)))
-
-    (defun orderless+basic-try (str table pred point)
-      (or (completion-basic-try-completion str table pred point)
-          (orderless-try-completion str table pred point)))
-
-    (add-to-list 'completion-styles-alist
-                 '(orderless+basic
-                   orderless+basic-try
-                   orderless+basic-all
-                   "Unholy mix of Orderless and Basic."))))
+    (setopt completion-styles '(orderless basic)
+            ;; Try Basic first for TRAMP hosts and support partial paths.
+            completion-category-overrides
+            '((file (styles partial-completion)))
+            ;; Emacs 31+: let partial completion also match substrings.
+            completion-pcm-leading-wildcard t)
+    (setq completion-ignore-case t)))
 
 (setup pinyinlib
   (:load-after orderless)
@@ -38,6 +27,7 @@
   ;; makes Corfu available immediately if idle warming has not run yet.
   (:once find-file-hook)
   (:when-loaded
+    (:also-load corfu-popupinfo)
     (:with-feature nerd-icons-corfu
       (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
     ;; Symbols Nerd Font Mono glyphs are 1-2px taller than the default font.
@@ -53,6 +43,7 @@
             corfu-auto t
             corfu-quit-no-match 'separator)
     (global-corfu-mode)
+    (corfu-popupinfo-mode +1)
     (:with-mode corfu
       (:bind "<escape>" corfu-quit
              "TAB"  corfu-next

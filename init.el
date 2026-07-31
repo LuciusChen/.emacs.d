@@ -17,7 +17,7 @@
 (defconst ORG-PATH (expand-file-name "org" DROPBOX-PATH))
 (defconst FALLBACK-FONTS '("Jigmo" "Jigmo2" "Jigmo3"))
 (defconst FONT-SIZE (if IS-MAC 14 12))
-(defconst DEFAULT-FONT (format "PragmataPro Mono %d" FONT-SIZE))
+(defconst DEFAULT-FONT (format "PragmataPro %d" FONT-SIZE))
 (defconst ORG-FONT (format "PragmataPro %d" FONT-SIZE))
 (defconst ZH-DEFAULT-FONT "LXGW WenKai Screen")
 (defconst EMOJI-FONTS '("Apple Color Emoji"
@@ -51,9 +51,9 @@
 (defvar USE-PACKAGE-LIST
   '(nov ;; sis
         plz avy mpv cape citar setup nerd-icons corfu forge denote
-        elfeed popper embark bibtex vertico nerd-icons-corfu diredfl
+        elfeed alert popper embark bibtex vertico nerd-icons-corfu diredfl
         cdlatex pyvenv consult mmm-mode swift-mode citar-denote
-        diff-hl company goggles flymake web-mode js2-mode doom-modeline
+        diff-hl goggles flymake web-mode js2-mode doom-modeline
         webpaste apheleia mastodon pdf-tools consult-dir denote-org
         macrostep orderless git-modes git-blamed denote-journal
         org-modern ace-pinyin marginalia org-remark dape denote-markdown
