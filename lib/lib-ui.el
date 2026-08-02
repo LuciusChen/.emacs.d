@@ -36,13 +36,12 @@
     (when (and (<= frame-alpha-lower-limit newalpha) (>= 100 newalpha))
       (modify-frame-parameters frame (list (cons 'alpha-background newalpha))))))
 
-(defun set-opacity (value)
-  "Set the background opacity of all frames to VALUE."
-  (dolist (frame (frame-list))
-    (unless (display-graphic-p frame)
-      (error "Cannot adjust opacity of this frame"))
+(defun set-opacity (value &optional target-frame)
+  "Set opacity to VALUE on TARGET-FRAME, or on all graphical frames."
+  (dolist (frame (if target-frame (list target-frame) (frame-list)))
     (when (and (<= frame-alpha-lower-limit value) (>= 100 value))
-      (modify-frame-parameters frame (list (cons 'alpha-background value))))))
+      (when (display-graphic-p frame)
+        (modify-frame-parameters frame (list (cons 'alpha-background value)))))))
 
 (defun apply-theme (theme opacity)
   "Apply THEME and set window OPACITY."
@@ -60,14 +59,12 @@
       (apply-theme light-theme 100)
     (apply-theme dark-theme (if IS-MAC 75 90))))
 
-(defun opacity-dark-theme (&rest frame)
-  "Set the opacity of the FRAME to 60% if the background mode is dark.
-This function only works in a graphical interface.  The FRAME argument is
-optional and is used to specify which frame's opacity to change."
-  (if (display-graphic-p)
-      (if (eq (frame-parameter nil 'background-mode) 'dark)
-          (set-opacity (if IS-MAC 75 90)))
-    (message "Non-graphical interface")))
+(defun opacity-dark-theme (&optional frame)
+  "Set FRAME opacity when its background mode is dark."
+  (let ((frame (or frame (selected-frame))))
+    (when (and (display-graphic-p frame)
+               (eq (frame-parameter frame 'background-mode) 'dark))
+      (set-opacity (if IS-MAC 75 90) frame))))
 
 (defun light ()
   (interactive)

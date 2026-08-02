@@ -3,16 +3,6 @@
 ;;; Code:
 
 (setup telega
-  ;; @LawxenceX
-  ;; telega 中 telega-prefix-map 定义的是 defvar，
-  ;; 需要转成 defun，即 defalias。
-  ;; defun 宏展开其实也是 defalias 包裹了一个 lambda。
-  ;; (defalias 'telega-prefix-map telega-prefix-map)
-  ;; (keymap-global-set "C-c t" 'telega-prefix-map)
-  ;;
-  ;; @Eli
-  ;; :bind-into 里面用 :ensure 规定了 func`，直接传的话就会给你加 #'。
-  ;; 改成 (identity xxx-prefix-map) 即可
   (keymap-global-set "C-c t" (identity telega-prefix-map))
   (:when-loaded
     (:with-map telega-prefix-map

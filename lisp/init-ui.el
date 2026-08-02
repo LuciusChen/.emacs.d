@@ -2,8 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-(setup tool-bar (:when-loaded (tool-bar-mode -1)))
-(setup scroll-bar (:when-loaded (set-scroll-bar-mode nil)))
 (setup tooltip (:when-loaded (setopt tooltip-delay 2.5)))
 ;; Don't scale font on trackpad pinch!
 (global-unset-key (kbd "<pinch>"))
@@ -86,14 +84,14 @@
           panel-title "")
   (panel-create-hook))
 
-(when window-system
-  (setup faces
-    (:also-load lib-face)
-    (:with-hook (window-setup-hook
-                 server-after-make-frame-hook)
-      (:hook +setup-fonts))
-    (:with-mode org-mode (:set-font ORG-FONT))
-    (:advice face-at-point :around #'+suggest-other-faces)))
+(setup faces
+  (:also-load lib-face)
+  (+setup-character-display)
+  (+setup-fonts)
+  (:with-hook after-make-frame-functions
+    (:hook +setup-fonts))
+  (:with-mode org-mode (:set-font ORG-FONT))
+  (:advice face-at-point :around #'+without-global-hl-line))
 
 (setup nerd-icons
   (:when-loaded

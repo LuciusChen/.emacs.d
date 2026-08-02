@@ -14,6 +14,8 @@
   ;; setup's `:bind' waits for the feature; bind the autoloads eagerly.
   (keymap-set ctl-x-map "C-j" #'dired-jump)
   (keymap-set ctl-x-4-map "C-j" #'dired-jump-other-window)
+  (autoload 'dired-media-preview-mode "dired-media-preview" nil t)
+  (autoload 'dired-media-preview-global-mode "dired-media-preview" nil t)
   (:when-loaded
     (setopt dired-recursive-deletes 'top
             dired-dwim-target t
@@ -29,6 +31,7 @@
     ;; Prefer g-prefixed coreutils version of standard utilities when available
     (let ((gls (executable-find "gls")))
       (when gls (setq insert-directory-program gls)))
+    (keymap-set dired-mode-map "M-t" #'dired-media-preview-global-mode)
     (:with-mode dired-mode (:hook diff-hl-dired-mode
                                   diredfl-mode))))
 

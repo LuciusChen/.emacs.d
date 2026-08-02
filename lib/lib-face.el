@@ -2,97 +2,84 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun set-face-like-default (face)
-  "Set FACE attributes to match the default face."
+(defun +set-face-family-like-default (face)
+  "Make FACE use the family of `default' without fixing its size or style."
   (set-face-attribute face nil
-                      :family (face-attribute 'default :family)
-                      :height (face-attribute 'default :height)
-                      :weight (face-attribute 'default :weight)
-                      :slant (face-attribute 'default :slant)))
+                      :family (face-attribute 'default :family nil 'default)
+                      :height 'unspecified
+                      :weight 'unspecified
+                      :slant 'unspecified))
 
-(defun +setup-fonts ()
-  "Setup fonts."
-  ;; Setting the default
-  (set-face-attribute 'default nil :font DEFAULT-FONT :weight 'normal)
-  ;; Inline code and code blocks commonly inherit `fixed-pitch'.  Keep it in
-  ;; sync with `default' so they use the configured default font too.
-  (set-face-like-default 'fixed-pitch)
-  (set-face-like-default 'fixed-pitch-serif)
-  (set-face-like-default 'variable-pitch)
+(defvar +default-fontset-configured-p nil
+  "Non-nil after the default fontset has been configured.")
 
-  ;; https://www.wfonts.com/font/symbola
-  (cl-loop for font in SYMBOL-FONT
-           when (find-font (font-spec :name font))
-           return (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
+(defun +setup-fonts (&optional frame)
+  "Set up fonts for graphical FRAME, or the selected frame."
+  (let ((frame (or frame (selected-frame))))
+    (when (display-graphic-p frame)
+      (with-selected-frame frame
+        ;; Setting the default
+        (set-face-attribute 'default nil :font DEFAULT-FONT :weight 'normal)
+        ;; Inline code and code blocks commonly inherit `fixed-pitch'.  Keep it
+        ;; in sync with `default' so they use the configured default font too.
+        (+set-face-family-like-default 'fixed-pitch)
+        (+set-face-family-like-default 'fixed-pitch-serif)
+        (+set-face-family-like-default 'variable-pitch)
 
-  ;; "Emacs 28 now has 'emoji . before, emoji is part of 'symbol"
-  ;; 根据上面这句话应该写成 'emoji 就可以了，但是由于 Emoji 本身
-  ;; 分布比较散，所以还是先设置 'unicode 后再设置 CJK 比较靠谱。
-  ;; 特例：'emoji 就会导致 ⛈️ fallback 到 ⛈
-  ;; https://emacs-china.org/t/emacs/15676/34
-  ;;
-  ;; 另外 emoji 的尺寸会导致 corfu candidates 显示不全，因此要缩小。
-  (cl-loop for font in EMOJI-FONTS
-           when (find-font (font-spec :name font))
-           return (set-fontset-font t 'emoji (font-spec :family font :size (* FONT-SIZE 0.85)) nil 'prepend))
-  ;; Set Chinese font
-  ;; Do not use 'unicode charset, it will cause the English font setting invalid
-  ;; kana       = Japanese Hiragana & Katakana (e.g., あ, ア)
-  ;; han        = Chinese characters used in Chinese/Japanese/Korean (e.g., 中, 日, 韓)
-  ;; cjk-misc   = CJK punctuation & symbols (e.g., 、 。 ① ②)
-  ;; bopomofo   = Taiwanese phonetic symbols (e.g., ㄅ, ㄆ, ㄇ)
-  ;; hangul     = Korean Hangul alphabet (e.g., 가, 나, 한)
-  (dolist (charset '(kana han cjk-misc bopomofo hangul))
-    (set-fontset-font (frame-parameter nil 'font) charset
-                      (font-spec :family ZH-DEFAULT-FONT)))
-  ;; Setting fall-back fonts
-  ;; https://idiocy.org/emacs-fonts-and-fontsets.html
-  (dolist (font FALLBACK-FONTS)
-    (when (member font (font-family-list))
-      (set-fontset-font "fontset-default" 'han font nil 'append)))
-  ;; Force Emacs to search by using font-spec
-  (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
+        (unless +default-fontset-configured-p
+          ;; https://www.wfonts.com/font/symbola
+          (cl-loop for font in SYMBOL-FONT
+                   when (find-font (font-spec :name font))
+                   return (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
+
+          ;; Use the dedicated emoji script without changing unrelated Unicode
+          ;; fallbacks.  Keep emoji slightly smaller so Corfu rows are not clipped.
+          ;; Overwrite the default list; prepend makes VS16 sequences use Symbola.
+          (cl-loop for font in EMOJI-FONTS
+                   when (find-font (font-spec :name font))
+                   return (set-fontset-font
+                           t 'emoji
+                           (font-spec :family font :size (* FONT-SIZE 0.85))))
+
+          ;; Setting fall-back fonts
+          ;; https://idiocy.org/emacs-fonts-and-fontsets.html
+          (dolist (font FALLBACK-FONTS)
+            (when (member font (font-family-list))
+              (set-fontset-font "fontset-default" 'han font nil 'append)))
+          ;; Force Emacs to search by using font-spec
+          (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
+          (setq +default-fontset-configured-p t))
+
+        ;; Set Chinese font
+        ;; Do not use 'unicode charset, it will cause the English font setting invalid
+        ;; kana       = Japanese Hiragana & Katakana (e.g., あ, ア)
+        ;; han        = Chinese characters used in Chinese/Japanese/Korean (e.g., 中, 日, 韓)
+        ;; cjk-misc   = CJK punctuation & symbols (e.g., 、 。 ① ②)
+        ;; bopomofo   = Taiwanese phonetic symbols (e.g., ㄅ, ㄆ, ㄇ)
+        ;; hangul     = Korean Hangul alphabet (e.g., 가, 나, 한)
+        (dolist (charset '(kana han cjk-misc bopomofo hangul))
+          (set-fontset-font (frame-parameter frame 'font) charset
+                            (font-spec :family ZH-DEFAULT-FONT)))))))
+
+(defun +setup-character-display ()
+  "Set up special character composition and display."
   (when IS-LINUX
-    ;; Set character composition rule for U+FE0F on Linux 2025-10-31
-    ;;
-    ;; Background:
-    ;; On some Linux systems, U+FE0F (VARIATION SELECTOR-16) may display as a box
-    ;; instead of the expected variant display (such as a colored emoji). This is
-    ;; due to the lack of proper character composition rules.
-    ;;
-    ;; Solution:
-    ;; Use the `set-char-table-range` function to set a composition rule for U+FE0F
-    ;; in the `composition-function-table`. This ensures it combines correctly with
-    ;; preceding characters to display as the intended variant.
-    ;;
-    ;; To avoid unnecessary settings on non-Linux systems, the `when` conditional
-    ;; is used to apply this rule only in a Linux environment.
+    ;; Compose VARIATION SELECTOR-16 with the preceding character.
     ;; https://t.me/emacs_china/297476
-    (set-char-table-range composition-function-table #xFE0F '(["\\c.\\c^+" 1 compose-gstring-for-graphic]))))
+    (set-char-table-range composition-function-table #xFE0F '(["\\c.\\c^+" 1 compose-gstring-for-graphic])))
 
-(defun +suggest-other-faces (func &rest args)
-  "Temporarily disable `global-hl-line-mode' while executing FUNC with ARGS."
-  (let ((was-hl-line-mode-enabled global-hl-line-mode))
-    (when was-hl-line-mode-enabled
+  ;; Hide U+FFF4 on all platforms.
+  (set-char-table-range glyphless-char-display #xFFF4 'zero-width))
+
+(defun +without-global-hl-line (func &rest args)
+  "Call FUNC with ARGS while temporarily disabling global hl-line mode."
+  (let ((was-enabled (bound-and-true-p global-hl-line-mode)))
+    (when was-enabled
       (global-hl-line-mode -1))
     (unwind-protect
         (apply func args)
-      (when was-hl-line-mode-enabled
+      (when was-enabled
         (global-hl-line-mode 1)))))
-
-;; 用于检查 unicode 是否被字体覆盖
-(defun check-symbols-nerd-font-mono-coverage (unicode)
-  "Check if 'Symbols Nerd Font Mono' covers the specified UNICODE character."
-  (interactive "sEnter Unicode (e.g., 0F11E7): ")
-  (let ((font-family "Symbols Nerd Font Mono")
-        (char (string-to-number unicode 16))
-        (buffer (get-buffer-create "*Font Check*")))
-    (with-current-buffer buffer
-      (erase-buffer)
-      (insert (format "Checking coverage for Unicode %s in font: %s\n\n" unicode font-family))
-      (insert (propertize (string char)
-                          'face `(:family ,font-family :height 200)))
-      (display-buffer buffer))))
 
 (provide 'lib-face)
 ;;; lib-face.el ends here

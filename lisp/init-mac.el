@@ -44,13 +44,10 @@
   (keymap-global-set "<triple-wheel-left>" 'ignore)
   (keymap-global-set "M-`" 'ns-next-frame))
 
-(setup (:only-if (and (display-graphic-p)))
-  (:require lib-env)
-  (+load-env-file)
-  ;; 修复 dvisvgm 找不到 texmf.cnf 的问题（Homebrew 安装的 TeX Live）
-  ;; Homebrew symlink
-  (setenv "TEXMFCNF" "/opt/homebrew/opt/texlive/share/texmf-dist/web2c/")
-  (setenv "TEXMFROOT" "/opt/homebrew/opt/texlive/share"))
+;; 修复 dvisvgm 找不到 texmf.cnf 的问题（Homebrew 安装的 TeX Live）。
+;; 这些是进程环境变量，GUI、daemon 和终端 Emacs 都需要。
+(setenv "TEXMFCNF" "/opt/homebrew/opt/texlive/share/texmf-dist/web2c/")
+(setenv "TEXMFROOT" "/opt/homebrew/opt/texlive/share")
 
 (setup (:only-if (fboundp 'mac-input-source))
   (:require lib-ime)
