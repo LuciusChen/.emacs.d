@@ -114,6 +114,10 @@
          "com.apple.keylayout.ABC"
          "im.rime.inputmethod.Squirrel.Hans")
       (sis-ism-lazyman-config "1" "2" 'fcitx5))
+    ;; Respect the Meta prefix maps used by Consult and Emacs search.
+    (setq sis-prefix-override-keys
+          (delete-dups
+           (append sis-prefix-override-keys '("M-g" "M-s"))))
     ;; enable the /cursor color/ mode
     (sis-global-cursor-color-mode t)
     ;; enable the /respect/ mode
