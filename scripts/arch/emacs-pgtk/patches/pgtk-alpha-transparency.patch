@@ -1,8 +1,17 @@
 diff --git a/doc/lispref/display.texi b/doc/lispref/display.texi
-index 0d0899e418c..88d0a9c99a1 100644
+index 0d0899e418c..fbf14d11217 100644
 --- a/doc/lispref/display.texi
 +++ b/doc/lispref/display.texi
-@@ -6444,6 +6444,15 @@ Image Descriptors
+@@ -6339,6 +6339,8 @@ Image Descriptors
+ color from the corners is the background color of the image.  Otherwise,
+ @var{bg} must be a list @code{(@var{red} @var{green} @var{blue})}
+ specifying the color to assume for the background of the image.
++If the image already has transparency, the heuristic mask preserves it
++and can only make additional pixels transparent.
+ 
+ If @var{mask} is @code{nil}, remove a mask from the image, if it has
+ one.  Images in some formats include a mask which can be removed by
+@@ -6444,6 +6446,15 @@ Image Descriptors
  @code{:max-height} will only be usable through ImageMagick, if
  available (@pxref{ImageMagick Images}).
  @end defun
@@ -18,7 +27,7 @@ index 0d0899e418c..88d0a9c99a1 100644
  @node XBM Images
  @subsection XBM Images
  @cindex XBM
-@@ -6619,8 +6628,9 @@ SVG Images
+@@ -6619,8 +6630,9 @@ SVG Images
  @item :background @var{background}
  @var{background}, if non-@code{nil}, should be a string specifying a
  color, which is used as the image's background color if the image
@@ -30,7 +39,7 @@ index 0d0899e418c..88d0a9c99a1 100644
  
  @item :css @var{css}
  @var{css}, if non-@code{nil}, should be a string specifying the CSS to
-@@ -7093,6 +7103,10 @@ Other Image Types
+@@ -7093,6 +7105,10 @@ Other Image Types
  
  @item PNG
  Image type @code{png}.
@@ -41,7 +50,7 @@ index 0d0899e418c..88d0a9c99a1 100644
  
  @item TIFF
  Image type @code{tiff}.
-@@ -7101,6 +7115,7 @@ Other Image Types
+@@ -7101,6 +7117,7 @@ Other Image Types
  @item WebP
  Image type @code{webp}.
  Supports the @code{:index} property.  @xref{Multi-Frame Images}.
@@ -50,10 +59,10 @@ index 0d0899e418c..88d0a9c99a1 100644
  
  @node Defining Images
 diff --git a/etc/NEWS b/etc/NEWS
-index 13810f81054..1f697a657b0 100644
+index 13810f81054..5d5c4e92d52 100644
 --- a/etc/NEWS
 +++ b/etc/NEWS
-@@ -30,6 +30,24 @@ applies, and please also update docstrings as needed.
+@@ -30,6 +30,25 @@ applies, and please also update docstrings as needed.
  
  * Changes in Emacs 32.1
  
@@ -62,6 +71,7 @@ index 13810f81054..1f697a657b0 100644
 +The PNG, SVG, and WebP image loaders now retain their alpha channels
 +when the ':background' image property is nil.  A non-nil background
 +color continues to flatten transparent pixels against that color.
++Heuristic masks now preserve existing image alpha on Cairo displays.
 +
 ++++
 +** PGTK images can respect 'alpha-background'.
@@ -110,10 +120,83 @@ index 2f4162660b8..dbef68b5c7a 100644
  
  (defun image-toggle-hex-display ()
 diff --git a/src/image.c b/src/image.c
-index 1086f474eec..57839789f27 100644
+index 1086f474eec..ebaa7a33c3c 100644
 --- a/src/image.c
 +++ b/src/image.c
-@@ -8265,6 +8265,12 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -7380,15 +7380,27 @@ image_build_heuristic_mask (struct frame *f, struct image *img,
+   bool use_img_background;
+   unsigned long bg = 0;
+ 
++#ifdef USE_CAIRO
++  /* Cairo loaders can supply an A8 mask containing the image's alpha.
++     Preserve it and make the heuristic mask an additional constraint,
++     as the NS implementation does with its embedded alpha.  */
++  bool reuse_mask_p = img->mask != NO_PIXMAP;
++#else
+   if (img->mask)
+     image_clear_image_1 (f, img, CLEAR_IMAGE_MASK);
++#endif
+ 
+ #ifndef HAVE_NTGUI
+ #ifndef HAVE_NS
+   /* Create an image and pixmap serving as mask.  */
+-  if (! image_create_x_image_and_pixmap (f, img, img->width, img->height, 1,
+-					 &mask_img, 1))
+-    return;
++#ifdef USE_CAIRO
++  if (reuse_mask_p)
++    mask_img = img->mask;
++  else
++#endif
++    if (! image_create_x_image_and_pixmap (f, img, img->width, img->height, 1,
++					   &mask_img, 1))
++      return;
+ #endif /* !HAVE_NS */
+ #else
+   /* Create the bit array serving as mask.  */
+@@ -7431,24 +7443,36 @@ image_build_heuristic_mask (struct frame *f, struct image *img,
+   if (use_img_background)
+     bg = four_corners_best (ximg, img->corners, img->width, img->height);
+ 
+-  /* Set all bits in mask_img to 1 whose color in ximg is different
+-     from the background color bg.  */
++  /* Make pixels matching BG transparent.  If MASK_IMG already contains
++     alpha, leave the other pixels unchanged.  */
+ #ifndef HAVE_NTGUI
+   for (y = 0; y < img->height; ++y)
+     for (x = 0; x < img->width; ++x)
+ #ifndef HAVE_NS
+-      PUT_PIXEL (mask_img, x, y, (GET_PIXEL (ximg, x, y) != bg
+-				  ? PIX_MASK_DRAW : PIX_MASK_RETAIN));
++#ifdef USE_CAIRO
++      if (reuse_mask_p)
++	{
++	  if (GET_PIXEL (ximg, x, y) == bg)
++	    PUT_PIXEL (mask_img, x, y, PIX_MASK_RETAIN);
++	}
++      else
++#endif
++	PUT_PIXEL (mask_img, x, y, (GET_PIXEL (ximg, x, y) != bg
++				    ? PIX_MASK_DRAW : PIX_MASK_RETAIN));
+ #else
+       if (XGetPixel (ximg, x, y) == bg)
+         ns_set_alpha (ximg, x, y, 0);
+ #endif /* HAVE_NS */
+ #ifndef HAVE_NS
+   /* Fill in the background_transparent field while we have the mask handy. */
++  img->background_transparent_valid = 0;
+   image_background_transparent (img, f, mask_img);
+ 
+   /* Put mask_img into the image.  */
+-  image_put_x_image (f, img, mask_img, 1);
++#ifdef USE_CAIRO
++  if (!reuse_mask_p)
++#endif
++    image_put_x_image (f, img, mask_img, 1);
+ #endif /* !HAVE_NS */
+ #else
+   for (y = 0; y < img->height; ++y)
+@@ -8265,6 +8289,12 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
    png_byte channels;
    png_uint_32 row_bytes;
    bool transparent_p;
@@ -126,7 +209,7 @@ index 1086f474eec..57839789f27 100644
    struct png_memory_storage tbr;  /* Data to be read */
    ptrdiff_t nbytes;
    Emacs_Pix_Container ximg;
-@@ -8439,13 +8445,17 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -8439,13 +8469,17 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
        || color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
      png_set_gray_to_rgb (png_ptr);
  
@@ -150,7 +233,7 @@ index 1086f474eec..57839789f27 100644
        Emacs_Color color;
  
        /* If the user specified a color, try to use it; if not, use the
-@@ -8508,7 +8518,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -8508,7 +8542,7 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
       contains an alpha channel.  */
    Emacs_Pix_Container mask_img = NULL;
    if (channels == 4
@@ -159,7 +242,7 @@ index 1086f474eec..57839789f27 100644
        && !image_create_x_image_and_pixmap (f, img, width, height, 1,
  					   &mask_img, 1))
      {
-@@ -8532,26 +8542,21 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
+@@ -8532,26 +8566,21 @@ png_load_body (struct frame *f, struct image *img, struct png_load_context *c)
  	  g = *p++ << 8;
  	  b = *p++ << 8;
  	  PUT_PIXEL (ximg, x, y, lookup_rgb_color (f, r, g, b));
@@ -197,7 +280,7 @@ index 1086f474eec..57839789f27 100644
  	      ++p;
  	    }
  	}
-@@ -10732,14 +10737,29 @@ webp_load (struct frame *f, struct image *img)
+@@ -10732,14 +10761,29 @@ webp_load (struct frame *f, struct image *img)
    if (!image_create_x_image_and_pixmap (f, img, width, height, 0, &ximg, false))
      goto cleanup;
  
@@ -231,7 +314,7 @@ index 1086f474eec..57839789f27 100644
        /* If the user specified a color, try to use it; if not, use the
  	 current frame background, ignoring any default background
  	 color set by the image.  */
-@@ -10775,12 +10795,22 @@ webp_load (struct frame *f, struct image *img)
+@@ -10775,12 +10819,22 @@ webp_load (struct frame *f, struct image *img)
  	  int r, g, b;
  	  /* The WebP alpha channel allows 256 levels of partial
  	     transparency.  Blend it with the background manually.  */
@@ -259,7 +342,7 @@ index 1086f474eec..57839789f27 100644
  	      p += 4;
  	    }
  	  else
-@@ -10805,6 +10835,13 @@ webp_load (struct frame *f, struct image *img)
+@@ -10805,6 +10859,13 @@ webp_load (struct frame *f, struct image *img)
    img->width = width;
    img->height = height;
  
@@ -273,7 +356,7 @@ index 1086f474eec..57839789f27 100644
    if (features.has_animation)
      /* Return animation metadata.  */
      {
-@@ -12137,6 +12174,12 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12137,6 +12198,12 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
    bool empty_errmsg = true;
    const char *errmsg = "";
    ptrdiff_t errlen = 0;
@@ -286,7 +369,7 @@ index 1086f474eec..57839789f27 100644
  
  #if ! GLIB_CHECK_VERSION (2, 36, 0)
    /* g_type_init is a glib function that must be called prior to
-@@ -12346,13 +12389,10 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12346,13 +12413,10 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
      Lisp_Object encoded_contents
        = Fbase64_encode_string (make_unibyte_string (contents, size), Qt);
  
@@ -304,7 +387,7 @@ index 1086f474eec..57839789f27 100644
        "<svg xmlns:xlink=\"http://www.w3.org/1999/xlink\" "
        "xmlns:xi=\"http://www.w3.org/2001/XInclude\" "
        "style=\"color: #%06X;\" "
-@@ -12361,11 +12401,19 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12361,11 +12425,19 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
        "<rect width=\"100%%\" height=\"100%%\" fill=\"#%06X\"/>"
        "<xi:include href=\"data:image/svg+xml;base64,%s\"></xi:include>"
        "</svg>";
@@ -325,7 +408,7 @@ index 1086f474eec..57839789f27 100644
      if (!NILP (value))
        {
          background = image_alloc_image_color (f, img, value, img->face_background);
-@@ -12387,9 +12435,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12387,9 +12459,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
  
      unsigned int color = foreground & 0xFFFFFF, fill = background & 0xFFFFFF;
      wrapped_contents
@@ -342,7 +425,7 @@ index 1086f474eec..57839789f27 100644
    }
  
    /* Now we parse the wrapped version.  */
-@@ -12471,18 +12523,27 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12471,18 +12547,27 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
    {
      /* Try to create a x pixmap to hold the svg pixmap.  */
      Emacs_Pix_Container ximg;
@@ -374,7 +457,7 @@ index 1086f474eec..57839789f27 100644
      for (int y = 0; y < height; ++y)
        {
  	for (int x = 0; x < width; ++x)
-@@ -12490,9 +12551,10 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12490,9 +12575,10 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
  	    int red     = *pixels++;
  	    int green   = *pixels++;
  	    int blue    = *pixels++;
@@ -387,7 +470,7 @@ index 1086f474eec..57839789f27 100644
  
  	    PUT_PIXEL (ximg, x, y, lookup_rgb_color (f, red << 8, green << 8, blue << 8));
  	  }
-@@ -12517,6 +12579,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
+@@ -12517,6 +12603,13 @@ svg_load_image (struct frame *f, struct image *img, char *contents,
  
      /* Put ximg into the image.  */
      image_put_x_image (f, img, ximg, 0);

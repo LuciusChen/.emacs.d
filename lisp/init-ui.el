@@ -100,9 +100,6 @@
         (nerd-icons-install-fonts t))
       (nerd-icons-set-font))))
 
-(setup (:require window-navigation)
-  (window-navigation-mode))
-
 ;; Warm the mode-line ahead of the other `:warm' entries.
 (setup-idle-require 'doom-modeline)
 

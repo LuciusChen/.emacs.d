@@ -40,6 +40,9 @@ face 背景不一致。telega 的左右圆角 SVG 就属于这种情况。
 1. PNG、SVG 和 WebP 原生加载器在 Cairo 下保存完整的 0--255 alpha，
    并使用 A8 mask；具体背景色触发预混合。PNG 的 palette `tRNS`
    透明度也遵循同一规则，不再在指定背景色后残留 clipping mask。
+   如果图片同时请求 heuristic mask，后处理会在已有 A8 mask 上继续
+   清除匹配背景色的像素，而不是丢弃原 alpha 后重建二值 mask；这与
+   NS 对内嵌 RGBA 的处理一致。
 2. PGTK 对明确指定 `:background nil` 的彩色 image glyph 使用
    `CAIRO_OPERATOR_ATOP`。
 3. Image mode 遵循正常的 `image-type` 加载器优先级，使 PNG、SVG 和
@@ -119,6 +122,23 @@ PGTK 的受限 `ATOP` 合成负责让圆帽内部背景与相邻 face 一起服�
 实际应用还应检查 telega：按钮中间的 face 背景与左右 SVG 圆帽应保持
 相同透明度。
 
+telega 的回复竖线还覆盖了 heuristic mask 与源 alpha 的组合。它的 SVG
+透明像素通常保存为 alpha 0、RGB 黑色，而 heuristic 使用当前 default
+face 的背景色。预期透明区域保持透明，不能因为 RGB 与该背景色不同而
+变成黑色矩形：
+
+```elisp
+(let* ((bg (face-background 'default nil t))
+       (svg "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"32\">
+               <rect width=\"8\" height=\"32\" fill=\"#d080a0\"/>
+             </svg>")
+       (mask `(heuristic ,(color-values bg))))
+  (insert-image `(image :type svg :data ,svg :mask ,mask)))
+```
+
+这条路径应保留 loader 生成的 A8 alpha，并只把 heuristic 命中的像素
+进一步设为透明。
+
 ## 验证状态
 
 在本轮 `tRNS` 补充之前，主 patch 已完成：
@@ -134,13 +154,10 @@ PGTK 的受限 `ATOP` 合成负责让圆帽内部背景与相邻 face 一起服�
 2 项跳过；唯一异常是既有的 `image-tests-image-metadata/webp`，其资源
 `black.webp` 是静态 WebP，与本补丁的 alpha 路径无关。
 
-当前最终 patch（包含 palette `tRNS`）已在干净基线上通过
-`git apply --check`、`patch --dry-run` 和源码 `git diff --check`；
-fixture 也已确认是带 `tRNS` 的 2x1 palette PNG。由于本机没有 PGTK
-构建环境，新增代码尚未重新做 PGTK 完整编译，用例也尚未在 PGTK 图形
-会话中实际执行，因此不把它计入上面的“实际通过”。发送上游前需补跑
-`image-tests-image-mask-p/trns-png`：省略背景应有 A8 mask，指定
-`"black"` 后应无 mask。
+当前最终 patch（包含 palette `tRNS` 和 heuristic/A8 mask 合并）已在
+本机 PGTK 构建树完成增量完整构建。telega 回复竖线的最小复现也已在
+同一构建的 PGTK 图形会话中与已安装旧版本做 A/B：旧版本出现黑色矩形，
+新版本的 heuristic 结果与直接使用原生 alpha 一致。
 
 ## 向上游提交
 
