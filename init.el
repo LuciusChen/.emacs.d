@@ -49,10 +49,9 @@
 
 ;; install packages
 (defvar USE-PACKAGE-LIST
-  '(nov ;; sis
-        plz avy mpv cape citar setup nerd-icons corfu forge denote
-        elfeed alert popper embark bibtex vertico nerd-icons-corfu diredfl
-        cdlatex pyvenv consult mmm-mode swift-mode citar-denote
+  '(nov sis plz avy mpv cape citar setup nerd-icons corfu forge denote
+        alert popper embark bibtex vertico nerd-icons-corfu diredfl
+        cdlatex pyvenv consult mmm-mode swift-mode citar-denote meow
         diff-hl goggles flymake web-mode js2-mode doom-modeline
         webpaste apheleia mastodon pdf-tools consult-dir denote-org
         macrostep orderless git-modes git-blamed denote-journal
@@ -61,6 +60,7 @@
         embark-consult diminish rainbow-delimiters rainbow-mode hnview
         command-log-mode password-store nerd-icons-completion ox-hugo
         password-store-otp projectile package-lint clutch mysql pg
+        ghostel gptel
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch")
@@ -75,20 +75,15 @@
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")
         (rose-pine :host github :repo "LuciusChen/rose-pine")
         (passages :host github :repo "LuciusChen/passages")
-        (emacs-smart-input-source :host github :repo "laishulu/emacs-smart-input-source")
         (chirp :host github :repo "LuciusChen/chirp")
-        (ghostel :host github :repo "dakra/ghostel")
         (java-server :host github :repo "LuciusChen/java-server")
         (lexdb :host github :repo "LuciusChen/lexdb")
         (gt :host github :repo "LuciusChen/gt.el")
         (telega :host github :repo "LuciusChen/telega.el")
         (panel :host github :repo "LuciusChen/panel")
-        (meow :host github :repo "meow-edit/meow")
-        (gptel :host github :repo "karthink/gptel")
+        (lorniu :host github :repo "lorniu/dropbox.el")
         (tramp-rpc :host github :repo "ArthurHeymans/emacs-tramp-rpc")
         (yasnippet :host github :repo "joaotavora/yasnippet")
-        (eglot-booster :host github :repo "jdtsmith/eglot-booster")
-        ;; (beancount-mode :host github :repo "beancount/beancount-mode")
         (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))))
 
 (dolist (e USE-PACKAGE-LIST) (straight-use-package e))

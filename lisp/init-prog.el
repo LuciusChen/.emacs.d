@@ -344,12 +344,6 @@
                                                     )))
             eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
 
-;; https://github.com/blahgeek/emacs-lsp-booster
-;; Download the executable file from the address above and place it in your exec-path.
-(setup eglot-booster
-  (:load-after eglot)
-  (:when-loaded (eglot-booster-mode)))
-
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
 
