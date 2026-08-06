@@ -33,113 +33,45 @@
         (when latest-version-dir
           (car (directory-files latest-version-dir t "lombok-[0-9.]+\\.jar$")))))))
 
-(defun custom-eglot-java-init-opts (_server _eglot-java-eclipse-jdt)
-  "Return custom initialization options for the Java language server.
+(defun get-latest-java-debug-jar ()
+  "Return the path to the latest Microsoft Java Debug bundle."
+  (let ((directory
+         (expand-file-name
+          "debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/"
+          user-emacs-directory)))
+    (when (file-directory-p directory)
+      (car (last
+            (sort
+             (directory-files
+              directory t "com.microsoft.java.debug.plugin-[0-9.]+\\.jar$")
+             #'version<))))))
 
-SERVER and EGLOT-JAVA-ECLIPSE-JDT are passed by Eglot."
-  `(:bundles [,(file-truename
-                (car
-                 (directory-files
-                  (expand-file-name "~/.emacs.d/debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/")
-                  t "com.microsoft.java.debug.plugin-[0-9.]+\\.jar$" t)))]))
-
-(defun jdtls-find-java-program ()
-  "Find the best java executable for running jdtls (Java 17-21, highest first).
-On Linux, scans /usr/lib/jvm/java-NN-openjdk directories.
-On macOS, tries /usr/libexec/java_home for versions 21 down to 17."
+(defun jdtls-find-java-home ()
+  "Return a Java 21-or-newer JDK home suitable for JDTLS."
   (cond
-   (IS-LINUX
-    (let* ((candidates (seq-filter
-                        (lambda (dir)
-                          (let ((ver (string-to-number
-                                      (nth 1 (split-string (file-name-nondirectory dir) "-")))))
-                            (and (<= 17 ver) (<= ver 21))))
-                        (directory-files "/usr/lib/jvm/" t "^java-[0-9]+-openjdk$")))
-           (sorted (sort candidates
-                         (lambda (a b)
-                           (> (string-to-number (nth 1 (split-string (file-name-nondirectory a) "-")))
-                              (string-to-number (nth 1 (split-string (file-name-nondirectory b) "-")))))))
-           (best (car sorted)))
-      (when best (concat best "/bin/java"))))
    (IS-MAC
-    (cl-loop for ver from 21 downto 17
-             for home = (string-trim
-                         (shell-command-to-string
-                          (format "/usr/libexec/java_home -v %d 2>/dev/null" ver)))
-             when (and (not (string-empty-p home)) (file-exists-p (concat home "/bin/java")))
-             return (concat home "/bin/java")))))
-
-(defvar jdtls-install-dir
-  (let* ((base-dir (cond
-                    (IS-MAC "/opt/homebrew/Cellar/jdtls/")
-                    (IS-LINUX "~/.local/share/jdtls/")))
-         (base-dir (and base-dir (expand-file-name base-dir))))
-    (when (and base-dir (file-directory-p base-dir))
-      (car (last (sort
-                  (directory-files base-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$")
-                  (lambda (a b)
-                    (version< (file-name-nondirectory a)
-                              (file-name-nondirectory b))))))))
-  "The installation directory of the latest jdtls version.")
-
-
-(defun jdtls-command-contact (&optional _interactive)
-  "Construct the command to start JDTLS with appropriate options and arguments.
-
-Sets up JVM arguments, Lombok agent, and Java Debug plugin.
-Automatically selects the latest versions available in specified directories.
-
-Steps:
-1. Determine JDTLS cache directory.
-2. Identify project directory and generate unique data directory.
-3. Find the latest Lombok jar in the Maven repository.
-4. Find the latest Java Debug plugin jar in the debug adapters directory.
-5. Construct JVM arguments, including Lombok agent and memory settings.
-6. Combine JDTLS executable, JVM arguments, data directory, and options.
-
-INTERACTIVE is an optional argument, if non-nil, run interactively.
-
-Raises an error if Lombok or Java Debug plugin jars are not found.
-
-Returns:
-  A list representing the command to start JDTLS with necessary arguments."
-  (let* ((jdtls-cache-dir (file-name-concat user-emacs-directory "cache" "lsp-cache"))
-         (project-dir (file-name-nondirectory (directory-file-name (project-root (project-current)))))
-         (data-dir (expand-file-name (file-name-concat jdtls-cache-dir (md5 project-dir))))
-         ;; Automatically find the latest Lombok version in the specified directory
-         (lombok-dir (expand-file-name "~/.m2/repository/org/projectlombok/lombok/"))
-         (lombok-version-dirs (sort (directory-files lombok-dir t "^[0-9]+\\.[0-9]+\\.[0-9]+$")
-                                    (lambda (a b)
-                                      (version< (file-name-nondirectory a) (file-name-nondirectory b)))))
-         (latest-version-dir (car (last lombok-version-dirs)))
-         (lombok-jar (car (directory-files latest-version-dir t "lombok-[0-9.]+\\.jar$")))
-         ;; Automatically find the latest Java Debug plugin version in the specified directory
-         (java-debug-dir (expand-file-name "~/.emacs.d/debug-adapters/java-debug/com.microsoft.java.debug.plugin/target/"))
-         (java-debug-jar (car (directory-files java-debug-dir t "com.microsoft.java.debug.plugin-[0-9.]+\\.jar$" t))))
-
-    (unless (and lombok-jar (file-exists-p lombok-jar))
-      (error "Lombok jar not found or does not exist in %s" lombok-dir))
-    (unless (and java-debug-jar (file-exists-p java-debug-jar))
-      (error "Java Debug plugin jar not found or does not exist in %s" java-debug-dir))
-
-    (let* ((jvm-args `(,(concat "-javaagent:" lombok-jar)
-                       "-Xmx8G"
-                       ;; "-XX:+UseG1GC"
-                       "-XX:+UseZGC"
-                       "-XX:+UseStringDeduplication"
-                       ;; "-XX:FreqInlineSize=325"
-                       ;; "-XX:MaxInlineLevel=9"
-                       "-XX:+UseCompressedOops"))
-           (jvm-args (mapcar (lambda (arg) (concat "--jvm-arg=" arg)) jvm-args))
-           ;; Tell JDTLS the data directory and JVM args
-           (contact (append '("jdtls")
-                            jvm-args
-                            `("-data" ,data-dir)
-                            `(:initializationOptions
-                              (:bundles
-                               ;; Use the latest Java Debug plugin jar
-                               [,(file-truename java-debug-jar)])))))
-      contact)))
+    (let ((home
+           (string-trim
+            (shell-command-to-string
+             "/usr/libexec/java_home -v 21 2>/dev/null"))))
+      (when (file-executable-p (expand-file-name "bin/java" home))
+        home)))
+   (IS-LINUX
+    (let ((root "/usr/lib/jvm/"))
+      (when (file-directory-p root)
+        (let (candidates)
+          (dolist (home (directory-files root t "^[^.]" t))
+            (let ((name (file-name-nondirectory home)))
+              (when (and
+                     (string-match
+                      "\\(?:java\\|jdk\\)[^0-9]*\\([0-9]+\\)" name)
+                     (>= (string-to-number (match-string 1 name)) 21)
+                     (file-executable-p (expand-file-name "bin/java" home)))
+                (push (cons (string-to-number (match-string 1 name)) home)
+                      candidates))))
+          (cdar (sort candidates
+                      (lambda (left right)
+                        (> (car left) (car right)))))))))))
 
 (defun mapper-find-xml ()
   "Jump from a Java mapper file to the corresponding XML mapper file.

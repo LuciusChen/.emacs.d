@@ -21,6 +21,7 @@ tree-sitter/
 diffs-assets/
 auto-save-list/
 debug-adapters/
+/java-kit/
 java-server-hcr/
 java-server-tomcat/
 chirp/

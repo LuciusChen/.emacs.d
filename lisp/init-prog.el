@@ -311,38 +311,29 @@
                ;; Show all eldoc feedback.
                (setq eldoc-documentation-strategy #'eldoc-documentation-compose))))))
 
-;; 若提示 [eglot] (warning) Could not find required eclipse.jdt.ls files (build required?)
-;; 则需要执行 eglot-java-upgrade-lsp-server
-(setup eglot-java
+;; `java-kit' uses the installed JDTLS on PATH until
+;; `java-kit-install-jdtls' installs a managed copy.
+(setup java-kit
   (:with-mode (java-mode java-ts-mode)
-    (:hook eglot-java-mode)
+    (:hook java-kit-mode)
     (:hook breadcrumb-local-mode))
   (:when-loaded
     (:also-load lib-eglot)
-    (:with-map eglot-java-mode-map
-      (:bind "C-c C-b" eglot-java-project-build-task
-             "C-c C-B" (lambda () (interactive)(eglot-java-run-test t))
+    (:with-map java-kit-mode-map
+      (:bind "C-c C-b" java-kit-build
              "C-c C-t" eglot-code-actions
-             "C-c C-d" java-server-tomcat-deploy
-             "C-c C-s" java-server-tomcat-stop))
-    (setopt eglot-java-server-install-dir jdtls-install-dir
-            eglot-java-java-program (jdtls-find-java-program)
-            eglot-java-default-task "clean install" ;; fork 了提了 pr 还未合并
-            eglot-java-eclipse-jdt-cache-directory (concat user-emacs-directory "cache")
-            eglot-java-eclipse-jdt-config-directory (when jdtls-install-dir
-                                                      (concat jdtls-install-dir
-                                                              (if IS-MAC "/config_mac_arm/" "/config_linux/")))
-            eglot-java-eclipse-jdt-args (let ((lombok (get-latest-lombok-jar)))
-                                          (append (when lombok
-                                                    (list (concat "-javaagent:" lombok)))
-                                                  '("-Xmx8G"
-                                                    ;; "-XX:+UseG1GC"
-                                                    "-XX:+UseZGC"
-                                                    "-XX:+UseStringDeduplication"
-                                                    ;; "-XX:FreqInlineSize=325"
-                                                    ;; "-XX:MaxInlineLevel=9"
-                                                    )))
-            eglot-java-user-init-opts-fn 'custom-eglot-java-init-opts)))
+             "C-c C-d" java-kit-tomcat-deploy
+             "C-c C-s" java-kit-tomcat-stop))
+    (let ((lombok (get-latest-lombok-jar))
+          (java-debug (get-latest-java-debug-jar)))
+      (setopt java-kit-jdtls-java-home (jdtls-find-java-home)
+              java-kit-maven-default-task "clean install"
+              java-kit-jdtls-jvm-arguments
+              (append (when lombok (list (concat "-javaagent:" lombok)))
+                      '("-Xmx8G"
+                        "-XX:+UseZGC"
+                        "-XX:+UseStringDeduplication"))
+              java-kit-jdtls-bundles (when java-debug (list java-debug))))))
 
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
