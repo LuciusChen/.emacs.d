@@ -258,26 +258,6 @@
             indent-bars-treesit-scope '((python function_definition class_definition for_statement
                                                 if_statement with_statement while_statement)))))
 
-;; Latex
-;; $ luarocks install digestif
-;; ╺═══════════════════════════════════════╸
-;; Java
-;; $ brew install jdtls
-;; ╺═══════════════════════════════════════╸
-;; Python
-;; $ brew install pipx
-;; $ pipx install pyright
-;; ╺═══════════════════════════════════════
-;; HTML
-;; $ npm install -g vscode-langservers-extracted
-;; ╺═══════════════════════════════════════
-;; JS
-;; $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-;; $ nvm install node
-;; $ sudo npm install -g typescript
-;; $ npm install -g @vue/language-server
-;; $ npm install -g typescript-language-server
-
 (setup eglot
   (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
       (:hook eglot-ensure))
@@ -333,7 +313,10 @@
                       '("-Xmx8G"
                         "-XX:+UseZGC"
                         "-XX:+UseStringDeduplication"))
-              java-kit-jdtls-bundles (when java-debug (list java-debug))))))
+              java-kit-jdtls-bundles (when java-debug (list java-debug))))
+    ;; Arch's JSP compiler needs a newer runtime than legacy projects.
+    (when IS-LINUX
+      (setopt java-kit-tomcat-java-home java-kit-jdtls-java-home))))
 
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
@@ -341,9 +324,6 @@
 ;; Java and JS --> ~/.emacs.d/debuger.sh (chmod 777 debuger.sh)
 ;; if build failed, see https://github.com/microsoft/java-debug/issues/569
 ;; add `-U`' to force update.
-
-;; Python
-;; $ pipx install debugpy
 (setup dape
   (keymap-global-set "<f5>" 'dape)
   (:when-loaded

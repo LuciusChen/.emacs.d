@@ -71,7 +71,7 @@
                       candidates))))
           (cdar (sort candidates
                       (lambda (left right)
-                        (> (car left) (car right)))))))))))
+                        (< (car left) (car right)))))))))))
 
 (defun mapper-find-xml ()
   "Jump from a Java mapper file to the corresponding XML mapper file.
