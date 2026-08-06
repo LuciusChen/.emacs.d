@@ -41,11 +41,6 @@
                            t 'emoji
                            (font-spec :family font :size (* FONT-SIZE 0.85))))
 
-          ;; Setting fall-back fonts
-          ;; https://idiocy.org/emacs-fonts-and-fontsets.html
-          (dolist (font FALLBACK-FONTS)
-            (when (member font (font-family-list))
-              (set-fontset-font "fontset-default" 'han font nil 'append)))
           ;; Force Emacs to search by using font-spec
           (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
           (setq +default-fontset-configured-p t))
@@ -59,7 +54,16 @@
         ;; hangul     = Korean Hangul alphabet (e.g., 가, 나, 한)
         (dolist (charset '(kana han cjk-misc bopomofo hangul))
           (set-fontset-font (frame-parameter frame 'font) charset
-                            (font-spec :family ZH-DEFAULT-FONT)))))))
+                            (font-spec :family ZH-DEFAULT-FONT)))
+        ;; Setting fall-back fonts
+        ;; https://idiocy.org/emacs-fonts-and-fontsets.html
+        (dolist (font FALLBACK-FONTS)
+          (when (member font (font-family-list))
+            (set-fontset-font "fontset-default" 'han font nil 'append)))
+
+        (set-fontset-font (frame-parameter frame 'font)
+                          'tai-viet
+                          (font-spec :family "Noto Sans Tai Viet"))))))
 
 (defun +setup-character-display ()
   "Set up special character composition and display."
