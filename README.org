@@ -35,7 +35,7 @@
 - [[https://emacs-china.org/t/emacs/15676/34][经验分享：emacs单独设置中文与英语的字体 - #34，来自 p1uxtar - Emacs-general - Emacs China]]
 - [[https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points][Glyph Sets and Code Points · ryanoasis/nerd-fonts Wiki · GitHub]]
 *** Theme
-主题目前选用 [[https://github.com/LuciusChen/rose-pine][rose-pine]]，Dashboard 选用 fork 修改后的 [[https://github.com/LuciusChen/panel][panel]]，mode-line 选用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]。
+主题目前选用 [[https://github.com/LuciusChen/ashen][ashen]]，Dashboard 选用 fork 修改后的 [[https://github.com/LuciusChen/panel][panel]]，mode-line 选用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]。
 ** Security
 所有条目都存入 pass 中，并通过启用 =auth-source-pass-enable= 自动读取。然而，对于自建的 GitLab， =machine= 的值必须采用 =192.168.1.220:9081/api/v4= 格式，这一信息无法直接存入 pass。因此，我更改了存储名称，并编写了 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lib/lib-auth.el#L11][check-and-update-authinfo]]，将其自动读取并写入 =.authinfo= 中，从而实现配置过程的自动化。
 ** Feature Overview

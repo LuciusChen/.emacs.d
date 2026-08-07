@@ -368,5 +368,9 @@
             clutch-cell-preview-style 'child-frame
             clutch-cell-preview-max-size '(0.65 . 0.45))))
 
+(setup ghostel
+  (:when-loaded
+    (setopt ghostel-glyph-scale-floor 1.0)))
+
 (provide 'init-prog)
 ;;; init-prog.el ends here

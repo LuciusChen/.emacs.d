@@ -73,7 +73,7 @@
         (discourse-graphs :host github :repo "LuciusChen/discourse-graphs")
         (emt :host github :repo "LuciusChen/emt")
         (meow-cjk :host github :repo "LuciusChen/meow-cjk")
-        (rose-pine :host github :repo "LuciusChen/rose-pine")
+        (ashen :host github :repo "LuciusChen/ashen")
         (passages :host github :repo "LuciusChen/passages")
         (chirp :host github :repo "LuciusChen/chirp")
         (lexdb :host github :repo "LuciusChen/lexdb")

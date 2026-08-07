@@ -46,9 +46,9 @@
     ;; first-time startup on Emacs > 26.3.
     (setopt custom-safe-themes t
             ;; If you don't customize it, this is the theme you get.
-            custom-enabled-themes '(rose-pine-night))
-    (setq light-theme 'rose-pine-day
-          dark-theme 'rose-pine-night)))
+            custom-enabled-themes '(ashen-night))
+    (setq light-theme 'ashen-day
+          dark-theme 'ashen-night)))
 
 (setup startup
   (when IS-MAC
