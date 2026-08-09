@@ -259,7 +259,7 @@
                                                 if_statement with_statement while_statement)))))
 
 (setup eglot
-  (:with-mode (python-ts-mode js-ts-mode typescript-mode tsx-ts-mode vue-mode latex-mode)
+  (:with-mode (python-ts-mode js-ts-mode typescript-ts-mode tsx-ts-mode vue-mode latex-mode)
       (:hook eglot-ensure))
   (:when-loaded
     (:also-load lib-eglot)
