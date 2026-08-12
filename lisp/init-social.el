@@ -140,9 +140,10 @@
        (420415423                    ; @matrix_t2bot
         (:chat-id "!kkriwaRKIBYFoYfXjb:matrix.org" :type :matrix)))
      telega-box-button-styles (let ((styles (copy-tree telega-box-button-styles)))
-                                (setf (alist-get 'admin-sender-tag styles)
-                                      '(:inherit owner-sender-tag
-                                                 :passive-face telega-shadow))
+                                (dolist (tag '(owner-sender-tag admin-sender-tag))
+                                  (setf (plist-get (alist-get tag styles)
+                                                   :passive-face)
+                                        'telega-shadow))
                                 styles))
     (when IS-MAC
       (advice-add 'telega-alert--notify :filter-args
