@@ -59,7 +59,7 @@
         org-cliplink language-detection ox-pandoc breadcrumb indent-bars
         embark-consult diminish rainbow-delimiters rainbow-mode hnview
         command-log-mode password-store nerd-icons-completion ox-hugo
-        password-store-otp projectile package-lint clutch mysql pg
+        password-store-otp projectile package-lint clutch mysql pgsql
         ghostel gptel
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
