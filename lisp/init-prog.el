@@ -313,10 +313,7 @@
                       '("-Xmx8G"
                         "-XX:+UseZGC"
                         "-XX:+UseStringDeduplication"))
-              java-kit-jdtls-bundles (when java-debug (list java-debug))))
-    ;; Arch's JSP compiler needs a newer runtime than legacy projects.
-    (when IS-LINUX
-      (setopt java-kit-tomcat-java-home java-kit-jdtls-java-home))))
+              java-kit-jdtls-bundles (when java-debug (list java-debug))))))
 
 ;; `C-c C-k`' in the minibuffer to keep only the adapter name jdtls
 ;; and force dap to re-lookup :filePath, :mainClass, and :projectName.
