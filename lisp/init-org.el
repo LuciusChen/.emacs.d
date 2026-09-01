@@ -35,13 +35,10 @@
             ;; HOLD(h/!)      ; 离开时添加变更信息
             ;; HOLD(h@/!)     ; 进入时添加笔记，离开时添加变更信息
             org-todo-keywords
-            '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
-              (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c/!)")
-              (sequence "WAITING(w/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c/!)"))
-            org-todo-repeat-to-state "NEXT"
-            org-todo-keyword-faces
-            '(("NEXT" :inherit warning)
-              ("PROJECT" :inherit font-lock-string-face)))
+            '((sequence "TODO(t)" "PROJECT(p)" "WAITING(w@/!)" "DELEGATED(e!)" "HOLD(h@/!)"
+                        "|"
+                        "DONE(d)" "CANCELLED(c@)"))
+            org-todo-keyword-faces '(("PROJECT" :inherit font-lock-string-face)))
     ;; emphasis
     (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:]"
                                            "-[:space:].,:!?;'\")}\\[[:nonascii:]"
@@ -91,8 +88,10 @@
   (:when-loaded
     (:also-load lib-org-archive-hierachical)
     (setopt org-archive-mark-done nil
-            org-archive-location "%s_archive::* Archive"
-            org-archive-default-command 'org-archive-subtree-hierarchical)))
+            org-archive-location "%s_archive::* Archive")
+    ;; Third-party commands are supported here, but Org's Custom type only
+    ;; lists its three built-in archive commands, so `setopt' rejects this one.
+    (setq org-archive-default-command 'org-archive-subtree-hierarchical)))
 
 (setup org-clock
   (:with-function (org-clock-goto

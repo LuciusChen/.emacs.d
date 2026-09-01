@@ -7,6 +7,10 @@
 ;; behaviour so that startup is consistent across Emacs versions.
 
 ;;; Code:
+;; Keep Customize from writing generated `custom-set-*' forms into init.el.
+;; All persistent options in this configuration are maintained as Lisp.
+(setq custom-file null-device)
+
 ;; Emacs "activates" all installed packages before reading
 ;; the user-init-file unless you've set package-enable-at-startup to nil
 ;; in the early init file.
@@ -20,6 +24,12 @@
             (setq gc-cons-threshold (* 20 1024 1024))))
 
 ;;; Performance
+
+;; Cache the contents of `load-path' directories so library loading can skip
+;; directories that cannot contain the requested file (Emacs 31+).
+(when (boundp 'load-path-filter-function)
+  (setq load-path-filter-function
+        #'load-path-filter-cache-directory-files))
 
 ;; Prefer loading newer compiled files
 (setq load-prefer-newer t)
