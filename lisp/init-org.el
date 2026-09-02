@@ -373,7 +373,7 @@
                      (org-agenda-skip-function
                       (lambda ()
                         (or (org-agenda-skip-subtree-if 'todo '("HOLD" "WAITING"))
-                            (org-agenda-skip-entry-if 'nottodo '("NEXT")))))
+                            (org-agenda-skip-entry-if 'nottodo '("TODO")))))
                      (org-tags-match-list-sublevels t)
                      (org-agenda-sorting-strategy
                       '(todo-state-down effort-up category-keep))))
@@ -423,7 +423,7 @@
                      (org-tags-match-list-sublevels t)
                      (org-agenda-sorting-strategy
                       '(category-keep))))
-         (tags-todo "-inbox/-NEXT"
+         (tags-todo "-inbox"
                     ((org-agenda-overriding-header "Orphaned Tasks")
                      (org-agenda-tags-todo-honor-ignore-options t)
                      (org-agenda-prefix-format "%-11c%5(org-todo-age) ")
