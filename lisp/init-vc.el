@@ -8,12 +8,11 @@
 
 (setup (:warm autorevert)
   (:once find-file-hook dired-mode-hook)
+  (setopt mode-line-collapse-minor-modes '(auto-revert-mode))
   (:when-loaded
     (setopt  global-auto-revert-non-file-buffers t
              auto-revert-verbose nil)
-    (global-auto-revert-mode)
-    ;; 隐藏一些比较冗长的 mode 名称，从而让 mode-line 更加简洁。
-    (diminish 'auto-revert-mode)))
+    (global-auto-revert-mode)))
 
 (setup magit
   ;; Bind before Magit loads: both commands are autoloaded, and keeping the

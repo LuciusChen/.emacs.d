@@ -8,32 +8,36 @@
 (define-derived-mode wxss-mode css-mode "CSS")
 (define-derived-mode wxml-mode html-mode "HTML")
 
+(setopt treesit-enabled-modes
+        '(dockerfile-ts-mode
+          java-ts-mode
+          js-ts-mode
+          json-ts-mode
+          lua-ts-mode
+          markdown-ts-mode
+          python-ts-mode
+          tsx-ts-mode
+          typescript-ts-mode
+          yaml-ts-mode)
+        treesit-auto-install-grammar 'always)
+
 (setup (:with-mode vue-mode (:match-file "*.vue"))
   (:with-mode jsp-mode (:match-file "*.jsp"))
   (:with-mode emacs-lisp-mode (:match-file "*.el"))
   (:with-mode wxss-mode (:match-file "*.wxss"))
   (:with-mode my-html-mode (:match-file "*.wxml")
               (:match-file "*.html"))
-  (:with-mode java-ts-mode (:match-file "*.java"))
-  (:with-mode python-ts-mode (:match-file "*.py"))
-  (:with-mode yaml-ts-mode (:match-file "*.yaml" "*.yml"))
-  (:with-mode lua-ts-mode (:match-file "*.lua"))
-  (:with-mode tsx-ts-mode (:match-file "*.tsx")
-              (:match-file "*.jsx"))
-  (:with-mode js-mode (:match-file "*.js")
-              (:match-file "*.es6")
+  (:with-mode tsx-ts-mode (:match-file "*.jsx"))
+  (:with-mode js-ts-mode (:match-file "*.es6")
               (:match-file "*.js.erb")
-              (:match-file "*.es6.erb"))
-  (:with-mode typescript-ts-mode (:match-file "*.mjs")
-              (:match-file "*.mts")
-              (:match-file "*.cjs")
-              (:match-file "*.ts"))
+              (:match-file "*.es6.erb")
+              (:match-file "*.mjs")
+              (:match-file "*.cjs"))
+  (:with-mode typescript-ts-mode (:match-file "*.mts"))
   (:with-mode clojure-ts-mode (:match-file "*.edn"))
   (:with-mode jsonc-mode (:match-file "*.jsonc"))
-  (:with-mode json-ts-mode (:match-file "*.json"))
-  (:with-mode dockerfile-ts-mode (:match-file "*.Dockerfile"))
   (:with-mode prisma-ts-mode (:match-file "*.prisma"))
-  (:with-mode markdown-ts-mode (:match-file "*.md")))
+  (add-to-list 'interpreter-mode-alist '("node" . js-ts-mode)))
 
 (setup display-fill-column-indicator (:hook-into prog-mode))
 (setup display-line-numbers (:hook-into prog-mode))
@@ -153,26 +157,15 @@
                (flymake-mode 1)))))
   (:when-loaded
     (setopt flymake-no-changes-timeout 0.5
-            flymake-show-diagnostics-at-end-of-line t)))
+            flymake-inline-diagnostics t)))
 
 (setup js
   (:also-load lib-js)
   (:when-loaded
     (setopt js-indent-level 2)
     (+major-mode-lighter 'js-mode "JS")
+    (+major-mode-lighter 'js-ts-mode "JS")
     (+major-mode-lighter 'js-jsx-mode "JSX")))
-
-;; js2-mode
-(setup js2-mode
-  (:when-loaded
-    (:with-hook (js-mode-hook js2-mode-hook) (:hook +enable-js2-checks-if-flymake-inactive))
-    ;; Disable js2 mode's syntax error highlighting by default...
-    (setopt js2-mode-show-parse-errors nil
-            js2-mode-show-strict-warnings nil)
-    (js2-imenu-extras-setup)
-    (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))
-    (+major-mode-lighter 'js2-mode "JS2")
-    (+major-mode-lighter 'js2-jsx-mode "JSX2")))
 
 (setup xref
   ;; 用 Popper 替代了 +xref-show-xrefs 以及 setopt 配置
@@ -225,21 +218,12 @@
             (vue             . ("https://github.com/tree-sitter-grammars/tree-sitter-vue"))
             (yaml            . ("https://github.com/tree-sitter-grammars/tree-sitter-yaml"))
             (markdown        . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
-            (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))
-
-    (defun +treesit-install-all-languages ()
-      "Install all languages specified by `treesit-language-source-alist'."
-      (interactive)
-      (let ((languages (mapcar 'car treesit-language-source-alist)))
-        (dolist (lang languages)
-          (treesit-install-language-grammar lang)
-          (message "`%s' parser was installed." lang)
-          (sit-for 0.75))))))
+            (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))))
 
 (setup indent-bars
   ;; `indent-bars-mode' is autoloaded, so hooking it in suffices; requiring
   ;; the package here would load it eagerly at startup.
-  (:with-mode (java-ts-mode python-ts-mode vue-mode typescript-mode typescript-ts-mode js-mode)
+  (:with-mode (java-ts-mode python-ts-mode vue-mode typescript-mode typescript-ts-mode js-ts-mode)
     (:hook indent-bars-mode))
   (:when-loaded
     (setopt indent-bars-color '(highlight :face-bg t :blend 0.15)
@@ -279,7 +263,7 @@
     (setopt eglot-watch-files-outside-project-root nil)
     (add-to-list 'eglot-server-programs '(my-html-mode . ("vscode-html-language-server" "--stdio")))
     (add-to-list 'eglot-server-programs `((vue-mode vue-ts-mode typescript-ts-mode typescript-mode) . ("vue-language-server" "--stdio" :initializationOptions ,(vue-eglot-init-options))))
-    (add-to-list 'eglot-server-programs '(js-mode . ("typescript-language-server" "--stdio")))
+    (add-to-list 'eglot-server-programs '(js-ts-mode . ("typescript-language-server" "--stdio")))
     (:advice eglot-completion-at-point :around cape-wrap-buster)
     ;; https://github.com/joaotavora/eglot/discussions/898
     (:with-hook eglot-managed-mode-hook
