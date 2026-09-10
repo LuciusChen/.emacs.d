@@ -186,11 +186,9 @@
                 denote-journal-path-to-new-or-existing-entry
                 get-today-heading)
                "%<%H:%M> %? :prod:\n" :kill-buffer t)
-              ("t" "Tasks             || org-agenda" plain
-               (file+olp
-                denote-journal-path-to-new-or-existing-entry
-                org-capture-heading-tasks)
-               "*** TODO %?" :kill-buffer t)
+              ("t" "Tasks             || inbox" entry
+               (file "agenda/inbox.org")
+               "* TODO %?" :kill-buffer t)
               ("n" "Notes with source ||" entry
                (file+olp
                 denote-journal-path-to-new-or-existing-entry
@@ -215,12 +213,7 @@
                (file+headline
                 denote-journal-path-to-new-or-existing-entry
                 get-today-heading)
-               "%(fetch-weather-data)\n")
-              ("a" "Tasks             || copying to journal" plain
-               (file+olp
-                denote-journal-path-to-new-or-existing-entry
-                org-capture-heading-tasks)
-               "" :kill-buffer t)))
+               "%(fetch-weather-data)\n")))
       (:with-hook org-capture-before-finalize-hook
         (:hook org-sort-second-level-entries-by-time)))))
 

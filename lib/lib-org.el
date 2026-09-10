@@ -298,10 +298,6 @@ SUBHEADING exists under today's date, adding it if necessary."
         (insert (concat "* " date-headline "\n** " subheading "\n")))
       (list date-headline subheading))))
 
-(defun org-capture-heading-tasks ()
-  "Return the heading path for daily tasks."
-  (get-today-heading-with-subheading "Tasks :task:"))
-
 (defun org-capture-heading-notes ()
   "Return the heading path for daily notes."
   (get-today-heading-with-subheading "Notes :note:"))
