@@ -512,6 +512,16 @@
             org-cite-activate-processor 'citar
             citar-bibliography org-cite-global-bibliography)))
 
+(setup org-indent
+  (:when-loaded
+    (defun +org-indent-blank-prefixes (&rest _)
+      "Display virtual heading indentation as spaces for transparent frames."
+      (dotimes (i (length org-indent--heading-line-prefixes))
+        (when-let* ((prefix (aref org-indent--heading-line-prefixes i)))
+          (aset org-indent--heading-line-prefixes i
+                (subst-char-in-string ?* ?\s prefix)))))
+    (:advice org-indent--compute-prefixes :after #'+org-indent-blank-prefixes)))
+
 (setup org-modern
   (:with-mode org-mode
       (:hook org-modern-mode)
@@ -536,6 +546,17 @@
             org-modern-table-horizontal 0.2
             org-modern-checkbox nil
             org-ellipsis "[+]")
+    (defun +org-modern-blank-leading-stars (&rest _)
+      "Display hidden leading stars as spaces when Org Indent is active."
+      (when (bound-and-true-p org-indent-mode)
+        (let ((beg (match-beginning 1))
+              (end (match-end 1)))
+          (when (< beg end)
+            ;; Distinct strings keep each star a separate cursor position.
+            (while (< beg end)
+              (put-text-property beg (1+ beg) 'display (string ?\s))
+              (setq beg (1+ beg)))))))
+    (:advice org-modern--star :after #'+org-modern-blank-leading-stars)
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
     ;; https://emacs.stackexchange.com/questions/45291/change-color-of-org-mode-checkboxes
     (defface org-checkbox-todo-text
