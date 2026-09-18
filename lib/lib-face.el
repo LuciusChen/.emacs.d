@@ -38,8 +38,7 @@
           ;; Also use the emoji font for card index dividers (U+1F5C2).
           (cl-loop for font in EMOJI-FONTS
                    when (find-font (font-spec :name font))
-                   return (let ((spec (font-spec :family font
-                                                :size (* FONT-SIZE 0.85))))
+                   return (let ((spec (font-spec :family font)))
                             (dolist (target '(emoji #x1F5C2))
                               (set-fontset-font t target spec))))
 
