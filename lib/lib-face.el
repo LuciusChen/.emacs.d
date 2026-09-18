@@ -35,11 +35,13 @@
           ;; Use the dedicated emoji script without changing unrelated Unicode
           ;; fallbacks.  Keep emoji slightly smaller so Corfu rows are not clipped.
           ;; Overwrite the default list; prepend makes VS16 sequences use Symbola.
+          ;; Also use the emoji font for card index dividers (U+1F5C2).
           (cl-loop for font in EMOJI-FONTS
                    when (find-font (font-spec :name font))
-                   return (set-fontset-font
-                           t 'emoji
-                           (font-spec :family font :size (* FONT-SIZE 0.85))))
+                   return (let ((spec (font-spec :family font
+                                                :size (* FONT-SIZE 0.85))))
+                            (dolist (target '(emoji #x1F5C2))
+                              (set-fontset-font t target spec))))
 
           ;; Force Emacs to search by using font-spec
           (set-fontset-font t 'han (font-spec :script 'han) nil 'append)

@@ -198,7 +198,7 @@
             `((:id ode
                    :type ode
                    :name "ODE"
-                   :db-file ,(concat DROPBOX-PATH "/Configurations/dictionary/sqlite/LDOCE6.db")
+                   :db-file ,(concat DROPBOX-PATH "/Configurations/dictionary/sqlite/ODE_Living_Online.db")
                    :priority 1)
               (:id ldoce
                    :type ldoce
