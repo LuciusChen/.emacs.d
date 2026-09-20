@@ -62,28 +62,6 @@
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
      telega-avatar-workaround-gaps-for (when (display-graphic-p) '(return t))
-     ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
-     ;; telega-symbol
-     ;; remove iterm from `telega-symbols-emojify`
-     telega-symbols-emojify
-     (cl-reduce (lambda (emojify key)
-                  (assq-delete-all key emojify))
-                '(verified vertical-bar checkmark forum heavy-checkmark reply reply-quote horizontal-bar forward button-close summarize-in summarize-out)
-                :initial-value telega-symbols-emojify)
-     telega-symbol-button-close (nerd-icons-mdicon "nf-md-close_box_outline")
-     telega-symbol-verified (nerd-icons-codicon "nf-cod-verified_filled" :face 'telega-blue)
-     telega-symbol-vertical-bar "│" ;; U+2502 Box Drawings Light Vertical
-     telega-symbol-saved-messages-tag-end (nerd-icons-faicon "nf-fa-tag")
-     telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text")
-     telega-symbol-flames (nerd-icons-mdicon "nf-md-delete_clock")
-     telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
-     telega-symbol-reply (nerd-icons-faicon "nf-fa-reply")
-     telega-symbol-reply-quote (nerd-icons-faicon "nf-fa-reply_all")
-     telega-symbol-forward (nerd-icons-faicon "nf-fa-mail_forward")
-     telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
-     telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
-     telega-symbol-summarize-in (nerd-icons-octicon "nf-oct-fold")
-     telega-symbol-summarize-out (nerd-icons-octicon "nf-oct-unfold")
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
