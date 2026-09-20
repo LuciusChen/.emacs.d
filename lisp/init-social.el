@@ -62,6 +62,16 @@
      telega-sticker-size '(6 . 24)
      ;; 替代两行头像，防止头像因为字符高度不统一裂开。
      telega-avatar-workaround-gaps-for (when (display-graphic-p) '(return t))
+          ;; 以下都是 telega-symbols-emojify 中的 telega-symbol
+     ;; telega-symbol
+     ;; remove iterm from `telega-symbols-emojify`
+     telega-symbols-emojify
+     (cl-reduce (lambda (emojify key)
+                  (assq-delete-all key emojify))
+                '(checkmark heavy-checkmark)
+                :initial-value telega-symbols-emojify)
+     telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
+     telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
