@@ -74,7 +74,9 @@
     (set-char-table-range composition-function-table #xFE0F '(["\\c.\\c^+" 1 compose-gstring-for-graphic])))
 
   ;; Hide U+FFF4 on all platforms.
-  (set-char-table-range glyphless-char-display #xFFF4 'zero-width))
+  (set-char-table-range glyphless-char-display #xFFF4 'zero-width)
+  ;; Hide C1 control characters (U+0080-U+009F), e.g. in Telega admin titles.
+  (set-char-table-range glyphless-char-display '(#x80 . #x9F) 'zero-width))
 
 (defun +without-global-hl-line (func &rest args)
   "Call FUNC with ARGS while temporarily disabling global hl-line mode."

@@ -68,10 +68,12 @@
      telega-symbols-emojify
      (cl-reduce (lambda (emojify key)
                   (assq-delete-all key emojify))
-                '(checkmark heavy-checkmark)
+                '(checkmark heavy-checkmark button-close)
                 :initial-value telega-symbols-emojify)
      telega-symbol-checkmark (nerd-icons-mdicon "nf-md-check")
      telega-symbol-heavy-checkmark (nerd-icons-codicon "nf-cod-check_all")
+     telega-symbol-mark (propertize " " 'face 'telega-button-highlight)
+     telega-symbol-button-close (nerd-icons-mdicon "nf-md-close_box_outline")
      telega-translate-to-language-by-default "zh"
      telega-msg-save-dir "~/Downloads"
      telega-chat-input-markups '("markdown2" "org")
