@@ -34,6 +34,8 @@
 ;; branch develop
 (setq straight-repository-branch "develop")
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
+;; Its pre-build check misreports unbuilt deps; pinyinlib has no Version.
+(setq straight-check-dependency-versions nil)
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))

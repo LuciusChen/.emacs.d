@@ -113,14 +113,15 @@
   (:when-loaded
     (setopt gt-langs '(en zh)
             ;; gt-debug-p t
-            ;; gt-chatgpt-host "https://api.deepseek.com"
-            ;; gt-chatgpt-path "/chat/completions"
-            ;; gt-chatgpt-key '(auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
-            ;; gt-chatgpt-model "deepseek-v4-flash"
-            gt-chatgpt-host "https://openrouter.ai"
-            gt-chatgpt-path "/api/v1/chat/completions"
-            gt-chatgpt-key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
-            gt-chatgpt-model "deepseek/deepseek-v4-flash"
+            gt-chatgpt-host "https://api.deepseek.com"
+            gt-chatgpt-path "/chat/completions"
+            gt-chatgpt-key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
+            gt-chatgpt-model "deepseek-v4-flash"
+            gt-chatgpt-extra-options '((thinking . ((type . "disabled"))))
+            ;; gt-chatgpt-host "https://openrouter.ai"
+            ;; gt-chatgpt-path "/api/v1/chat/completions"
+            ;; gt-chatgpt-key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
+            ;; gt-chatgpt-model "deepseek/deepseek-v4-flash"
             gt-buffer-render-follow-p t
             gt-buffer-render-window-config
             '((display-buffer-reuse-window display-buffer-in-direction)

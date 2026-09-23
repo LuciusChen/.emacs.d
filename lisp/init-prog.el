@@ -157,7 +157,7 @@
                (flymake-mode 1)))))
   (:when-loaded
     (setopt flymake-no-changes-timeout 0.5
-            flymake-inline-diagnostics t)))
+            flymake-inline-diagnostics 'eol)))
 
 (setup js
   (:also-load lib-js)
