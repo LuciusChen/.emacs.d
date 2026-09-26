@@ -87,6 +87,7 @@
      telega-filters-custom nil
      telega-root-fill-column 70 ; fill-column
      telega-filter-custom-show-folders nil
+     telega-symbol-rich-text-table-border '(?─ ?\s ?\s)
      ;; telega-bridge-bot
      ;; 获取永久性的 access token
      ;; #+begin_src verb :wrap src ob-verb-response
