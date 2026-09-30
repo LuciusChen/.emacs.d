@@ -27,6 +27,10 @@
         (+set-face-family-like-default 'variable-pitch)
 
         (unless +default-fontset-configured-p
+          ;; Honor fontset entries for symbols even when the default font has
+          ;; a glyph for them.  This lets text-default emoji use the emoji font.
+          (setq use-default-font-for-symbols nil)
+
           ;; https://www.wfonts.com/font/symbola
           (cl-loop for font in SYMBOL-FONT
                    when (find-font (font-spec :name font))
@@ -34,12 +38,13 @@
 
           ;; Use the dedicated emoji script without changing unrelated Unicode
           ;; fallbacks.  Keep emoji slightly smaller so Corfu rows are not clipped.
-          ;; Overwrite the default list; prepend makes VS16 sequences use Symbola.
-          ;; Also use the emoji font for card index dividers (U+1F5C2).
+          ;; Overwrite the default list so VS16 sequences use this emoji font.
+          ;; Also use the emoji font for EYE (U+1F441) and card index
+          ;; dividers (U+1F5C2), which macOS otherwise renders as text.
           (cl-loop for font in EMOJI-FONTS
                    when (find-font (font-spec :name font))
                    return (let ((spec (font-spec :family font)))
-                            (dolist (target '(emoji #x1F5C2))
+                            (dolist (target '(emoji #x1F441 #x1F5C2))
                               (set-fontset-font t target spec))))
 
           ;; Force Emacs to search by using font-spec

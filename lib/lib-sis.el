@@ -4,7 +4,8 @@
 
 (defun +sis-set-english-outside-meow-insert (&optional state)
   "Switch to English when Meow enters a non-insert STATE."
-  (when (and (not (eq state 'insert))
+  (when (and (eq (current-buffer) (window-buffer))
+             (not (eq state 'insert))
              (not (bound-and-true-p meow-insert-mode)))
     (sis-set-english)))
 
