@@ -58,10 +58,7 @@
 
   (:with-hook window-setup-hook
     (:hook reapply-themes)
-    (:hook set-dividers-and-fringe-color)
-    (when window-system (:hook opacity-dark-theme)))
-
-  (:with-hook after-make-frame-functions (:hook opacity-dark-theme)))
+    (:hook set-dividers-and-fringe-color)))
 
 (setup frame
   (:with-hook after-init-hook (:hook reapply-themes)))

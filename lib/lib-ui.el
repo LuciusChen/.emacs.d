@@ -2,6 +2,17 @@
 ;;; Commentary:
 ;;; Code:
 
+(when (and (eq system-type 'darwin)
+           (get 'ns-alpha-elements 'x-frame-parameter))
+  (let ((parameters '((alpha-background . 70)
+                      (ns-alpha-elements . (ns-alpha-all))
+                      (ns-background-blur . 20))))
+    (dolist (parameter parameters)
+      (setf (alist-get (car parameter) default-frame-alist) (cdr parameter)))
+    (dolist (frame (frame-list))
+      (when (eq (framep frame) 'ns)
+        (modify-frame-parameters frame parameters)))))
+
 ;; Ensure that themes will be applied even if they have not been customized
 (defun reapply-themes ()
   "Forcibly load the themes listed in `custom-enabled-themes'."
@@ -43,36 +54,28 @@
       (when (display-graphic-p frame)
         (modify-frame-parameters frame (list (cons 'alpha-background value)))))))
 
-(defun apply-theme (theme opacity)
-  "Apply THEME and set window OPACITY."
+(defun apply-theme (theme)
+  "Apply THEME."
   (interactive)
   (when custom-enabled-themes
     (disable-theme (car custom-enabled-themes)))
   (setq custom-enabled-themes (list theme))
   (reapply-themes)
-  (set-dividers-and-fringe-color)
-  (when (and window-system) (set-opacity opacity)))
+  (set-dividers-and-fringe-color))
 
 (defun apply-theme-based-on-appearance (&rest _)
   "Apply a theme based on the current macOS system appearance."
   (if (eq ns-system-appearance 'light)
-      (apply-theme light-theme 100)
-    (apply-theme dark-theme (if IS-MAC 75 90))))
-
-(defun opacity-dark-theme (&optional frame)
-  "Set FRAME opacity when its background mode is dark."
-  (let ((frame (or frame (selected-frame))))
-    (when (and (display-graphic-p frame)
-               (eq (frame-parameter frame 'background-mode) 'dark))
-      (set-opacity (if IS-MAC 75 90) frame))))
+      (apply-theme light-theme)
+    (apply-theme dark-theme)))
 
 (defun light ()
   (interactive)
-  (apply-theme light-theme 100))
+  (apply-theme light-theme))
 
 (defun dark ()
   (interactive)
-  (apply-theme dark-theme (if IS-MAC 75 90)))
+  (apply-theme dark-theme))
 
 (provide 'lib-ui)
 ;;; lib-ui.el ends here

@@ -6,7 +6,52 @@ Homebrew emacs-plus 构建；本文档不会参与构建。
 
 补丁基于 Emacs master
 `fb6ad8aa780df52b01dc018a283b11db33ded906` 整理，相关讨论见
-Bug#67968。它与同目录的 `ns-alpha-background.patch` 配合使用。
+Bug#67968。它与同目录的 `frame-transparency.patch` 配合使用。
+
+## Emacs 32 透明与 CGS 模糊
+
+本目录使用 emacs-plus 社区维护的 `frame-transparency.patch`，同时提供
+`alpha-background` 透明绘制和 `ns-background-blur` 背景模糊。它替代原来的
+`ns-alpha-background.patch`，两份不能同时应用。
+
+补丁原样复制自：
+
+- [emacs-plus Emacs 32 补丁](https://github.com/d12frosted/homebrew-emacs-plus/blob/b94a79889f435e200481f6cdb8d21b9b7a977a8c/community/patches/frame-transparency/emacs-32.patch)
+- SHA256：`4776c3fe0c896573254bbabda38d734cf8a48381ad20d833ec0863870acc3111`
+- Emacs 32 验证基线：`476db856b2cce49af7ff00bac99dc08dc3aa80b8`
+
+`lib/lib-ui.el` 为 Cocoa frame 默认设置背景不透明度 `alpha-background` 为 70、
+`ns-alpha-elements` 为 `(ns-alpha-all)`，以及模糊半径 `ns-background-blur` 为 20。
+默认值仅用于 macOS，配置仅在新构建注册了
+`ns-alpha-elements` 参数时启用，旧二进制不会启用新模糊参数。
+现有窗口和新窗口都会应用默认值，明暗主题切换不再重置透明度；手动调节
+继续使用 `alpha-background`。将模糊半径设为 0 可以关闭模糊而保留透明。作者的半径 setter
+只保存参数，调整后需重新应用透明度或重新显示 frame 才更新窗口。
+
+`~/.config/emacs-plus/build.yml` 已仅为 Emacs 32 固定上述基线，
+保留原来的图标设置。也可显式指定基线重编译：
+
+```sh
+~/.emacs.d/scripts/macos/emacs_setup.sh HOMEBREW_EMACS_PLUS_32_REVISION=476db856b2cce49af7ff00bac99dc08dc3aa80b8 normal 32
+```
+
+现有脚本会移除旧透明补丁的公式引用并注入新的综合补丁，不需要修改脚本。
+在上述基线上，按 `fix-ns-x-colors`、`system-appearance`、
+`round-undecorated-frame`、`ns-preserve-svg-alpha`、`ns-mac-input-source`、
+`frame-transparency` 顺序应用已通过检查。
+
+本次已完成：
+
+- 原样补丁与其上游提交的 SHA256 一致；
+- 现有公式和干净公式的补丁注入，以及重复运行均通过；
+- 综合补丁在图片补丁之前、之后应用均成功，最终源码一致；
+- NS、xwidgets、librsvg、WebP 完整构建成功，本次关闭 native compilation；
+- 实际 NS 图形启动、新 frame 参数继承、装饰切换后的窗口重建检查通过；
+- PNG、SVG、WebP 三项 NS 图片加载 ERT 测试全部通过。
+
+CGS 模糊使用 macOS 私有接口，复用的是作者现有实现。窗口单独截图无法
+可靠展示后方桌面的合成，尚未完成与 kitty 的视觉对照；效果仍需在实际
+桌面上判断。补丁文件变更需重编译后生效，仅调整 Lisp 中的默认参数不需要重编译。
 
 ## 结论：共享语义，不共享错误的底层实现
 
@@ -93,12 +138,12 @@ non-premultiplied flag 的 alpha bitmap 按预乘格式解释。
 补丁加入了 GNUstep/旧 macOS 的枚举兼容名，但本轮只实际编译验证了
 Cocoa 构建，不能把 GNUstep 兼容性写成已经运行通过。
 
-## 与 `ns-alpha-background.patch` 的关系
+## 与 `frame-transparency.patch` 的关系
 
 两项能力相互独立：
 
 - 本补丁单独使用时，PNG/SVG/WebP 的透明边缘和半透明像素仍能正确保留。
-- `ns-alpha-background.patch` 让 NS frame 和 face 背景真正具有
+- `frame-transparency.patch` 让 NS frame 和 face 背景真正具有
   `alpha-background`。
 - 两者同时使用时，明确写 `:background nil` 的异形背景图片才需要
   `SourceAtop`，使图片覆盖区不把 frame 背景重新变成不透明。
@@ -111,11 +156,12 @@ system-appearance
 round-undecorated-frame
 ns-preserve-svg-alpha
 ns-mac-input-source
-ns-alpha-background
+frame-transparency
 ```
 
-本轮已经按这个公式顺序从干净基线逐个应用，全部无冲突；本补丁单独
-应用到同一基线也通过检查。提交上游时仍应说明逻辑依赖：图片 alpha
+图片补丁此前已按原透明补丁组合验证；改用社区综合补丁后，
+也已在上面的 Emacs 32 基线上按新公式顺序应用成功。
+提交上游时仍应说明逻辑依赖：图片 alpha
 保留部分可以独立评审，合成 operator 部分依赖 NS 的
 `alpha-background` 支持。
 
