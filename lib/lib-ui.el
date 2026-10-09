@@ -4,7 +4,7 @@
 
 (when (and (eq system-type 'darwin)
            (get 'ns-alpha-elements 'x-frame-parameter))
-  (let ((parameters '((alpha-background . 70)
+  (let ((parameters '((alpha-background . 60)
                       (ns-alpha-elements . (ns-alpha-all))
                       (ns-background-blur . 20))))
     (dolist (parameter parameters)
