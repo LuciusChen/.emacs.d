@@ -115,69 +115,68 @@
             ;; gt-debug-p t
             gt-chatgpt-host "https://api.deepseek.com"
             gt-chatgpt-path "/chat/completions"
-            gt-chatgpt-key (auth-source-pick-first-password :host "api.deepseek.com" :user "deepseek")
             gt-chatgpt-model "deepseek-v4-flash"
             gt-chatgpt-extra-options '((thinking . ((type . "disabled"))))
-            ;; gt-chatgpt-host "https://openrouter.ai"
-            ;; gt-chatgpt-path "/api/v1/chat/completions"
-            ;; gt-chatgpt-key (auth-source-pick-first-password :host "openrouter.ai" :user "openrouter")
-            ;; gt-chatgpt-model "deepseek/deepseek-v4-flash"
             gt-buffer-render-follow-p t
             gt-buffer-render-window-config
             '((display-buffer-reuse-window display-buffer-in-direction)
               (direction . bottom)
               (window-height . 0.4)))
-    (setq gt-preset-translators
-          `((default . ,(gt-translator
-                         :taker (list (gt-taker :pick nil :if 'selection)
-                                      (gt-taker :text 'paragraph :if '(Info-mode telega-webpage-mode help-mode eww-mode helpful-mode devdocs-mode))
-                                      (gt-taker :text 'word))
-                         :engines (list (gt-chatgpt-engine :if 'not-word
-                                                           :headers `(("Content-Type" . "application/json")
-                                                                      ("Authorization" . ,(concat "Bearer " (encode-coding-string (gt-resolve-key (gt-chatgpt-engine)) 'utf-8)))
-                                                                      ("HTTP-Referer" . "https://github.com/lorniu/gt.el")
-                                                                      ("X-Title" . "emacs/gt.el")))
-                                        (gt-google-engine :if 'word)
-                                        (gt-youdao-suggest-engine :if '(and word src:en)))
-                         :render  (list (gt-overlay-render :if '(Info-mode telega-webpage-mode eww-mode helpful-mode devdocs-mode))
-                                        (gt-insert-render :if '(telega-chat-mode) :type 'replace)
-                                        (gt-buffer-render))))
-            ;; gt-insert-render
-            (after-source-insert . ,(gt-translator
-                                     :taker (gt-taker :text 'buffer :pick 'paragraph)
-                                     :engines (gt-google-engine)
-                                     :render (gt-insert-render :type 'after)))
-            (replace-source-chat-insert . ,(gt-translator
-                                            :taker (gt-taker :text 'paragraph :pick nil)
-                                            :engines (gt-google-engine)
-                                            :render (gt-insert-render :type 'replace)))
-            (only-translate-rare-insert . ,(gt-translator
-                                            :taker (gt-taker :text 'paragraph
-                                                             :pick 'word
-                                                             :pick-pred (lambda (w) (length> w 6)))
-                                            :engines (gt-google-engine)
-                                            :render (gt-insert-render :type 'after
-                                                                      :rfmt " (%s)"
-                                                                      :rface '(:foreground "grey"))))
-            ;; gt-overlay-render
-            (after-source-overlay . ,(gt-translator
-                                      :taker (gt-taker :text 'buffer :pick 'paragraph)
-                                      :engines (gt-google-engine)
-                                      :render (gt-overlay-render :type 'after
-                                                                 :sface nil
-                                                                 :rface 'font-lock-doc-face)))
-            (only-translate-rare-overlay . ,(gt-translator
-                                             :taker (gt-taker :text 'buffer :pick 'word :pick-pred (lambda (w) (length> w 5)))
-                                             :engines (gt-google-engine)
-                                             :render (gt-overlay-render :type 'after
-                                                                        :rfmt "(%s)"
-                                                                        :rface '(:foreground "grey"))))))
+    (let ((reading-modes '(Info-mode telega-webpage-mode eww-mode helpful-mode devdocs-mode)))
+      (setq gt-preset-translators
+            `((default . ,(gt-translator
+                           :taker (list (gt-taker :pick nil :if 'selection)
+                                        (gt-taker :text 'paragraph :if (cons 'help-mode reading-modes))
+                                        (gt-taker :text 'word))
+                           ;; key 是 authinfo 里的 login，host 取自引擎地址
+                           :engines (list (gt-chatgpt-engine :if 'not-word :key 'deepseek)
+                                          ;; 换用 OpenRouter 时替换上一行：
+                                          ;; (gt-chatgpt-engine :if 'not-word :key 'openrouter
+                                          ;;                    :host "https://openrouter.ai"
+                                          ;;                    :path "/api/v1/chat/completions"
+                                          ;;                    :model "deepseek/deepseek-v4-flash"
+                                          ;;                    :headers '(("HTTP-Referer" . "https://github.com/lorniu/gt.el")
+                                          ;;                               ("X-Title" . "emacs/gt.el")))
+                                          (gt-google-engine :if 'word)
+                                          (gt-youdao-suggest-engine :if '(and word src:en)))
+                           :render  (list (gt-overlay-render :if reading-modes)
+                                          (gt-insert-render :if '(telega-chat-mode) :type 'replace)
+                                          (gt-buffer-render))))
+              ;; gt-insert-render
+              (after-source-insert . ,(gt-translator
+                                       :taker (gt-taker :text 'buffer :pick 'paragraph)
+                                       :engines (gt-google-engine)
+                                       :render (gt-insert-render :type 'after)))
+              (replace-source-chat-insert . ,(gt-translator
+                                              :taker (gt-taker :text 'paragraph :pick nil)
+                                              :engines (gt-google-engine)
+                                              :render (gt-insert-render :type 'replace)))
+              (only-translate-rare-insert . ,(gt-translator
+                                              :taker (gt-taker :text 'paragraph
+                                                               :pick 'word
+                                                               :pick-pred (lambda (w) (length> w 6)))
+                                              :engines (gt-google-engine)
+                                              :render (gt-insert-render :type 'after
+                                                                        :rfmt " (%s)"
+                                                                        :rface '(:foreground "grey"))))
+              ;; gt-overlay-render
+              (after-source-overlay . ,(gt-translator
+                                        :taker (gt-taker :text 'buffer :pick 'paragraph)
+                                        :engines (gt-google-engine)
+                                        :render (gt-overlay-render :type 'after
+                                                                   :sface nil
+                                                                   :rface 'font-lock-doc-face)))
+              (only-translate-rare-overlay . ,(gt-translator
+                                               :taker (gt-taker :text 'buffer :pick 'word :pick-pred (lambda (w) (length> w 5)))
+                                               :engines (gt-google-engine)
+                                               :render (gt-overlay-render :type 'after
+                                                                          :rfmt "(%s)"
+                                                                          :rface '(:foreground "grey")))))))
     (when IS-LINUX
       (setopt gt-tts-native-engine 'espeak-ng)
-      (cl-defmethod gt-speech ((engine (eql 'espeak-ng)) text lang &optional play-fn)
-        ;; 调用 espeak-ng 命令来朗读文本
-        (let ((command (format "espeak-ng -v %s \"%s\"" lang text)))
-          (start-process-shell-command "espeak-ng" nil command))))))
+      ;; 直接传参，避免文本被 shell 解释
+      (cl-defmethod gt-speech ((_ (eql 'espeak-ng)) text lang &optional _play-fn)
+        (start-process "espeak-ng" nil "espeak-ng" "-v" (format "%s" (or lang 'en)) text)))))
 
 (setup citar-denote
   (:load-after denote)
