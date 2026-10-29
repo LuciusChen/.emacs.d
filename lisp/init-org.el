@@ -116,13 +116,10 @@
 
 (setup ob-core
   (:when-loaded
-    (setopt org-plantuml-jar-path
-            (expand-file-name (concat ORG-PATH "/plantuml/plantuml.jar"))
-            ;; 这里应该就是 .zshrc 里面配置的 python
-            org-babel-python-command "python")
+    ;; 这里应该就是 .zshrc 里面配置的 python
+    (setopt org-babel-python-command "python")
     (org-babel-do-load-languages
-     'org-babel-load-languages '((plantuml . t)
-                                 (python . t)
+     'org-babel-load-languages '((python . t)
                                  (shell . t)
                                  (sql . t)
                                  (latex . t)))))
