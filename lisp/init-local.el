@@ -32,5 +32,13 @@
 ;;     ;; Open in Inkscape
 ;;     (start-process "inkscape" nil "inkscape" fullpath)))
 
+;; Org calendar: a week, month or year calendar linked to a timeline.
+(setup org-almanac
+  (:with-function org-almanac (:autoload-this nil t))
+  (:with-feature org-agenda
+    (:when-loaded
+      (add-to-list 'org-agenda-custom-commands
+                   '("c" "Calendar" (lambda (_) (org-almanac)))))))
+
 (provide 'init-local)
 ;;; init-local.el ends here
