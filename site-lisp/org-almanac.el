@@ -943,6 +943,86 @@ with \\[delete-other-windows], stays closed.")
   (save-selected-window
     (org-almanac--open #'switch-to-buffer-other-window)))
 
+(defun org-almanac--entry-heading (marker)
+  "Return the position of the heading that MARKER belongs to, or nil."
+  (with-current-buffer (marker-buffer marker)
+    (org-with-wide-buffer
+     (goto-char marker)
+     (ignore-errors (org-back-to-heading t) (point)))))
+
+(defun org-almanac--move-to-entry (heading day)
+  "Move point to the line of the entry under marker HEADING, among those of DAY.
+Stay at the start of the selected date if the entry has left that day."
+  (let ((found nil))
+    (save-excursion
+      (goto-char (point-min))
+      (while (and (not found) (not (eobp)))
+        (let ((marker (org-get-at-bol 'org-marker)))
+          (when (and marker
+                     (eql day (org-almanac--day-at-point))
+                     (eq (marker-buffer marker) (marker-buffer heading))
+                     (eql (org-almanac--entry-heading marker)
+                          (marker-position heading)))
+            (setq found (point))))
+        (forward-line 1)))
+    (when found
+      (goto-char found)
+      (set-window-point (selected-window) found)
+      (set-marker org-almanac--last-point found))))
+
+(defun org-almanac--edit-entry (command arg)
+  "Run the Org COMMAND with prefix ARG on the heading of this line, then redraw.
+Org does the work, so prompts, logging, repeaters and habits behave as usual.
+The entry's file is not saved."
+  (let ((marker (or (org-get-at-bol 'org-marker)
+                    (user-error "No entry on this line")))
+        (day (org-almanac--day-at-point))
+        heading)
+    (unless (marker-buffer marker)
+      (user-error "This entry is stale, press g to refresh"))
+    (with-current-buffer (marker-buffer marker)
+      (org-with-wide-buffer
+       (goto-char marker)
+       (when (looking-at-p "[ \t]*%%(")
+         (user-error "A diary line has no heading to change"))
+       (org-back-to-heading t)
+       (setq heading (point-marker))
+       (let ((current-prefix-arg arg))
+         (call-interactively command))))
+    (revert-buffer)
+    (org-almanac--move-to-entry heading day)
+    (set-marker heading nil)))
+
+(defun org-almanac-todo (&optional arg)
+  "Change the TODO state of the entry on this line.
+ARG is passed to `org-todo'."
+  (interactive "P" org-almanac-mode)
+  (org-almanac--edit-entry #'org-todo arg))
+
+(defun org-almanac-schedule (&optional arg)
+  "Schedule the entry on this line.
+ARG is passed to `org-schedule'."
+  (interactive "P" org-almanac-mode)
+  (org-almanac--edit-entry #'org-schedule arg))
+
+(defun org-almanac-deadline (&optional arg)
+  "Set the deadline of the entry on this line.
+ARG is passed to `org-deadline'."
+  (interactive "P" org-almanac-mode)
+  (org-almanac--edit-entry #'org-deadline arg))
+
+(defun org-almanac-set-tags (&optional arg)
+  "Set the tags of the entry on this line.
+ARG is passed to `org-set-tags-command'."
+  (interactive "P" org-almanac-mode)
+  (org-almanac--edit-entry #'org-set-tags-command arg))
+
+(defun org-almanac-priority (&optional arg)
+  "Set the priority of the entry on this line.
+ARG is passed to `org-priority'."
+  (interactive "P" org-almanac-mode)
+  (org-almanac--edit-entry #'org-priority arg))
+
 (defun org-almanac-capture ()
   "Run `org-capture' with the selected date as the default date."
   (interactive nil org-almanac-mode)
@@ -1003,6 +1083,12 @@ with \\[delete-other-windows], stays closed.")
   "=" #'org-almanac-filter
   "|" #'org-almanac-filter-clear
   "k" #'org-almanac-capture
+  "t" #'org-almanac-todo
+  "C-c C-s" #'org-almanac-schedule
+  "C-c C-d" #'org-almanac-deadline
+  ":" #'org-almanac-set-tags
+  "," #'org-almanac-priority
+  "s" #'org-save-all-org-buffers
   "SPC" #'org-almanac-show
   "TAB" #'org-almanac-visit-other-window
   "RET" #'org-almanac-visit
