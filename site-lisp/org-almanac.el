@@ -11,27 +11,36 @@
 ;; and selecting a date moves the timeline.  The timeline has no fixed range;
 ;; it loads more days as point approaches either end.
 ;;
-;; There is one layout for every window width.  Keys follow `org-agenda',
-;; `g' reverts, dates are read with `org-read-date' and new entries go
-;; through `org-capture'.
+;; There is one style for every window width: wider windows show more weeks
+;; or months side by side.  Keys follow `org-agenda', `g' reloads and returns
+;; to today, dates are read with `org-read-date', new entries go through
+;; `org-capture', and Org's own commands change entries.  With org-modern
+;; installed, TODO keywords and tags are drawn as its labels.
 ;;
 ;; The timeline shows headings without a TODO keyword that carry an active
 ;; timestamp, and tasks with a clock time.  A legend above the dates names
 ;; the kinds of entry, whose marks appear on the dates and in the timeline.
-;; Today's habits appear with their consistency graph, but like in the
-;; agenda they say nothing about other dates, so dates carry no habit marks.
+;; Today's habits appear with a strip of their recent days, and dates carry no
+;; habit marks.
 ;; Date-only tasks, overdue items and deadline warnings stay out, unless
 ;; `org-almanac-show-date-only-tasks' is set.
 
 ;;; Code:
 
 (require 'calendar)
+(require 'hl-line)
 (require 'org)
 (require 'org-agenda)
 (require 'org-capture)
 (require 'org-habit)
 (require 'seq)
 (require 'subr-x)
+;; Optional: with it, TODO keywords and tags are drawn as its labels, so they
+;; match Org buffers and any theme's colours for them.
+(require 'org-modern nil t)
+
+(defvar org-modern-todo-faces)
+(defvar org-modern-tag-faces)
 
 (defgroup org-almanac nil
   "Calendar linked to a continuous Org timeline."
@@ -60,31 +69,18 @@
     (t nil))
   "Faint background of the weekend columns in the calendar.")
 
-(defface org-almanac-label
-  '((t :height 0.8 :width condensed :underline nil))
-  "Parent face of the labels in the timeline.
-`org-almanac--update-label-face' adds a border in the background colour.")
+(defface org-almanac-current
+  '((t :inherit hl-line))
+  "Background of the entry at point in the timeline.")
 
-(defface org-almanac-todo
-  '((t :inherit (org-todo org-almanac-label) :inverse-video t))
-  "Face of the labels of open TODO keywords.")
-
-(defface org-almanac-done
-  '((default :inherit org-almanac-label)
-    (((background light)) :background "gray90" :foreground "black")
-    (t :background "gray20" :foreground "white"))
-  "Face of the labels of done TODO keywords.")
-
-(defface org-almanac-tag
-  '((default :inherit (secondary-selection org-almanac-label))
-    (((background light)) :foreground "black")
-    (t :foreground "white"))
-  "Face of the tag labels.")
+(defface org-almanac-deadline
+  '((t :inherit org-imminent-deadline :inverse-video t))
+  "Face of the label that marks a deadline, when org-modern draws labels.")
 
 (defconst org-almanac--glyphs
-  '((unicode :h "─" :now "►"
+  '((unicode :h "─" :now "►" :habit-done "█" :habit-missed "░" :habit-today "○"
              :event "■" :task "□" :deadline "▲" :diary "◆" :habit "○" :done "▣")
-    (ascii :h "-" :now ">"
+    (ascii :h "-" :now ">" :habit-done "#" :habit-missed "." :habit-today "o"
            :event "*" :task "o" :deadline "!" :diary "~" :habit "@" :done "x"))
   "Drawing characters for each value of `org-almanac-style'.")
 
@@ -108,14 +104,16 @@ The glyph of each kind is in `org-almanac--glyphs'.")
   "Width of a week or month calendar.")
 (defconst org-almanac--month-gap 2
   "Columns between the months of the year calendar.")
-(defconst org-almanac--legend-column-width 9
-  "Width of the first two columns of the legend.")
-(defconst org-almanac--time-width 11
-  "Width of the time column, enough for a range like 09:00-09:30.")
+(defconst org-almanac--legend-column-widths '(12 8)
+  "Widths of the first two columns of the legend.")
+(defconst org-almanac--habit-days 7
+  "Past days shown and counted in a habit's strip.")
 (defconst org-almanac--year-max-columns 4
   "Most months shown side by side in the year calendar.")
+(defconst org-almanac--page-max-columns 3
+  "Most weeks or months shown side by side in the other calendars.")
 (defconst org-almanac--search-batches 12
-  "Batches an explicit search loads before reporting no more events.")
+  "Batches a search loads before reporting no more events.")
 
 ;; All state lives in the timeline buffer.
 (defvar-local org-almanac--selected nil
@@ -129,6 +127,8 @@ A marker stays correct when more days are inserted above it.")
   "Last absolute date loaded into the timeline.")
 (defvar-local org-almanac--size nil
   "Calendar size: `week', `month' or `year'.")
+(defvar-local org-almanac--current nil
+  "Markers (START . END) of the text highlighted as the current entry, or nil.")
 (defvar-local org-almanac--filter nil
   "Regexp that event titles or categories must match, or nil.")
 (defvar-local org-almanac--cache nil
@@ -287,56 +287,71 @@ Habits do not: they repeat, so marks would only hide the dates that differ."
   "Format MINUTES after midnight as a clock time."
   (format "%02d:%02d" (% (/ minutes 60) 24) (% minutes 60)))
 
-(defun org-almanac--pad-time (text)
-  "Return TEXT padded to the width of the time column."
-  (concat text (make-string (- org-almanac--time-width (string-width text))
-                            ?\s)))
+(defun org-almanac--habit-today-face (habit today)
+  "Return a face colouring today's cell by HABIT's state on absolute date TODAY.
+Org's habit faces only set backgrounds, so that colour becomes the foreground."
+  (when-let* ((color (face-background
+                      (car (org-habit-get-faces habit today)) nil t)))
+    `(:foreground ,color)))
 
-(defun org-almanac--habit-graph (event)
-  "Return the consistency graph of the habit EVENT, in the time column.
-It always covers seven days back, today and tomorrow, whatever width the
-agenda's own graph has."
-  (let ((now (time-subtract nil (* 3600 org-extend-today-until))))
-    (org-almanac--pad-time
-     (org-habit-build-graph (plist-get event :habit)
-                            (time-subtract now (days-to-time 7))
-                            now
-                            (time-add now (days-to-time 1))))))
+(defun org-almanac--habit-strip (event)
+  "Return the strip of the habit EVENT: past days, today and a count.
+Each past day is done or missed, and the count covers those days only."
+  (let* ((habit (plist-get event :habit))
+         (today (org-today))
+         (done (org-habit-done-dates habit))
+         (past (number-sequence (- today org-almanac--habit-days) (1- today)))
+         (cell (lambda (day)
+                 (if (memq day done)
+                     (propertize (org-almanac--glyph :habit-done)
+                                 'face 'org-scheduled-today)
+                   (propertize (org-almanac--glyph :habit-missed)
+                               'face 'shadow)))))
+    (concat
+     (mapconcat cell past "")
+     (if (memq today done)
+         (funcall cell today)
+       (propertize (org-almanac--glyph :habit-today)
+                   'face (org-almanac--habit-today-face habit today)))
+     (propertize (format "  %d/%d"
+                         (seq-count (lambda (day) (memq day done)) past)
+                         org-almanac--habit-days)
+                 'face 'shadow))))
 
 (defun org-almanac--time-text (event)
-  "Return the time of EVENT as a column of fixed width."
+  "Return the time of EVENT as text, or nil if it has none."
   (let ((start (plist-get event :start))
         (end (plist-get event :end)))
-    (org-almanac--pad-time
-     (cond (end (concat (org-almanac--clock start) "-"
-                        (org-almanac--clock end)))
-           (start (org-almanac--clock start))
-           (t "")))))
+    (cond (end (concat (org-almanac--clock start) "-"
+                       (org-almanac--clock end)))
+          (start (org-almanac--clock start)))))
 
 (defun org-almanac--state (event pastp)
   "Return how EVENT is drawn: `active', `done' or `past'.
-PASTP means its time has gone by, which does not end a habit."
+PASTP means its time has gone by.  That only ends an entry without a TODO
+keyword: an open task or habit still needs doing."
   (cond ((plist-get event :done) 'done)
-        ((and pastp (not (plist-get event :habit))) 'past)
+        ((and pastp (not (plist-get event :keyword))) 'past)
         (t 'active)))
 
-(defun org-almanac--update-label-face ()
-  "Give labels a border in the background colour, so they sit apart in a line."
-  (set-face-attribute
-   'org-almanac-label nil
-   :box (list :color (face-attribute 'default :background nil t)
-              :line-width (cons -1 (- (ceiling (* (frame-char-height) 0.1)))))))
-
-(defun org-almanac--label (text face)
-  "Return TEXT as a label in FACE."
-  (propertize (concat " " text " ") 'face face))
+(defun org-almanac--label (text modern-face plain-face)
+  "Return TEXT as an org-modern label in MODERN-FACE.
+Without org-modern, return it unpadded in PLAIN-FACE."
+  (if (featurep 'org-modern)
+      (propertize (concat " " text " ") 'face modern-face)
+    (propertize text 'face plain-face)))
 
 (defun org-almanac--keyword-text (keyword state)
   "Return the TODO KEYWORD of an event in STATE."
-  (pcase state
-    ('past (propertize keyword 'face 'shadow))
-    ('done (org-almanac--label keyword 'org-almanac-done))
-    (_ (org-almanac--label keyword 'org-almanac-todo))))
+  (if (eq state 'done)
+      (org-almanac--label keyword 'org-modern-done 'org-done)
+    (org-almanac--label
+     keyword
+     (if-let* ((face (and (featurep 'org-modern)
+                          (cdr (assoc keyword org-modern-todo-faces)))))
+         `(,face org-modern-label)
+       'org-modern-todo)
+     (org-get-todo-face keyword))))
 
 (defun org-almanac--title-text (event face state)
   "Return the title of EVENT in FACE, with its TODO keyword drawn for STATE."
@@ -347,43 +362,58 @@ PASTP means its time has gone by, which does not end a habit."
                 (propertize (substring title (length keyword)) 'face face))
       (propertize title 'face face))))
 
-(defun org-almanac--tags-text (tags state)
-  "Return the string TAGS, like \":a:b:\", for an event in STATE."
-  (if (eq state 'active)
-      (mapconcat (lambda (tag) (org-almanac--label tag 'org-almanac-tag))
+(defun org-almanac--tags-text (tags)
+  "Return the string TAGS, like \":a:b:\", as labels or in `org-tag'."
+  (if (featurep 'org-modern)
+      (mapconcat (lambda (tag)
+                   (org-almanac--label
+                    tag
+                    (if-let* ((face (cdr (assoc tag org-modern-tag-faces))))
+                        `(,face org-modern-tag)
+                      'org-modern-tag)
+                    nil))
                  (split-string tags ":" t) " ")
-    (propertize tags 'face 'shadow)))
+    (propertize tags 'face 'org-tag)))
 
-(defun org-almanac--event-line (event pastp)
-  "Return the timeline line for EVENT.  When PASTP, its time has gone by.
+(defun org-almanac--event-lines (event pastp)
+  "Return the two timeline lines of EVENT, joined by a newline.
+PASTP means its time has gone by.  The first line holds the mark and the time,
+plus the graph of a habit; the second holds the title and tags, indented under
+the mark.  Both carry the same marker, which makes them one entry.
 The title keeps the face the agenda gave it, so planning state reads as it
 does there, but at normal weight: Org makes entries bold by how near they are,
-which on a timeline of many days only looks uneven.  The mark shows the kind
-of entry, as named in the legend."
+which on a timeline of many days only looks uneven.  Labels keep their weight."
   (let* ((state (org-almanac--state event pastp))
          (habit (plist-get event :habit))
-         (face (pcase state
-                 ('done 'org-agenda-done)
-                 ('past 'shadow)
-                 (_ (or (plist-get event :face) 'org-agenda-calendar-event))))
-         (mark (org-almanac--kind-mark (org-almanac--kind event)))
-         (line
+         (time (org-almanac--time-text event))
+         (face `((:weight normal)
+                 ,(pcase state
+                    ('done 'org-agenda-done)
+                    ('past 'shadow)
+                    (_ (or (plist-get event :face)
+                           'org-agenda-calendar-event)))))
+         (kind (org-almanac--kind event))
+         (mark (org-almanac--kind-mark kind))
+         (lines
           (concat
            (if (eq state 'past)
                (propertize (substring-no-properties mark) 'face 'shadow)
              mark)
            " "
            (if habit
-               (org-almanac--habit-graph event)
-             (propertize (org-almanac--time-text event) 'face face))
-           " "
-           (when-let* ((start (and habit (plist-get event :start))))
-             (propertize (concat (org-almanac--clock start) " ") 'face face))
+               (concat (and time (concat (propertize time 'face face) "  "))
+                       (org-almanac--habit-strip event))
+             (propertize (or time "All day") 'face face))
+           (when (eq kind 'deadline)
+             (concat "  " (org-almanac--label
+                           "Deadline"
+                           '(org-almanac-deadline org-modern-label)
+                           'org-imminent-deadline)))
+           "\n  "
            (org-almanac--title-text event face state)
            (when-let* ((tags (plist-get event :tags)))
-             (concat "  " (org-almanac--tags-text tags state))))))
-    (add-face-text-property 0 (length line) '(:weight normal) nil line)
-    (propertize line 'org-marker (plist-get event :marker))))
+             (concat "  " (org-almanac--tags-text tags))))))
+    (propertize lines 'org-marker (plist-get event :marker))))
 
 (defun org-almanac--now-line (minutes)
   "Return the timeline rule for the time MINUTES after midnight.
@@ -435,7 +465,7 @@ ends each day."
                           events)
                        events))
              (line (lambda (event)
-                     (org-almanac--event-line
+                     (org-almanac--event-lines
                       event
                       (org-almanac--past-p event day today minutes))))
              (lines (append
@@ -499,6 +529,8 @@ Stop at the first batch that adds lines, and return non-nil if one did."
 (defun org-almanac--rebuild (center)
   "Fill the timeline with the days around the absolute date CENTER."
   (let ((inhibit-read-only t))
+    ;; The text is about to go, and new text needs its own highlight.
+    (setq org-almanac--current nil)
     (setq org-almanac--start (- center org-almanac-preload-days)
           org-almanac--end (+ center org-almanac-preload-days))
     (erase-buffer)
@@ -512,28 +544,23 @@ Stop at the first batch that adds lines, and return non-nil if one did."
     (add-face-text-property 0 (length cell) 'org-almanac-weekend t cell))
   cell)
 
-(defun org-almanac--calendar-cell (day month-bounds today)
-  "Return the calendar cell for absolute date DAY.
-MONTH-BOUNDS is the displayed month or nil.  TODAY is an absolute date."
-  (let ((outside (and month-bounds
-                      (not (<= (car month-bounds) day (cdr month-bounds)))))
-        (dom (cadr (calendar-gregorian-from-absolute day))))
+(defun org-almanac--calendar-cell (day today)
+  "Return the calendar cell for absolute date DAY, given TODAY."
+  (propertize
+   (concat
     (propertize
-     (concat
-      (propertize
-       (format "%3d" dom)
-       'face (cond ((= day org-almanac--selected)
-                    (if (= day today)
-                        '(:inverse-video t :weight bold)
-                      '(:inverse-video t)))
-                   ((= day today) 'org-agenda-date-today)
-                   (outside 'shadow)))
-      (if-let* ((kind (org-almanac--day-kind
-                       (org-almanac--marked-events day))))
-          (org-almanac--kind-mark kind)
-        " "))
-     'org-almanac-day day
-     'mouse-face 'highlight)))
+     (format "%3d" (cadr (calendar-gregorian-from-absolute day)))
+     'face (cond ((= day org-almanac--selected)
+                  (if (= day today)
+                      '(:inverse-video t :weight bold)
+                    '(:inverse-video t)))
+                 ((= day today) 'org-agenda-date-today)))
+    (if-let* ((kind (org-almanac--day-kind
+                     (org-almanac--marked-events day))))
+        (org-almanac--kind-mark kind)
+      " "))
+   'org-almanac-day day
+   'mouse-face 'highlight))
 
 (defun org-almanac--rule (width)
   "Return a horizontal rule WIDTH columns wide."
@@ -568,10 +595,11 @@ When SHOW-SELECTED, it also names the selected date on the right."
                          ?\s)
             (propertize date 'face 'org-agenda-date))))
 
-(defun org-almanac--month-lines (day today hide-outside)
-  "Return the month containing absolute date DAY as calendar lines.
-TODAY is an absolute date.  When HIDE-OUTSIDE, dates of other months are left
-blank.  A month always has six rows, so months line up and the height is fixed."
+(defun org-almanac--month-lines (day today)
+  "Return the month containing absolute date DAY as calendar lines, given TODAY.
+Dates of other months are blank, so a date appears once however many months
+are shown.  A month always has six rows, so months line up and the height is
+fixed."
   (let* ((bounds (org-almanac--month-bounds day))
          (start (org-almanac--week-start (car bounds))))
     (append
@@ -583,60 +611,79 @@ blank.  A month always has six rows, so months line up and the height is fixed."
                 (lambda (column)
                   (let ((date (+ start (* 7 row) column)))
                     (org-almanac--shade-weekend
-                     (if (and hide-outside
-                              (not (<= (car bounds) date (cdr bounds))))
-                         (make-string org-almanac--cell-width ?\s)
-                       (org-almanac--calendar-cell date bounds today))
+                     (if (<= (car bounds) date (cdr bounds))
+                         (org-almanac--calendar-cell date today)
+                       (make-string org-almanac--cell-width ?\s))
                      column)))
                 (number-sequence 0 6) ""))
              (number-sequence 0 5)))))
 
-(defun org-almanac--week-lines (today)
-  "Return the week containing the selected date as calendar lines, given TODAY."
-  (let ((start (org-almanac--week-start org-almanac--selected)))
-    (list (org-almanac--title-line org-almanac--selected t)
+(defun org-almanac--week-lines (start today)
+  "Return the week beginning on absolute date START as calendar lines.
+TODAY is an absolute date.  The week holding the selected date names it."
+  (let ((selectedp (<= start org-almanac--selected (+ start 6))))
+    (list (org-almanac--title-line
+           (if selectedp org-almanac--selected start) selectedp)
           (org-almanac--weekday-line)
           (mapconcat (lambda (column)
                        (org-almanac--shade-weekend
-                        (org-almanac--calendar-cell (+ start column) nil today)
+                        (org-almanac--calendar-cell (+ start column) today)
                         column))
                      (number-sequence 0 6) ""))))
 
-(defun org-almanac--year-columns ()
-  "Return how many months fit side by side in the calendar's window."
+(defun org-almanac--columns (limit)
+  "Return how many calendars fit side by side in the window, at most LIMIT."
   (let ((window (or (get-buffer-window org-almanac--calendar-buffer)
                     (get-buffer-window org-almanac--buffer)
                     (selected-window))))
-    (max 1 (min org-almanac--year-max-columns
+    (max 1 (min limit
                 (/ (+ (window-body-width window) org-almanac--month-gap -1)
                    (+ org-almanac--calendar-width org-almanac--month-gap))))))
 
-(defun org-almanac--year-lines (today)
-  "Return the twelve months of the selected year as calendar lines, given TODAY."
+(defun org-almanac--side-by-side (blocks)
+  "Return the calendar BLOCKS joined line by line, each a list of lines."
+  (let ((gap (make-string org-almanac--month-gap ?\s)))
+    (apply #'seq-mapn (lambda (&rest parts) (string-join parts gap)) blocks)))
+
+(defun org-almanac--week-page (today)
+  "Return the selected week and the weeks after it that fit, given TODAY."
+  (let ((start (org-almanac--week-start org-almanac--selected)))
+    (org-almanac--side-by-side
+     (mapcar (lambda (index)
+               (org-almanac--week-lines (+ start (* 7 index)) today))
+             (number-sequence
+              0 (1- (org-almanac--columns org-almanac--page-max-columns)))))))
+
+(defun org-almanac--month-page (today)
+  "Return the selected month and the months after it that fit, given TODAY."
+  (let ((day org-almanac--selected)
+        (blocks nil))
+    (dotimes (_ (org-almanac--columns org-almanac--page-max-columns))
+      (push (org-almanac--month-lines day today) blocks)
+      (setq day (1+ (cdr (org-almanac--month-bounds day)))))
+    (org-almanac--side-by-side (nreverse blocks))))
+
+(defun org-almanac--year-page (today)
+  "Return the twelve months of the selected year, given TODAY."
   (let ((year (nth 2 (calendar-gregorian-from-absolute
-                      org-almanac--selected)))
-        (columns (org-almanac--year-columns)))
+                      org-almanac--selected))))
     (mapcan
      (lambda (months)
-       (let ((blocks (mapcar
-                      (lambda (month)
-                        (org-almanac--month-lines
-                         (calendar-absolute-from-gregorian (list month 1 year))
-                         today t))
-                      months))
-             (gap (make-string org-almanac--month-gap ?\s)))
-         (apply #'seq-mapn
-                (lambda (&rest parts) (string-join parts gap))
-                blocks)))
-     (seq-partition (number-sequence 1 12) columns))))
+       (org-almanac--side-by-side
+        (mapcar (lambda (month)
+                  (org-almanac--month-lines
+                   (calendar-absolute-from-gregorian (list month 1 year))
+                   today))
+                months)))
+     (seq-partition (number-sequence 1 12)
+                    (org-almanac--columns org-almanac--year-max-columns)))))
 
 (defun org-almanac--calendar-lines (today)
   "Return the calendar lines for the selected date, given TODAY."
   (let ((lines (pcase org-almanac--size
-                 ('week (org-almanac--week-lines today))
-                 ('month (org-almanac--month-lines
-                          org-almanac--selected today nil))
-                 ('year (org-almanac--year-lines today)))))
+                 ('week (org-almanac--week-page today))
+                 ('month (org-almanac--month-page today))
+                 ('year (org-almanac--year-page today)))))
     (append lines (list (org-almanac--rule (string-width (car lines)))))))
 
 (defun org-almanac--legend-item (kind)
@@ -646,17 +693,21 @@ blank.  A month always has six rows, so months line up and the height is fixed."
 
 (defun org-almanac--legend-lines ()
   "Return the lines naming each kind of entry next to its mark.
-The two lines share three columns, so the kinds line up above each other."
+They read in order of urgency, which decides the mark a date shows; habits
+come last because dates do not show them.  The two lines share three columns,
+so the kinds line up above each other."
   (mapcar
    (lambda (kinds)
-     (pcase-let ((`(,first ,second ,third) kinds))
+     (pcase-let ((`(,first ,second ,third) kinds)
+                 (`(,first-width ,second-width)
+                  org-almanac--legend-column-widths))
        (concat
         (truncate-string-to-width (org-almanac--legend-item first)
-                                  org-almanac--legend-column-width 0 ?\s)
+                                  first-width 0 ?\s)
         (truncate-string-to-width (org-almanac--legend-item second)
-                                  org-almanac--legend-column-width 0 ?\s)
+                                  second-width 0 ?\s)
         (org-almanac--legend-item third))))
-   '((event task deadline) (diary habit done))))
+   '((deadline task event) (diary done habit))))
 
 (defun org-almanac--draw-calendar ()
   "Redraw the calendar from the timeline buffer's state."
@@ -741,16 +792,22 @@ with \\[delete-other-windows], stays closed.")
     (let ((margin (* direction (1+ (window-body-height)))))
       (/= (forward-line margin) 0))))
 
+(defun org-almanac--load-near-edges ()
+  "Load more days while point is within a window of either end."
+  (dolist (direction '(1 -1))
+    (while (and (org-almanac--near-edge direction)
+                (org-almanac--extend direction org-almanac--search-batches)))))
+
 (defun org-almanac--sync ()
-  "Select the date of the line at point whenever point has moved."
+  "Keep the timeline loaded and the selected date on the line at point.
+This runs after every command, because scrolling into the end of the buffer
+moves neither point nor the date."
+  (org-almanac--load-near-edges)
   (unless (eql (point) (marker-position org-almanac--last-point))
     (set-marker org-almanac--last-point (point))
     (let ((day (org-almanac--day-at-point)))
       (when (and day (/= day org-almanac--selected))
         (setq org-almanac--selected day)
-        (dolist (direction '(1 -1))
-          (when (org-almanac--near-edge direction)
-            (org-almanac--extend direction 1)))
         (org-almanac--draw-calendar)))))
 
 (defun org-almanac--move-to-day (day)
@@ -779,14 +836,18 @@ with \\[delete-other-windows], stays closed.")
 
 ;;; Commands
 
-(defun org-almanac--revert (&rest _)
+(defun org-almanac--reload ()
   "Read the agenda files again and redraw around the selected date."
   (org-agenda-prepare-buffers (org-agenda-files nil 'ifmode))
   (org-compile-prefix-format 'agenda)
-  (org-almanac--update-label-face)
   (setq org-almanac--cache (make-hash-table))
   (org-almanac--rebuild org-almanac--selected)
   (org-almanac--select org-almanac--selected))
+
+(defun org-almanac--revert (&rest _)
+  "Read the agenda files again and go back to today."
+  (setq org-almanac--selected (org-almanac--today))
+  (org-almanac--reload))
 
 (defun org-almanac-next-day (&optional n)
   "Select the date N days later."
@@ -889,13 +950,66 @@ with \\[delete-other-windows], stays closed.")
   (interactive nil org-almanac-mode)
   (org-almanac-filter ""))
 
+(defun org-almanac--entry-start ()
+  "Move point to the first line of the entry at point."
+  (let ((marker (org-get-at-bol 'org-marker)))
+    (while (and marker
+                (not (bobp))
+                (eq marker (save-excursion
+                             (forward-line -1)
+                             (org-get-at-bol 'org-marker))))
+      (forward-line -1))))
+
+(defun org-almanac--entry-range ()
+  "Return (START . END) of the entry at point, or of its line if there is none."
+  (let ((marker (org-get-at-bol 'org-marker)))
+    (save-excursion
+      (org-almanac--entry-start)
+      (let ((start (point)))
+        (forward-line 1)
+        (while (and marker (not (eobp))
+                    (eq marker (org-get-at-bol 'org-marker)))
+          (forward-line 1))
+        (cons start (point))))))
+
+(defun org-almanac--clear-current ()
+  "Remove the current entry's highlight, if it still has one."
+  (when org-almanac--current
+    (with-silent-modifications
+      (alter-text-property
+       (car org-almanac--current) (cdr org-almanac--current) 'face
+       (lambda (face)
+         (if (listp face)
+             (remq 'org-almanac-current face)
+           (unless (eq face 'org-almanac-current) face)))))
+    (set-marker (car org-almanac--current) nil)
+    (set-marker (cdr org-almanac--current) nil)
+    (setq org-almanac--current nil)))
+
+(defun org-almanac--highlight-current ()
+  "Highlight the entry at point.
+This is a text property below every other face, not an overlay like
+`hl-line-mode', which would cover the backgrounds of labels and habit graphs."
+  (pcase-let ((`(,start . ,end) (org-almanac--entry-range)))
+    (unless (and org-almanac--current
+                 (= start (car org-almanac--current))
+                 (= end (cdr org-almanac--current)))
+      (org-almanac--clear-current)
+      (with-silent-modifications
+        (add-face-text-property start end 'org-almanac-current t))
+      (setq org-almanac--current
+            (cons (copy-marker start) (copy-marker end))))))
+
 (defun org-almanac--next-event-line (direction)
-  "Move to the next event line towards DIRECTION; return non-nil on success."
+  "Move to the next entry towards DIRECTION; return non-nil on success."
   (let ((start (point))
+        (current (org-get-at-bol 'org-marker))
         (found nil))
     (while (and (not found) (zerop (forward-line direction)) (not (eobp)))
-      (setq found (org-get-at-bol 'org-marker)))
-    (unless found
+      (let ((marker (org-get-at-bol 'org-marker)))
+        (setq found (and marker (not (eq marker current))))))
+    (if found
+        (org-almanac--entry-start)
       (goto-char start))
     found))
 
@@ -988,8 +1102,13 @@ The entry's file is not saved."
        (org-back-to-heading t)
        (setq heading (point-marker))
        (let ((current-prefix-arg arg))
-         (call-interactively command))))
-    (revert-buffer)
+         (call-interactively command))
+       ;; Org logs a state change after the command, which is too late for the
+       ;; redraw below.  A log that needs a note still waits for the user.
+       (when (and (memq 'org-add-log-note post-command-hook)
+                  (memq org-log-note-how '(time state)))
+         (org-add-log-note))))
+    (org-almanac--reload)
     (org-almanac--move-to-entry heading day)
     (set-marker heading nil)))
 
@@ -1105,6 +1224,7 @@ ARG is passed to `org-priority'."
               org-almanac--size org-almanac-default-size
               org-almanac--last-point (make-marker))
   (add-hook 'post-command-hook #'org-almanac--sync nil t)
+  (add-hook 'post-command-hook #'org-almanac--highlight-current nil t)
   (add-hook 'kill-buffer-hook #'org-almanac--clean-up nil t))
 
 ;;;###autoload
@@ -1114,7 +1234,6 @@ ARG is passed to `org-priority'."
   (pop-to-buffer-same-window (get-buffer-create org-almanac--buffer))
   (unless (derived-mode-p 'org-almanac-mode)
     (org-almanac-mode))
-  (setq org-almanac--selected (org-almanac--today))
   (revert-buffer)
   (org-almanac--show-calendar (selected-window))
   (add-hook 'window-buffer-change-functions #'org-almanac--reconcile-windows)
