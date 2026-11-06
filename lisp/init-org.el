@@ -159,11 +159,7 @@
     (denote-rename-buffer-mode 1)))
 
 (setup denote-journal
-  (defun +org-capture-loader ()
-    "Load journal capture configuration, then invoke `org-capture'."
-    (interactive)
-    (require 'denote-journal)
-    (call-interactively #'org-capture))
+  (autoload '+org-capture-loader "lib-org" nil t)
   (keymap-global-set "C-c c" '+org-capture-loader)
   (:when-loaded
     (:also-load lib-weather)
@@ -511,12 +507,7 @@
 
 (setup org-indent
   (:when-loaded
-    (defun +org-indent-blank-prefixes (&rest _)
-      "Display virtual heading indentation as spaces for transparent frames."
-      (dotimes (i (length org-indent--heading-line-prefixes))
-        (when-let* ((prefix (aref org-indent--heading-line-prefixes i)))
-          (aset org-indent--heading-line-prefixes i
-                (subst-char-in-string ?* ?\s prefix)))))
+    (:also-load lib-org)
     (:advice org-indent--compute-prefixes :after #'+org-indent-blank-prefixes)))
 
 (setup org-modern
@@ -529,6 +520,7 @@
                (push '("[-]" . #("□–" 0 2 (composition ((2))))) prettify-symbols-alist)
                (prettify-symbols-mode))))
   (:when-loaded
+    (:also-load lib-org)
     (setopt org-modern-star 'replace
             org-modern-replace-stars "❑❍❑❍❑❍"
             org-modern-list '((?+ . "◦")
@@ -543,21 +535,7 @@
             org-modern-table-horizontal 0.2
             org-modern-checkbox nil
             org-ellipsis "[+]")
-    (defun +org-modern-clear-label-box ()
-      "Remove the label border, which stays opaque on transparent frames."
-      (dolist (face '(org-modern-label org-modern-habit))
-        (set-face-attribute face nil :box nil)))
     (add-hook 'org-modern-mode-hook #'+org-modern-clear-label-box)
-    (defun +org-modern-blank-leading-stars (&rest _)
-      "Display hidden leading stars as spaces when Org Indent is active."
-      (when (bound-and-true-p org-indent-mode)
-        (let ((beg (match-beginning 1))
-              (end (match-end 1)))
-          (when (< beg end)
-            ;; Distinct strings keep each star a separate cursor position.
-            (while (< beg end)
-              (put-text-property beg (1+ beg) 'display (string ?\s))
-              (setq beg (1+ beg)))))))
     (:advice org-modern--star :after #'+org-modern-blank-leading-stars)
     ;; 美化 checkbox，unchecked 和 checked 分别继承 TODO 的 TODO 和 DONE 的颜色。
     ;; https://emacs.stackexchange.com/questions/45291/change-color-of-org-mode-checkboxes

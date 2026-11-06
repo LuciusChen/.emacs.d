@@ -5,18 +5,8 @@
 (setup nov
   (:match-file "*.epub")
   (:when-loaded
-    (:with-hook nov-mode-hook (:hook +nov-annotate-font-lock))
-    (defface +nov-annotate-face
-      '((t (:foreground "#86C166")))
-      "Face for # in nov-annotate-face."
-      :group 'nov-annotate-face)
-
-    (defun +nov-annotate-font-lock ()
-      "Set up font-lock for # in +nov-annotate-face."
-      (font-lock-add-keywords
-       nil
-       '(("『\\(\\(?:.\\|\n\\)*?\\)』" . '+nov-annotate-face)))
-      (font-lock-flush))))
+    (:also-load lib-nov)
+    (:with-hook nov-mode-hook (:hook +nov-annotate-font-lock))))
 
 ;; pdf-view-themed-minor
 ;; Synchronize color filter with the present Emacs theme.

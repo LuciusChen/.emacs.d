@@ -2,6 +2,35 @@
 ;;; Commentary:
 ;;; Code:
 
+(defun +org-capture-loader ()
+  "Load journal capture configuration, then invoke `org-capture'."
+  (interactive)
+  (require 'denote-journal)
+  (call-interactively #'org-capture))
+
+(defun +org-indent-blank-prefixes (&rest _)
+  "Display virtual heading indentation as spaces for transparent frames."
+  (dotimes (i (length org-indent--heading-line-prefixes))
+    (when-let* ((prefix (aref org-indent--heading-line-prefixes i)))
+      (aset org-indent--heading-line-prefixes i
+            (subst-char-in-string ?* ?\s prefix)))))
+
+(defun +org-modern-clear-label-box ()
+  "Remove the label border, which stays opaque on transparent frames."
+  (dolist (face '(org-modern-label org-modern-habit))
+    (set-face-attribute face nil :box nil)))
+
+(defun +org-modern-blank-leading-stars (&rest _)
+  "Display hidden leading stars as spaces when Org Indent is active."
+  (when (bound-and-true-p org-indent-mode)
+    (let ((beg (match-beginning 1))
+          (end (match-end 1)))
+      (when (< beg end)
+        ;; Distinct strings keep each star a separate cursor position.
+        (while (< beg end)
+          (put-text-property beg (1+ beg) 'display (string ?\s))
+          (setq beg (1+ beg)))))))
+
 ;; Save the corresponding buffers
 (defun log-todo-next-creation-date (&rest _)
   "Log NEXT creation time in the property drawer under the key 'ACTIVATED'."

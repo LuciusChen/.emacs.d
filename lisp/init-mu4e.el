@@ -74,6 +74,7 @@
 
 (setup mu4e
   (:when-loaded
+    (:also-load lib-mu4e)
     ;; for sending mails
     (:require smtpmail)
     (setopt mu4e-mu-binary (executable-find "mu")
@@ -179,25 +180,6 @@
                  '("\\*mu4e-update\\*"
                    (display-buffer-below-selected)
                    (window-height . 0.1)))
-    ;; chose from account before sending
-    ;; this is a custom function that works for me.
-    ;; well I stole it somewhere long ago.
-    ;; I suggest using it to make matters easy
-    ;; of course adjust the email adresses and account descriptions
-    (defun +set-msmtp-account ()
-      (if (message-mail-p)
-          (save-excursion
-            (let*
-                ((from (save-restriction
-                         (message-narrow-to-headers)
-                         (message-fetch-field "from")))
-                 (account
-                  (cond
-                   ((string-match "chenyaohua@njcjh.cn" from) "qq")
-                   ((string-match "chenyh572@gmail.com" from) "gmail")
-                   ((string-match "chenyh1013@163.com" from) "163"))))
-              (setq message-sendmail-extra-arguments (list '"-a" account))))))
-
     (add-hook 'message-send-mail-hook '+set-msmtp-account)
 
     ;; Automatically add Cc & Bcc headers in mu4e compose mode.

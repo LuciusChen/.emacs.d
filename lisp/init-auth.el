@@ -21,42 +21,10 @@
     (setenv "GPG_AGENT_INFO" nil)))                  ; Unset GPG_AGENT_INFO environment variable
 
 (setup password-store
-  (defun password-store-generate-password (&optional length no-symbols)
-    "Interactively generate a random password.
-If LENGTH is provided, it specifies the password length.
-If NO-SYMBOLS is non-nil, the password will not contain symbols.
-The default LENGTH is 16."
-    (interactive
-     (list (read-number "Password length: " 16)
-           (not (y-or-n-p "Include symbols? "))))
-    (let* ((chars (concat "abcdefghijklmnopqrstuvwxyz"
-                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                          "0123456789"
-                          (unless no-symbols "!@#$%^&*()-_=+[]{}|;:,.<>?")))
-           (password ""))
-      (dotimes (_ length password)
-        (setq password (concat password (string (elt chars (random (length chars)))))))
-      (kill-new password)
-      (message "Generated password: %s (Copied to clipboard)" password)
-      password))
+  (autoload 'password-store-generate-password "lib-auth" nil t)
 
   (:when-loaded
-    (defun +password-store-insert (entry &optional password)
-      "Insert a new ENTRY containing PASSWORD or the current region if selected."
-      (interactive
-       (list (password-store--completing-read)
-             (if (use-region-p)
-                 (buffer-substring-no-properties (region-beginning) (region-end))
-               (read-passwd "Password: " t))))
-      (let* ((password (or password (read-passwd "Password: " t)))
-             (command (format "echo %s | %s insert -m -f %s"
-                              (shell-quote-argument password)
-                              password-store-executable
-                              (shell-quote-argument entry)))
-             (ret (process-file-shell-command command)))
-        (if (zerop ret)
-            (message "Successfully inserted entry for %s" entry)
-          (message "Cannot insert entry for %s" entry))))
+    (:also-load lib-auth)
 
     (:advice password-store-insert :override +password-store-insert)))
 

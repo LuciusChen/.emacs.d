@@ -82,13 +82,7 @@
     ;;   ((sql-mode . ((sql-product . postgres))))
     ;; This allows Apheleia to use the correct formatter (=pgformatter' for PostgreSQL,
     ;; =sql-neatfmt' for MySQL, =sql-formatter' for others).
-    (defun +setup-sql-formatter ()
-      "Setup SQL formatter based on sql-product."
-      (setq-local apheleia-formatter
-                  (pcase sql-product
-                    ('postgres 'pgformatter)
-                    ('mysql 'sql-neatfmt)
-                    (_ 'sql-formatter))))
+    (:also-load lib-prog)
     (:with-mode sql-mode (:hook +setup-sql-formatter))))
 
 (setup mmm-mode
@@ -181,11 +175,7 @@
   ;;         (when window
   ;;           (select-window window)))))
 
-  (defun +xref-quit-window ()
-    "Quit the xref window."
-    (let ((xref-window (get-buffer-window "*xref*")))
-      (when xref-window
-        (quit-window nil xref-window))))
+  (autoload '+xref-quit-window "lib-prog")
 
   (setopt xref-auto-jump-to-first-xref 'move)
   ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)

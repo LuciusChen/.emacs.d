@@ -107,5 +107,15 @@
   (interactive)
   (apply-theme dark-theme))
 
+;; HACK: close popper window with `C-g'
+(defun +popper-close-window-hack (&rest _)
+  "Close popper window via `C-g'."
+  (when (and (called-interactively-p 'interactive)
+             (not (region-active-p))
+             popper-open-popup-alist)
+    (let ((window (caar popper-open-popup-alist)))
+      (when (window-live-p window)
+        (delete-window window)))))
+
 (provide 'lib-ui)
 ;;; lib-ui.el ends here
