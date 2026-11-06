@@ -51,10 +51,7 @@
           dark-theme 'ashen-night)))
 
 (setup startup
-  (when IS-MAC
-    (apply-theme-based-on-appearance)
-    (:with-hook ns-system-appearance-change-functions
-      (:hook apply-theme-based-on-appearance)))
+  (follow-system-appearance)
 
   (:with-hook window-setup-hook
     (:hook reapply-themes)
