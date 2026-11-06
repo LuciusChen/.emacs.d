@@ -543,6 +543,11 @@
             org-modern-table-horizontal 0.2
             org-modern-checkbox nil
             org-ellipsis "[+]")
+    (defun +org-modern-clear-label-box ()
+      "Remove the label border, which stays opaque on transparent frames."
+      (dolist (face '(org-modern-label org-modern-habit))
+        (set-face-attribute face nil :box nil)))
+    (add-hook 'org-modern-mode-hook #'+org-modern-clear-label-box)
     (defun +org-modern-blank-leading-stars (&rest _)
       "Display hidden leading stars as spaces when Org Indent is active."
       (when (bound-and-true-p org-indent-mode)

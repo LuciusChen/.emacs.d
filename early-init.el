@@ -162,6 +162,8 @@
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(horizontal-scroll-bars) default-frame-alist)
 (push '(undecorated-round . t) default-frame-alist)
+(when (eq system-type 'gnu/linux)
+  (push '(alpha-background . 90) default-frame-alist))
 
 (setq initial-frame-alist '((width . 100) (height . 40)))
 
