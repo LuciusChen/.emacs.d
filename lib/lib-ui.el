@@ -63,11 +63,41 @@
   (reapply-themes)
   (set-dividers-and-fringe-color))
 
+(defun system-appearance ()
+  "Return the system appearance, `light' or `dark'."
+  (cond (IS-MAC ns-system-appearance)
+        ;; The portal's color-scheme is 0 for no preference, 1 dark, 2 light.
+        ((and IS-LINUX
+              (eql 2 (car (ignore-error dbus-error
+                            (dbus-call-method
+                             :session "org.freedesktop.portal.Desktop"
+                             "/org/freedesktop/portal/desktop"
+                             "org.freedesktop.portal.Settings" "ReadOne"
+                             "org.freedesktop.appearance" "color-scheme")))))
+         'light)
+        (t 'dark)))
+
 (defun apply-theme-based-on-appearance (&rest _)
-  "Apply a theme based on the current macOS system appearance."
-  (if (eq ns-system-appearance 'light)
+  "Apply a theme based on the current system appearance."
+  (if (eq (system-appearance) 'light)
       (apply-theme light-theme)
     (apply-theme dark-theme)))
+
+(defun follow-system-appearance ()
+  "Apply a theme now and whenever the system appearance changes."
+  (cond (IS-MAC
+         (add-hook 'ns-system-appearance-change-functions
+                   #'apply-theme-based-on-appearance))
+        (IS-LINUX
+         (require 'dbus)
+         (ignore-error dbus-error
+           (dbus-register-signal
+            :session "org.freedesktop.portal.Desktop"
+            "/org/freedesktop/portal/desktop"
+            "org.freedesktop.portal.Settings" "SettingChanged"
+            #'apply-theme-based-on-appearance
+            :arg0 "org.freedesktop.appearance" :arg1 "color-scheme"))))
+  (apply-theme-based-on-appearance))
 
 (defun light ()
   (interactive)
