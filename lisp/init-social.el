@@ -26,6 +26,7 @@
                 ;; then laguage could be detected automatically
                 ;; for code blocks without language explicitly specified.
                 language-detection)
+    (add-hook 'enable-theme-functions #'+telega-redraw-for-theme)
     ;; palettes 根据使用主题的配色去置换
     (setq telega-builtin-palettes-alist
           '((light

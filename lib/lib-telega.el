@@ -80,5 +80,17 @@ NOTE: macOS only."
                    :disable_content_type_detection nil))
             (message (format "Saved to cloud: %s" fname))))))))
 
+(defun +telega-redraw-for-theme (&rest _)
+  "Redraw telega buffers so palette colors follow the enabled theme.
+Telega inserts palette colors into the text as literal values."
+  (when (get-buffer telega-root-buffer-name)
+    (telega-root-view--redisplay)
+    (dolist (chatbuf (telega-chat-buffers))
+      (with-current-buffer chatbuf
+        (with-telega-buffer-modify
+         (telega-save-cursor
+           (telega-chatbuf--footer-update)
+           (ewoc-refresh telega-chatbuf--ewoc)))))))
+
 (provide 'lib-telega)
 ;;; lib-telega.el ends here
