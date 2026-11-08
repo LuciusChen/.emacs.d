@@ -106,11 +106,14 @@
 (require 'init-minibuffer)
 (require 'init-completion)
 (require 'init-prog)
+(require 'init-tools)
 (require 'init-nav)
 (require 'init-transient)
 
 (require 'init-org)
 (require 'init-reader)
+(require 'init-ai)
+(require 'init-knowledge)
 
 (require 'init-social)
 (require 'init-mu4e)

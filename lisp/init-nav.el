@@ -84,5 +84,14 @@
          "C-x C-d" consult-dir
          "C-x C-j" consult-dir-jump-file)))))
 
+(setup (:warm projectile)
+  (:when-loaded
+    (:also-load projectile-consult)
+    (projectile-mode +1)
+    (setopt projectile-project-search-path '("~/IdeaProjects/")
+            projectile-per-command-compilation-buffer t)
+    (:with-map projectile-command-map
+      (:bind "f" projectile-consult-find-file))))
+
 (provide 'init-nav)
 ;;; init-nav.el ends here

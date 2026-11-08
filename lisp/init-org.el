@@ -571,6 +571,13 @@
                  (if (eq (call-process "hugo" nil nil) 0)
                      (message "Hugo compilation successful")
                    (message "Hugo compilation failed")))))))
+(setup citar-denote
+  (:load-after denote)
+  (:when-loaded
+    (setopt citar-denote-use-bib-keywords t
+            citar-denote-subdir "bib-notes")
+    (citar-denote-mode)))
+
 ;; Org calendar: a week, month or year calendar linked to a timeline.
 (setup org-almanac
   (:with-function org-almanac (:autoload-this nil t))
