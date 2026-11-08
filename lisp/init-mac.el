@@ -51,7 +51,7 @@
 
 (setup (:only-if (fboundp 'mac-input-source))
   (:require lib-ime)
-  (keymap-global-set "<f13>" 'toggle-ime))
+  (keymap-global-set "<f13>" '+toggle-ime))
 
 (setup (:only-if (not (display-graphic-p)))
   (defun +paste-from-osx ()
