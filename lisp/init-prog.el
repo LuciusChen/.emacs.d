@@ -126,7 +126,7 @@
 ;; https://stackoverflow.com/questions/27704367/emacs-how-to-set-the-default-database-type-for-a-sql-file-in-sql-mode
 (setup sql
   (:when-loaded
-    (:also-load lib-format)
+    (:also-load lib-mybatis)
     ;; Replace MyBatis tags with placeholders for clean SQL editing.
     ;; Formatting delegated to apheleia; tags restored after editing.
     (:with-map sql-mode-map (:bind "C-c '" +mybatis-edit-sql-block))
@@ -154,7 +154,7 @@
             flymake-inline-diagnostics 'eol)))
 
 (setup js
-  (:also-load lib-js)
+  (:also-load lib-prog)
   (:when-loaded
     (setopt js-indent-level 2)
     (+major-mode-lighter 'js-mode "JS")
@@ -165,7 +165,6 @@
   (autoload '+xref-quit-window "lib-prog")
 
   (setopt xref-auto-jump-to-first-xref 'move)
-  ;; (setq xref-show-xrefs-function #'+xref-show-xrefs)
   (:with-hook xref-after-jump-hook (:hook +xref-quit-window)))
 
 (setup treesit

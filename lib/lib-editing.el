@@ -56,5 +56,13 @@
       (setq goggles--changes nil
             goggles--delta 0))))
 
+(defun +open-in-marked ()
+  "Open the current file in Marked 2."
+  (interactive)
+  (unless buffer-file-name
+    (user-error "Must be visiting a file"))
+  (call-process-shell-command
+   (format "open -a \"Marked 2\" \"%s\"" buffer-file-name)))
+
 (provide 'lib-editing)
 ;;; lib-editing.el ends here

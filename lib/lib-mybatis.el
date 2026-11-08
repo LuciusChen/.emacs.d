@@ -1,4 +1,4 @@
-;;; lib-format.el --- MyBatis SQL editor -*- lexical-binding: t -*-
+;;; lib-mybatis.el --- MyBatis SQL editor -*- lexical-binding: t -*-
 ;;; Commentary:
 ;; Provides functionality to edit MyBatis SQL blocks in a separate buffer
 ;; with proper SQL syntax highlighting and formatting.
@@ -470,5 +470,5 @@ This does not modify the current buffer."
     (set-window-configuration window-config)
     (message "Edit aborted")))
 
-(provide 'lib-format)
-;;; lib-format.el ends here
+(provide 'lib-mybatis)
+;;; lib-mybatis.el ends here

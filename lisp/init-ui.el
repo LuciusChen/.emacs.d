@@ -97,6 +97,16 @@
 ;; Warm the mode-line ahead of the other `:warm' entries.
 (setup-idle-require 'doom-modeline)
 
+(setup doom-modeline
+  (:when-loaded
+    (setopt doom-modeline-height 18
+            doom-modeline-buffer-file-name-style 'auto
+            doom-modeline-buffer-modification-icon t
+            doom-modeline-bar-width 4
+            doom-modeline-hud t
+            doom-modeline-hud-min-height 1)
+    (doom-modeline-mode)))
+
 (setup (:warm popper)
   (:with-function (popper-cycle popper-toggle-type)
     (:autoload-this nil t))

@@ -34,16 +34,6 @@
   ;; 只有当需要补全的字符数大于 4 时才执行循环补全。
   (setopt completion-cycle-threshold 4))
 
-(setup doom-modeline
-  (:when-loaded
-    (setopt doom-modeline-height 18
-            doom-modeline-buffer-file-name-style 'auto
-            doom-modeline-buffer-modification-icon t
-            doom-modeline-bar-width 4
-            doom-modeline-hud t
-            doom-modeline-hud-min-height 1)
-    (doom-modeline-mode)))
-
 (setup (:require vertico)
   (setopt vertico-cycle t)
   (vertico-mode))

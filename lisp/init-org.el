@@ -86,7 +86,7 @@
 
 (setup org-archive
   (:when-loaded
-    (:also-load lib-org-archive-hierachical)
+    (:also-load lib-org-archive-hierarchical)
     (setopt org-archive-mark-done nil
             org-archive-location "%s_archive::* Archive")
     ;; Third-party commands are supported here, but Org's Custom type only
@@ -571,5 +571,19 @@
                  (if (eq (call-process "hugo" nil nil) 0)
                      (message "Hugo compilation successful")
                    (message "Hugo compilation failed")))))))
+;; Org calendar: a week, month or year calendar linked to a timeline.
+(setup org-almanac
+  (:with-function org-almanac (:autoload-this nil t))
+  (:with-feature org-agenda
+    (:when-loaded
+      (add-to-list 'org-agenda-custom-commands
+                   '("c" "Calendar" (lambda (_) (org-almanac)))))))
+
+;; weft: org semantic kernel.  Nothing is loaded at startup: the commands
+;; autoload, and the index watcher starts when Emacs has been idle.
+(setq weft-vaults (list ORG-PATH)
+      weft-recipes '(dg study))
+(run-with-idle-timer 3 nil (lambda () (weft-mode 1)))
+
 (provide 'init-org)
 ;;; init-org.el ends here

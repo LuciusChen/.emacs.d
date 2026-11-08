@@ -1,4 +1,4 @@
-;; lib-org-archive-hierachical.el --- Initialize org	-*- lexical-binding: t; -*-
+;; lib-org-archive-hierarchical.el --- Initialize org	-*- lexical-binding: t; -*-
 ;; (setq org-archive-mark-done nil)
 ;; (setq org-archive-location "%s_archive::* Archive")
 
@@ -124,5 +124,5 @@ belongs as a list."
 (defun org-archive-subtree ()
   (org-archive-subtree-hierarchical))
 ;;;; provide
-(provide 'lib-org-archive-hierachical)
-;;; lib-org-archive-hierachical.el ends here.
+(provide 'lib-org-archive-hierarchical)
+;;; lib-org-archive-hierarchical.el ends here.
