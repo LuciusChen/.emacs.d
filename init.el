@@ -54,13 +54,13 @@
   '(nov sis plz avy mpv cape citar setup nerd-icons corfu forge denote
         alert popper embark bibtex vertico nerd-icons-corfu diredfl
         cdlatex pyvenv consult mmm-mode swift-mode citar-denote meow
-        diff-hl goggles flymake web-mode doom-modeline
-        webpaste apheleia mastodon pdf-tools consult-dir denote-org
-        macrostep orderless git-modes git-blamed denote-journal
+        diff-hl goggles web-mode doom-modeline
+        apheleia mastodon pdf-tools consult-dir denote-org
+        macrostep orderless git-modes denote-journal
         org-modern ace-pinyin marginalia org-remark dape denote-markdown
         org-cliplink language-detection ox-pandoc breadcrumb indent-bars
         embark-consult rainbow-delimiters rainbow-mode hnview
-        command-log-mode password-store nerd-icons-completion ox-hugo
+        password-store nerd-icons-completion ox-hugo
         password-store-otp projectile package-lint clutch mysql pgsql
         ghostel gptel
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")

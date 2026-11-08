@@ -34,7 +34,7 @@
   ;; 只有当需要补全的字符数大于 4 时才执行循环补全。
   (setopt completion-cycle-threshold 4))
 
-(setup (:warm doom-modeline)
+(setup doom-modeline
   (:when-loaded
     (setopt doom-modeline-height 18
             doom-modeline-buffer-file-name-style 'auto

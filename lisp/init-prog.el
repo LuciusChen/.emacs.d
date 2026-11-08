@@ -1,4 +1,4 @@
-;;; init-prog.el --- Measure startup and require times -*- lexical-binding: t -*-
+;;; init-prog.el --- Programming language support -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -162,19 +162,6 @@
     (+major-mode-lighter 'js-jsx-mode "JSX")))
 
 (setup xref
-  ;; 用 Popper 替代了 +xref-show-xrefs 以及 setopt 配置
-  ;;
-  ;;   (defun +xref-show-xrefs (fetcher display-action)
-  ;;     "Display some Xref values produced by FETCHER using DISPLAY-ACTION.
-  ;; Do not jump to the first xref, just move the focus to the xref window."
-  ;;     (let ((buf (xref--show-xref-buffer fetcher
-  ;;                                        `((window . ,(selected-window))
-  ;;                                          (display-action . ,display-action)
-  ;;                                          (auto-jump . nil)))))
-  ;;       (let ((window (get-buffer-window buf)))
-  ;;         (when window
-  ;;           (select-window window)))))
-
   (autoload '+xref-quit-window "lib-prog")
 
   (setopt xref-auto-jump-to-first-xref 'move)
@@ -319,10 +306,6 @@
           pyvenv-post-deactivate-hooks
           (list (lambda ()
                   (setq python-shell-interpreter "python3"))))))
-
-(setup webpaste
-  (:when-loaded
-    (setopt webpaste-provider-priority '("paste.rs" "dpaste.com"))))
 
 (setup clutch
   (:with-mode clutch-mode (:match-file "*.sql"))
