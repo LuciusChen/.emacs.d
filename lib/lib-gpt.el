@@ -54,14 +54,12 @@
 ;; brave 免费额度 2000 次/月
 (defun brave-search-query (query)
   "Perform a web search using the Brave Search API with the given QUERY."
-  (let ((url-request-method "GET")
-        (url-request-extra-headers `(("X-Subscription-Token" . ,brave-search-api-key)))
+  (let ((url-request-extra-headers `(("X-Subscription-Token" . ,brave-search-api-key)))
         (url (format "https://api.search.brave.com/res/v1/web/search?q=%s" (url-encode-url query))))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (when (re-search-forward "^$" nil 'move)
-        (let ((json-object-type 'hash-table)) ; Use hash-table for JSON parsing
-          (json-parse-string (buffer-substring-no-properties (point) (point-max))))))))
+        (json-parse-string (buffer-substring-no-properties (point) (point-max)))))))
 
 (defvar +gptel-tools
   (list

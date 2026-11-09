@@ -33,7 +33,7 @@
 
 ;; Save the corresponding buffers
 (defun log-todo-next-creation-date (&rest _)
-  "Log NEXT creation time in the property drawer under the key 'ACTIVATED'."
+  "Log NEXT creation time in the property drawer under the key \"ACTIVATED\"."
   (when (and (string= (org-get-todo-state) "NEXT")
              (not (org-entry-get nil "ACTIVATED")))
     (org-entry-put nil "ACTIVATED" (format-time-string "[%Y-%m-%d]"))))
@@ -51,10 +51,10 @@
   (when (and (or (equal org-state "DONE")
                  (equal org-state "CANCELLED"))
              (not (org-find-property "STYLE")))
+    (require 'org-refile)
     (let ((org-refile-keep t) ;; Set this to nil to delete the original!
           (org-after-refile-insert-hook #'save-buffer)
           today-file
-          pos
           tasks-pos)
       (save-window-excursion
         (org-capture t "a")
@@ -165,6 +165,7 @@
 (defun +org-refile-anywhere (&optional goto default-buffer rfloc msg)
   "A version of `org-refile' which allows refiling to any subtree."
   (interactive "P")
+  (require 'org-refile)
   (let ((org-refile-target-verify-function))
     (org-refile goto default-buffer rfloc msg)))
 
@@ -298,7 +299,7 @@ If DEST, a buffer, is provided, insert the markup there."
       (message "Running defuddle for %s..." source))))
 
 (defun get-today-heading ()
-  "Return today's date as a headline in the format 'Sat, 08 Mar 2025', creating it if necessary."
+  "Return today's date as a headline in the format \"Sat, 08 Mar 2025\", creating it if necessary."
   (let ((date-headline (format-time-string "%a, %d %b %Y")))
     (save-excursion
       (goto-char (point-min))
@@ -313,7 +314,7 @@ If DEST, a buffer, is provided, insert the markup there."
   "Ensure today's date as a headline and SUBHEADING under it in the buffer.
 Return a list containing the date headline and the SUBHEADING.
 
-This function searches for today's date formatted as 'Sat, 08 Mar 2025'.
+This function searches for today's date formatted as \"Sat, 08 Mar 2025\".
 If it doesn't exist, it creates it. Then, it ensures that the specified
 SUBHEADING exists under today's date, adding it if necessary."
   (let ((date-headline (format-time-string "%a, %d %b %Y")))

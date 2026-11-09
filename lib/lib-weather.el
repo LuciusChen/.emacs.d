@@ -2,14 +2,14 @@
 ;;; Commentary:
 ;;; Code:
 
-(defvar latitude "32.09703")
-(defvar longitude "118.77969")
+(defvar +weather-latitude "32.09703"
+  "Latitude used for the weather forecast.")
+(defvar +weather-longitude "118.77969"
+  "Longitude used for the weather forecast.")
 
 (defun fetch-weather-data (&rest _)
   "Fetch weather data from API and return weather string."
-  (let ((url-request-method "GET")
-        (url-request-extra-headers '(("Content-Type" . "application/json")))
-        (url (format "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=Asia%%2FSingapore&forecast_days=1" latitude longitude)))
+  (let ((url (format "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=Asia%%2FSingapore&forecast_days=1" +weather-latitude +weather-longitude)))
     (with-current-buffer (url-retrieve-synchronously url)
       (goto-char (point-min))
       (re-search-forward "^$")

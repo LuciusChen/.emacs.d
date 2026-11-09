@@ -35,18 +35,17 @@
   (funcall bounds-fn))
 
 (cl-defmethod gt-thing-at-point ((_ (eql 'xxx)) (_ (eql 'mastodon-mode)))
-  (let (bds)
-    (cond
-     ;; Check if the current line is a toot
-     ((get-text-property (point) 'item-json)
-      (message "Toot detected at point.")
-      (mastodon-translate-text #'find-toot-text-bounds))
-     ;; Otherwise, assume we are dealing with a profile
-     ((mastodon-tl--profile-buffer-p)
-      (message "Profile detected.")
-      (mastodon-translate-text #'find-profile-note-bounds))
-     (t
-      (user-error "Not in a recognizable Mastodon buffer")))))
+  (cond
+   ;; Check if the current line is a toot
+   ((get-text-property (point) 'item-json)
+    (message "Toot detected at point.")
+    (mastodon-translate-text #'find-toot-text-bounds))
+   ;; Otherwise, assume we are dealing with a profile
+   ((mastodon-tl--profile-buffer-p)
+    (message "Profile detected.")
+    (mastodon-translate-text #'find-profile-note-bounds))
+   (t
+    (user-error "Not in a recognizable Mastodon buffer"))))
 
 (defun mastodon-detect-and-translate ()
   "Detect the content type under the cursor and translate it using `gt`."
