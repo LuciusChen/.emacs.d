@@ -74,20 +74,18 @@ belongs as a list."
   (interactive)
   (let ((org-tree (org-archive-subtree-hierarchical--org-struct-subtree))
         (this-buffer (current-buffer))
-        (file (abbreviate-file-name
-               (or (buffer-file-name (buffer-base-buffer))
-                   (error "No file associated to buffer")))))
+        (_file (abbreviate-file-name
+                (or (buffer-file-name (buffer-base-buffer))
+                    (error "No file associated to buffer"))))
+        location afile visiting buffer)
     (save-excursion
       (setq location org-archive-location
             afile (car (org-archive--compute-location
-                        (or (org-entry-get nil "ARCHIVE" 'inherit) location)))
-            ;; heading (org-extract-archive-heading location)
-            infile-p (equal file (abbreviate-file-name (or afile ""))))
+                        (or (org-entry-get nil "ARCHIVE" 'inherit) location))))
       (unless afile
         (error "Invalid `org-archive-location'"))
       (if (> (length afile) 0)
-          (setq newfile-p (not (file-exists-p afile))
-                visiting (find-buffer-visiting afile)
+          (setq visiting (find-buffer-visiting afile)
                 buffer (or visiting (find-file-noselect afile)))
         (setq buffer (current-buffer)))
       (unless buffer
@@ -121,8 +119,6 @@ belongs as a list."
     (newline)
     (org-insert-struct (cdr struct))))
 
-(defun org-archive-subtree ()
-  (org-archive-subtree-hierarchical))
 ;;;; provide
 (provide 'lib-org-archive-hierarchical)
 ;;; lib-org-archive-hierarchical.el ends here.
