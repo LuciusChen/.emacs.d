@@ -347,7 +347,6 @@ All `#{...}` and `${...}` parameters are replaced by `?`."
 
 ;;; Interactive commands
 
-;;;###autoload
 (defun +mybatis-edit-sql-block ()
   "Edit MyBatis SQL block in a separate buffer with sql-mode."
   (interactive)
@@ -392,7 +391,6 @@ All `#{...}` and `${...}` parameters are replaced by `?`."
 
         (pop-to-buffer edit-buffer)))))
 
-;;;###autoload
 (defun +mybatis-copy-sql-for-client ()
   "Copy current MyBatis SQL block as client-executable SQL.
 The copied SQL is extracted from mapper XML and parameters are replaced with `?`.
@@ -409,7 +407,6 @@ This does not modify the current buffer."
         (kill-new client-sql)
         (message "Copied MyBatis SQL for client execution (%d chars)" (length client-sql))))))
 
-;;;###autoload
 (defun +mybatis-commit-sql-block ()
   "Commit the edited SQL back to the original MyBatis XML."
   (interactive)
@@ -438,7 +435,7 @@ This does not modify the current buffer."
                                    raw-op-count))
                  (setq edited-sql (+mybatis--encode-raw-xml-operators edited-sql))
                (user-error "Aborted: raw < or > operators are not XML-safe")))
-            ('ignore nil))))))
+            ('ignore nil)))))
 
     (let ((decoded-sql (+mybatis--decode-sql-from-editing
                         edited-sql placeholder-maps base-indent +mybatis-roundtrip-mode)))
@@ -456,9 +453,8 @@ This does not modify the current buffer."
 
       (kill-buffer)
       (set-window-configuration window-config)
-      (message "SQL block updated"))
+      (message "SQL block updated")))
 
-;;;###autoload
 (defun +mybatis-abort-sql-block ()
   "Abort editing and close the SQL edit buffer."
   (interactive)
