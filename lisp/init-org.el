@@ -586,11 +586,5 @@
       (add-to-list 'org-agenda-custom-commands
                    '("c" "Calendar" (lambda (_) (org-almanac)))))))
 
-;; weft: org semantic kernel.  Nothing is loaded at startup: the commands
-;; autoload, and the index watcher starts when Emacs has been idle.
-(setq weft-vaults (list ORG-PATH)
-      weft-recipes '(dg study))
-(run-with-idle-timer 3 nil (lambda () (weft-mode 1)))
-
 (provide 'init-org)
 ;;; init-org.el ends here

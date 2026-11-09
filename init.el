@@ -85,8 +85,6 @@
         (lorniu :host github :repo "lorniu/dropbox.el")
         (tramp-rpc :host github :repo "ArthurHeymans/emacs-tramp-rpc")
         (yasnippet :host github :repo "joaotavora/yasnippet")
-        (weft :type nil :local-repo "~/repos/weft"
-              :files (:defaults "recipes" "data"))
         (mu :host github :repo "djcb/mu" :files (:defaults "mu4e/*.el"))))
 
 (dolist (e USE-PACKAGE-LIST) (straight-use-package e))
