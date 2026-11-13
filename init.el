@@ -62,7 +62,7 @@
         embark-consult rainbow-delimiters rainbow-mode hnview
         password-store nerd-icons-completion ox-hugo
         password-store-otp projectile package-lint clutch mysql pgsql
-        ghostel gptel
+        gptel
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch")
@@ -104,7 +104,6 @@
 (require 'init-minibuffer)
 (require 'init-completion)
 (require 'init-prog)
-(require 'init-tools)
 (require 'init-nav)
 (require 'init-transient)
 
