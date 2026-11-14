@@ -1,0 +1,899 @@
+From fb60828d71df7f328df0b2d39be9fff21d099fc1 Mon Sep 17 00:00:00 2001
+From: Lucius <chenyh572@gmail.com>
+Date: Fri, 13 Nov 2026 14:04:18 +0800
+Subject: [PATCH] Add optional animation of the cursor
+
+Let the cursor be stretched between its old and its new position, with a
+trail behind it, and shrink into the new one, instead of jumping there,
+when 'cursor-animation-duration' is a number.  While it moves, the
+cursor is not drawn in its new position, the terminal shows it, and when
+the movement is over, Emacs draws the cursor and the terminal stops
+showing it.  What moves and how is computed in xdisp.c, so that
+terminals only have to show it; implement that on macOS and on PGTK.
+The cursor on an image does not move like this.
+
+* src/frame.h (struct cursor_glide): New struct.
+(struct frame): New member 'cursor_glide'.
+* src/dispextern.h (struct redisplay_interface): New member
+'glide_cursor'.
+(gui_glide_cursor, gui_cursor_glide_shape, gui_cursor_glide_progress)
+(gui_cursor_glide_land): Declare.
+* src/xdisp.c (glide_now, glide_ease_out, glide_corners)
+(gui_cursor_glide_shape, gui_cursor_glide_progress, gui_glide_cursor)
+(gui_cursor_glide_land): New functions.
+(display_and_set_cursor): Call 'gui_glide_cursor'.
+(syms_of_xdisp): Define 'cursor-animation-duration'.
+* src/nsterm.h (EmacsView): New member 'cursorGlide'.
+(EmacsView.cursorGlide): New method.
+(EmacsCursorGlide): New class.
+* src/nsterm.m (EmacsCursorGlide): Implement it.
+(ns_glide_cursor): New function.
+(ns_redisplay_interface): Use it.
+(-[EmacsView dealloc]): Release 'cursorGlide'.
+* src/pgtkterm.h (struct pgtk_output): New members 'glide_tick' and
+'glide_timeout'.
+* src/pgtkterm.c (pgtk_glide_stop, pgtk_glide_tick, pgtk_glide_land)
+(pgtk_glide_cursor, pgtk_glide_path, pgtk_paint_glide): New functions.
+(pgtk_redisplay_interface): Use 'pgtk_glide_cursor'.
+(pgtk_handle_draw): Call 'pgtk_paint_glide'.
+(pgtk_free_frame_resources): Call 'pgtk_glide_stop'.
+* lisp/cus-start.el (standard): Add 'cursor-animation-duration'.
+* doc/emacs/display.texi (Cursor Display): Document it.
+* etc/NEWS: Announce it.
+---
+ doc/emacs/display.texi |  10 ++
+ etc/NEWS               |   6 ++
+ lisp/cus-start.el      |   4 +
+ src/dispextern.h       |  12 +++
+ src/frame.h            |  30 ++++++
+ src/nsterm.h           |  22 ++++
+ src/nsterm.m           | 194 ++++++++++++++++++++++++++++++++-
+ src/pgtkterm.c         |  91 ++++++++++++++++
+ src/pgtkterm.h         |   3 +
+ src/xdisp.c            | 240 ++++++++++++++++++++++++++++++++++++++++-
+ 10 files changed, 610 insertions(+), 2 deletions(-)
+
+diff --git a/doc/emacs/display.texi b/doc/emacs/display.texi
+index a0e59d6bda0..02d4fc40eac 100644
+--- a/doc/emacs/display.texi
++++ b/doc/emacs/display.texi
+@@ -2146,6 +2146,16 @@ Cursor Display
+ thinner bar.)  To turn off cursors in non-selected windows, change the
+ variable @code{cursor-in-non-selected-windows} to @code{nil}.
+ 
++@vindex cursor-animation-duration
++@cindex cursor animation
++  If you set the variable @code{cursor-animation-duration} to a number
++of seconds, the cursor is stretched between its old and its new
++position, with a trail behind it, and shrinks into the new position
++over that time, instead of jumping there at once.  A value around 0.1
++looks smooth without getting in the way when typing.  The cursor does
++not move like this on images.  This is only supported on macOS and on
++GTK with Wayland.
++
+ @node Line Truncation
+ @section Line Truncation
+ 
+diff --git a/etc/NEWS b/etc/NEWS
+index 15624bc558d..e96d833b759 100644
+--- a/etc/NEWS
++++ b/etc/NEWS
+@@ -63,6 +63,12 @@ set similarly to 'setopt-local'; i.e., if a user option has a defcustom
+ ':set' function, that function will be invoked.
+ 
+ ---
++** New user option 'cursor-animation-duration'.
++If set to a number of seconds, the cursor is stretched between its old
++and its new position, with a trail behind it, and shrinks into the new
++position over that time, instead of jumping there.  This is only
++supported on macOS and on GTK with Wayland (PGTK).
++
+ ** New user option 'setopt-local-type-mismatch'.
+ This option controls what 'setopt-local' does when it detects a type
+ mismatch between the specified value and the ':type' specification of a
+diff --git a/lisp/cus-start.el b/lisp/cus-start.el
+index 5b8b9dcfdc7..9365cf8fdaa 100644
+--- a/lisp/cus-start.el
++++ b/lisp/cus-start.el
+@@ -723,6 +723,10 @@ minibuffer-prompt-properties--setter
+ 			      "24.3")
+ 	     (unibyte-display-via-language-environment mule boolean)
+ 	     (blink-cursor-alist cursor alist "22.1")
++             (cursor-animation-duration cursor
++                                        (choice (const :tag "Off" nil)
++                                                number)
++                                        "32.1")
+ 	     (overline-margin display integer "22.1")
+ 	     (underline-minimum-offset display integer "23.1")
+              (mouse-autoselect-window
+diff --git a/src/dispextern.h b/src/dispextern.h
+index 3114cdfcec9..4033c996d03 100644
+--- a/src/dispextern.h
++++ b/src/dispextern.h
+@@ -3192,6 +3192,11 @@ reset_mouse_highlight (Mouse_HLInfo *hlinfo)
+   /* Called to (re)calculate the default face when changing the font
+      backend.  */
+   void (*default_font_parameter) (struct frame *f, Lisp_Object parms);
++
++  /* Show the cursor of frame F moving, as described by its
++     `cursor_glide', if SHOW is true, or stop showing it.  Not all
++     terminals have this function.  */
++  void (*glide_cursor) (struct frame *f, bool show);
+ #endif /* HAVE_WINDOW_SYSTEM */
+ };
+ 
+@@ -3654,6 +3659,13 @@ #define DEFAULT_TOOL_BAR_IMAGE_HEIGHT 24
+ extern void erase_phys_cursor (struct window *);
+ extern void display_and_set_cursor (struct window *, bool, int, int, int, int);
+ extern void gui_update_cursor (struct frame *, bool);
++extern bool gui_glide_cursor (struct window *, struct glyph_row *,
++			      struct glyph *, int, int,
++			      enum text_cursor_kinds, int, bool);
++extern void gui_cursor_glide_shape (struct frame *, double, double[4][2],
++				    double[4][2]);
++extern double gui_cursor_glide_progress (struct frame *);
++extern void gui_cursor_glide_land (struct frame *);
+ extern void gui_clear_cursor (struct window *);
+ extern void gui_draw_vertical_border (struct window *w);
+ extern void gui_draw_right_divider (struct window *w);
+diff --git a/src/frame.h b/src/frame.h
+index 64d8a74f36e..6eccd943ffe 100644
+--- a/src/frame.h
++++ b/src/frame.h
+@@ -142,6 +142,33 @@ #define EMACS_FRAME_H
+ 
+ /* The structure representing a frame.  */
+ 
++#ifdef HAVE_WINDOW_SYSTEM
++/* State of the animation of the cursor of a frame moving to a new
++   position, see `gui_glide_cursor' in xdisp.c.  Windows are identified
++   by their sequence numbers, 0 for none, and positions are in pixels of
++   the frame.  */
++
++struct cursor_glide
++{
++  /* The window and the rectangle (x, y, width, height) that the cursor
++     was last drawn in, unless it was on an image.  */
++  EMACS_INT last_window;
++  int last_rect[4];
++
++  /* The window and the position in it of the cursor that is not drawn
++     while it moves, because the terminal shows it.  */
++  EMACS_INT flight_window;
++  int flight_x, flight_y;
++
++  /* The corners of the quadrilateral that shows it at the beginning and
++     at the end of the movement, and how late each gets to the end.  */
++  double from[4][2], to[4][2], late[4];
++
++  /* When the movement began, and how long it takes, in seconds.  */
++  double start, duration;
++};
++#endif
++
+ struct frame
+ {
+   union vectorlike_header header;
+@@ -713,6 +740,9 @@ #define EMACS_FRAME_H
+   /* Background opacity */
+   double alpha_background;
+ 
++  /* The cursor moving to a new position.  */
++  struct cursor_glide cursor_glide;
++
+   /* Exponent for gamma correction of colors.  1/(VIEWING_GAMMA *
+      SCREEN_GAMMA) where viewing_gamma is 0.4545 and SCREEN_GAMMA is a
+      frame parameter.  0 means don't do gamma correction.  */
+diff --git a/src/nsterm.h b/src/nsterm.h
+index 69f565d51f9..745b4c9d6d6 100644
+--- a/src/nsterm.h
++++ b/src/nsterm.h
+@@ -461,6 +461,7 @@ #define NSTRACE_UNSILENCE()
+ 
+ @class EmacsToolbar;
+ @class EmacsLayer;
++@class EmacsCursorGlide;
+ 
+ #ifdef NS_IMPL_COCOA
+ @interface EmacsView : NSView <NSTextInput, NSTextInputClient, NSWindowDelegate>
+@@ -471,6 +472,9 @@ #define NSTRACE_UNSILENCE()
+ #ifdef NS_IMPL_COCOA
+   char *old_title;
+   BOOL maximizing_resize;
++#endif
++#if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MIN_REQUIRED >= 101400
++  EmacsCursorGlide *cursorGlide;
+ #endif
+   BOOL font_panel_active;
+   NSFont *font_panel_result;
+@@ -505,6 +509,9 @@ #define NSTRACE_UNSILENCE()
+ - (void) toggleFullScreen: (id) sender;
+ - (BOOL) fsIsNative;
+ - (BOOL) isFullscreen;
++#if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MIN_REQUIRED >= 101400
++- (EmacsCursorGlide *) cursorGlide;
++#endif
+ #if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
+ - (void) updateCollectionBehavior;
+ #endif
+@@ -749,6 +756,7 @@ #define NSTRACE_UNSILENCE()
+ @end
+ 
+ #if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MIN_REQUIRED >= 101400
++#include <QuartzCore/QuartzCore.h>
+ @interface EmacsLayer : CALayer
+ {
+   NSMutableArray *cache;
+@@ -761,6 +769,20 @@ #define NSTRACE_UNSILENCE()
+ - (void) setColorSpace: (CGColorSpaceRef)cs;
+ - (void) setDoubleBuffered: (bool)db;
+ - (CGContextRef) getContext;
++- (CGColorSpaceRef) colorSpace;
++@end
++
++/* Shows the cursor of a frame moving, see nsterm.m.  */
++@interface EmacsCursorGlide : NSObject
++{
++  EmacsView *view;
++  struct frame *frame;
++  CAShapeLayer *head, *trail;
++}
++- (id) initWithView: (EmacsView *)v frame: (struct frame *)f;
++- (void) detach;
++- (void) show;
++- (void) hide;
+ @end
+ #endif
+ 
+diff --git a/src/nsterm.m b/src/nsterm.m
+index fa66b0e9c2c..2b6f7de6dd2 100644
+--- a/src/nsterm.m
++++ b/src/nsterm.m
+@@ -3291,6 +3291,20 @@ Hide the window (X11 semantics)
+ }
+ 
+ 
++#if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MIN_REQUIRED >= 101400
++static void
++ns_glide_cursor (struct frame *f, bool show)
++/* --------------------------------------------------------------------------
++     External (RIF): Show the cursor of F moving, or stop.
++   -------------------------------------------------------------------------- */
++{
++  if (show)
++    [[FRAME_NS_VIEW (f) cursorGlide] show];
++  else
++    [[FRAME_NS_VIEW (f) cursorGlide] hide];
++}
++#endif
++
+ static void
+ ns_draw_window_cursor (struct window *w, struct glyph_row *glyph_row,
+ 		       int x, int y, enum text_cursor_kinds cursor_type,
+@@ -5831,7 +5845,10 @@ static Lisp_Object ns_string_to_lispmod (const char *s)
+   ns_shift_glyphs_for_insert,
+   ns_show_hourglass,
+   ns_hide_hourglass,
+-  ns_default_font_parameter
++  ns_default_font_parameter,
++#if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MIN_REQUIRED >= 101400
++  ns_glide_cursor
++#endif
+ };
+ 
+ #ifdef NS_IMPL_COCOA
+@@ -7069,6 +7086,8 @@ - (void)dealloc
+   /* Release layer and menu */
+   EmacsLayer *layer = (EmacsLayer *)[self layer];
+   [layer release];
++  [cursorGlide detach];
++  [cursorGlide release];
+ #endif
+ 
+   [[self menu] release];
+@@ -9199,6 +9218,16 @@ - (void) setFSValue: (int)value
+   fs_state = value;
+ }
+ 
++#if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MIN_REQUIRED >= 101400
++- (EmacsCursorGlide *) cursorGlide
++{
++  if (!cursorGlide)
++    cursorGlide = [[EmacsCursorGlide alloc] initWithView: self
++						   frame: emacsframe];
++  return cursorGlide;
++}
++#endif
++
+ - (void)mouseEntered: (NSEvent *)theEvent
+ {
+   NSTRACE ("[EmacsView mouseEntered:]");
+@@ -11231,6 +11260,12 @@ - (BOOL) checkDimensions
+ }
+ 
+ 
++- (CGColorSpaceRef) colorSpace
++{
++  return colorSpace;
++}
++
++
+ /* Return a CGContextRef that can be used for drawing to the screen.  */
+ - (CGContextRef) getContext
+ {
+@@ -11395,6 +11430,163 @@ - (void) copyContentsTo: (IOSurfaceRef) destination
+ 
+ @end /* EmacsLayer */
+ 
++/* ==========================================================================
++
++   Cursor animation
++
++   ========================================================================== */
++
++/* Show the cursor of a frame moving, as `gui_glide_cursor' in xdisp.c
++   computes it, with two CALayers over the frame, the head, which is
++   the cursor, and the trail, which is stretched behind it.  Core
++   Animation moves them, and Emacs does not do anything until the
++   movement is over.  */
++
++@implementation EmacsCursorGlide
++
++- (id) initWithView: (EmacsView *)v frame: (struct frame *)f
++{
++  self = [super init];
++  view = v;
++  frame = f;
++  return self;
++}
++
++
++/* Called when the view goes away.  */
++- (void) detach
++{
++  [NSObject cancelPreviousPerformRequestsWithTarget: self];
++  view = nil;
++}
++
++
++- (void) dealloc
++{
++  [trail removeFromSuperlayer];
++  [trail release];
++  [head removeFromSuperlayer];
++  [head release];
++  [super dealloc];
++}
++
++
++/* Return a path through the corners CORNERS, of the frame, in the
++   coordinates of PARENT.  */
++static CGPathRef
++ns_glide_path (CALayer *parent, double corners[4][2])
++{
++  CGPoint points[4];
++  CGMutablePathRef path = CGPathCreateMutable ();
++
++  for (int c = 0; c < 4; c++)
++    points[c] = CGPointMake (corners[c][0], [parent isGeometryFlipped]
++			     ? corners[c][1]
++			     : NSHeight ([parent bounds]) - corners[c][1]);
++  CGPathAddLines (path, NULL, points, 4);
++  CGPathCloseSubpath (path);
++  return path;
++}
++
++
++/* Show the cursor moving.  */
++- (void) show
++{
++  CALayer *parent = [view layer];
++  enum { STEPS = 20 };
++
++  /* What Emacs draws is shown with the components of its colors in the
++     color space of the layer, taken as they are, so do the same, so that
++     the cursor does not change color when the movement is over.  */
++  NSColorSpace *space
++    = [[[NSColorSpace alloc] initWithCGColorSpace: [(EmacsLayer *) parent
++						     colorSpace]] autorelease];
++  CGFloat rgba[4];
++  [[FRAME_CURSOR_COLOR (frame) colorUsingColorSpace: space] getComponents: rgba];
++  CGColorRef color = CGColorCreateSRGB (rgba[0], rgba[1], rgba[2], 1);
++
++  if (!head)
++    {
++      NSNull *none = [NSNull null];
++
++      head = [[CAShapeLayer alloc] init];
++      trail = [[CAShapeLayer alloc] init];
++      for (CALayer *layer in @[trail, head])
++	{
++	  [layer setActions: @{@"path": none, @"fillColor": none,
++			       @"opacity": none}];
++	  [parent addSublayer: layer];
++	}
++    }
++
++  /* The shapes at a number of times during the movement, which are shown
++     one after the other, instead of animated.  */
++  NSMutableArray *heads = [NSMutableArray arrayWithCapacity: STEPS];
++  NSMutableArray *trails = [NSMutableArray arrayWithCapacity: STEPS];
++  for (int i = 0; i < STEPS; i++)
++    {
++      double head_corners[4][2], trail_corners[4][2];
++      CGPathRef path;
++
++      gui_cursor_glide_shape (frame, (double) i / (STEPS - 1), trail_corners,
++			      head_corners);
++      path = ns_glide_path (parent, head_corners);
++      [heads addObject: (id) path];
++      CGPathRelease (path);
++      path = ns_glide_path (parent, trail_corners);
++      [trails addObject: (id) path];
++      CGPathRelease (path);
++    }
++
++  /* The last shapes stay after the movement, until the cursor is drawn.  */
++  NSArray *layers[] = { @[head, heads], @[trail, trails] };
++  for (int i = 0; i < 2; i++)
++    {
++      CAShapeLayer *layer = layers[i][0];
++      NSArray *paths = layers[i][1];
++      CAKeyframeAnimation *animation
++	= [CAKeyframeAnimation animationWithKeyPath: @"path"];
++
++      [layer setFrame: [parent bounds]];
++      [layer setFillColor: color];
++      [layer setPath: (CGPathRef) [paths lastObject]];
++      [layer setOpacity: 1];
++      [animation setValues: paths];
++      [animation setCalculationMode: kCAAnimationDiscrete];
++      [animation setDuration: frame->cursor_glide.duration];
++      [layer addAnimation: animation forKey: @"glide"];
++    }
++
++  CGColorRelease (color);
++  [NSObject cancelPreviousPerformRequestsWithTarget: self];
++  [self performSelector: @selector (land) withObject: nil
++	     afterDelay: frame->cursor_glide.duration
++		inModes: @[NSRunLoopCommonModes]];
++}
++
++
++/* Stop showing the cursor.  */
++- (void) hide
++{
++  [NSObject cancelPreviousPerformRequestsWithTarget: self];
++  for (CALayer *layer in @[head, trail])
++    {
++      [layer removeAllAnimations];
++      [layer setOpacity: 0];
++    }
++}
++
++
++/* The movement is over.  */
++- (void) land
++{
++  if (view && FRAME_LIVE_P (frame) && frame->output_data.ns)
++    gui_cursor_glide_land (frame);
++}
++
++@end /* EmacsCursorGlide */
++
++
+ 
+ #endif /* NS_IMPL_COCOA */
+ 
+diff --git a/src/pgtkterm.c b/src/pgtkterm.c
+index c99d527595f..4b61deff138 100644
+--- a/src/pgtkterm.c
++++ b/src/pgtkterm.c
+@@ -262,6 +262,8 @@ pgtk_get_device_for_event (struct pgtk_display_info *dpyinfo,
+   return Qt;
+ }
+ 
++static void pgtk_glide_stop (struct frame *);
++
+ /* This is not a flip context in the same sense as gpu rendering
+    scenes, it only occurs when a new context was required due to a
+    resize or other fundamental change.  This is called when that
+@@ -464,6 +466,7 @@ pgtk_free_frame_resources (struct frame *f)
+       cancel_atimer (FRAME_X_OUTPUT (f)->scale_factor_atimer);
+       FRAME_X_OUTPUT (f)->scale_factor_atimer = NULL;
+     }
++  pgtk_glide_stop (f);
+ 
+ #define CLEAR_IF_EQ(FIELD)	\
+   do { if (f == dpyinfo->FIELD) dpyinfo->FIELD = 0; } while (false)
+@@ -3013,6 +3016,91 @@ pgtk_draw_bar_cursor (struct window *w, struct glyph_row *row, int width,
+ 
+ /* RIF: Draw cursor on window W.  */
+ 
++/* Animation of the cursor, see `gui_glide_cursor' in xdisp.c.  While
++   the cursor moves, `pgtk_handle_draw' paints its head and its trail
++   over the frame, which is redrawn at each tick of the frame clock.  A
++   timeout, not the ticks, which stop when the frame is not shown, tells
++   when the cursor gets there.  */
++
++static void
++pgtk_glide_stop (struct frame *f)
++{
++  struct pgtk_output *output = FRAME_X_OUTPUT (f);
++
++  if (output->glide_tick && FRAME_GTK_WIDGET (f))
++    gtk_widget_remove_tick_callback (FRAME_GTK_WIDGET (f), output->glide_tick);
++  if (output->glide_timeout)
++    g_source_remove (output->glide_timeout);
++  output->glide_tick = output->glide_timeout = 0;
++}
++
++static gboolean
++pgtk_glide_tick (GtkWidget *widget, GdkFrameClock *clock, gpointer data)
++{
++  gtk_widget_queue_draw (widget);
++  return G_SOURCE_CONTINUE;
++}
++
++static gboolean
++pgtk_glide_land (gpointer data)
++{
++  struct frame *f = data;
++
++  FRAME_X_OUTPUT (f)->glide_timeout = 0;
++  gui_cursor_glide_land (f);
++  return G_SOURCE_REMOVE;
++}
++
++/* Show the cursor of F moving if SHOW, or stop.  */
++
++static void
++pgtk_glide_cursor (struct frame *f, bool show)
++{
++  struct pgtk_output *output = FRAME_X_OUTPUT (f);
++
++  pgtk_glide_stop (f);
++  if (show)
++    {
++      output->glide_tick
++	= gtk_widget_add_tick_callback (FRAME_GTK_WIDGET (f), pgtk_glide_tick,
++					NULL, NULL);
++      output->glide_timeout
++	= g_timeout_add (f->cursor_glide.duration * 1000, pgtk_glide_land, f);
++    }
++  gtk_widget_queue_draw (FRAME_GTK_WIDGET (f));
++}
++
++/* Make the path of the quadrilateral with the corners CORNERS in CR.  */
++
++static void
++pgtk_glide_path (cairo_t *cr, double corners[4][2])
++{
++  cairo_move_to (cr, corners[0][0], corners[0][1]);
++  for (int c = 1; c < 4; c++)
++    cairo_line_to (cr, corners[c][0], corners[c][1]);
++  cairo_close_path (cr);
++}
++
++/* Paint the cursor of F, which is moving, in CR: the trail, then the
++   head.  */
++
++static void
++pgtk_paint_glide (struct frame *f, cairo_t *cr)
++{
++  double trail[4][2], head[4][2];
++  Emacs_Color color;
++
++  color.pixel = FRAME_CURSOR_COLOR (f);
++  pgtk_query_color (f, &color);
++  cairo_set_source_rgb (cr, color.red / 65535.0, color.green / 65535.0,
++			color.blue / 65535.0);
++  gui_cursor_glide_shape (f, gui_cursor_glide_progress (f), trail, head);
++  pgtk_glide_path (cr, trail);
++  cairo_fill (cr);
++  pgtk_glide_path (cr, head);
++  cairo_fill (cr);
++}
++
+ static void
+ pgtk_draw_window_cursor (struct window *w, struct glyph_row *glyph_row, int x,
+ 			 int y, enum text_cursor_kinds cursor_type,
+@@ -3782,6 +3870,7 @@ pgtk_flush_display (struct frame *f)
+   pgtk_show_hourglass,
+   pgtk_hide_hourglass,
+   pgtk_default_font_parameter,
++  pgtk_glide_cursor,
+ };
+ 
+ void
+@@ -5113,6 +5202,8 @@ pgtk_handle_draw (GtkWidget *widget, cairo_t *cr, gpointer *data)
+ 	{
+ 	  cairo_set_source_surface (cr, src, 0, 0);
+ 	  cairo_paint (cr);
++	  if (f != NULL && f->cursor_glide.flight_window)
++	    pgtk_paint_glide (f, cr);
+ 	}
+     }
+   return FALSE;
+diff --git a/src/pgtkterm.h b/src/pgtkterm.h
+index 490bd6c8b6b..ff88699ed33 100644
+--- a/src/pgtkterm.h
++++ b/src/pgtkterm.h
+@@ -348,6 +348,9 @@ #define BLUE_FROM_ULONG(color)	((color) & 0xff)
+ 
+   unsigned long mouse_color;
+   unsigned long cursor_color;
++
++  /* Sources of the animation of the cursor of this frame.  */
++  guint glide_tick, glide_timeout;
+   unsigned long cursor_foreground_color;
+ 
+   int icon_top;
+diff --git a/src/xdisp.c b/src/xdisp.c
+index 0f5bbfb5b47..df848e11332 100644
+--- a/src/xdisp.c
++++ b/src/xdisp.c
+@@ -35385,7 +35385,10 @@ display_and_set_cursor (struct window *w, bool on,
+      glyph_row->height will be less than or equal to 0.  Eschew
+      displaying the cursor in that case.  */
+ 
+-  if (MATRIX_ROW_BOTTOM_Y (glyph_row) > 0)
++  if (MATRIX_ROW_BOTTOM_Y (glyph_row) > 0
++      && !(on && gui_glide_cursor (w, glyph_row, glyph, x, y,
++				   new_cursor_type, new_cursor_width,
++				   active_cursor)))
+     FRAME_RIF (f)->draw_window_cursor (w, glyph_row, x, y,
+ 				       new_cursor_type, new_cursor_width,
+ 				       on, active_cursor);
+@@ -35469,6 +35472,233 @@ gui_clear_cursor (struct window *w)
+     update_window_cursor (w, false);
+ }
+ 
++
++/***********************************************************************
++			    Cursor animation
++ ***********************************************************************/
++
++/* When `cursor-animation-duration' is a number, and the terminal has a
++   `glide_cursor' function, a cursor that moves is not drawn where it
++   moves to until the movement is over.  Instead the terminal shows it
++   moving, as a rectangle that is the cursor, and a quadrilateral that
++   is stretched between where the cursor was and where it is now, both
++   computed here.  When the movement is over `gui_cursor_glide_land'
++   draws the cursor and tells the terminal to stop showing it, so that
++   there is always one cursor, never none or two.  */
++
++static double
++glide_now (void)
++{
++  return timespectod (current_timespec ());
++}
++
++/* Return where the ease-out timing function maps T, between 0 and 1.
++   It stops before it gets really slow, so that the cursor does not
++   crawl to where it is going, and the character shows up when it
++   arrives.  */
++
++static double
++glide_ease_out (double t)
++{
++  return (1 - pow (1 - 0.7 * t, 3)) / (1 - pow (0.3, 3));
++}
++
++/* Store in CORNERS those of the rectangle R, which is x, y, width, and
++   height.  */
++
++static void
++glide_corners (const int *r, double corners[4][2])
++{
++  corners[0][0] = corners[3][0] = r[0];
++  corners[1][0] = corners[2][0] = r[0] + r[2];
++  corners[0][1] = corners[1][1] = r[1];
++  corners[2][1] = corners[3][1] = r[1] + r[3];
++}
++
++/* Compute the shape of the cursor of frame F that is moving, at time T,
++   from 0 to 1, of the movement.  Store the corners of the quadrilateral
++   that is its trail in TRAIL, and those of the rectangle that is the
++   cursor itself in HEAD.  */
++
++void
++gui_cursor_glide_shape (struct frame *f, double t, double trail[4][2],
++			double head[4][2])
++{
++  struct cursor_glide *g = &f->cursor_glide;
++  double e = glide_ease_out (t);
++
++  for (int c = 0; c < 4; c++)
++    for (int k = 0; k < 2; k++)
++      {
++	double delta = g->to[c][k] - g->from[c][k];
++
++	head[c][k] = g->from[c][k] + delta * e;
++	trail[c][k] = g->from[c][k] + delta * pow (e, g->late[c]);
++      }
++}
++
++/* Return how far the cursor of frame F is in its movement, from 0 to 1.  */
++
++double
++gui_cursor_glide_progress (struct frame *f)
++{
++  struct cursor_glide *g = &f->cursor_glide;
++
++  return min (max ((glide_now () - g->start) / g->duration, 0), 1);
++}
++
++/* Called to draw the cursor of window W, of type TYPE and WIDTH, in
++   the position X, Y of the window, in ROW, on GLYPH, ACTIVE being true
++   if it is the cursor of the selected window.  Return true if it must
++   not be drawn, because the terminal shows it moving.  */
++
++bool
++gui_glide_cursor (struct window *w, struct glyph_row *row,
++		  struct glyph *glyph, int x, int y,
++		  enum text_cursor_kinds type, int width, bool active)
++{
++  struct frame *f = XFRAME (w->frame);
++  struct cursor_glide *g = &f->cursor_glide;
++  double duration = (NUMBERP (Vcursor_animation_duration)
++		     ? XFLOATINT (Vcursor_animation_duration) : 0);
++  double now = glide_now ();
++
++  if (!FRAME_RIF (f)->glide_cursor)
++    return false;
++
++  /* While the terminal shows the cursor, leave it hidden, unless the
++     movement is over or the cursor is going to look different.  */
++  if (g->flight_window == w->sequence_number)
++    {
++      if (active && type != NO_CURSOR && g->flight_x == x && g->flight_y == y
++	  && now < g->start + g->duration)
++	{
++	  w->phys_cursor_on_p = false;
++	  return true;
++	}
++      g->flight_window = 0;
++      FRAME_RIF (f)->glide_cursor (f, false);
++    }
++
++  if (duration <= 0 || !active)
++    return false;
++  if (type == NO_CURSOR || !glyph)
++    {
++      /* Keep the last visible position as the next movement's origin
++         when blinking temporarily hides the cursor.  */
++      if (!glyph || !w->cursor_off_p)
++        g->last_window = 0;
++      return false;
++    }
++
++  /* Compute the rectangle of the cursor, as the terminals do.  */
++  int fx, fy, h, bx, by, bw, bh;
++  get_phys_cursor_geometry (w, row, glyph, &fx, &fy, &h);
++  w->phys_cursor_width = min (w->phys_cursor_width,
++			      type == BAR_CURSOR
++			      ? (width < 1 ? max (FRAME_CURSOR_WIDTH (f), 1)
++				 : width)
++			      : INT_MAX);
++  if (type == BAR_CURSOR && (glyph->resolved_level & 1))
++    fx += glyph->pixel_width - w->phys_cursor_width;
++  if (type == HBAR_CURSOR)
++    {
++      int bar = min (width < 1 ? lrint (0.25 * h) : width, row->height);
++
++      if (h > bar)
++	fy += h - bar;
++      h = bar;
++    }
++  window_box (w, TEXT_AREA, &bx, &by, &bw, &bh);
++
++  int x0 = max (fx, bx), y0 = max (fy, by);
++  int x1 = min (fx + w->phys_cursor_width, bx + bw), y1 = min (fy + h, by + bh);
++  if (x1 <= x0 || y1 <= y0)
++    {
++      g->last_window = 0;
++      return false;
++    }
++
++  /* Find out whether it moved, and from where.  The cursor on an image
++     does not move like this.  */
++  int r[4] = { x0, y0, x1 - x0, y1 - y0 };
++  int previous[4] = { g->last_rect[0], g->last_rect[1],
++		      g->last_rect[2], g->last_rect[3] };
++  bool same_window = g->last_window == w->sequence_number;
++  bool moved = (g->last_window != 0 && glyph->type != IMAGE_GLYPH
++		&& (!same_window || previous[0] != r[0] || previous[1] != r[1]));
++
++  g->last_window = glyph->type == IMAGE_GLYPH ? 0 : w->sequence_number;
++  memcpy (g->last_rect, r, sizeof r);
++  if (!moved)
++    return false;
++
++  /* Start from the shape of the cursor, if it is still moving.  */
++  double old[4][2], new[4][2], lead[4], least = 1, most = -1;
++  bool following = g->flight_window && now < g->start + g->duration;
++
++  glide_corners (r, new);
++  if (following)
++    {
++      double head[4][2];
++
++      gui_cursor_glide_shape (f, gui_cursor_glide_progress (f), old, head);
++    }
++  else
++    glide_corners (previous, old);
++
++  /* The corners of the quadrilateral move with the ease-out timing
++     function, but the more a corner trails behind the movement of the
++     cursor, the later it gets to where the cursor is now, which stretches
++     the quadrilateral.  It does that less if the cursor follows another
++     movement, or if it moves at most two columns and lines, unless to
++     another window, and the stretch is limited for long movements.  */
++  double dx = (new[0][0] + new[2][0] - old[0][0] - old[2][0]) / 2;
++  double dy = (new[0][1] + new[2][1] - old[0][1] - old[2][1]) / 2;
++  double distance = max (hypot (dx, dy), 1);
++  bool near = (same_window
++	       && fabs (round (dx / FRAME_COLUMN_WIDTH (f))) <= 2
++	       && fabs (round (dy / FRAME_LINE_HEIGHT (f))) <= 2);
++  double stretch = min (near ? 0 : following ? 0.6 : 1.5, 8 * r[3] / distance);
++
++  for (int c = 0; c < 4; c++)
++    {
++      /* How much the corner leads the cursor, from 1 to -1.  */
++      double ox = new[c][0] - (new[0][0] + new[2][0]) / 2;
++      double oy = new[c][1] - (new[0][1] + new[2][1]) / 2;
++
++      lead[c] = (ox * dx + oy * dy) / (hypot (ox, oy) * distance);
++      least = min (least, lead[c]);
++      most = max (most, lead[c]);
++    }
++  for (int c = 0; c < 4; c++)
++    g->late[c] = 1 + stretch * (most - lead[c]) / max (most - least, 0.001);
++  memcpy (g->from, old, sizeof old);
++  memcpy (g->to, new, sizeof new);
++  g->flight_window = w->sequence_number;
++  g->flight_x = x;
++  g->flight_y = y;
++  g->start = now;
++  g->duration = duration;
++  FRAME_RIF (f)->glide_cursor (f, true);
++  w->phys_cursor_on_p = false;
++  return true;
++}
++
++/* Called by the terminal when the movement of the cursor of frame F is
++   over.  Draw the cursor, and have the terminal stop showing it.  */
++
++void
++gui_cursor_glide_land (struct frame *f)
++{
++  if (f->cursor_glide.flight_window)
++    {
++      f->cursor_glide.flight_window = 0;
++      gui_update_cursor (f, true);
++      FRAME_RIF (f)->glide_cursor (f, false);
++    }
++}
++
+ #endif /* HAVE_WINDOW_SYSTEM */
+ 
+ /* Implementation of draw_row_with_mouse_face for GUI sessions, GPM,
+@@ -39065,6 +39295,14 @@ syms_of_xdisp (void)
+      during loadup.  */
+   Vresize_mini_windows = Qnil;
+ 
++  DEFVAR_LISP ("cursor-animation-duration", Vcursor_animation_duration,
++    doc: /* Time in seconds that the cursor takes to move to a new position.
++While it moves, it is stretched between the old and the new position,
++and leaves a trail.  If nil, the cursor jumps there at once, and so it
++does on images.  This only has an effect on the NS and PGTK builds of
++Emacs.  */);
++  Vcursor_animation_duration = Qnil;
++
+   DEFVAR_LISP ("blink-cursor-alist", Vblink_cursor_alist,
+     doc: /* Alist specifying how to blink the cursor off.
+ Each element has the form (ON-STATE . OFF-STATE).  Whenever the
+-- 
+2.54.0 (Apple Git-157)
+
