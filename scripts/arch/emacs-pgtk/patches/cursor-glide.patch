@@ -11,12 +11,13 @@ the movement is over, Emacs draws the cursor and the terminal stops
 showing it.  What moves and how is computed in xdisp.c, so that
 terminals only have to show it; implement that on macOS and on PGTK.
 The cursor on an image does not move like this.
+The default duration is 0.1 seconds; setting it to nil disables animation.
 
 * src/frame.h (struct cursor_glide): New struct.
 (struct frame): New member 'cursor_glide'.
 * src/dispextern.h (struct redisplay_interface): New member
 'glide_cursor'.
-(gui_glide_cursor, gui_cursor_glide_shape, gui_cursor_glide_progress)
+(gui_cursor_glide_shape, gui_cursor_glide_progress)
 (gui_cursor_glide_land): Declare.
 * src/xdisp.c (glide_now, glide_ease_out, glide_corners)
 (gui_cursor_glide_shape, gui_cursor_glide_progress, gui_glide_cursor)
@@ -41,20 +42,20 @@ The cursor on an image does not move like this.
 * doc/emacs/display.texi (Cursor Display): Document it.
 * etc/NEWS: Announce it.
 ---
- doc/emacs/display.texi |  10 ++
- etc/NEWS               |   6 ++
- lisp/cus-start.el      |   4 +
- src/dispextern.h       |  12 +++
- src/frame.h            |  30 ++++++
- src/nsterm.h           |  22 ++++
- src/nsterm.m           | 194 ++++++++++++++++++++++++++++++++-
- src/pgtkterm.c         |  91 ++++++++++++++++
- src/pgtkterm.h         |   3 +
- src/xdisp.c            | 240 ++++++++++++++++++++++++++++++++++++++++-
- 10 files changed, 610 insertions(+), 2 deletions(-)
+ doc/emacs/display.texi |   10 ++
+ etc/NEWS               |    7 +
+ lisp/cus-start.el      |    4 +
+ src/dispextern.h       |    9 ++
+ src/frame.h            |   30 ++++++
+ src/nsterm.h           |   22 ++++
+ src/nsterm.m           |  194 +++++++++++++++++++++++++++++++++++++
+ src/pgtkterm.c         |   91 +++++++++++++++++
+ src/pgtkterm.h         |    3 +
+ src/xdisp.c            |  252 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 620 insertions(+), 2 deletions(-)
 
 diff --git a/doc/emacs/display.texi b/doc/emacs/display.texi
-index a0e59d6bda0..02d4fc40eac 100644
+index a0e59d6bda0..ca71831e298 100644
 --- a/doc/emacs/display.texi
 +++ b/doc/emacs/display.texi
 @@ -2146,6 +2146,16 @@ Cursor Display
@@ -63,30 +64,31 @@ index a0e59d6bda0..02d4fc40eac 100644
  
 +@vindex cursor-animation-duration
 +@cindex cursor animation
-+  If you set the variable @code{cursor-animation-duration} to a number
-+of seconds, the cursor is stretched between its old and its new
-+position, with a trail behind it, and shrinks into the new position
-+over that time, instead of jumping there at once.  A value around 0.1
-+looks smooth without getting in the way when typing.  The cursor does
-+not move like this on images.  This is only supported on macOS and on
-+GTK with Wayland.
++  The variable @code{cursor-animation-duration} specifies the duration
++of cursor animation in seconds.  Its default value is 0.1.  During a
++movement, the cursor is stretched between its old and new positions,
++with a trail behind it, and shrinks into the new position instead of
++jumping there at once.  Set this variable to @code{nil} to disable the
++animation.  The cursor does not move like this on images.  This is only
++supported on macOS and on GTK with Wayland.
 +
  @node Line Truncation
  @section Line Truncation
  
 diff --git a/etc/NEWS b/etc/NEWS
-index 15624bc558d..e96d833b759 100644
+index 15624bc558d..fa2a4e8f3de 100644
 --- a/etc/NEWS
 +++ b/etc/NEWS
-@@ -63,6 +63,12 @@ set similarly to 'setopt-local'; i.e., if a user option has a defcustom
+@@ -63,6 +63,13 @@ set similarly to 'setopt-local'; i.e., if a user option has a defcustom
  ':set' function, that function will be invoked.
  
  ---
 +** New user option 'cursor-animation-duration'.
-+If set to a number of seconds, the cursor is stretched between its old
-+and its new position, with a trail behind it, and shrinks into the new
-+position over that time, instead of jumping there.  This is only
-+supported on macOS and on GTK with Wayland (PGTK).
++Cursor movements are now animated over 0.1 seconds by default.  The
++cursor is stretched between its old and new positions, with a trail
++behind it, and shrinks into the new position instead of jumping there.
++Set this option to nil to disable animation.  This is only supported
++on macOS and on GTK with Wayland (PGTK).
 +
  ** New user option 'setopt-local-type-mismatch'.
  This option controls what 'setopt-local' does when it detects a type
@@ -107,7 +109,7 @@ index 5b8b9dcfdc7..9365cf8fdaa 100644
  	     (underline-minimum-offset display integer "23.1")
               (mouse-autoselect-window
 diff --git a/src/dispextern.h b/src/dispextern.h
-index 3114cdfcec9..4033c996d03 100644
+index 3114cdfcec9..040ffdd6008 100644
 --- a/src/dispextern.h
 +++ b/src/dispextern.h
 @@ -3192,6 +3192,11 @@ reset_mouse_highlight (Mouse_HLInfo *hlinfo)
@@ -122,13 +124,10 @@ index 3114cdfcec9..4033c996d03 100644
  #endif /* HAVE_WINDOW_SYSTEM */
  };
  
-@@ -3654,6 +3659,13 @@ #define DEFAULT_TOOL_BAR_IMAGE_HEIGHT 24
+@@ -3654,6 +3659,10 @@ #define DEFAULT_TOOL_BAR_IMAGE_HEIGHT 24
  extern void erase_phys_cursor (struct window *);
  extern void display_and_set_cursor (struct window *, bool, int, int, int, int);
  extern void gui_update_cursor (struct frame *, bool);
-+extern bool gui_glide_cursor (struct window *, struct glyph_row *,
-+			      struct glyph *, int, int,
-+			      enum text_cursor_kinds, int, bool);
 +extern void gui_cursor_glide_shape (struct frame *, double, double[4][2],
 +				    double[4][2]);
 +extern double gui_cursor_glide_progress (struct frame *);
@@ -486,7 +485,7 @@ index fa66b0e9c2c..2b6f7de6dd2 100644
  #endif /* NS_IMPL_COCOA */
  
 diff --git a/src/pgtkterm.c b/src/pgtkterm.c
-index c99d527595f..4b61deff138 100644
+index c99d527595f..07d4308b404 100644
 --- a/src/pgtkterm.c
 +++ b/src/pgtkterm.c
 @@ -262,6 +262,8 @@ pgtk_get_device_for_event (struct pgtk_display_info *dpyinfo,
@@ -610,7 +609,7 @@ index c99d527595f..4b61deff138 100644
  	{
  	  cairo_set_source_surface (cr, src, 0, 0);
  	  cairo_paint (cr);
-+	  if (f != NULL && f->cursor_glide.flight_window)
++	  if (f->cursor_glide.flight_window)
 +	    pgtk_paint_glide (f, cr);
  	}
      }
@@ -630,10 +629,20 @@ index 490bd6c8b6b..ff88699ed33 100644
  
    int icon_top;
 diff --git a/src/xdisp.c b/src/xdisp.c
-index 0f5bbfb5b47..df848e11332 100644
+index 0f5bbfb5b47..bc02e0b8c94 100644
 --- a/src/xdisp.c
 +++ b/src/xdisp.c
-@@ -35385,7 +35385,10 @@ display_and_set_cursor (struct window *w, bool on,
+@@ -1217,6 +1217,9 @@ static void update_tool_bar (struct frame *, bool);
+ static void update_tool_bar (struct frame *, bool);
+ static void gui_draw_bottom_divider (struct window *w);
++static bool gui_glide_cursor (struct window *, struct glyph_row *,
++			      struct glyph *, int, int,
++			      enum text_cursor_kinds, int, bool);
+ static void notice_overwritten_cursor (struct window *,
+                                        enum glyph_row_area,
+                                        int, int, int, int);
+ static int  normal_char_height (struct font *, int);
+@@ -35385,7 +35388,10 @@ display_and_set_cursor (struct window *w, bool on,
       glyph_row->height will be less than or equal to 0.  Eschew
       displaying the cursor in that case.  */
  
@@ -645,7 +654,7 @@ index 0f5bbfb5b47..df848e11332 100644
      FRAME_RIF (f)->draw_window_cursor (w, glyph_row, x, y,
  				       new_cursor_type, new_cursor_width,
  				       on, active_cursor);
-@@ -35469,6 +35472,233 @@ gui_clear_cursor (struct window *w)
+@@ -35469,6 +35475,241 @@ gui_clear_cursor (struct window *w)
      update_window_cursor (w, false);
  }
  
@@ -705,13 +714,17 @@ index 0f5bbfb5b47..df848e11332 100644
 +  double e = glide_ease_out (t);
 +
 +  for (int c = 0; c < 4; c++)
-+    for (int k = 0; k < 2; k++)
-+      {
-+	double delta = g->to[c][k] - g->from[c][k];
++    {
++      double trailing = pow (e, g->late[c]);
 +
-+	head[c][k] = g->from[c][k] + delta * e;
-+	trail[c][k] = g->from[c][k] + delta * pow (e, g->late[c]);
-+      }
++      for (int k = 0; k < 2; k++)
++	{
++	  double delta = g->to[c][k] - g->from[c][k];
++
++	  head[c][k] = g->from[c][k] + delta * e;
++	  trail[c][k] = g->from[c][k] + delta * trailing;
++	}
++    }
 +}
 +
 +/* Return how far the cursor of frame F is in its movement, from 0 to 1.  */
@@ -729,19 +742,23 @@ index 0f5bbfb5b47..df848e11332 100644
 +   if it is the cursor of the selected window.  Return true if it must
 +   not be drawn, because the terminal shows it moving.  */
 +
-+bool
++static bool
 +gui_glide_cursor (struct window *w, struct glyph_row *row,
 +		  struct glyph *glyph, int x, int y,
 +		  enum text_cursor_kinds type, int width, bool active)
 +{
 +  struct frame *f = XFRAME (w->frame);
-+  struct cursor_glide *g = &f->cursor_glide;
-+  double duration = (NUMBERP (Vcursor_animation_duration)
-+		     ? XFLOATINT (Vcursor_animation_duration) : 0);
-+  double now = glide_now ();
 +
 +  if (!FRAME_RIF (f)->glide_cursor)
 +    return false;
++
++  struct cursor_glide *g = &f->cursor_glide;
++  double duration = (NUMBERP (Vcursor_animation_duration)
++		     ? XFLOATINT (Vcursor_animation_duration) : 0);
++  if (!g->flight_window && (duration <= 0 || !active))
++    return false;
++
++  double now = glide_now ();
 +
 +  /* While the terminal shows the cursor, leave it hidden, unless the
 +     movement is over or the cursor is going to look different.  */
@@ -879,17 +896,18 @@ index 0f5bbfb5b47..df848e11332 100644
  #endif /* HAVE_WINDOW_SYSTEM */
  
  /* Implementation of draw_row_with_mouse_face for GUI sessions, GPM,
-@@ -39065,6 +39295,14 @@ syms_of_xdisp (void)
+@@ -39065,6 +39306,15 @@ syms_of_xdisp (void)
       during loadup.  */
    Vresize_mini_windows = Qnil;
  
 +  DEFVAR_LISP ("cursor-animation-duration", Vcursor_animation_duration,
 +    doc: /* Time in seconds that the cursor takes to move to a new position.
++The default is 0.1.
 +While it moves, it is stretched between the old and the new position,
 +and leaves a trail.  If nil, the cursor jumps there at once, and so it
 +does on images.  This only has an effect on the NS and PGTK builds of
 +Emacs.  */);
-+  Vcursor_animation_duration = Qnil;
++  Vcursor_animation_duration = make_float (0.1);
 +
    DEFVAR_LISP ("blink-cursor-alist", Vblink_cursor_alist,
      doc: /* Alist specifying how to blink the cursor off.
