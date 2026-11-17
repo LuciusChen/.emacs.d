@@ -45,14 +45,14 @@ The default duration is 0.1 seconds; setting it to nil disables animation.
  doc/emacs/display.texi |   10 ++
  etc/NEWS               |    7 +
  lisp/cus-start.el      |    4 +
- src/dispextern.h       |    9 +
- src/frame.h            |   33 +++++
+ src/dispextern.h       |    8 +
+ src/frame.h            |   30 +++++
  src/nsterm.h           |   22 ++++
- src/nsterm.m           |  194 ++++++++++++++++++++++++++++++++
- src/pgtkterm.c         |   91 +++++++++++++++
- src/pgtkterm.h         |    3
- src/xdisp.c            |  289 ++++++++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 660 insertions(+), 2 deletions(-)
+ src/nsterm.m           |  173 +++++++++++++++++++++++++++++++
+ src/pgtkterm.c         |   88 ++++++++++++++++
+ src/pgtkterm.h         |    3 +
+ src/xdisp.c            |  267 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 610 insertions(+), 2 deletions(-)
 
 diff --git a/doc/emacs/display.texi b/doc/emacs/display.texi
 index a0e59d6bda0..ca71831e298 100644
@@ -109,7 +109,7 @@ index 5b8b9dcfdc7..9365cf8fdaa 100644
  	     (underline-minimum-offset display integer "23.1")
               (mouse-autoselect-window
 diff --git a/src/dispextern.h b/src/dispextern.h
-index 3114cdfcec9..040ffdd6008 100644
+index 3114cdfcec9..10b4b91368c 100644
 --- a/src/dispextern.h
 +++ b/src/dispextern.h
 @@ -3192,6 +3192,11 @@ reset_mouse_highlight (Mouse_HLInfo *hlinfo)
@@ -124,22 +124,21 @@ index 3114cdfcec9..040ffdd6008 100644
  #endif /* HAVE_WINDOW_SYSTEM */
  };
  
-@@ -3654,6 +3659,10 @@ #define DEFAULT_TOOL_BAR_IMAGE_HEIGHT 24
+@@ -3654,6 +3659,9 @@ #define DEFAULT_TOOL_BAR_IMAGE_HEIGHT 24
  extern void erase_phys_cursor (struct window *);
  extern void display_and_set_cursor (struct window *, bool, int, int, int, int);
  extern void gui_update_cursor (struct frame *, bool);
-+extern void gui_cursor_glide_shape (struct frame *, double, double[4][2],
-+				    double[4][2]);
++extern void gui_cursor_glide_shape (struct frame *, double, double[4][2]);
 +extern double gui_cursor_glide_progress (struct frame *);
 +extern void gui_cursor_glide_land (struct frame *);
  extern void gui_clear_cursor (struct window *);
  extern void gui_draw_vertical_border (struct window *w);
  extern void gui_draw_right_divider (struct window *w);
 diff --git a/src/frame.h b/src/frame.h
-index 64d8a74f36e..8bff3499d92 100644
+index 64d8a74f36e..8af98c4e7c7 100644
 --- a/src/frame.h
 +++ b/src/frame.h
-@@ -142,6 +142,36 @@ #define EMACS_FRAME_H
+@@ -142,6 +142,33 @@ #define EMACS_FRAME_H
  
  /* The structure representing a frame.  */
  
@@ -161,12 +160,9 @@ index 64d8a74f36e..8bff3499d92 100644
 +  EMACS_INT flight_window;
 +  int flight_x, flight_y;
 +
-+  /* Keep the long ribbon until a window-switch flight finishes.  */
-+  bool window_switch;
-+
-+  /* The starting corners of the trail and head, their common destination,
-+     and how late each trail corner gets there.  */
-+  double from[4][2], head_from[4][2], to[4][2], late[4];
++  /* The starting and destination corners of the cursor, and the relative
++     lag of each corner along the direction of movement.  */
++  double from[4][2], to[4][2], lag[4];
 +
 +  /* When the movement began, and how long it takes, in seconds.  */
 +  double start, duration;
@@ -176,7 +172,7 @@ index 64d8a74f36e..8bff3499d92 100644
  struct frame
  {
    union vectorlike_header header;
-@@ -713,6 +743,9 @@ #define EMACS_FRAME_H
+@@ -713,6 +740,9 @@ #define EMACS_FRAME_H
    /* Background opacity */
    double alpha_background;
  
@@ -187,7 +183,7 @@ index 64d8a74f36e..8bff3499d92 100644
       SCREEN_GAMMA) where viewing_gamma is 0.4545 and SCREEN_GAMMA is a
       frame parameter.  0 means don't do gamma correction.  */
 diff --git a/src/nsterm.h b/src/nsterm.h
-index 69f565d51f9..745b4c9d6d6 100644
+index 69f565d51f9..e5171c19140 100644
 --- a/src/nsterm.h
 +++ b/src/nsterm.h
 @@ -461,6 +461,7 @@ #define NSTRACE_UNSILENCE()
@@ -238,7 +234,7 @@ index 69f565d51f9..745b4c9d6d6 100644
 +{
 +  EmacsView *view;
 +  struct frame *frame;
-+  CAShapeLayer *head, *trail;
++  CAShapeLayer *shape;
 +}
 +- (id) initWithView: (EmacsView *)v frame: (struct frame *)f;
 +- (void) detach;
@@ -248,7 +244,7 @@ index 69f565d51f9..745b4c9d6d6 100644
  #endif
  
 diff --git a/src/nsterm.m b/src/nsterm.m
-index fa66b0e9c2c..9c5a6a53a8e 100644
+index fa66b0e9c2c..6f588e1383b 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
 @@ -3291,6 +3291,20 @@ Hide the window (X11 semantics)
@@ -323,7 +319,7 @@ index fa66b0e9c2c..9c5a6a53a8e 100644
  /* Return a CGContextRef that can be used for drawing to the screen.  */
  - (CGContextRef) getContext
  {
-@@ -11395,6 +11430,163 @@ - (void) copyContentsTo: (IOSurfaceRef) destination
+@@ -11395,6 +11430,142 @@ - (void) copyContentsTo: (IOSurfaceRef) destination
  
  @end /* EmacsLayer */
  
@@ -334,10 +330,9 @@ index fa66b0e9c2c..9c5a6a53a8e 100644
 +   ========================================================================== */
 +
 +/* Show the cursor of a frame moving, as `gui_glide_cursor' in xdisp.c
-+   computes it, with two CALayers over the frame, the head, which is
-+   the cursor, and the trail, which is stretched behind it.  Core
-+   Animation moves them, and Emacs does not do anything until the
-+   movement is over.  */
++   computes it, with one shape layer over the frame.  Its corners move
++   at different rates, stretching and contracting the whole cursor.
++   Core Animation moves it until the movement is over.  */
 +
 +@implementation EmacsCursorGlide
 +
@@ -360,10 +355,8 @@ index fa66b0e9c2c..9c5a6a53a8e 100644
 +
 +- (void) dealloc
 +{
-+  [trail removeFromSuperlayer];
-+  [trail release];
-+  [head removeFromSuperlayer];
-+  [head release];
++  [shape removeFromSuperlayer];
++  [shape release];
 +  [super dealloc];
 +}
 +
@@ -402,57 +395,42 @@ index fa66b0e9c2c..9c5a6a53a8e 100644
 +  [[FRAME_CURSOR_COLOR (frame) colorUsingColorSpace: space] getComponents: rgba];
 +  CGColorRef color = CGColorCreateSRGB (rgba[0], rgba[1], rgba[2], 1);
 +
-+  if (!head)
++  if (!shape)
 +    {
 +      NSNull *none = [NSNull null];
 +
-+      head = [[CAShapeLayer alloc] init];
-+      trail = [[CAShapeLayer alloc] init];
-+      for (CALayer *layer in @[trail, head])
-+	{
-+	  [layer setActions: @{@"path": none, @"fillColor": none,
-+			       @"opacity": none}];
-+	  [parent addSublayer: layer];
-+	}
++      shape = [[CAShapeLayer alloc] init];
++      [shape setActions: @{@"path": none, @"fillColor": none,
++			  @"opacity": none}];
++      [parent addSublayer: shape];
 +    }
 +
 +  /* Sample the movement; Core Animation interpolates the paths between
 +     these shapes at the display's refresh rate.  */
-+  NSMutableArray *heads = [NSMutableArray arrayWithCapacity: STEPS];
-+  NSMutableArray *trails = [NSMutableArray arrayWithCapacity: STEPS];
++  NSMutableArray *paths = [NSMutableArray arrayWithCapacity: STEPS];
 +  for (int i = 0; i < STEPS; i++)
 +    {
-+      double head_corners[4][2], trail_corners[4][2];
++      double corners[4][2];
 +      CGPathRef path;
 +
-+      gui_cursor_glide_shape (frame, (double) i / (STEPS - 1), trail_corners,
-+			      head_corners);
-+      path = ns_glide_path (parent, head_corners);
-+      [heads addObject: (id) path];
-+      CGPathRelease (path);
-+      path = ns_glide_path (parent, trail_corners);
-+      [trails addObject: (id) path];
++      gui_cursor_glide_shape (frame, (double) i / (STEPS - 1), corners);
++      path = ns_glide_path (parent, corners);
++      [paths addObject: (id) path];
 +      CGPathRelease (path);
 +    }
 +
-+  /* The last shapes stay after the movement, until the cursor is drawn.  */
-+  NSArray *layers[] = { @[head, heads], @[trail, trails] };
-+  for (int i = 0; i < 2; i++)
-+    {
-+      CAShapeLayer *layer = layers[i][0];
-+      NSArray *paths = layers[i][1];
-+      CAKeyframeAnimation *animation
-+	= [CAKeyframeAnimation animationWithKeyPath: @"path"];
++  /* The last shape stays after the movement, until the cursor is drawn.  */
++  CAKeyframeAnimation *animation
++    = [CAKeyframeAnimation animationWithKeyPath: @"path"];
 +
-+      [layer setFrame: [parent bounds]];
-+      [layer setFillColor: color];
-+      [layer setPath: (CGPathRef) [paths lastObject]];
-+      [layer setOpacity: 1];
-+      [animation setValues: paths];
-+      [animation setCalculationMode: kCAAnimationLinear];
-+      [animation setDuration: frame->cursor_glide.duration];
-+      [layer addAnimation: animation forKey: @"glide"];
-+    }
++  [shape setFrame: [parent bounds]];
++  [shape setFillColor: color];
++  [shape setPath: (CGPathRef) [paths lastObject]];
++  [shape setOpacity: 1];
++  [animation setValues: paths];
++  [animation setCalculationMode: kCAAnimationLinear];
++  [animation setDuration: frame->cursor_glide.duration];
++  [shape addAnimation: animation forKey: @"glide"];
 +
 +  CGColorRelease (color);
 +  [NSObject cancelPreviousPerformRequestsWithTarget: self];
@@ -466,11 +444,8 @@ index fa66b0e9c2c..9c5a6a53a8e 100644
 +- (void) hide
 +{
 +  [NSObject cancelPreviousPerformRequestsWithTarget: self];
-+  for (CALayer *layer in @[head, trail])
-+    {
-+      [layer removeAllAnimations];
-+      [layer setOpacity: 0];
-+    }
++  [shape removeAllAnimations];
++  [shape setOpacity: 0];
 +}
 +
 +
@@ -488,7 +463,7 @@ index fa66b0e9c2c..9c5a6a53a8e 100644
  #endif /* NS_IMPL_COCOA */
  
 diff --git a/src/pgtkterm.c b/src/pgtkterm.c
-index c99d527595f..07d4308b404 100644
+index c99d527595f..aeb5ea4e302 100644
 --- a/src/pgtkterm.c
 +++ b/src/pgtkterm.c
 @@ -262,6 +262,8 @@ pgtk_get_device_for_event (struct pgtk_display_info *dpyinfo,
@@ -508,12 +483,12 @@ index c99d527595f..07d4308b404 100644
  
  #define CLEAR_IF_EQ(FIELD)	\
    do { if (f == dpyinfo->FIELD) dpyinfo->FIELD = 0; } while (false)
-@@ -3013,6 +3016,91 @@ pgtk_draw_bar_cursor (struct window *w, struct glyph_row *row, int width,
+@@ -3013,6 +3016,88 @@ pgtk_draw_bar_cursor (struct window *w, struct glyph_row *row, int width,
  
  /* RIF: Draw cursor on window W.  */
  
 +/* Animation of the cursor, see `gui_glide_cursor' in xdisp.c.  While
-+   the cursor moves, `pgtk_handle_draw' paints its head and its trail
++   the cursor moves, `pgtk_handle_draw' paints its stretched shape
 +   over the frame, which is redrawn at each tick of the frame clock.  A
 +   timeout, not the ticks, which stop when the frame is not shown, tells
 +   when the cursor gets there.  */
@@ -577,30 +552,27 @@ index c99d527595f..07d4308b404 100644
 +  cairo_close_path (cr);
 +}
 +
-+/* Paint the cursor of F, which is moving, in CR: the trail, then the
-+   head.  */
++/* Paint the cursor of F, which is moving, as one quadrilateral in CR.  */
 +
 +static void
 +pgtk_paint_glide (struct frame *f, cairo_t *cr)
 +{
-+  double trail[4][2], head[4][2];
++  double corners[4][2];
 +  Emacs_Color color;
 +
 +  color.pixel = FRAME_CURSOR_COLOR (f);
 +  pgtk_query_color (f, &color);
 +  cairo_set_source_rgb (cr, color.red / 65535.0, color.green / 65535.0,
 +			color.blue / 65535.0);
-+  gui_cursor_glide_shape (f, gui_cursor_glide_progress (f), trail, head);
-+  pgtk_glide_path (cr, trail);
-+  cairo_fill (cr);
-+  pgtk_glide_path (cr, head);
++  gui_cursor_glide_shape (f, gui_cursor_glide_progress (f), corners);
++  pgtk_glide_path (cr, corners);
 +  cairo_fill (cr);
 +}
 +
  static void
  pgtk_draw_window_cursor (struct window *w, struct glyph_row *glyph_row, int x,
  			 int y, enum text_cursor_kinds cursor_type,
-@@ -3782,6 +3870,7 @@ pgtk_flush_display (struct frame *f)
+@@ -3782,6 +3867,7 @@ pgtk_flush_display (struct frame *f)
    pgtk_show_hourglass,
    pgtk_hide_hourglass,
    pgtk_default_font_parameter,
@@ -608,7 +580,7 @@ index c99d527595f..07d4308b404 100644
  };
  
  void
-@@ -5113,6 +5202,8 @@ pgtk_handle_draw (GtkWidget *widget, cairo_t *cr, gpointer *data)
+@@ -5113,6 +5199,8 @@ pgtk_handle_draw (GtkWidget *widget, cairo_t *cr, gpointer *data)
  	{
  	  cairo_set_source_surface (cr, src, 0, 0);
  	  cairo_paint (cr);
@@ -632,7 +604,7 @@ index 490bd6c8b6b..ff88699ed33 100644
  
    int icon_top;
 diff --git a/src/xdisp.c b/src/xdisp.c
-index 0f5bbfb5b47..089a7feed5d 100644
+index 0f5bbfb5b47..b0631a334a2 100644
 --- a/src/xdisp.c
 +++ b/src/xdisp.c
 @@ -1217,6 +1217,9 @@ static void update_tool_bar (struct frame *, bool);
@@ -657,7 +629,7 @@ index 0f5bbfb5b47..089a7feed5d 100644
      FRAME_RIF (f)->draw_window_cursor (w, glyph_row, x, y,
  				       new_cursor_type, new_cursor_width,
  				       on, active_cursor);
-@@ -35469,6 +35475,278 @@ gui_clear_cursor (struct window *w)
+@@ -35469,6 +35475,256 @@ gui_clear_cursor (struct window *w)
      update_window_cursor (w, false);
  }
  
@@ -669,9 +641,9 @@ index 0f5bbfb5b47..089a7feed5d 100644
 +/* When `cursor-animation-duration' is a number, and the terminal has a
 +   `glide_cursor' function, a cursor that moves is not drawn where it
 +   moves to until the movement is over.  Instead the terminal shows it
-+   moving, as a rectangle that is the cursor, and a quadrilateral that
-+   is stretched between where the cursor was and where it is now, both
-+   computed here.  When the movement is over `gui_cursor_glide_land'
++   moving, as one quadrilateral that stretches from where the cursor
++   was towards its new position and contracts into the cursor there.
++   When the movement is over `gui_cursor_glide_land'
 +   draws the cursor and tells the terminal to stop showing it, so that
 +   there is always one cursor, never none or two.  */
 +
@@ -717,30 +689,30 @@ index 0f5bbfb5b47..089a7feed5d 100644
 +}
 +
 +/* Compute the shape of the cursor of frame F that is moving, at time T,
-+   from 0 to 1, of the movement.  Store the corners of the quadrilateral
-+   that is its trail in TRAIL, and those of the rectangle that is the
-+   cursor itself in HEAD.  */
++   from 0 to 1, of the movement.  Store its four corners in CORNERS.  */
 +
 +void
-+gui_cursor_glide_shape (struct frame *f, double t, double trail[4][2],
-+			double head[4][2])
++gui_cursor_glide_shape (struct frame *f, double t, double corners[4][2])
 +{
 +  struct cursor_glide *g = &f->cursor_glide;
 +  double e = glide_ease_out (t);
++  double stretch[2];
++
++  /* Move the whole shape together and stretch its rear corners along
++     the movement.  The stretch vanishes at both ends.  This affine
++     deformation keeps the quadrilateral from folding on a retarget.  */
++  for (int k = 0; k < 2; k++)
++    stretch[k] = (g->to[0][k] + g->to[2][k]
++		  - g->from[0][k] - g->from[2][k]) / 2
++      * (e - e * e * e * e);
 +
 +  for (int c = 0; c < 4; c++)
-+    {
-+      double trailing = pow (e, g->late[c]);
-+
-+      for (int k = 0; k < 2; k++)
++    for (int k = 0; k < 2; k++)
 +	{
 +	  double delta = g->to[c][k] - g->from[c][k];
 +
-+	  head[c][k] = g->head_from[c][k]
-+	    + (g->to[c][k] - g->head_from[c][k]) * e;
-+	  trail[c][k] = g->from[c][k] + delta * trailing;
++	  corners[c][k] = g->from[c][k] + delta * e - stretch[k] * g->lag[c];
 +	}
-+    }
 +}
 +
 +/* Return how far the cursor of frame F is in its movement, from 0 to 1.  */
@@ -856,60 +828,38 @@ index 0f5bbfb5b47..089a7feed5d 100644
 +      return false;
 +    }
 +
-+  /* Preserve both shapes when a new target interrupts a flight.  In
-+     particular, the head must not jump to the previous destination or
-+     be replaced by the stretched shape of its trail.  */
-+  double old[4][2], old_head[4][2], new[4][2], lead[4], least = 1, most = -1;
++  /* Retarget the whole visible shape when a movement interrupts it.  */
++  double old[4][2], new[4][2];
 +  bool following = g->flight_window && now < g->start + g->duration;
-+  bool window_switch = !same_window || (following && g->window_switch);
 +
 +  glide_corners (r, new);
 +  if (following)
 +    {
 +      double progress = min (max ((now - g->start) / g->duration, 0), 1);
-+      gui_cursor_glide_shape (f, progress, old, old_head);
++      gui_cursor_glide_shape (f, progress, old);
 +    }
 +  else
-+    {
-+      glide_corners (previous, old);
-+      memcpy (old_head, old, sizeof old_head);
-+    }
++    glide_corners (previous, old);
 +
-+  /* The corners of the quadrilateral move with the ease-out timing
-+     function, but the more a corner trails behind the movement of the
-+     cursor, the later it gets to where the cursor is now, which stretches
-+     the quadrilateral.  Window switches keep a long ribbon across the
-+     distance travelled, including when retargeted before landing.
-+     Other movements keep their shorter, distance-limited stretch.  */
++  /* Use normalized corners so stretching along the movement preserves
++     a convex shape, regardless of the cursor's width and height.  The
++     same deformation applies to every distance and window.  */
 +  double dx = (new[0][0] + new[2][0] - old[0][0] - old[2][0]) / 2;
 +  double dy = (new[0][1] + new[2][1] - old[0][1] - old[2][1]) / 2;
-+  double distance = max (hypot (dx, dy), 1);
-+  bool near = (same_window
-+	       && fabs (round (dx / FRAME_COLUMN_WIDTH (f))) <= 2
-+	       && fabs (round (dy / FRAME_LINE_HEIGHT (f))) <= 2);
-+  double stretch = (window_switch ? 3.0
-+		    : min (near ? 0 : following ? 0.6 : 1.5,
-+			   8 * r[3] / distance));
++  double distance = max (fabs (dx) + fabs (dy), 1);
 +
 +  for (int c = 0; c < 4; c++)
 +    {
-+      /* How much the corner leads the cursor, from 1 to -1.  */
-+      double ox = new[c][0] - (new[0][0] + new[2][0]) / 2;
-+      double oy = new[c][1] - (new[0][1] + new[2][1]) / 2;
++      double ox = c == 1 || c == 2 ? 1 : -1;
++      double oy = c < 2 ? -1 : 1;
 +
-+      lead[c] = (ox * dx + oy * dy) / (hypot (ox, oy) * distance);
-+      least = min (least, lead[c]);
-+      most = max (most, lead[c]);
++      g->lag[c] = (1 - (ox * dx + oy * dy) / distance) / 2;
 +    }
-+  for (int c = 0; c < 4; c++)
-+    g->late[c] = 1 + stretch * (most - lead[c]) / max (most - least, 0.001);
 +  memcpy (g->from, old, sizeof old);
-+  memcpy (g->head_from, old_head, sizeof old_head);
 +  memcpy (g->to, new, sizeof new);
 +  g->flight_window = w->sequence_number;
 +  g->flight_x = x;
 +  g->flight_y = y;
-+  g->window_switch = window_switch;
 +  g->start = now;
 +  g->duration = duration;
 +  FRAME_RIF (f)->glide_cursor (f, true);
@@ -936,7 +886,7 @@ index 0f5bbfb5b47..089a7feed5d 100644
  #endif /* HAVE_WINDOW_SYSTEM */
  
  /* Implementation of draw_row_with_mouse_face for GUI sessions, GPM,
-@@ -39065,6 +39343,15 @@ syms_of_xdisp (void)
+@@ -39065,6 +39321,15 @@ syms_of_xdisp (void)
       during loadup.  */
    Vresize_mini_windows = Qnil;
  
