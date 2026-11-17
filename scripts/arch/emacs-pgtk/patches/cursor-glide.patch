@@ -48,11 +48,11 @@ The default duration is 0.1 seconds; setting it to nil disables animation.
  src/dispextern.h       |    8 +
  src/frame.h            |   30 +++++
  src/nsterm.h           |   22 ++++
- src/nsterm.m           |  173 +++++++++++++++++++++++++++++++
+ src/nsterm.m           |  173 ++++++++++++++++++++++++++++++-
  src/pgtkterm.c         |   88 ++++++++++++++++
  src/pgtkterm.h         |    3 +
- src/xdisp.c            |  267 ++++++++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 610 insertions(+), 2 deletions(-)
+ src/xdisp.c            |  271 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 614 insertions(+), 2 deletions(-)
 
 diff --git a/doc/emacs/display.texi b/doc/emacs/display.texi
 index a0e59d6bda0..ca71831e298 100644
@@ -604,7 +604,7 @@ index 490bd6c8b6b..ff88699ed33 100644
  
    int icon_top;
 diff --git a/src/xdisp.c b/src/xdisp.c
-index 0f5bbfb5b47..b0631a334a2 100644
+index 0f5bbfb5b47..26dfcd43bed 100644
 --- a/src/xdisp.c
 +++ b/src/xdisp.c
 @@ -1217,6 +1217,9 @@ static void update_tool_bar (struct frame *, bool);
@@ -629,7 +629,7 @@ index 0f5bbfb5b47..b0631a334a2 100644
      FRAME_RIF (f)->draw_window_cursor (w, glyph_row, x, y,
  				       new_cursor_type, new_cursor_width,
  				       on, active_cursor);
-@@ -35469,6 +35475,256 @@ gui_clear_cursor (struct window *w)
+@@ -35469,6 +35475,260 @@ gui_clear_cursor (struct window *w)
      update_window_cursor (w, false);
  }
  
@@ -847,13 +847,17 @@ index 0f5bbfb5b47..b0631a334a2 100644
 +  double dx = (new[0][0] + new[2][0] - old[0][0] - old[2][0]) / 2;
 +  double dy = (new[0][1] + new[2][1] - old[0][1] - old[2][1]) / 2;
 +  double distance = max (fabs (dx) + fabs (dy), 1);
++  /* Keep the deformation subtle and bound its growth during long jumps
++     and repeated retargets.  Scale the lag, preserving the whole shape.  */
++  double stretch = min (0.35, 8.0 * FRAME_LINE_HEIGHT (f)
++			/ max (hypot (dx, dy), 1));
 +
 +  for (int c = 0; c < 4; c++)
 +    {
 +      double ox = c == 1 || c == 2 ? 1 : -1;
 +      double oy = c < 2 ? -1 : 1;
 +
-+      g->lag[c] = (1 - (ox * dx + oy * dy) / distance) / 2;
++      g->lag[c] = stretch * (1 - (ox * dx + oy * dy) / distance) / 2;
 +    }
 +  memcpy (g->from, old, sizeof old);
 +  memcpy (g->to, new, sizeof new);
@@ -886,7 +890,7 @@ index 0f5bbfb5b47..b0631a334a2 100644
  #endif /* HAVE_WINDOW_SYSTEM */
  
  /* Implementation of draw_row_with_mouse_face for GUI sessions, GPM,
-@@ -39065,6 +39321,15 @@ syms_of_xdisp (void)
+@@ -39065,6 +39325,15 @@ syms_of_xdisp (void)
       during loadup.  */
    Vresize_mini_windows = Qnil;
  
