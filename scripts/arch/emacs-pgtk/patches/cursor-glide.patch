@@ -19,7 +19,7 @@ The default duration is 0.1 seconds; setting it to nil disables animation.
 'glide_cursor'.
 (gui_cursor_glide_shape, gui_cursor_glide_progress)
 (gui_cursor_glide_land): Declare.
-* src/xdisp.c (glide_now, glide_ease_out, glide_corners)
+* src/xdisp.c (glide_now, glide_stop, glide_ease_out, glide_corners)
 (gui_cursor_glide_shape, gui_cursor_glide_progress, gui_glide_cursor)
 (gui_cursor_glide_land): New functions.
 (display_and_set_cursor): Call 'gui_glide_cursor'.
@@ -46,13 +46,13 @@ The default duration is 0.1 seconds; setting it to nil disables animation.
  etc/NEWS               |    7 +
  lisp/cus-start.el      |    4 +
  src/dispextern.h       |    9 ++
- src/frame.h            |   30 ++++++
+ src/frame.h            |   30 +++++
  src/nsterm.h           |   22 ++++
- src/nsterm.m           |  194 +++++++++++++++++++++++++++++++++++++
- src/pgtkterm.c         |   91 +++++++++++++++++
+ src/nsterm.m           |  194 +++++++++++++++++++++++++++++++++
+ src/pgtkterm.c         |   91 +++++++++++++++
  src/pgtkterm.h         |    3 +
- src/xdisp.c            |  252 ++++++++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 620 insertions(+), 2 deletions(-)
+ src/xdisp.c            |  285 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 653 insertions(+), 2 deletions(-)
 
 diff --git a/doc/emacs/display.texi b/doc/emacs/display.texi
 index a0e59d6bda0..ca71831e298 100644
@@ -136,7 +136,7 @@ index 3114cdfcec9..040ffdd6008 100644
  extern void gui_draw_vertical_border (struct window *w);
  extern void gui_draw_right_divider (struct window *w);
 diff --git a/src/frame.h b/src/frame.h
-index 64d8a74f36e..6eccd943ffe 100644
+index 64d8a74f36e..8355e6d6ad3 100644
 --- a/src/frame.h
 +++ b/src/frame.h
 @@ -142,6 +142,33 @@ #define EMACS_FRAME_H
@@ -161,9 +161,9 @@ index 64d8a74f36e..6eccd943ffe 100644
 +  EMACS_INT flight_window;
 +  int flight_x, flight_y;
 +
-+  /* The corners of the quadrilateral that shows it at the beginning and
-+     at the end of the movement, and how late each gets to the end.  */
-+  double from[4][2], to[4][2], late[4];
++  /* The starting corners of the trail and head, their common destination,
++     and how late each trail corner gets there.  */
++  double from[4][2], head_from[4][2], to[4][2], late[4];
 +
 +  /* When the movement began, and how long it takes, in seconds.  */
 +  double start, duration;
@@ -245,7 +245,7 @@ index 69f565d51f9..745b4c9d6d6 100644
  #endif
  
 diff --git a/src/nsterm.m b/src/nsterm.m
-index fa66b0e9c2c..2b6f7de6dd2 100644
+index fa66b0e9c2c..9c5a6a53a8e 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
 @@ -3291,6 +3291,20 @@ Hide the window (X11 semantics)
@@ -413,8 +413,8 @@ index fa66b0e9c2c..2b6f7de6dd2 100644
 +	}
 +    }
 +
-+  /* The shapes at a number of times during the movement, which are shown
-+     one after the other, instead of animated.  */
++  /* Sample the movement; Core Animation interpolates the paths between
++     these shapes at the display's refresh rate.  */
 +  NSMutableArray *heads = [NSMutableArray arrayWithCapacity: STEPS];
 +  NSMutableArray *trails = [NSMutableArray arrayWithCapacity: STEPS];
 +  for (int i = 0; i < STEPS; i++)
@@ -446,7 +446,7 @@ index fa66b0e9c2c..2b6f7de6dd2 100644
 +      [layer setPath: (CGPathRef) [paths lastObject]];
 +      [layer setOpacity: 1];
 +      [animation setValues: paths];
-+      [animation setCalculationMode: kCAAnimationDiscrete];
++      [animation setCalculationMode: kCAAnimationLinear];
 +      [animation setDuration: frame->cursor_glide.duration];
 +      [layer addAnimation: animation forKey: @"glide"];
 +    }
@@ -629,7 +629,7 @@ index 490bd6c8b6b..ff88699ed33 100644
  
    int icon_top;
 diff --git a/src/xdisp.c b/src/xdisp.c
-index 0f5bbfb5b47..bc02e0b8c94 100644
+index 0f5bbfb5b47..09e45d75993 100644
 --- a/src/xdisp.c
 +++ b/src/xdisp.c
 @@ -1217,6 +1217,9 @@ static void update_tool_bar (struct frame *, bool);
@@ -654,7 +654,7 @@ index 0f5bbfb5b47..bc02e0b8c94 100644
      FRAME_RIF (f)->draw_window_cursor (w, glyph_row, x, y,
  				       new_cursor_type, new_cursor_width,
  				       on, active_cursor);
-@@ -35469,6 +35475,241 @@ gui_clear_cursor (struct window *w)
+@@ -35469,6 +35475,274 @@ gui_clear_cursor (struct window *w)
      update_window_cursor (w, false);
  }
  
@@ -676,6 +676,18 @@ index 0f5bbfb5b47..bc02e0b8c94 100644
 +glide_now (void)
 +{
 +  return timespectod (current_timespec ());
++}
++
++/* Stop a flight without forgetting the last cursor position.  */
++
++static void
++glide_stop (struct frame *f)
++{
++  if (f->cursor_glide.flight_window)
++    {
++      f->cursor_glide.flight_window = 0;
++      FRAME_RIF (f)->glide_cursor (f, false);
++    }
 +}
 +
 +/* Return where the ease-out timing function maps T, between 0 and 1.
@@ -721,7 +733,8 @@ index 0f5bbfb5b47..bc02e0b8c94 100644
 +	{
 +	  double delta = g->to[c][k] - g->from[c][k];
 +
-+	  head[c][k] = g->from[c][k] + delta * e;
++	  head[c][k] = g->head_from[c][k]
++	    + (g->to[c][k] - g->head_from[c][k]) * e;
 +	  trail[c][k] = g->from[c][k] + delta * trailing;
 +	}
 +    }
@@ -760,29 +773,39 @@ index 0f5bbfb5b47..bc02e0b8c94 100644
 +
 +  double now = glide_now ();
 +
-+  /* While the terminal shows the cursor, leave it hidden, unless the
-+     movement is over or the cursor is going to look different.  */
-+  if (g->flight_window == w->sequence_number)
++  if (!active)
 +    {
-+      if (active && type != NO_CURSOR && g->flight_x == x && g->flight_y == y
-+	  && now < g->start + g->duration)
-+	{
-+	  w->phys_cursor_on_p = false;
-+	  return true;
-+	}
-+      g->flight_window = 0;
-+      FRAME_RIF (f)->glide_cursor (f, false);
++      /* A window we are leaving may be redrawn before the selected
++         window.  Keep its flight until the new cursor can retarget it.  */
++      if (g->flight_window == w->sequence_number
++	  && (duration <= 0 || w == XWINDOW (f->selected_window)
++	      || f != FRAME_DISPLAY_INFO (f)->highlight_frame))
++	glide_stop (f);
++      return false;
 +    }
 +
-+  if (duration <= 0 || !active)
-+    return false;
-+  if (type == NO_CURSOR || !glyph)
++  if (duration <= 0)
 +    {
++      glide_stop (f);
++      return false;
++    }
++  if (type == NO_CURSOR || !glyph || glyph->type == IMAGE_GLYPH)
++    {
++      glide_stop (f);
 +      /* Keep the last visible position as the next movement's origin
 +         when blinking temporarily hides the cursor.  */
-+      if (!glyph || !w->cursor_off_p)
++      if (!glyph || glyph->type == IMAGE_GLYPH || !w->cursor_off_p)
 +        g->last_window = 0;
 +      return false;
++    }
++
++  /* A redraw at the same destination must not restart the flight.  */
++  if (g->flight_window == w->sequence_number
++      && g->flight_x == x && g->flight_y == y
++      && now < g->start + g->duration)
++    {
++      w->phys_cursor_on_p = false;
++      return true;
 +    }
 +
 +  /* Compute the rectangle of the cursor, as the terminals do.  */
@@ -809,37 +832,44 @@ index 0f5bbfb5b47..bc02e0b8c94 100644
 +  int x1 = min (fx + w->phys_cursor_width, bx + bw), y1 = min (fy + h, by + bh);
 +  if (x1 <= x0 || y1 <= y0)
 +    {
++      glide_stop (f);
 +      g->last_window = 0;
 +      return false;
 +    }
 +
-+  /* Find out whether it moved, and from where.  The cursor on an image
-+     does not move like this.  */
++  /* Find out whether it moved, and from where.  */
 +  int r[4] = { x0, y0, x1 - x0, y1 - y0 };
 +  int previous[4] = { g->last_rect[0], g->last_rect[1],
 +		      g->last_rect[2], g->last_rect[3] };
 +  bool same_window = g->last_window == w->sequence_number;
-+  bool moved = (g->last_window != 0 && glyph->type != IMAGE_GLYPH
++  bool moved = (g->last_window != 0
 +		&& (!same_window || previous[0] != r[0] || previous[1] != r[1]));
 +
-+  g->last_window = glyph->type == IMAGE_GLYPH ? 0 : w->sequence_number;
++  g->last_window = w->sequence_number;
 +  memcpy (g->last_rect, r, sizeof r);
 +  if (!moved)
-+    return false;
++    {
++      glide_stop (f);
++      return false;
++    }
 +
-+  /* Start from the shape of the cursor, if it is still moving.  */
-+  double old[4][2], new[4][2], lead[4], least = 1, most = -1;
++  /* Preserve both shapes when a new target interrupts a flight.  In
++     particular, the head must not jump to the previous destination or
++     be replaced by the stretched shape of its trail.  */
++  double old[4][2], old_head[4][2], new[4][2], lead[4], least = 1, most = -1;
 +  bool following = g->flight_window && now < g->start + g->duration;
 +
 +  glide_corners (r, new);
 +  if (following)
 +    {
-+      double head[4][2];
-+
-+      gui_cursor_glide_shape (f, gui_cursor_glide_progress (f), old, head);
++      double progress = min (max ((now - g->start) / g->duration, 0), 1);
++      gui_cursor_glide_shape (f, progress, old, old_head);
 +    }
 +  else
-+    glide_corners (previous, old);
++    {
++      glide_corners (previous, old);
++      memcpy (old_head, old, sizeof old_head);
++    }
 +
 +  /* The corners of the quadrilateral move with the ease-out timing
 +     function, but the more a corner trails behind the movement of the
@@ -868,6 +898,7 @@ index 0f5bbfb5b47..bc02e0b8c94 100644
 +  for (int c = 0; c < 4; c++)
 +    g->late[c] = 1 + stretch * (most - lead[c]) / max (most - least, 0.001);
 +  memcpy (g->from, old, sizeof old);
++  memcpy (g->head_from, old_head, sizeof old_head);
 +  memcpy (g->to, new, sizeof new);
 +  g->flight_window = w->sequence_number;
 +  g->flight_x = x;
@@ -889,14 +920,16 @@ index 0f5bbfb5b47..bc02e0b8c94 100644
 +    {
 +      f->cursor_glide.flight_window = 0;
 +      gui_update_cursor (f, true);
-+      FRAME_RIF (f)->glide_cursor (f, false);
++      /* Cursor refresh may have started another flight.  */
++      if (!f->cursor_glide.flight_window)
++	FRAME_RIF (f)->glide_cursor (f, false);
 +    }
 +}
 +
  #endif /* HAVE_WINDOW_SYSTEM */
  
  /* Implementation of draw_row_with_mouse_face for GUI sessions, GPM,
-@@ -39065,6 +39306,15 @@ syms_of_xdisp (void)
+@@ -39065,6 +39339,15 @@ syms_of_xdisp (void)
       during loadup.  */
    Vresize_mini_windows = Qnil;
  
