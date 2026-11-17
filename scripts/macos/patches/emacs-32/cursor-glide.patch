@@ -34,7 +34,7 @@ The default duration is 0.1 seconds; setting it to nil disables animation.
 * src/pgtkterm.h (struct pgtk_output): New members 'glide_tick' and
 'glide_timeout'.
 * src/pgtkterm.c (pgtk_glide_stop, pgtk_glide_tick, pgtk_glide_land)
-(pgtk_glide_cursor, pgtk_glide_path, pgtk_paint_glide): New functions.
+(pgtk_glide_cursor, pgtk_paint_glide): New functions.
 (pgtk_redisplay_interface): Use 'pgtk_glide_cursor'.
 (pgtk_handle_draw): Call 'pgtk_paint_glide'.
 (pgtk_free_frame_resources): Call 'pgtk_glide_stop'.
@@ -49,10 +49,10 @@ The default duration is 0.1 seconds; setting it to nil disables animation.
  src/frame.h            |   30 +++++
  src/nsterm.h           |   22 ++++
  src/nsterm.m           |  173 ++++++++++++++++++++++++++++++-
- src/pgtkterm.c         |   88 ++++++++++++++++
+ src/pgtkterm.c         |   80 ++++++++++++++
  src/pgtkterm.h         |    3 +
  src/xdisp.c            |  271 ++++++++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 614 insertions(+), 2 deletions(-)
+ 10 files changed, 606 insertions(+), 2 deletions(-)
 
 diff --git a/doc/emacs/display.texi b/doc/emacs/display.texi
 index a0e59d6bda0..ca71831e298 100644
@@ -463,7 +463,7 @@ index fa66b0e9c2c..6f588e1383b 100644
  #endif /* NS_IMPL_COCOA */
  
 diff --git a/src/pgtkterm.c b/src/pgtkterm.c
-index c99d527595f..aeb5ea4e302 100644
+index c99d527595f..2b2a34a8b19 100644
 --- a/src/pgtkterm.c
 +++ b/src/pgtkterm.c
 @@ -262,6 +262,8 @@ pgtk_get_device_for_event (struct pgtk_display_info *dpyinfo,
@@ -483,7 +483,7 @@ index c99d527595f..aeb5ea4e302 100644
  
  #define CLEAR_IF_EQ(FIELD)	\
    do { if (f == dpyinfo->FIELD) dpyinfo->FIELD = 0; } while (false)
-@@ -3013,6 +3016,88 @@ pgtk_draw_bar_cursor (struct window *w, struct glyph_row *row, int width,
+@@ -3013,6 +3016,80 @@ pgtk_draw_bar_cursor (struct window *w, struct glyph_row *row, int width,
  
  /* RIF: Draw cursor on window W.  */
  
@@ -541,17 +541,6 @@ index c99d527595f..aeb5ea4e302 100644
 +  gtk_widget_queue_draw (FRAME_GTK_WIDGET (f));
 +}
 +
-+/* Make the path of the quadrilateral with the corners CORNERS in CR.  */
-+
-+static void
-+pgtk_glide_path (cairo_t *cr, double corners[4][2])
-+{
-+  cairo_move_to (cr, corners[0][0], corners[0][1]);
-+  for (int c = 1; c < 4; c++)
-+    cairo_line_to (cr, corners[c][0], corners[c][1]);
-+  cairo_close_path (cr);
-+}
-+
 +/* Paint the cursor of F, which is moving, as one quadrilateral in CR.  */
 +
 +static void
@@ -565,14 +554,17 @@ index c99d527595f..aeb5ea4e302 100644
 +  cairo_set_source_rgb (cr, color.red / 65535.0, color.green / 65535.0,
 +			color.blue / 65535.0);
 +  gui_cursor_glide_shape (f, gui_cursor_glide_progress (f), corners);
-+  pgtk_glide_path (cr, corners);
++  cairo_move_to (cr, corners[0][0], corners[0][1]);
++  for (int c = 1; c < 4; c++)
++    cairo_line_to (cr, corners[c][0], corners[c][1]);
++  cairo_close_path (cr);
 +  cairo_fill (cr);
 +}
 +
  static void
  pgtk_draw_window_cursor (struct window *w, struct glyph_row *glyph_row, int x,
  			 int y, enum text_cursor_kinds cursor_type,
-@@ -3782,6 +3867,7 @@ pgtk_flush_display (struct frame *f)
+@@ -3782,6 +3859,7 @@ pgtk_flush_display (struct frame *f)
    pgtk_show_hourglass,
    pgtk_hide_hourglass,
    pgtk_default_font_parameter,
@@ -580,7 +572,7 @@ index c99d527595f..aeb5ea4e302 100644
  };
  
  void
-@@ -5113,6 +5199,8 @@ pgtk_handle_draw (GtkWidget *widget, cairo_t *cr, gpointer *data)
+@@ -5113,6 +5191,8 @@ pgtk_handle_draw (GtkWidget *widget, cairo_t *cr, gpointer *data)
  	{
  	  cairo_set_source_surface (cr, src, 0, 0);
  	  cairo_paint (cr);
