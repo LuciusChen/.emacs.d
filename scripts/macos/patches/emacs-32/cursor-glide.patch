@@ -45,14 +45,14 @@ The default duration is 0.1 seconds; setting it to nil disables animation.
  doc/emacs/display.texi |   10 ++
  etc/NEWS               |    7 +
  lisp/cus-start.el      |    4 +
- src/dispextern.h       |    9 ++
- src/frame.h            |   30 +++++
+ src/dispextern.h       |    9 +
+ src/frame.h            |   33 +++++
  src/nsterm.h           |   22 ++++
- src/nsterm.m           |  194 +++++++++++++++++++++++++++++++++
+ src/nsterm.m           |  194 ++++++++++++++++++++++++++++++++
  src/pgtkterm.c         |   91 +++++++++++++++
- src/pgtkterm.h         |    3 +
- src/xdisp.c            |  285 ++++++++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 653 insertions(+), 2 deletions(-)
+ src/pgtkterm.h         |    3
+ src/xdisp.c            |  289 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 660 insertions(+), 2 deletions(-)
 
 diff --git a/doc/emacs/display.texi b/doc/emacs/display.texi
 index a0e59d6bda0..ca71831e298 100644
@@ -136,10 +136,10 @@ index 3114cdfcec9..040ffdd6008 100644
  extern void gui_draw_vertical_border (struct window *w);
  extern void gui_draw_right_divider (struct window *w);
 diff --git a/src/frame.h b/src/frame.h
-index 64d8a74f36e..8355e6d6ad3 100644
+index 64d8a74f36e..8bff3499d92 100644
 --- a/src/frame.h
 +++ b/src/frame.h
-@@ -142,6 +142,33 @@ #define EMACS_FRAME_H
+@@ -142,6 +142,36 @@ #define EMACS_FRAME_H
  
  /* The structure representing a frame.  */
  
@@ -161,6 +161,9 @@ index 64d8a74f36e..8355e6d6ad3 100644
 +  EMACS_INT flight_window;
 +  int flight_x, flight_y;
 +
++  /* Keep the long ribbon until a window-switch flight finishes.  */
++  bool window_switch;
++
 +  /* The starting corners of the trail and head, their common destination,
 +     and how late each trail corner gets there.  */
 +  double from[4][2], head_from[4][2], to[4][2], late[4];
@@ -173,7 +176,7 @@ index 64d8a74f36e..8355e6d6ad3 100644
  struct frame
  {
    union vectorlike_header header;
-@@ -713,6 +740,9 @@ #define EMACS_FRAME_H
+@@ -713,6 +743,9 @@ #define EMACS_FRAME_H
    /* Background opacity */
    double alpha_background;
  
@@ -629,7 +632,7 @@ index 490bd6c8b6b..ff88699ed33 100644
  
    int icon_top;
 diff --git a/src/xdisp.c b/src/xdisp.c
-index 0f5bbfb5b47..09e45d75993 100644
+index 0f5bbfb5b47..089a7feed5d 100644
 --- a/src/xdisp.c
 +++ b/src/xdisp.c
 @@ -1217,6 +1217,9 @@ static void update_tool_bar (struct frame *, bool);
@@ -654,7 +657,7 @@ index 0f5bbfb5b47..09e45d75993 100644
      FRAME_RIF (f)->draw_window_cursor (w, glyph_row, x, y,
  				       new_cursor_type, new_cursor_width,
  				       on, active_cursor);
-@@ -35469,6 +35475,274 @@ gui_clear_cursor (struct window *w)
+@@ -35469,6 +35475,278 @@ gui_clear_cursor (struct window *w)
      update_window_cursor (w, false);
  }
  
@@ -858,6 +861,7 @@ index 0f5bbfb5b47..09e45d75993 100644
 +     be replaced by the stretched shape of its trail.  */
 +  double old[4][2], old_head[4][2], new[4][2], lead[4], least = 1, most = -1;
 +  bool following = g->flight_window && now < g->start + g->duration;
++  bool window_switch = !same_window || (following && g->window_switch);
 +
 +  glide_corners (r, new);
 +  if (following)
@@ -874,16 +878,18 @@ index 0f5bbfb5b47..09e45d75993 100644
 +  /* The corners of the quadrilateral move with the ease-out timing
 +     function, but the more a corner trails behind the movement of the
 +     cursor, the later it gets to where the cursor is now, which stretches
-+     the quadrilateral.  It does that less if the cursor follows another
-+     movement, or if it moves at most two columns and lines, unless to
-+     another window, and the stretch is limited for long movements.  */
++     the quadrilateral.  Window switches keep a long ribbon across the
++     distance travelled, including when retargeted before landing.
++     Other movements keep their shorter, distance-limited stretch.  */
 +  double dx = (new[0][0] + new[2][0] - old[0][0] - old[2][0]) / 2;
 +  double dy = (new[0][1] + new[2][1] - old[0][1] - old[2][1]) / 2;
 +  double distance = max (hypot (dx, dy), 1);
 +  bool near = (same_window
 +	       && fabs (round (dx / FRAME_COLUMN_WIDTH (f))) <= 2
 +	       && fabs (round (dy / FRAME_LINE_HEIGHT (f))) <= 2);
-+  double stretch = min (near ? 0 : following ? 0.6 : 1.5, 8 * r[3] / distance);
++  double stretch = (window_switch ? 3.0
++		    : min (near ? 0 : following ? 0.6 : 1.5,
++			   8 * r[3] / distance));
 +
 +  for (int c = 0; c < 4; c++)
 +    {
@@ -903,6 +909,7 @@ index 0f5bbfb5b47..09e45d75993 100644
 +  g->flight_window = w->sequence_number;
 +  g->flight_x = x;
 +  g->flight_y = y;
++  g->window_switch = window_switch;
 +  g->start = now;
 +  g->duration = duration;
 +  FRAME_RIF (f)->glide_cursor (f, true);
@@ -929,7 +936,7 @@ index 0f5bbfb5b47..09e45d75993 100644
  #endif /* HAVE_WINDOW_SYSTEM */
  
  /* Implementation of draw_row_with_mouse_face for GUI sessions, GPM,
-@@ -39065,6 +39339,15 @@ syms_of_xdisp (void)
+@@ -39065,6 +39343,15 @@ syms_of_xdisp (void)
       during loadup.  */
    Vresize_mini_windows = Qnil;
  
