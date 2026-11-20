@@ -69,6 +69,7 @@ CMAKE_ARGS=(
 if [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="Unix Makefiles"
   CMAKE_ARGS+=(
+      -U 'ZLIB_*'  # Xcode updates can remove the SDK cached by FindZLIB.
     "-DOPENSSL_ROOT_DIR=${TDLIB_OPENSSL_ROOT_DIR:-$(brew --prefix openssl@3)}"
     -DCMAKE_INSTALL_PREFIX:PATH=/usr/local
   )

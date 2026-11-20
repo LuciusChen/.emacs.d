@@ -83,15 +83,12 @@
           sis-other-cursor-color "orange"
           sis-context-hooks '(meow-insert-enter-hook))
     (:with-feature meow
-        (:with-hook meow-switch-state-hook
-          (:hook +sis-set-english-outside-meow-insert))
-        (:with-hook meow-insert-exit-hook
-          (:hook +sis-set-english-outside-meow-insert)))
+      (:advice meow--switch-state :before #'+sis-set-english-outside-meow-insert))
     (if IS-MAC
         (sis-ism-lazyman-config
          "com.apple.keylayout.ABC"
          "im.rime.inputmethod.Squirrel.Hans")
-      (sis-ism-lazyman-config "1" "2" 'fcitx5))
+        (sis-ism-lazyman-config "1" "2" 'fcitx5))
     ;; Respect the Meta prefix maps used by Consult and Emacs search.
     (setq sis-prefix-override-keys
           (delete-dups

@@ -2,10 +2,11 @@
 ;;; Commentary:
 ;;; Code:
 
-(defun +sis-set-english-outside-meow-insert (&optional state)
-  "Switch to English when Meow enters a non-insert STATE."
+(defun +sis-set-english-outside-meow-insert (&optional state _no-hook)
+  "Use English on focus-in or before moving between non-insert Meow states."
   (when (and (eq (current-buffer) (window-buffer))
              (not (eq state 'insert))
+             (or (null state) (not (eq state (meow--current-state))))
              (not (bound-and-true-p meow-insert-mode)))
     (sis-set-english)))
 
@@ -17,7 +18,8 @@
                (not (org-in-src-block-p)))
               ((derived-mode-p 'gfm-mode 'telega-chat-mode))
               ((string-match-p "\\*new toot\\*" (buffer-name))))
-             (not (or (looking-back "[a-zA-Z]\\|\\cc" 1)
+             (not (or (looking-back "[a-zA-Z]\\|\\cc"
+                                    (max (point-min) (1- (point))))
                       (looking-at-p "[a-zA-Z]\\|\\cc"))))
     'other))
 
