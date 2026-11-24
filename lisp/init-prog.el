@@ -43,7 +43,10 @@
   (:with-mode (markdown-mode markdown-ts-mode)
     (:hook pele-markdown-mode))
   (:when-loaded
-    (setopt pele-module-auto-install 'download)))
+    (setopt pele-module-auto-install 'download
+            pele-font-size FONT-SIZE
+            pele-font-family (format "PragmataPro, %s" ZH-DEFAULT-FONT)
+            pele-font-family-mono pele-font-family)))
 
 (setup display-fill-column-indicator (:hook-into prog-mode))
 (setup display-line-numbers (:hook-into prog-mode))
