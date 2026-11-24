@@ -54,6 +54,7 @@
                                       "\\(?:\\*\\|[+-]?[[:alnum:].,\\]*[[:alnum:]]\\)\\)")
           )
     (:with-mode org-mode
+      (:hook pele-org-mode)
       (:hook (lambda () (electric-pair-local-mode -1)))
       (:hook org-indent-mode)
       (:hook visual-line-mode)
@@ -122,7 +123,9 @@
      'org-babel-load-languages '((python . t)
                                  (shell . t)
                                  (sql . t)
-                                 (latex . t)))))
+                                 (latex . t)
+                                 (pele . t)))
+    (pele-babel-enable-mermaid)))
 
 (setup (:warm denote)
   ;; Denote commands already have upstream autoloads, so install their entry

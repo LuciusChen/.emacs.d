@@ -66,6 +66,7 @@
         (ytm-radio :host github :repo "LuciusChen/ytm-radio")
         (org-defuddle :host github :repo "LuciusChen/org-defuddle")
         (ob-clutch :host github :repo "LuciusChen/ob-clutch")
+        (pele :host github :repo "LuciusChen/pele.el")
         (mongodb :host github :repo "LuciusChen/mongodb.el")
         (redis :host github :repo "LuciusChen/redis.el")
         (java-kit :host github :repo "LuciusChen/java-kit")

@@ -39,6 +39,12 @@
   (:with-mode prisma-ts-mode (:match-file "*.prisma"))
   (add-to-list 'interpreter-mode-alist '("node" . js-ts-mode)))
 
+(setup pele
+  (:with-mode (markdown-mode markdown-ts-mode)
+    (:hook pele-markdown-mode))
+  (:when-loaded
+    (setopt pele-module-auto-install 'download)))
+
 (setup display-fill-column-indicator (:hook-into prog-mode))
 (setup display-line-numbers (:hook-into prog-mode))
 
