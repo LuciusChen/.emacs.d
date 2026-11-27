@@ -1,48 +1,27 @@
 [[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/Linux-0.24s-brightgreen.svg?style=svg]] [[https://github.com/LuciusChen/.emacs.d][https://img.shields.io/badge/macOS-0.58s-blue.svg?style=svg]]
 * Emacs Configuration
 ** Introduction
-最初因为市场上许多笔记软件无法提供足够的定制化选项，我感到不满。在朋友的推荐下，我开始接触 [[https://orgmode.org/][Org mode]]，从而进入了 [[https://github.com/doomemacs/doomemacs][doomemacs]] 的领域。然而，对于缺乏 [[https://www.gnu.org/software/emacs/manual/html_node/eintr/][elisp]] 相关知识的新手来说，doomemacs 仿佛一个黑盒，难以定位问题以及个性化调整，且这与我“满足自身需求且尽可能减少配置”的理念相悖。因此，从 2022 年起，我开始构建自己的配置。
+之前用市面上的笔记软件总觉得不够顺手，经朋友推荐入坑了 [[https://orgmode.org/][Org mode]] 和 [[https://github.com/doomemacs/doomemacs][doomemacs]]。不过刚上手时还不懂 [[https://www.gnu.org/software/emacs/manual/html_node/eintr/][elisp]]，doomemacs 封装太厚，出了问题不好排查，也不方便按自己习惯改。我想把配置尽量精简，够用就行，所以从 2022 年起开始自己写。
 
-这套配置完全出于个人需求的考量而设计。如果能有幸得到他人的关注与使用，我将倍感欣慰。同时，若其中存在不足之处，欢迎随时指正。
-** Compilation
-*** MacOS
-使用脚本 [[./scripts/macos/emacs_setup.sh][emacs_setup.sh]] 进行安装时，若 [[./patches/][patches]] 目录中的补丁与 emacs-plus 维护的补丁同名，则会覆盖原有补丁并修改其 =sha= 值。否则，这些补丁将作为 =user_patch= 被纳入 =emacs-plus@31.rb= 中进行管理。
-
-只需执行 =./emacs_setup.sh= 即可完成安装。如需安装 =feature/igc= 分支，只需添加参数 =mps= 。
-**** patches
-与 [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] 重复的 patches 在这里是因为我经常编译，就自己维护了。[[./patches/emacs-30/fix-window-role.patch][fix-window-role.patch]] 在 emacs@31 已经合并到上游了。
-
-1. [[./patches/emacs-31/cursor-animation.patch][cursor-animation.patch]] 相较于 neovide 等其他的光标动画，我更喜欢这个。最初由 @ksqsf 在 [[https://t.me/c/1873425044/68208][Emacs_CN Lite 轻聊版]] 中放出，@TakaObsid 完善后不再遮挡内容。
-2. [[./patches/emacs-31/ns-alpha-background.patch][ns-alpha-background.patch]]
-3. [[./patches/emacs-31/ns-mac-input-source.patch][ns-mac-input-source.patch]] 经由 @georgealbert 整理提取，用于切换输入法。
-*** Arch Linux
-使用 [[./scripts/arch/build-emacs-pgtk.sh][build-emacs-pgtk.sh]] 进行编译，这实际上是我自行维护的 =PKGBUILD= ，旨在简化编译与安装过程。
-** Package Management
-包管理使用的是 [[https://github.com/radian-software/straight.el][straight.el]] + [[https://codeberg.org/pkal/setup.el][setup.el]]，前者功能比较全面，可以 pin 到具体的 commits；后者相对简单，可以在此基础上自定义关键字，比如 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lisp/init-setup.el#L78][:set-font]]（按 =mode= 定义不同的字体）。
-*** setup.el 常见问题
-1. =:bind-into= 已经被淘汰，最好用 =(:with-map xxx-map (:bind "C-c x t" xxxx))= 的写法。
-2. =:option= 已经被淘汰，用 Emacs 内置的 =setq= 和 =setopt= 。
-3. =:file-match= 修改后，需要从 =(:match-file "\\.lua\\'")= 改为 =(:match-file "*.lua")= 。
-** UI/UX
-*** Fonts
-1. 默认字体：[[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro Mono]]
-2. 中文字体：[[https://github.com/lxgw/LxgwWenKai-Screen][LXGW WenKai Screen]]，fallback 字体：[[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]]（CJK 全覆盖）。
-3. org-mode 字体：[[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro Liga]]
-
-配置参考：
-- [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs Init: Setup Font]]
-- [[https://idiocy.org/emacs-fonts-and-fontsets.html][Emacs, fonts and fontsets | idiocy.org]]
-- [[https://emacs-china.org/t/emacs/15676/34][经验分享：emacs单独设置中文与英语的字体 - #34，来自 p1uxtar - Emacs-general - Emacs China]]
-- [[https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points][Glyph Sets and Code Points · ryanoasis/nerd-fonts Wiki · GitHub]]
-*** Theme
-主题目前选用 [[https://github.com/LuciusChen/ashen][ashen]]，Dashboard 选用 fork 修改后的 [[https://github.com/LuciusChen/panel][panel]]，mode-line 选用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]。
-** Security
-所有条目都存入 pass 中，并通过启用 =auth-source-pass-enable= 自动读取。然而，对于自建的 GitLab， =machine= 的值必须采用 =192.168.1.220:9081/api/v4= 格式，这一信息无法直接存入 pass。因此，我更改了存储名称，并编写了 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lib/lib-auth.el#L11][check-and-update-authinfo]]，将其自动读取并写入 =.authinfo= 中，从而实现配置过程的自动化。
+这套配置主要是自用，如果刚好能帮到你当然更好，有毛病也欢迎直接提。
 ** Feature Overview
+*** Org 移动端（Aster）
+手机上用的是自己写的 Aster：支持日历、待办、习惯管理和日记，也能快速记录、直接编辑 Org 原文。数据保存在你自己的 =.org= 文件中，方便与 Emacs 配合使用。
+
+- iOS：已上架 [[https://apps.apple.com/app/id6805523425][App Store]]
+- Android：目前还在 Google Play 封闭测试阶段（需要 12 人连续测满两周才能上架），欢迎帮忙测一下：[[https://play.google.com/apps/testing/com.lucius.aster][Google Play 测试入口]]
+*** Java 开发
+日常 Java 开发已经从 IntelliJ IDEA 迁到 Emacs，核心组合是 =eglot= + [[https://github.com/svaante/dape][dape]] + [[https://github.com/LuciusChen/java-kit][java-kit]]：
+
+- LSP 与项目：用自写的 =java-kit= 接管 JDTLS、项目 JDK 识别、Lombok 挂载以及 Maven 构建 / Tomcat 部署（=C-c C-b= 构建，=C-c C-d= / =C-c C-s= 部署和停止），配合内置 =eglot= 做补全、跳转和重构。
+- 调试：用 =dape=（=<f5>=）对接 =java-debug= 跑断点调试。
+- MyBatis 配套：[[./lib/lib-eglot.el][mapper-find-xml]]（=C-c C-x=）可以在 Mapper 接口和对应 XML 之间跳转；XML 里用 =mmm-mode= 嵌 =sql-mode=，配合 [[./lib/lib-mybatis.el][+mybatis-edit-sql-block]]（=C-c '=）把动态 SQL 抽到独立 buffer 里改完格式化再写回。
+*** 数据库
+用自写的 [[https://github.com/LuciusChen/clutch][clutch]] 替代了 DataGrip，直接在 Emacs 里写 SQL、查表和改行数据（MySQL / PostgreSQL / SQLite / MongoDB / Redis 走原生协议，Oracle 等走 JDBC，支持 SSH 隧道，也能配合 [[https://github.com/LuciusChen/ob-clutch][ob-clutch]] 在 Org 里执行）。打开 =.sql= 文件默认进 =clutch-mode=。
 *** 输入法切换
 =ns-mac-input-source.patch= 应用后可以原生支持切换输入法，主要是添加了 =mac-input-source= 方法。
 
-1. [[https://github.com/laishulu/emacs-smart-input-source][emacs-smart-input-source]] 如果检测到 =mac-input-source= 就会才用该函数来切换输入法，代替 [[https://github.com/laishulu/macism][macism]]。
+1. [[https://github.com/laishulu/emacs-smart-input-source][emacs-smart-input-source]] 如果检测到 =mac-input-source= 就会采用该函数来切换输入法，代替 [[https://github.com/laishulu/macism][macism]]。
 2. 通过 [[https://karabiner-elements.pqrs.org/][Karabiner-Elements]] [[https://github.com/LuciusChen/dotfiles/blob/0b0fe7f03c932d779d187e943fc6d92c9e11795a/macos/.config/karabiner.edn#L58][映射]] =left_shift= 到 =f13= ，绑定后就可以通过 =left_shift= 切换输入法。
 **** 常见问题
 - 自 Sequoia 系统开始，系统增加了 =CursorUIViewservice= 进程来显示输入法状态，经常会卡死导致内存占用。可以通过下面的命令彻底关闭。参考自 [[https://www.reddit.com/r/MacOS/comments/16vmjfc/comment/kcq6nql/][Reddit - Dive into anything]]。
@@ -86,5 +65,38 @@ Emacs 内预览曾尝试 [[https://github.com/dandavison/xenops][xenops]] 和 [[
 - OpenRouter 等平台不支持 =stream= 参数为 null，因此当 =stream= 为 =null= 则不纳入到入参当中。
 *** Git
 - [[https://github.com/magit/forge][forge]] 的 =forge-copy-url-at-point-as-kill= 可以复制当前文件的链接，当选择某行时，链接也会具体到某行，可以替代我用到 [[https://github.com/sshaw/git-link][git-link]] 的功能。
-- IDEA 中修改代码，也可以切换到 Emacs 用 [[https://github.com/magit/magit][magit]] 进行 git 操作, [[./scripts/macos/magit.sh][magit.sh]] 可以自动化这个过程。在 IDEA 中 =Settings>Tools>External Tools= 中设置 =Program= 为 =magit.sh= 地址，并在 =Working directory= 中填入宏 =$ProjectFileDir$= 即可。（宏参考 [[https://www.jetbrains.com/help/idea/built-in-macros.html][Built-in IDE macros | IntelliJ IDEA Documentation]]）（原文地址：[[https://dolzhenko.me/blog/2025/03/launching-magit-from-intellij-idea/][Launching Magit from IntelliJ IDEA - Dmitry Dolzhenko]]）
-*** Java 编程
+** Compilation
+*** MacOS
+用 [[./scripts/macos/emacs_setup.sh][emacs_setup.sh]] 编译安装，默认装 =emacs-plus@32=（也可以传参数 =31=）。脚本会把 [[./scripts/macos/patches/][patches]] 里对应版本的补丁同步进 formula：和 emacs-plus 重名的直接覆盖并更新 =sha=，其余的作为 =user_patch= 加进去。
+
+直接跑 =./scripts/macos/emacs_setup.sh= 就行，要编 =feature/igc= 分支就加参数 =mps=。
+**** patches
+和 [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]] 重名的补丁放这里主要是因为我经常自己编，干脆一起维护。Emacs 32 下各补丁的详细说明见 [[./scripts/macos/patches/emacs-32/README.md][emacs-32/README.md]]。
+
+1. [[./scripts/macos/patches/emacs-32/cursor-glide.patch][cursor-glide.patch]]：光标滑动动画，默认时长 0.1s（把 =cursor-animation-duration= 设为 =nil= 可关闭）。
+2. [[./scripts/macos/patches/emacs-32/frame-transparency.patch][frame-transparency.patch]]：窗口透明和背景模糊（Emacs 31 下还是旧的 [[./scripts/macos/patches/emacs-31/ns-alpha-background.patch][ns-alpha-background.patch]]）。
+3. [[./scripts/macos/patches/emacs-32/ns-preserve-svg-alpha.patch][ns-preserve-svg-alpha.patch]]：修 NS 下 PNG/SVG/WebP 图片透明和半透明窗口合成的问题。
+4. [[./scripts/macos/patches/emacs-32/ns-mac-input-source.patch][ns-mac-input-source.patch]]：经由 @georgealbert 整理提取，用于原生切换输入法。
+*** Arch Linux
+用 [[./scripts/arch/build-emacs-pgtk.sh][build-emacs-pgtk.sh]] 编译，背后是自己维护的 =PKGBUILD=，省得每次手动折腾。PGTK 补丁说明见 [[./scripts/arch/emacs-pgtk/patches/README.md][patches/README.md]]。
+** Package Management
+包管理使用的是 [[https://github.com/radian-software/straight.el][straight.el]] + [[https://codeberg.org/pkal/setup.el][setup.el]]，前者功能比较全面，可以 pin 到具体的 commits；后者相对简单，可以在此基础上自定义关键字，比如 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lisp/init-setup.el#L78][:set-font]]（按 =mode= 定义不同的字体）。
+*** setup.el 常见问题
+1. =:bind-into= 已经被淘汰，最好用 =(:with-map xxx-map (:bind "C-c x t" xxxx))= 的写法。
+2. =:option= 已经被淘汰，用 Emacs 内置的 =setq= 和 =setopt= 。
+3. =:file-match= 修改后，需要从 =(:match-file "\\.lua\\'")= 改为 =(:match-file "*.lua")= 。
+** UI/UX
+*** Fonts
+1. 默认字体：[[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro Mono]]
+2. 中文字体：[[https://github.com/lxgw/LxgwWenKai-Screen][LXGW WenKai Screen]]，fallback 字体：[[https://kamichikoichi.github.io/jigmo/][Jigmo fonts]]（CJK 全覆盖）。
+3. org-mode 字体：[[https://fsd.it/shop/fonts/pragmatapro/][PragmataPro Liga]]
+
+配置参考：
+- [[http://xahlee.info/emacs/emacs/emacs_list_and_set_font.html][Emacs Init: Setup Font]]
+- [[https://idiocy.org/emacs-fonts-and-fontsets.html][Emacs, fonts and fontsets | idiocy.org]]
+- [[https://emacs-china.org/t/emacs/15676/34][经验分享：emacs单独设置中文与英语的字体 - #34，来自 p1uxtar - Emacs-general - Emacs China]]
+- [[https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points][Glyph Sets and Code Points · ryanoasis/nerd-fonts Wiki · GitHub]]
+*** Theme
+主题目前选用 [[https://github.com/LuciusChen/ashen][ashen]]，Dashboard 选用 fork 修改后的 [[https://github.com/LuciusChen/panel][panel]]，mode-line 选用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]。
+** Security
+密码都存在 pass 里，开了 =auth-source-pass-enable= 自动读取。不过自建 GitLab 的 =machine= 必须写成 =192.168.1.220:9081/api/v4= 这种带端口和路径的格式，没法直接按原名存进 pass。所以我换了个条目名，写了 [[https://github.com/LuciusChen/.emacs.d/blob/431223eaf9b726076b6c6f6e6c8502c42173b7e1/lib/lib-auth.el#L11][check-and-update-authinfo]] 自动读出来同步到 =.authinfo=。

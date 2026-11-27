@@ -485,21 +485,21 @@ index 1086f474eec..ebaa7a33c3c 100644
  
    eassume (err == NULL);
 diff --git a/src/pgtkterm.c b/src/pgtkterm.c
-index 9a9ebef418c..6d1074c816b 100644
+index 97594d0a778..c1b6abc0c76 100644
 --- a/src/pgtkterm.c
 +++ b/src/pgtkterm.c
-@@ -2212,7 +2212,8 @@ pgtk_draw_glyph_string_bg_rect (struct glyph_string *s, int x, int y, int w,
+@@ -2224,7 +2224,8 @@ pgtk_draw_glyph_string_bg_rect (struct glyph_string *s, int x, int y, int w,
  static void
  pgtk_cr_draw_image (struct frame *f, Emacs_GC *gc, cairo_pattern_t *image,
- 		    int src_x, int src_y, int width, int height,
--		    int dest_x, int dest_y, bool overlay_p)
-+		    int dest_x, int dest_y, bool overlay_p,
+ 		    cairo_surface_t *surface, int src_x, int src_y, int width,
+-		    int height, int dest_x, int dest_y, bool overlay_p)
++		    int height, int dest_x, int dest_y, bool overlay_p,
 +		    bool respect_alpha_background)
  {
    cairo_t *cr = pgtk_begin_cr_clip (f);
  
-@@ -2232,6 +2233,11 @@ pgtk_cr_draw_image (struct frame *f, Emacs_GC *gc, cairo_pattern_t *image,
-   cairo_format_t format = cairo_image_surface_get_format (surface);
+@@ -2245,6 +2246,11 @@ pgtk_cr_draw_image (struct frame *f, Emacs_GC *gc, cairo_pattern_t *image,
+ 
    if (format != CAIRO_FORMAT_A8 && format != CAIRO_FORMAT_A1)
      {
 +      /* SOURCE ATOP retains the destination alpha.  This lets an image
@@ -507,10 +507,10 @@ index 9a9ebef418c..6d1074c816b 100644
 +	 making the transparent part of the image rectangular.  */
 +      if (respect_alpha_background && f->alpha_background != 1.0)
 +	cairo_set_operator (cr, CAIRO_OPERATOR_ATOP);
-       cairo_set_source (cr, image);
-       cairo_fill (cr);
-     }
-@@ -2252,6 +2258,9 @@ pgtk_draw_image_foreground (struct glyph_string *s)
+       if (surface)
+ 	cairo_set_source_surface (cr, surface, 0, 0);
+       else
+@@ -2269,6 +2275,9 @@ pgtk_draw_image_foreground (struct glyph_string *s)
  {
    int x = s->x;
    int y = s->ybase - image_ascent (s->img, s->face, &s->slice);
@@ -520,19 +520,19 @@ index 9a9ebef418c..6d1074c816b 100644
  
    /* If first glyph of S has a left box line, start drawing it to the
       right of that line.  */
-@@ -2273,7 +2282,7 @@ pgtk_draw_image_foreground (struct glyph_string *s)
+@@ -2290,7 +2299,7 @@ pgtk_draw_image_foreground (struct glyph_string *s)
        pgtk_set_glyph_string_clipping (s, cr);
-       pgtk_cr_draw_image (s->f, &s->xgcv, s->img->cr_data,
+       pgtk_cr_draw_image (s->f, &s->xgcv, s->img->cr_data, s->img->cr_surface,
  			  s->slice.x, s->slice.y, s->slice.width, s->slice.height,
 -			  x, y, true);
 +			  x, y, true, background_found && NILP (background));
        if (!s->img->mask)
  	{
  	  /* When the image has a mask, we can expect that at
-@@ -3679,7 +3688,7 @@ pgtk_draw_fringe_bitmap (struct window *w, struct glyph_row *row,
+@@ -3710,7 +3719,7 @@ pgtk_draw_fringe_bitmap (struct window *w, struct glyph_row *row,
  			: face->foreground);
        gcv.background = face->background;
-       pgtk_cr_draw_image (f, &gcv, fringe_bmp[p->which], 0, p->dh,
+       pgtk_cr_draw_image (f, &gcv, fringe_bmp[p->which], NULL, 0, p->dh,
 -			  p->wd, p->h, p->x, p->y, p->overlay_p);
 +			  p->wd, p->h, p->x, p->y, p->overlay_p, false);
      }
